@@ -245,7 +245,7 @@ module rf{
         constructor(delay:number){
             this.link = new Link();
             this.timer = new Timer(delay);
-            this.timer.addEventListener(TimerEventX.TIMER,this,this.timerHandler);
+            this.timer.addEventListener(TimerEventX.TIMER,this.timerHandler,this);
         }
 
         public timerHandler(event:EventX):void{

@@ -2,7 +2,7 @@
 module rf
 {
 	export interface IEventDispatcherX{
-		addEventListener(type:string,target:any,listener:Function,priority?:number):void;
+		addEventListener(type:string,listener:Function,thisObject:any,priority?:number):void;
 		removeEventListener(type:string, listener:Function):void;
 		hasEventListener?(type:string):boolean;
 		dispatchEvent(event:EventX):boolean;
@@ -109,7 +109,7 @@ module rf
 		}
 		
 		/** Registers an event listener at a certain object. */
-		public addEventListener(type:string,target:any,listener:Function,priority:number=0):void
+		public addEventListener(type:string,listener:Function,thisObject?:any,priority:number=0):void
 		{
 			if (undefined == this.mEventListeners){
 				this.mEventListeners = {};
@@ -119,7 +119,7 @@ module rf
 				signal = this.mEventListeners[type] = recyclable(Link);
 			}
 			
-			signal.addByWeight(listener,priority,target);
+			signal.addByWeight(listener,priority,thisObject);
 		}
 		
 		/** Removes an event listener from the object. */
@@ -182,7 +182,7 @@ module rf
 				if(false == vo.close){
 					let f:Function = vo.data;
 					if(undefined != f){
-						f.apply(vo.args,event);
+						f.call(vo.args,event);
 						// f(vo.args,event);
 					}
 				}
