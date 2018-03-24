@@ -4,8 +4,6 @@ module rf{
     export class Main implements ITickable{
         constructor(){      
             Engine.start();
-
-
             this.callLaterTest();
         }
 
