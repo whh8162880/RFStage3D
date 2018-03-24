@@ -168,15 +168,12 @@ module rf
 			if (undefined == this.mEventListeners || false == (event.type in this.mEventListeners)){
 				return false;
 			}
-			if(undefined == event.target){
-				event.target = this.mTarget;
-			}
 
 			event.currentTarget = this.mTarget;
 			let signal:Link = this.mEventListeners[event.type];
 			let vo:LinkVO = signal.getFrist();
 			while(vo){
-				if(event.stopPropagation){
+				if(event.stopPropagation || event.stopImmediatePropagation){
 					break;
 				}
 				if(false == vo.close){
@@ -189,12 +186,12 @@ module rf
 				vo = vo.next;
 			}
 
-			return event.stopPropagation;
+			return false == event.stopPropagation;
 		}
 	
 		public simpleDispatch(type:string,data:any = undefined,bubbles:boolean = false):boolean
 		{
-			if(undefined == this.mEventListeners || false == (type in this.mEventListeners)){
+			if(!bubbles && (undefined == this.mEventListeners || false == (type in this.mEventListeners))){
 				return false;
 			}
 
@@ -202,6 +199,7 @@ module rf
 			event.type = type;
 			event.data = data;
 			event.bubbles = bubbles;
+			event.target = this.mTarget;
 			let bool:boolean=this.dispatchEvent(event);
 			event.recycle();
 			return bool;

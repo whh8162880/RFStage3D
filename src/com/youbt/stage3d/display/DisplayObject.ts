@@ -406,5 +406,23 @@ module rf{
         }
 
         protected doResize():void{}
+
+
+
+        //==============================================================
+		public dispatchEvent(event:EventX):boolean
+		{
+            var bool:boolean = false;
+            if(undefined != this.mEventListeners && event.type in this.mEventListeners){
+                bool = super.dispatchEvent(event);
+            }
+
+            if(false == event.stopImmediatePropagation && event.bubbles){
+                if(this.parent){
+                    this.parent.dispatchEvent(event);
+                }
+            }
+            return bool;
+		}
     }
 }
