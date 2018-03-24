@@ -182,7 +182,8 @@ module rf
 				if(false == vo.close){
 					let f:Function = vo.data;
 					if(undefined != f){
-						f(vo.args,event);
+						f.apply(vo.args,event);
+						// f(vo.args,event);
 					}
 				}
 				vo = vo.next;

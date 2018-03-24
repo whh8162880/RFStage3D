@@ -5,7 +5,7 @@ module rf{
         constructor(){      
             Engine.start();
 
-            
+
             this.callLaterTest();
         }
 
@@ -44,10 +44,10 @@ module rf{
             function sayHello2():void{
                 console.log("hello2");
             }
-            TimerUtil.add(sayHello,2000,"hello",12);
-            TimerUtil.add(sayHello2,1000);
-            TimerUtil.remove(sayHello2);
-            // TimerUtil.time500.add(sayHello);
+            // TimerUtil.add(sayHello,2000,"hello",12);
+            // TimerUtil.add(sayHello2,1000);
+            // TimerUtil.remove(sayHello2);
+            TimerUtil.time500.add(sayHello2);
         }
 
     }

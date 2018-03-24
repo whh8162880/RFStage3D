@@ -248,8 +248,8 @@ module rf{
             this.timer.addEventListener(TimerEventX.TIMER,this,this.timerHandler);
         }
 
-        public timerHandler(target:GTimer,event:EventX):void{
-            let vo = target.link.getFrist();
+        public timerHandler(event:EventX):void{
+            let vo = this.link.getFrist();
             while(vo){
                 let next = vo.next;
                 if(false == vo.close){
@@ -296,15 +296,15 @@ module rf{
 
         public add(func:Function,args?:any):LinkVO{return undefined};
 
-        public timerHandler(target:GTimerCallLater,event:EventX):void{
+        public timerHandler(event:EventX):void{
             let now = Engine.now;
-            let vo = target.link.getFrist();
+            let vo = this.link.getFrist();
             while(vo){
                 let next = vo.next;
                 if(false == vo.close){
                     if(now > vo.weight){
                         let func:Function = vo.data;
-                        func.apply(target,vo.args);
+                        func.apply(this,vo.args);
                         vo.close = true;
                     }                    
                 }
