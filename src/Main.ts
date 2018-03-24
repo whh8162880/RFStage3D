@@ -3,7 +3,7 @@
 module rf{
     export class Main implements ITickable{
         constructor(){           
-            
+            this.engineTest();
         }
 
         public linktest():void{
@@ -24,12 +24,13 @@ module rf{
         }
 
         public engineTest():void{
-            Engine.addTick(this);
+            // Engine.addTick(this);
             Engine.start();
         }
 
         public update(now:number,interval:number):void{
-            console.log(now+","+interval);
+         //   document.title = now+","+interval;
+            // console.log(now+","+interval);
         }
 
     }
