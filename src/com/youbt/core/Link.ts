@@ -1,5 +1,4 @@
 /// <reference path="./ClassUtils.ts" />
-/// <reference path="./TimerUtil.ts" />
 module rf
 {
     export class LinkVO implements IRecyclable{
@@ -12,6 +11,7 @@ module rf
         public pre:Recyclable<LinkVO> = undefined;
 
         public weight:number = 0;
+        
 
         public onRecycle():void{
             this.data = undefined;
@@ -19,7 +19,7 @@ module rf
             this.next = undefined;
             this.pre = undefined;
             this.weight = 0;
-            this.close = true;            
+            this.close = true;        
         }
 
         public onSpawn():void{
@@ -35,6 +35,7 @@ module rf
         public id:any = undefined;
         public length:number = 0;
         public warningMax:number = 200;
+        public checkSameData:boolean = true;
 
         public getFrist():Recyclable<LinkVO>{
             if(undefined == this.first) return undefined;
@@ -78,8 +79,12 @@ module rf
 
         public add(value:any,args?:any):Recyclable<LinkVO>{
             if(!value) return undefined;
-            let vo:Recyclable<LinkVO> = this.getValueLink(value);
-            if(vo) return vo;
+            var vo:Recyclable<LinkVO>
+            if(this.checkSameData){
+                vo = this.getValueLink(value);
+                if(vo) return vo;
+            }
+            
 
             vo = recyclable(LinkVO);
             vo.data = value;
@@ -101,12 +106,16 @@ module rf
 
         public addByWeight(value:any,weight:number,args?:any):Recyclable<LinkVO>{
             if(!value) return undefined;
-            let vo = this.getValueLink(value);
-            if(vo){
-                if(weight == vo.weight){
-                    return vo;
+            var vo:Recyclable<LinkVO>
+
+            if(this.checkSameData){
+                vo = this.getValueLink(value);
+                if(vo){
+                    if(weight == vo.weight){
+                        return vo;
+                    }
+                    vo.close = true;
                 }
-                vo.close = true;
             }
 
             vo = recyclable(LinkVO);
@@ -157,7 +166,7 @@ module rf
             this.length --;
             vo.close = true;
             vo.data = null;
-            TimerUtil.addCallback(1000,this.clean);
+            TimerUtil.add(this.clean,1000);
         }
 
         protected clean():void{
@@ -233,6 +242,7 @@ module rf
             }
             this.first = this.last = undefined;
             this.length = 0;
+            this.checkSameData = true;
         }
 
         public toString():string{

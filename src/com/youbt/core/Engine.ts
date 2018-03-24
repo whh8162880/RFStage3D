@@ -240,16 +240,16 @@ module rf{
 
     export class GTimer{
 
-        private link:Link;
-        private timer:Timer;
+        public link:Link;
+        public timer:Timer;
         constructor(delay:number){
             this.link = new Link();
             this.timer = new Timer(delay);
-            this.timer.addEventListener(TimerEventX.TIMER,this.timerHandler);
+            this.timer.addEventListener(TimerEventX.TIMER,this,this.timerHandler);
         }
 
-        protected timerHandler(event:EventX):void{
-            let vo = this.link.getFrist();
+        public timerHandler(target:GTimer,event:EventX):void{
+            let vo = target.link.getFrist();
             while(vo){
                 let next = vo.next;
                 if(false == vo.close){
@@ -265,9 +265,10 @@ module rf{
             }
         }
 
-        public add(func:Function,args?:any):void{
-            this.link.add(func,args);
+        public add(func:Function,args?:any):LinkVO{
+            let vo = this.link.add(func,args);
             this.timer.start();
+            return vo;
         }
       
 
@@ -277,6 +278,66 @@ module rf{
                 this.timer.stop();
             }
         }
+
+    }
+
+    class GTimerCallLater extends GTimer{
+        constructor(){
+            super(10);
+            //this.link.checkSameData = false;
+        }
+
+        public later(f:Function,time:number,args?:any):void{
+            if(undefined == f){
+                return;
+            }
+            super.add(f,args).weight = Engine.now + time;
+        }
+
+        public add(func:Function,args?:any):LinkVO{return undefined};
+
+        public timerHandler(target:GTimerCallLater,event:EventX):void{
+            let now = Engine.now;
+            let vo = target.link.getFrist();
+            while(vo){
+                let next = vo.next;
+                if(false == vo.close){
+                    if(now > vo.weight){
+                        let func:Function = vo.data;
+                        func.apply(target,vo.args);
+                        vo.close = true;
+                    }                    
+                }
+                vo = next;
+            }
+        }
+    }
+
+    export class TimerUtil{
+        public static timeobj:Object = {};
+        public static time250:GTimer = TimerUtil.getTimer(250);
+		public static time500:GTimer = TimerUtil.getTimer(500);
+		public static time1000:GTimer = TimerUtil.getTimer(1000);
+		public static time3000:GTimer = TimerUtil.getTimer(3000);
+		public static time4000:GTimer = TimerUtil.getTimer(4000);
+        public static time5000:GTimer = TimerUtil.getTimer(5000);
+        private static later:GTimerCallLater = new GTimerCallLater();
+        public static getTimer(time:number):GTimer{
+            var gtimer:GTimer = TimerUtil.timeobj[time];
+            if(undefined == gtimer){
+                TimerUtil.timeobj[time] = gtimer = new GTimer(time);
+            }
+            return  gtimer;
+        }
+
+        public static add(f:Function,time:number,...args):void{
+            TimerUtil.later.later(f,time,args)
+        }
+
+        public static remove(f:Function):void{
+            TimerUtil.later.remove(f);
+        }
+
 
     }
 
