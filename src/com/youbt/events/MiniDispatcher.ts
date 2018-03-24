@@ -11,6 +11,58 @@ module rf
 
 
 	export class EventX implements IRecyclable{
+
+		/** Event type for a display object that is added to a parent. */
+        public static ADDED:String = "added";
+		
+		public static START:String= "start";
+        /** Event type for a display object that is added to the stage */
+        public static ADDED_TO_STAGE:String = "addedToStage";
+        /** Event type for a display object that is entering a new frame. */
+        public static ENTER_FRAME:String = "enterFrame";
+        /** Event type for a display object that is removed from its parent. */
+        public static REMOVED:String = "removed";
+        /** Event type for a display object that is removed from the stage. */
+        public static REMOVED_FROM_STAGE:String = "removedFromStage";
+        /** Event type for a triggered button. */
+        public static TRIGGERED:String = "triggered";
+        /** Event type for a display object that is being flattened. */
+        public static FLATTEN:String = "flatten";
+        /** Event type for a resized Flash Player. */
+        public static RESIZE:String = "resize";
+        /** Event type that may be used whenever something finishes. */
+        public static COMPLETE:String = "complete";
+        /** Event type for a (re)created stage3D rendering context. */
+        public static CONTEXT3D_CREATE:String = "context3DCreate";
+        /** Event type that indicates that the root DisplayObject has been created. */
+        public static ROOT_CREATED:String = "rootCreated";
+        /** Event type for an animated object that requests to be removed from the juggler. */
+        public static REMOVE_FROM_JUGGLER:String = "removeFromJuggler";
+        /** Event type that is dispatched by the AssetManager after a context loss. */
+        public static TEXTURES_RESTORED:String = "texturesRestored";
+        
+        /** An event type to be utilized in custom events. Not used by Starling right now. */
+        public static CHANGE:String = "change";
+        /** An event type to be utilized in custom events. Not used by Starling right now. */
+        public static CANCEL:String = "cancel";
+        /** An event type to be utilized in custom events. Not used by Starling right now. */
+        public static SCROLL:String = "scroll";
+        /** An event type to be utilized in custom events. Not used by Starling right now. */
+        public static OPEN:String = "open";
+        /** An event type to be utilized in custom events. Not used by Starling right now. */
+        public static CLOSE:String = "close";
+        /** An event type to be utilized in custom events. Not used by Starling right now. */
+        public static SELECT:String = "select";
+		
+		public static DISPOSE:String="dispose";
+		
+		public static DATA:String="data";
+		
+		public static ERROR:String="eventError";
+		
+		public static RECYCLE:String="recycle";
+
+
 		public type:string = undefined;
 		public data:any = undefined;
 		public bubbles:boolean = false;

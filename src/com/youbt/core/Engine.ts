@@ -7,26 +7,49 @@ module rf{
         update(now:number,interval:number):void;
     }
 
+    export class EngineEvent{
+        public static ENTER_FRAME:string = "ENTER_FRAME";
+        public static VISIBILITY_CHANGE:string = "visibility_change";
+        public static FPS_CHANGE:string = "FPS_CHANGE";
+    }
+
     export class Engine{
-          
-        public static now:number = 0;
 
-        public static interval:number = 0;
+        public static dispatcher:MiniDispatcher = new MiniDispatcher();
 
+        //当前程序开始时间
         public static startTime:number = 0;
+        //当前程序运行了多长时间
+        public static now:number = 0;
+        //上一帧到本帧间隔时间
+        public static interval:number = 0;
+        //窗口是否最小化
+        public static hidden:boolean = false;
+        //窗口最小化开始时间
+        public static hiddenTime:number = 0;
+        //一秒内刷新次数
+        public static fps:number = 0;
+        //一秒内执行代码使用时间
+        public static code:number = 0;
+        
 
         private static link:Link = new Link(); 
-
         private static _frameRate:number = 60;
         private static _frameInterval:number = 0;
         private static _nextUpdateTime:number = 0;
+        private static _nextProfileTime:number = 0;
+        private static _fpsCount:number = 0;
+        private static _codeTime:number = 0;
 
         public static start():void{
             Engine.startTime = Date.now();
             Engine.now = 0;
             Engine.frameRate = Engine._frameRate;
             Engine._nextUpdateTime = Engine.startTime + Engine._frameInterval;
+            Engine._nextProfileTime = Engine.startTime + 1000;
 
+
+            //动画ENTER_FRAME;
             let requestAnimationFrame =
             window["requestAnimationFrame"] ||
             window["webkitRequestAnimationFrame"] ||
@@ -42,18 +65,59 @@ module rf{
 
             function onAnimationChange():void{
                 requestAnimationFrame(onAnimationChange);
-                let now:number = Date.now();
-                if(now < Engine._nextUpdateTime) {
+                let time:number = Date.now();
+                if(time < Engine._nextUpdateTime) {
                   return;
                 }
-                Engine._nextUpdateTime += Engine._frameInterval;
-                now = now - Engine.startTime;
+                let now:number = time - Engine.startTime;
                 let interval:number = Engine.interval = now - Engine.now;
+                Engine._nextUpdateTime += Engine._frameInterval;
                 Engine.now = now;
                 Engine.update(now,interval);
+                Engine.profile();
             }
 
             requestAnimationFrame(onAnimationChange);
+
+
+            //窗口最大化最小化监听
+            var hidden, state, visibilityChange; 
+            if (typeof document["hidden"] !== "undefined") {
+                hidden = "hidden";
+                visibilityChange = "visibilitychange";
+                state = "visibilityState";
+            } else if (typeof document["mozHidden"] !== "undefined") {
+                hidden = "mozHidden";
+                visibilityChange = "mozvisibilitychange";
+                state = "mozVisibilityState";
+            } else if (typeof document["msHidden"] !== "undefined") {
+                hidden = "msHidden";
+                visibilityChange = "msvisibilitychange";
+                state = "msVisibilityState";
+            } else if (typeof document["webkitHidden"] !== "undefined") {
+                hidden = "webkitHidden";
+                visibilityChange = "webkitvisibilitychange";
+                state = "webkitVisibilityState";
+            }
+
+            document.addEventListener(visibilityChange, function() {
+                let stateDesc:string = document[state]
+                let hidden:boolean = stateDesc.toLocaleLowerCase().indexOf("hidden") != -1;
+                Engine.hidden = hidden;
+                if(hidden){
+                    Engine.hiddenTime = Date.now();
+                }else{
+                    if(0 != Engine.hiddenTime){
+                        let delayTime:number = (Date.now() - Engine.hiddenTime);
+                        Engine.startTime += delayTime;
+                        Engine._nextProfileTime += delayTime;
+                        Engine._nextUpdateTime += delayTime;
+                        Engine.hiddenTime = 0;
+                    }
+                }
+                Engine.dispatcher.simpleDispatch(EngineEvent.VISIBILITY_CHANGE,hidden);
+            }, false);
+            
         } 
 
         public static addTick(tick:ITickable):void{
@@ -65,8 +129,6 @@ module rf{
         }
 
         public static update(now:number,interval:number):void{
-           
-           
             let vo = Engine.link.getFrist();
             while(vo){
                 let next = vo.next;
@@ -76,6 +138,7 @@ module rf{
                 }
                 vo = next;
             }
+            Engine.dispatcher.simpleDispatch(EngineEvent.ENTER_FRAME);
         }
 
         public static set frameRate(value:number){
@@ -85,6 +148,21 @@ module rf{
 
         public static get frameRate():number{
             return Engine._frameRate;
+        }
+
+
+        private static profile():void{
+            let now:number = Date.now();
+            Engine._fpsCount ++;
+            Engine._codeTime += (now - Engine.startTime - Engine.now)
+            if(now > Engine._nextProfileTime){
+                Engine._nextProfileTime += 1000;
+                Engine.fps = Engine._fpsCount;
+                Engine.code = Engine._codeTime;
+                Engine._fpsCount = 0;
+                Engine._codeTime = 0;
+                Engine.dispatcher.simpleDispatch(EngineEvent.FPS_CHANGE);
+            }
         }
 
 
