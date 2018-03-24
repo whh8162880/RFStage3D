@@ -1,0 +1,17 @@
+{
+  "name": "rfstage3d",
+  "version": "1.0.0",
+  "description": "webgl 3d project",
+  "repository": {
+    "url": "http://192.168.1.53:1234/MelonGroup/RFStage3D.git",
+    "type": "git"
+  },
+  "devDependencies": {
+    "grunt": "^1.0.2",
+    "grunt-contrib-copy": "^1.0.0",
+    "grunt-contrib-uglify": "^3.3.0",
+    "grunt-ts": "^6.0.0-beta.19",
+    "typescript": "^2.7.2",
+    "webpack": "^4.2.0"
+  }
+}
