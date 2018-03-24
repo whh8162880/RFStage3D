@@ -1,3 +1,5 @@
+/// <reference path="./ClassUtils.ts" />
+/// <reference path="./TimerUtil.ts" />
 module rf
 {
     export class LinkVO implements IRecyclable{
@@ -18,6 +20,10 @@ module rf
             this.pre = undefined;
             this.weight = 0;
             this.close = true;            
+        }
+
+        public onSpawn():void{
+            this.close = false;
         }
     }
 
@@ -227,6 +233,19 @@ module rf
             }
             this.first = this.last = undefined;
             this.length = 0;
+        }
+
+        public toString():string{
+            let vo = this.getFrist();
+            let s:string = "list:";
+            while(vo){
+                let next = vo.next;
+                if(false == vo.close){
+                    s += vo.data+","
+                }
+                vo = vo.next;
+            }
+            return s;
         }
 
     }

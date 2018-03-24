@@ -19,10 +19,13 @@ module rf{
 
         private static _frameRate:number = 60;
         private static _frameInterval:number = 0;
+        private static _nextUpdateTime:number = 0;
 
         public static start():void{
-            Engine.now = Engine.startTime = Date.now();
+            Engine.startTime = Date.now();
+            Engine.now = 0;
             Engine.frameRate = Engine._frameRate;
+            Engine._nextUpdateTime = Engine.startTime + Engine._frameInterval;
 
             let requestAnimationFrame =
             window["requestAnimationFrame"] ||
@@ -37,7 +40,20 @@ module rf{
                 };
             }
 
-            requestAnimationFrame(Engine.update);
+            function onAnimationChange():void{
+                requestAnimationFrame(onAnimationChange);
+                let now:number = Date.now();
+                if(now < Engine._nextUpdateTime) {
+                  return;
+                }
+                Engine._nextUpdateTime += Engine._frameInterval;
+                now = now - Engine.startTime;
+                let interval:number = Engine.interval = now - Engine.now;
+                Engine.now = now;
+                Engine.update(now,interval);
+            }
+
+            requestAnimationFrame(onAnimationChange);
         } 
 
         public static addTick(tick:ITickable):void{
@@ -48,11 +64,10 @@ module rf{
             Engine.link.remove(tick);
         }
 
-        public static update():void{
-            let now:number = Date.now()-Engine.startTime;
-            let interval:number = Engine.interval = now - Engine.now;
-            Engine.now = now;
-            let vo = this.link.getFrist();
+        public static update(now:number,interval:number):void{
+           
+           
+            let vo = Engine.link.getFrist();
             while(vo){
                 let next = vo.next;
                 if(false == vo.close){
@@ -74,6 +89,10 @@ module rf{
 
 
         
+    }
+
+    export function getTimer():number{
+        return Date.now()-Engine.startTime;
     }
 
     export class TimerEventX extends EventX{
