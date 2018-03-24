@@ -340,16 +340,6 @@ module rf {
             // scenePos.z = raw[14];
         }
 
-
-		/**
-		 * 
-		 * @param now
-		 * 
-		 */
-        //		public render(now:number):void{
-        //		}
-
-
         public remove(): void {
             if (this.parent) {
                 this.parent.removeChild(this);
