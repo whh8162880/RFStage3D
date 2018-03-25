@@ -10,7 +10,7 @@
             // a particular target
             default:{
                 tsconfig:"./tsconfig.json",
-                //reference:"./build/reference.ts"
+                reference:"./build/reference.ts"
             }
         },
 
