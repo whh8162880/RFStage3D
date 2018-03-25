@@ -2,7 +2,7 @@
 module rf
 {
 	export interface IEventDispatcherX{
-		addEventListener(type:string,listener:Function,thisObject:any,priority?:number):void;
+		addEventListener(type:string,listener:Function,thisObject?:any,priority?:number):void;
 		removeEventListener(type:string, listener:Function):void;
 		hasEventListener?(type:string):boolean;
 		dispatchEvent(event:EventX):boolean;

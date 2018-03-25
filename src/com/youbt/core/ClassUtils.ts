@@ -1,6 +1,5 @@
+
 module rf {
-    
-    export let DEBUG:boolean = false;
 
     export interface IDisposable
 	{
