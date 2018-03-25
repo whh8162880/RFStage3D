@@ -1,6 +1,6 @@
 /// <reference path="./ClassUtils.ts" />
 /// <reference path="./Link.ts" />
-/// <reference path="../events/MiniDispatcher.ts" />
+/// <reference path="./MiniDispatcher.ts" />
 
 module rf{
     export interface ITickable{
