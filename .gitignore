@@ -2,3 +2,4 @@
 .tscache
 /build
 .vs
+/bin-debug

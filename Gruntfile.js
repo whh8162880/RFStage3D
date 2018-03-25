@@ -10,7 +10,9 @@
             // a particular target
             default:{
                 tsconfig:"./tsconfig.json",
-                reference:"./build/reference.ts"
+                //reference:"./build/reference.ts",
+                // debugjs:"./build/reference.js"
+                debugjs:["debug.html","./bin-debug"]
             }
         },
 
