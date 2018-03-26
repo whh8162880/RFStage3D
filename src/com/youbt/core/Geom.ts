@@ -58,6 +58,8 @@ module rf{
     export let tempAxeY: Vector3D = new Vector3D();
     export let tempAxeZ: Vector3D = new Vector3D();
 
+    export let PI2:number = Math.PI*2;
+
     export let RAW_DATA_CONTAINER:Float32Array = new Float32Array([
         1, 0, 0, 0,
         0, 1, 0, 0,
