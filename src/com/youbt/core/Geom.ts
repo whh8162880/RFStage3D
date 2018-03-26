@@ -1,17 +1,8 @@
+///<reference path="../stage3d/geom/Vector3D.ts" />
+///<reference path="../stage3d/geom/Matrix3D.ts" />
 module rf{
     export declare type PosKey = "x" | "y";
     export declare type SizeKey = "width" | "height";
-
-    /**
-     * 有`width` `height` 2个属性
-     * 
-     * @export
-     * @interface Size
-     */
-    export interface Size {
-        width: number;
-        height: number;
-    }
 
     /**
      * 有 `x` `y` 两个属性
@@ -19,20 +10,20 @@ module rf{
      * @export
      * @interface Point
      */
-    export interface Point {
-        x: number;
-        y: number;
-    }
+    export class Point {
+        public x: number;
+        public y: number;
+        constructor(x:number = 0,y:number = 0){
+            this.x = x;
+            this.y = y;
+        }
 
-    /**
-     * 有 `x` `y` `z` 3个属性
-     * 
-     * @export
-     * @interface Point3D
-     * @extends {Point}
-     */
-    export interface Point3D extends Point {
-        z: number;
+        public get length() : Number
+        {
+            return Math.sqrt(this.x * this.x + this.y * this.y);
+        }
+
+
     }
 
     /**
@@ -44,7 +35,21 @@ module rf{
      * @extends {Point}
      * @extends {Size}
      */
-    export interface Rect extends Point, Size { };
+    export class Rect extends Point{
+        public width:number = 0;
+        public height:number = 0;
+        constructor(x:number = 0, y:number = 0, width:number = 0, height:number = 0){
+            super(x,y);
+            this.width = width;
+            this.height - height;
+        }
+
+
+        public clone():Rect{
+            return new Rect(this.x,this.y,this.width,this.height);
+        }
+
+    }
 
 
     export let RADIANS_TO_DEGREES: number = 180 / Math.PI;

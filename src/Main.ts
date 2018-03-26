@@ -1,10 +1,14 @@
-/// <reference path="./com/youbt/core/Link.ts" />
-/// <reference path="./com/youbt/core/Engine.ts" />
+/// <reference path="./com/youbt/rfreference.ts" />
 module rf{
     export class Main implements ITickable{
         constructor(){      
             Engine.start();
-            this.callLaterTest();
+            // this.callLaterTest();
+        }
+
+
+        public init():void{
+            this.bitmapDataTest();
         }
 
         public linktest():void{
@@ -46,6 +50,14 @@ module rf{
             // TimerUtil.add(sayHello2,1000);
             // TimerUtil.remove(sayHello2);
             TimerUtil.time500.add(sayHello2);
+        }
+
+
+        public bitmapDataTest():void{
+            let b = new BitmapData(512,512,false,0);
+            let canvas = b.canvas;
+            document.body.appendChild(canvas);
+
         }
 
     }
