@@ -2,9 +2,6 @@
 ///<reference path="./Geom.ts" />
 module rf {
     export class BitmapData {
-
-        public transparent: boolean;
-
         private _rect: { x: number; y: number; width: number; height: number };
         private _transparent;
         private _canvas: HTMLCanvasElement;
