@@ -11,56 +11,34 @@ module rf
 
 
 	export class EventX implements IRecyclable{
-
-		/** Event type for a display object that is added to a parent. */
-        public static ADDED:String = "added";
-		
-		public static START:String= "start";
-        /** Event type for a display object that is added to the stage */
-        public static ADDED_TO_STAGE:String = "addedToStage";
         /** Event type for a display object that is entering a new frame. */
-        public static ENTER_FRAME:String = "enterFrame";
-        /** Event type for a display object that is removed from its parent. */
-        public static REMOVED:String = "removed";
-        /** Event type for a display object that is removed from the stage. */
-        public static REMOVED_FROM_STAGE:String = "removedFromStage";
-        /** Event type for a triggered button. */
-        public static TRIGGERED:String = "triggered";
-        /** Event type for a display object that is being flattened. */
-        public static FLATTEN:String = "flatten";
+        public static ENTER_FRAME:string = "enterFrame";
         /** Event type for a resized Flash Player. */
-        public static RESIZE:String = "resize";
+        public static RESIZE:string = "resize";
         /** Event type that may be used whenever something finishes. */
-        public static COMPLETE:String = "complete";
+        public static COMPLETE:string = "complete";
         /** Event type for a (re)created stage3D rendering context. */
-        public static CONTEXT3D_CREATE:String = "context3DCreate";
-        /** Event type that indicates that the root DisplayObject has been created. */
-        public static ROOT_CREATED:String = "rootCreated";
-        /** Event type for an animated object that requests to be removed from the juggler. */
-        public static REMOVE_FROM_JUGGLER:String = "removeFromJuggler";
-        /** Event type that is dispatched by the AssetManager after a context loss. */
-        public static TEXTURES_RESTORED:String = "texturesRestored";
-        
+        public static CONTEXT3D_CREATE:string = "context3DCreate";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static CHANGE:String = "change";
+        public static CHANGE:string = "change";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static CANCEL:String = "cancel";
+        public static CANCEL:string = "cancel";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static SCROLL:String = "scroll";
+        public static SCROLL:string = "scroll";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static OPEN:String = "open";
+        public static OPEN:string = "open";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static CLOSE:String = "close";
+        public static CLOSE:string = "close";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static SELECT:String = "select";
+        public static SELECT:string = "select";
 		
-		public static DISPOSE:String="dispose";
+		public static DISPOSE:string="dispose";
 		
-		public static DATA:String="data";
+		public static DATA:string="data";
 		
-		public static ERROR:String="eventError";
+		public static ERROR:string="eventError";
 		
-		public static RECYCLE:String="recycle";
+		public static RECYCLE:string="recycle";
 
 
 		public type:string = undefined;

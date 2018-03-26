@@ -8,7 +8,6 @@ module rf{
     }
 
     export class EngineEvent{
-        public static ENTER_FRAME:string = "ENTER_FRAME";
         public static VISIBILITY_CHANGE:string = "visibility_change";
         public static FPS_CHANGE:string = "FPS_CHANGE";
     }
@@ -138,7 +137,7 @@ module rf{
                 }
                 vo = next;
             }
-            Engine.dispatcher.simpleDispatch(EngineEvent.ENTER_FRAME);
+            Engine.dispatcher.simpleDispatch(EventX.ENTER_FRAME);
         }
 
         public static set frameRate(value:number){
