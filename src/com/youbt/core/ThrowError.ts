@@ -1,4 +1,4 @@
-
+///<reference path="./Config.ts" />
 module rf {
 
     export var ClientCheck = {

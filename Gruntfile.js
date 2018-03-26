@@ -29,7 +29,7 @@
     // grunt.loadNpmTasks("grunt-ts");
     // grunt.loadNpmTasks("grunt-contrib-uglify");
     // grunt.registerTask("default", ["ts","uglify:min"]);
-
+    
     grunt.loadNpmTasks("grunt-ts");
     grunt.registerTask("default", ["ts"]);
 };

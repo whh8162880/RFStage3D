@@ -1,3 +1,4 @@
+///<reference path="./CONFIG.ts" />
 namespace rf {
     export class Endian {
         public static LITTLE_ENDIAN:boolean = true;

@@ -22,7 +22,6 @@
     "src/**/*"
   ],
   "exclude": [
-    "src/com/youbt/resource",
-    "src/com/youbt/rfreference.ts"
+    "src/com/youbt/resource"
   ]
 }

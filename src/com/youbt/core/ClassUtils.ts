@@ -1,4 +1,4 @@
-
+///<reference path="./CONFIG.ts" />
 module rf {
 
     export interface IDisposable
