@@ -2,11 +2,7 @@
 module rf {
     export var ROOT: Stage3D;
 
-    export let RADIANS_TO_DEGREES: number = 180 / Math.PI;
-    export let DEGREES_TO_RADIANS: number = Math.PI / 180;
-    export let tempAxeX: Vector3D = new Vector3D();
-    export let tempAxeY: Vector3D = new Vector3D();
-    export let tempAxeZ: Vector3D = new Vector3D();
+    
 
     export let BIT_CLEAR: number = 0x1;
     export let BIT_VERTEX: number = 0x2;

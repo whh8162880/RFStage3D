@@ -1,4 +1,5 @@
-///<reference path="./core/CONFIG.ts" />
+///<reference path="./core/Config.ts" />
+///<reference path="./core/Geom.ts" />
 ///<reference path="./core/ClassUtils.ts" />
 ///<reference path="./core/Link.ts" />
 ///<reference path="./core/MiniDispatcher.ts" />
