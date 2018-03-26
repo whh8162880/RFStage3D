@@ -21,7 +21,7 @@
         {
             min: 
             {
-              files: {'build/rfstage3d.min.js': ['build/rfstage3d.js']}
+              files: {'bin-debug/rfstage3d.min.js': ['bin-debug/rfstage3d.js']}
             }
         }
     });

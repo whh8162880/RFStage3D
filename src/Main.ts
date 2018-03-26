@@ -8,7 +8,8 @@ module rf{
 
 
         public init():void{
-            this.bitmapDataTest();
+            // this.bitmapDataTest();
+            new MaxRectsBinPackTest();
         }
 
         public linktest():void{

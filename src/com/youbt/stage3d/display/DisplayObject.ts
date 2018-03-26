@@ -354,7 +354,7 @@ module rf {
         protected invalidateFuncs: Function[] = [];
 
         protected invalidate(func: Function = null): void {
-            ROOT.addEventListener(EngineEvent.ENTER_FRAME, this.onInvalidate, this);
+            ROOT.addEventListener(EventX.ENTER_FRAME, this.onInvalidate, this);
             if (null == func) {
                 func = this.doResize;
             }
@@ -372,13 +372,13 @@ module rf {
             if (i != -1) {
                 this.invalidateFuncs.splice(i, 1);
                 if (!this.invalidateFuncs.length) {
-                    ROOT.removeEventListener(EngineEvent.ENTER_FRAME, this.onInvalidate);
+                    ROOT.removeEventListener(EventX.ENTER_FRAME, this.onInvalidate);
                 }
             }
         }
 
         protected onInvalidate(event: EventX): void {
-            event.currentTarget.removeEventListener(EngineEvent.ENTER_FRAME, this.onInvalidate);
+            event.currentTarget.removeEventListener(EventX.ENTER_FRAME, this.onInvalidate);
             var arr: Function[] = this.invalidateFuncs.concat();
             this.invalidateFuncs.length = 0;
             for (var func of arr) {
