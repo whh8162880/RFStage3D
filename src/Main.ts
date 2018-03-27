@@ -149,6 +149,43 @@ module rf{
 
         }
 
+
+        public arrayTest(value:number):void{
+            var array:Uint8Array = new Uint8Array(value);
+            var data:DataView = new DataView(array.buffer);
+
+            var n:number = getTimer();
+            var temp:Uint8Array = new Uint8Array(value);
+            array.set(temp);
+            console.log("array.set::"+(getTimer() - n));
+            
+            n = getTimer();
+            for(var i:number = 0;i<value;i++){
+                data.setUint8(i,array[i]);
+            }
+            console.log("DataView.set::"+(getTimer() - n));
+        }
+
+        public caleTest(value:number):void{
+            var temp:number = 0;
+            var n:number = getTimer();
+            for(var i:number = 0;i<value;i++){
+                temp = temp+1;
+            }
+            console.log("time::"+(getTimer() - n));
+        }
+
+        public functionTest(value:number):void{
+            var temp:number = 0;
+            function test():void{var a=0;a=a+1};
+
+            var n:number = getTimer();
+            for(var i:number = 0;i<value;i++){
+                test();
+            }
+            console.log("time::"+(getTimer() - n));
+        }
+
     }
 }
 
