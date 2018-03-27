@@ -37,6 +37,11 @@ module rf
 		public static DATA:string="data";
 		
 		public static ERROR:string="eventError";
+
+		public static PROGRESS:string="progress";
+		public static IO_ERROR:string="ioError";
+
+		public static MESSAGE:string="message";
 		
 		public static RECYCLE:string="recycle";
 
