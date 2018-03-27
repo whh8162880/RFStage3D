@@ -1,5 +1,7 @@
 interface GL_Interface{
+    
     activeTexture(texture: number): void;
+    
     attachShader(program: WebGLProgram | null, shader: WebGLShader | null): void;
     bindAttribLocation(program: WebGLProgram | null, index: number, name: string): void;
     bindBuffer(target: number, buffer: WebGLBuffer | null): void;
@@ -19,6 +21,11 @@ interface GL_Interface{
     clearDepth(depth: number): void;
     clearStencil(s: number): void;
     colorMask(red: boolean, green: boolean, blue: boolean, alpha: boolean): void;
+
+    /*
+    * 编译一个GLSL着色器，使其成为为二进制数据，然后就可以被WebGLProgram对象所使用
+    * shader:GLSL着色器
+    */
     compileShader(shader: WebGLShader | null): void;
     compressedTexImage2D(target: number, level: number, internalformat: number, width: number, height: number, border: number, data: ArrayBufferView): void;
     compressedTexSubImage2D(target: number, level: number, xoffset: number, yoffset: number, width: number, height: number, format: number, data: ArrayBufferView): void;
@@ -28,7 +35,16 @@ interface GL_Interface{
     createFramebuffer(): WebGLFramebuffer | null;
     createProgram(): WebGLProgram | null;
     createRenderbuffer(): WebGLRenderbuffer | null;
+    
+    /*
+    * 创建一个 WebGLShader 着色器对象
+    * type:
+    *   gl.VERTEX_SHADER
+    *   gl.FRAGMENT_SHADER
+    * 可以使用shaderSource()和compileShader()方法配置着色器代码.
+    */
     createShader(type: number): WebGLShader | null;
+
     createTexture(): WebGLTexture | null;
     cullFace(mode: number): void;
     deleteBuffer(buffer: WebGLBuffer | null): void;
@@ -115,6 +131,12 @@ interface GL_Interface{
     renderbufferStorage(target: number, internalformat: number, width: number, height: number): void;
     sampleCoverage(value: number, invert: boolean): void;
     scissor(x: number, y: number, width: number, height: number): void;
+    
+    /*
+    *设置 WebGLShader 着色器（顶点着色器及片元着色器）的GLSL程序代码    
+    * shader:GLSL着色器
+    * source:GLSL程序代码 
+    */
     shaderSource(shader: WebGLShader | null, source: string): void;
     stencilFunc(func: number, ref: number, mask: number): void;
     stencilFuncSeparate(face: number, func: number, ref: number, mask: number): void;
