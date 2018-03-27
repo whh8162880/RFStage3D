@@ -39,15 +39,15 @@ module rf
         }
 
 
-        public upload(vertexProgramId: string = "shader-vs", fragmentProgramId: string = "shader-fs"): void
+        public upload(vertexCode: string, fragmentCode: string): void
         {
-            this._vShader = this.loadShader(vertexProgramId, GL.VERTEX_SHADER);
-            this._fShader = this.loadShader(fragmentProgramId, GL.FRAGMENT_SHADER);
+            this._vShader = this.loadShader(vertexCode, GL.VERTEX_SHADER);
+            this._fShader = this.loadShader(fragmentCode, GL.FRAGMENT_SHADER);
 
             if (!this._fShader || !this._vShader)
                 throw new Error("loadShader error");
 
-            GL.attachShader(this._glProgram, this._vShader);
+            GL.attachShader(this._glProgram, this._vShader) ;
             GL.attachShader(this._glProgram, this._fShader);
 
             GL.linkProgram(this._glProgram);
@@ -63,18 +63,19 @@ module rf
         /*
          * load shader from html file by document.getElementById
          */
-        private loadShader(elementId: string, type: number): WebGLShader {
-            var script: HTMLObjectElement = <HTMLObjectElement>document.getElementById(elementId);
-            if (!script)
-                throw new Error("cant find elementId: " + elementId);
+        private loadShader(code: string, type: number): WebGLShader {
+            // var script: HTMLObjectElement = <HTMLObjectElement>document.getElementById(elementId);
+            // if (!script)
+                // throw new Error("cant find elementId: " + elementId);
             var shader: WebGLShader = GL.createShader(type);
-            GL.shaderSource(shader, script.innerHTML);
+            GL.shaderSource(shader, code);
             GL.compileShader(shader);
             // Check the result of compilation
             if (!GL.getShaderParameter(shader, GL.COMPILE_STATUS))
             {
                 GL.deleteShader(shader);
-                throw new Error(GL.getShaderInfoLog(shader));
+                let error:string = GL.getShaderInfoLog(shader);
+                throw new Error(error);
             }
             return shader;
         }

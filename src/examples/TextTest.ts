@@ -12,6 +12,10 @@ module rf{
 
             // alert("w:"+div.clientWidth+"  h:"+div.clientHeight);
 
+           
+
+
+
             var c:HTMLCanvasElement=<HTMLCanvasElement>document.createElement("canvas");
             // c.style.cssText = "width:100px;height:100px";
             c.width = 200;
@@ -42,10 +46,17 @@ module rf{
             // ctx.drawImage(document.querySelector('img'), 0, 0, 300 * ratio, 90 * ratio);
 
 
-            ctx.font = "12px Microsoft YaHei";
-            ctx.fillText("你好啊"+ratio,0,24);
-            ctx.strokeText("你好啊",0,50);
+            // ctx.font = "12px Microsoft YaHei";
+            // ctx.fillText("你好啊"+ratio,0,24);
+            // ctx.strokeText("你好啊",0,50);
             document.body.appendChild(c);
+
+            ctx.font = '40pt Calibri';
+            ctx.lineWidth = 1;
+            ctx.strokeStyle = 'green';
+            ctx.strokeText('汪鸿海!', 20, 100);
+            ctx.fillStyle = 'red';
+            ctx.fillText('汪鸿海!', 20, 100);
 
             // var d:TextMetrics=ctx.measureText("你");
             // alert(d.width)
