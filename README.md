@@ -3,7 +3,7 @@
 安装vscode  VSCodeSetup-x64-1.21.0.exe  
 安装git Git-2.16.2-64-bit.exe
 
-[帮助文档 俞佳妮完成 2018/3/23][]
+#帮助文档[俞佳妮完成 2018/3/23]
 
     \\\\192.168.1.47/share/H5/GIT 在VSCODE的基本操作.docx
     
@@ -14,11 +14,12 @@
 
 注意配置好环境变量
 
-[安装grunt工具 http://www.gruntjs.net/][窦孝诚完成 2018/3/23]
+#安装grunt工具[http://www.gruntjs.net/][窦孝诚完成 2018/3/23]
 
     \\\\192.168.1.47/share/H5/ts打包为xxx.min.js.docx
     
-[][2018/3/24]
+
+#2018/3/24
 
 [ClassUtils.ts  对象创建器][通过测试]
 
@@ -45,7 +46,7 @@
             vo = next;
         }
        
-[][2018/3/25]
+#2018/3/25
 
 [Engine.ts  心跳脉动][通过测试]
 
@@ -72,15 +73,15 @@
     
 初始化了stage3d 基础对象
 
-[][2018/3/26]
+#2018/3/26
     
 [ByteArray.ts   ][]
 
 [BitmapData.ts  ][]
 
-添加了tween组件
+添加了tween组件[未测试]
     
     
-[][2018/3/27]
+#2018/3/27#
 
 [NET.ts 窦孝诚完成 ][]
