@@ -114,8 +114,8 @@ module rf{
                     console.log("socket open!");
                 }, this);
                 socket.addEventListener(EventX.MESSAGE, (e: EventX) => {
-                    console.log("½ÓÊÕµ½Êı¾İ: " + socket.input.bytesAvailable);
-                    console.log("¾ßÌåµÄÊı¾İ: " + socket.input.readUTFBytes(socket.input.bytesAvailable));
+                    console.log("æœåŠ¡å™¨è¿”å›çš„æ•°æ®: " + socket.input.bytesAvailable);
+                    console.log("å…·ä½“çš„æ•°æ®: " + socket.input.readUTFBytes(socket.input.bytesAvailable));
                 }, this);
                 socket.addEventListener(EventX.CLOSE, (e: EventX) => {
                     console.log("socket close");
@@ -126,15 +126,15 @@ module rf{
                 socket.connect("121.40.165.18", 8088);
 
                 setTimeout(() => {
-                    console.log("·¢ËÍÊı¾İ£ºss");
+                    console.log("å‘é€ï¼šss");
                     socket.send("ss");
 
                     setTimeout(() => {
-                        console.log("·¢ËÍÊı¾İ£ºÄãºÃ!");
-                        socket.output.writeUTFBytes("ÄãºÃ!");
+                        console.log("å‘é€ï¼šä½ å¥½!");
+                        socket.output.writeUTFBytes("ä½ å¥½!");
                         socket.flush();
 
-                        console.log("·¢ËÍÊı¾İ£ºhello!");
+                        console.log("å‘é€ï¼šhello!");
                         socket.send("hello!");
                     }, 1000);
 
