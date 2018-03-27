@@ -1,13 +1,7 @@
 ///<reference path="./display/Sprite.ts" />
 ///<reference path="./Context3D.ts" />
-module rf{
-
-    export var stageWidth:number = 0;
-    export var stageHeight:number = 0;
-    export var isWindowResized:boolean = false;
-    
-    
-    export class Stage3D extends Sprite{
+module rf{  
+    export class Stage3D extends Sprite implements IResizeable{
 
         static names: string[] = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 
@@ -15,22 +9,7 @@ module rf{
 
         constructor(){
             super();
-            this.initBrowserInfo();
         }
-
-
-        private initBrowserInfo(){
-            window.onresize = function (){
-                stageWidth = window.innerWidth;
-                stageHeight = window.innerHeight;
-                isWindowResized = true;
-                this.console.log("width:"+stageWidth+" height:"+stageHeight);
-            }
-            stageWidth = window.innerWidth;
-            stageHeight = window.innerHeight;
-            console.log("width:"+stageWidth+" height:"+stageHeight);
-        }
-
 
         public requestContext3D(canvas:HTMLCanvasElement):boolean{
             this.canvas = canvas;
@@ -60,7 +39,12 @@ module rf{
 
         //在这里驱动渲染
         public update(now:number,interval:number):void{
-            //todo
+            
+        }
+
+
+        public resize(width:number,height:number):void{
+            
         }
     }
 }

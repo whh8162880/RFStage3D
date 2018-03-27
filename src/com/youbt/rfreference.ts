@@ -6,6 +6,7 @@
 ///<reference path="./core/Link.ts" />
 ///<reference path="./core/MiniDispatcher.ts" />
 ///<reference path="./core/Engine.ts" />
+///<reference path="./core/Net.ts" />
 
 ///<reference path="./stage3d/geom/Matrix3D.ts" />
 ///<reference path="./stage3d/geom/Vector3D.ts" />

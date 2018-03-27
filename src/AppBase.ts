@@ -4,10 +4,13 @@ module rf {
     export class AppBase implements ITickable {
         constructor() {
             Engine.start();
-            ROOT = singleton(Stage3D)
+            ROOT = singleton(Stage3D);
         }
 
-        public update(now: number, interval: number): void {}
+        public update(now: number, interval: number): void {
+            //todo
+            ROOT.update(now,interval);
+        }
 
     }
 

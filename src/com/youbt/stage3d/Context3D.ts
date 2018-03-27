@@ -91,6 +91,8 @@ module rf
         public configureBackBuffer(width: number/* int */, height: number/* int */, antiAlias: number/* int */, enableDepthAndStencil:boolean = true): void
         {
             GL.viewport(0, 0, width, height);
+            GL.canvas.width = width;
+            GL.canvas.height = height;
             this._depthDisabled = enableDepthAndStencil;
             //TODO: antiAlias , Stencil
             if (enableDepthAndStencil)
