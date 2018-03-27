@@ -70,13 +70,17 @@ MiniDispathcer.ts   [事件分发][通过测试]
     addEventListener(type,hander,thisObj[注意:js在执行function是在一个大环境下执行 并不能获得方法所在对象this],priority)
     removeEventListener(type,handler)
     
+初始化了stage3d 基础对象
 
 2018/3/26
     
 ByteArray.ts
 
 BitmapData.ts
+
+添加了tween组件
     
     
 2018/3/27
-    NET.ts [窦孝诚完成 ]
+
+NET.ts [窦孝诚完成 ]
