@@ -1,16 +1,15 @@
 /// <reference path="./com/youbt/rfreference.ts" />
 module rf{
-    export class Main implements ITickable{
+    export class Main extends AppBase{
         constructor(){      
-            Engine.start();
-            // this.callLaterTest();
-            this.netTest();
+            super();
         }
 
 
         public init():void{
             // this.bitmapDataTest();
-            new MaxRectsBinPackTest();
+            // new MaxRectsBinPackTest();
+            new WebglTest();
         }
 
         public linktest():void{

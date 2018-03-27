@@ -5,4 +5,12 @@ module rf{
             super();
         }
     }
+
+
+
+    export class Graphics{
+        constructor(target:Sprite){
+
+        }
+    }
 }
