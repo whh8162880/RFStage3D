@@ -1,6 +1,6 @@
 
 module rf {
-    export type ResLoadHandler = (type: ResType, data: any, url: string) => void;
+    export type ResLoadHandler = (event: EventX) => void;
 
     /**
      * 加载优先级枚举
@@ -10,6 +10,22 @@ module rf {
         middle,
         high,
         max,
+    }
+
+    /**
+     * 添加一个加载项
+     * @param url 加载路径, 数组为添加多个
+     * @param complete 加载完毕回调
+     * @param thisObj 回调作用域
+     * @param type 资源类型
+     * @param priority 加载优先级
+     * @param cache 是否缓存
+     * @param noDispose 不自动释放
+     * @param disposeTime 自动释放时间, 超过该时间自动释放资源
+     */
+    export function loadRes(url: string | string[], complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin, 
+        priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): void {
+            Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
     }
 
     /**
@@ -115,13 +131,13 @@ module rf {
             loader.loadFile(item, this.doLoadComplete, this);
         }
 
-        private doLoadComplete(loader: Recyclable<ResLoaderBase>, item: ResItem, data: any): void {
+        private doLoadComplete(loader: Recyclable<ResLoaderBase>, event: EventX): void {
             this.nowLoader--;
 
             loader.recycle();
 
-            if (data) {
-                item.data = data;
+            let item: ResItem = event.data;
+            if (item) {
                 item.loadedTime = getTimer();
 
                 if (item.cache) {
@@ -132,8 +148,9 @@ module rf {
             }
 
             if (item.complete) {
-                item.complete.call(item.thisObj, item.type, item.data, item.url);
+                item.complete.call(item.thisObj, event);
             }
+            item.complete = item.thisObj = null;
 
             this.loadNext();
         }
@@ -247,15 +264,20 @@ module rf {
         }
 
         protected onComplete(event: EventX): void {
+            this._resItem.data = new ByteArray(this._httpRequest.response);
+            event.data = this._resItem;
             if (this._compFunc) {
-                this._compFunc.call(this._thisObject, this, this._resItem, this._httpRequest.response);
+                this._compFunc.call(this._thisObject, this, event);
             }
+            this._resItem = this._compFunc = this._thisObject = null;
         }
-
+        
         protected onIOError(event: EventX): void {
+            event.data = this._resItem;
             if (this._compFunc) {
-                this._compFunc.call(this._thisObject, this, this._resItem);
+                this._compFunc.call(this._thisObject, this, event);
             }
+            this._resItem = this._compFunc = this._thisObject = null;
         }
     }
 
@@ -265,6 +287,15 @@ module rf {
     export class ResTextLoader extends ResBinLoader {
         protected getType(): string {
             return HttpResponseType.TEXT;
+        }
+
+        protected onComplete(event: EventX): void {
+            this._resItem.data = this._httpRequest.response;
+            event.data = this._resItem;
+            if (this._compFunc) {
+                this._compFunc.call(this._thisObject, this, event);
+            }
+            this._resItem = this._compFunc = this._thisObject = null;
         }
     }
 
@@ -278,8 +309,11 @@ module rf {
                 // TODO : 解码数据为 Sound 对象
                 let sound: any;
 
-                this._compFunc.call(this._thisObject, this, this._resItem, sound);
+                this._resItem.data = sound;
+                event.data = this._resItem;
+                this._compFunc.call(this._thisObject, this, event);
             }
+            this._resItem = this._compFunc = this._thisObject = null;
         }
     }
 
@@ -291,12 +325,15 @@ module rf {
             let imageLoader = new ImageLoader();
             imageLoader.addEventListener(EventX.COMPLETE, (e: EventX) => {
                 if (compFunc) {
-                    compFunc.call(thisObject, this, resItem, imageLoader.data);
+                    resItem.data = imageLoader.data;
+                    e.data = resItem;
+                    compFunc.call(thisObject, this, e);
                 }
             }, this);
             imageLoader.addEventListener(EventX.IO_ERROR, (e: EventX) => {
                 if (compFunc) {
-                    compFunc.call(thisObject, this, resItem);
+                    e.data = resItem;
+                    compFunc.call(thisObject, this, e);
                 }
             }, this);
             imageLoader.load(resItem.url);
