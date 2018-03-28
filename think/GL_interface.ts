@@ -1,5 +1,9 @@
 interface GL_Interface{
     
+    /**
+     * 激活指定的纹理单元
+     * @param texture 需要激活的纹理单元。其值是 gl.TEXTUREI ，其中的 I 在 0 到 gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS - 1 范围内
+     */
     activeTexture(texture: number): void;
     
     /**
@@ -147,9 +151,9 @@ interface GL_Interface{
     getAttachedShaders(program: WebGLProgram | null): WebGLShader[] | null;
 
     /**
-     * 
-     * @param program 
-     * @param name 
+     * 返回了给定WebGLProgram对象中某属性的下标指向位置
+     * @param program 一个包含了属性参数的WebGLProgram 对象
+     * @param name 需要获取下标指向位置的 参数名
      */
     getAttribLocation(program: WebGLProgram | null, name: string): number;
     getBufferParameter(target: number, pname: number): any;
