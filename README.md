@@ -28,7 +28,7 @@
     单例对象用 let obj:Class = singleton(Class)创建
 
 [Link.ts    代替array的高性能双链表(性能未测试)][性能未测试]
-
+```typescript
     添加
         add(value,args?)
         addByWeight(value,weight,args?)
@@ -45,11 +45,11 @@
             }
             vo = next;
         }
-       
+```       
 #2018/3/25
 
 [Engine.ts  心跳脉动][通过测试]
-
+```typescript
     事件发生器:Engine.dispatcher 
         EventX.ENTER_FRAME  当渲染时发起事件
         EngineEvent.VISIBILITY_CHANGE  浏览器最小化/恢复时发出事件
@@ -65,12 +65,12 @@
         Engine.addTick(tick:Itickable)  注册心跳
         Engine.removeTick(tick:Itickable)   移除心跳
         getTimer()  获得运行事件
-
+```
 [MiniDispathcer.ts  事件分发][通过测试]
-
+```typescript
     addEventListener(type,hander,thisObj[注意:js在执行function是在一个大环境下执行 并不能获得方法所在对象this],priority)
     removeEventListener(type,handler)
-    
+```
 初始化了stage3d 基础对象
 
 #2018/3/26
@@ -82,6 +82,10 @@
 添加了tween组件[未测试]
     
     
-#2018/3/27#
+#2018/3/27
 
 [NET.ts 窦孝诚完成 ][]
+
+
+#2018/3/28
+[RES.ts 窦孝诚完成][]
