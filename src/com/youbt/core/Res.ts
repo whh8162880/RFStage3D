@@ -47,6 +47,7 @@ module rf {
 
         private _loadMap: { [priority: number]: ResItem[] };
         private _resMap: { [k: string]: ResItem };
+        private _loadingMap: { [k: string]: ResItem };
 
         private constructor() {
             this._analyzerMap = {};
@@ -57,6 +58,7 @@ module rf {
 
             this._loadMap = {};
             this._resMap = {};
+            this._loadingMap = {};
 
             // 资源释放机制
             setInterval(this.clearRes.bind(this), 10 * 1000);
@@ -84,23 +86,47 @@ module rf {
             }
 
             urls.forEach(v => {
-                let item = new ResItem();
-                item.type = type;
-                item.url = v;
-                item.cache = cache;
-                item.complete = complete;
-                item.thisObj = thisObj;
-                item.noDispose = noDispose;
-                item.disposeTime = disposeTime;
-    
-                if (!this._loadMap[priority]) {
-                    this._loadMap[priority] = [];
-                }
-                let list = this._loadMap[priority];
-                list.push(item);
-            });
+                // 已经加载好了
+                if (this._resMap[v]) {
+                    let item = this._resMap[v];
+                    item.noDispose = noDispose;
+                    item.disposeTime = disposeTime;
 
-            this.loadNext();
+                    setTimeout(() => {
+                        if (complete) {
+                            let event = new EventX(EventX.COMPLETE, item);
+                            complete.call(thisObj, event);
+                        }
+                    }, 0);
+                }
+                // 正在加载中
+                else if (this._loadingMap[v]) {
+                    let item = this._loadingMap[v];
+                    item.complete.push(complete);
+                    item.thisObj.push(thisObj);
+                }
+                // 新建加载
+                else {
+                    let item = new ResItem();
+                    item.type = type;
+                    item.url = v;
+                    item.cache = cache;
+                    item.complete = [complete];
+                    item.thisObj = [thisObj];
+                    item.noDispose = noDispose;
+                    item.disposeTime = disposeTime;
+        
+                    if (!this._loadMap[priority]) {
+                        this._loadMap[priority] = [];
+                    }
+                    let list = this._loadMap[priority];
+                    list.push(item);
+
+                    this._loadingMap[v] = item;
+
+                    this.loadNext();
+                }
+            });
         }
 
         private loadNext(): void {
@@ -147,10 +173,14 @@ module rf {
                 // TODO : 单个项目加载失败
             }
 
-            if (item.complete) {
-                item.complete.call(item.thisObj, event);
-            }
-            item.complete = item.thisObj = null;
+            item.complete.forEach((v, i) => {
+                if (v) {
+                    v.call(item.thisObj[i], event);
+                }
+            });
+            item.complete = item.thisObj = undefined;
+
+            delete this._loadingMap[item.url];
 
             this.loadNext();
         }
@@ -208,9 +238,9 @@ module rf {
 
         cache: boolean;
 
-        complete: ResLoadHandler;
+        complete: ResLoadHandler[];
         
-        thisObj: any;
+        thisObj: any[];
 
         data: any;
 
@@ -251,7 +281,7 @@ module rf {
             this._httpRequest.addEventListener(EventX.IO_ERROR, this.onIOError, this);
         }
 
-        protected getType(): string {
+        protected getType(): HttpResponseType {
             return HttpResponseType.ARRAY_BUFFER;
         }
 
@@ -266,18 +296,24 @@ module rf {
         protected onComplete(event: EventX): void {
             this._resItem.data = new ByteArray(this._httpRequest.response);
             event.data = this._resItem;
-            if (this._compFunc) {
-                this._compFunc.call(this._thisObject, this, event);
+            
+            let compFunc = this._compFunc;
+            let thisObject = this._thisObject;
+            this._resItem = this._compFunc = this._thisObject = undefined;
+            if (compFunc) {
+                compFunc.call(thisObject, this, event);
             }
-            this._resItem = this._compFunc = this._thisObject = null;
         }
         
         protected onIOError(event: EventX): void {
             event.data = this._resItem;
-            if (this._compFunc) {
-                this._compFunc.call(this._thisObject, this, event);
+
+            let compFunc = this._compFunc;
+            let thisObject = this._thisObject;
+            this._resItem = this._compFunc = this._thisObject = undefined;
+            if (compFunc) {
+                compFunc.call(thisObject, this, event);
             }
-            this._resItem = this._compFunc = this._thisObject = null;
         }
     }
 
@@ -285,17 +321,20 @@ module rf {
      * 文本加载
      */
     export class ResTextLoader extends ResBinLoader {
-        protected getType(): string {
+        protected getType(): HttpResponseType {
             return HttpResponseType.TEXT;
         }
 
         protected onComplete(event: EventX): void {
             this._resItem.data = this._httpRequest.response;
             event.data = this._resItem;
-            if (this._compFunc) {
-                this._compFunc.call(this._thisObject, this, event);
+            
+            let compFunc = this._compFunc;
+            let thisObject = this._thisObject;
+            this._resItem = this._compFunc = this._thisObject = undefined;
+            if (compFunc) {
+                compFunc.call(thisObject, this, event);
             }
-            this._resItem = this._compFunc = this._thisObject = null;
         }
     }
 
@@ -304,16 +343,19 @@ module rf {
      */
     export class ResSoundLoader extends ResBinLoader {
         protected onComplete(event: EventX): void {
-            if (this._compFunc) {
-                let data = this._httpRequest.response;
-                // TODO : 解码数据为 Sound 对象
-                let sound: any;
+            let data = this._httpRequest.response;
+            // TODO : 解码数据为 Sound 对象
+            let sound: any;
 
-                this._resItem.data = sound;
-                event.data = this._resItem;
-                this._compFunc.call(this._thisObject, this, event);
+            this._resItem.data = sound;
+            event.data = this._resItem;
+
+            let compFunc = this._compFunc;
+            let thisObject = this._thisObject;
+            this._resItem = this._compFunc = this._thisObject = undefined;
+            if (compFunc) {
+                compFunc.call(thisObject, this, event);
             }
-            this._resItem = this._compFunc = this._thisObject = null;
         }
     }
 
