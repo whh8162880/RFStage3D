@@ -8,21 +8,20 @@ interface GL_Interface{
      * @param shader 一个类型为片段或者顶点的 WebGLShader
      */
     attachShader(program: WebGLProgram | null, shader: WebGLShader | null): void;
+    
+    /**
+     * 通用顶点索引绑定到属性变量
+     * @param program 要绑定的WebGLProgram 对象
+     * @param index 指定要绑定的通用顶点的索引
+     * @param name 指定要绑定到通用顶点索引的变量的名称。 该名称不能以“webgl_”或“_webgl_”开头，因为这些名称将保留供WebGL使用
+     */
     bindAttribLocation(program: WebGLProgram | null, index: number, name: string): void;
 
     /**
      * 将给定的WebGLBuffer绑定到目标  
-     * @param target 
-     *      GLenum 指定绑定点(target)。 可能的值：
-     *          gl.ARRAY_BUFFER: 包含顶点属性的Buffer，如顶点坐标，纹理坐标数据或顶点颜色数据。
-     *          gl.ELEMENT_ARRAY_BUFFER: 用于元素索引的Buffer。
-     *      当使用 WebGL 2 context时，可以使用以下值：
-     *          gl.COPY_READ_BUFFER: 从一个Buffer对象复制到另一个Buffer对象。
-     *          gl.COPY_WRITE_BUFFER: 从一个Buffer对象复制到另一个Buffer对象。
-     *          gl.TRANSFORM_FEEDBACK_BUFFER: Buffer for transform feedback operations.
-     *          gl.UNIFORM_BUFFER: 用于存储统一块的Buffer。
-     *          gl.PIXEL_PACK_BUFFER: 用于像素传输操作的Buffer。
-     *          gl.PIXEL_UNPACK_BUFFER: 用于像素传输操作的Buffer。
+     * @param target 指定数据类型。可能的值有：gl.ARRAY_BUFFER、gl.ELEMENT_ARRAY_BUFFER
+     *  gl.ARRAY_BUFFER: 包含顶点属性的Buffer，如顶点坐标，纹理坐标数据或顶点颜色数据。
+     *  gl.ELEMENT_ARRAY_BUFFER: 用于元素索引的Buffer。
      * @param buffer 要绑定的 WebGLBuffer
      */
     bindBuffer(target: number, buffer: WebGLBuffer | null): void;
@@ -36,10 +35,15 @@ interface GL_Interface{
     blendFuncSeparate(srcRGB: number, dstRGB: number, srcAlpha: number, dstAlpha: number): void;
 
     /**
-     * 
-     * @param target 
-     * @param size 
-     * @param usage 
+     * 将定点数据传入到WebGLBuffer对象中
+     * @param target 指定数据类型。 可能的值有：gl.ARRAY_BUFFER、gl.ELEMENT_ARRAY_BUFFER
+     *  gl.ARRAY_BUFFER: 包含顶点属性的Buffer，如顶点坐标，纹理坐标数据或顶点颜色数据。
+     *  gl.ELEMENT_ARRAY_BUFFER: 用于元素索引的Buffer。
+     * @param size 缓冲区大小
+     * @param usage 缓冲类型。有这么几种可以供我们选择 GL_STREAM_DRAW , GL_STATIC_DRAW ,GL_DYNAMIC_DRAW
+     *  gl.GL_STREAM_DRAW:缓冲区的数据偶尔变动
+     *  gl.GL_STATIC_DRAW:缓冲区的数据不变
+     *  gl.GL_DYNAMIC_DRAW:缓冲区数据经常变动
      */
     bufferData(target: number, size: number | ArrayBufferView | ArrayBuffer, usage: number): void;
     bufferSubData(target: number, offset: number, data: ArrayBufferView | ArrayBuffer): void;
@@ -53,10 +57,10 @@ interface GL_Interface{
     
     /**
      * 设置清空颜色缓冲时的颜色值
-     * @param red 一个 GLclampf（flot） 类型的值，指定清除缓冲时的红色值。默认值：0。
-     * @param green 一个 GLclampf 类型的值，指定清除缓冲时的绿色值。默认值：0。
-     * @param blue 一个 GLclampf 类型的值，指定清除缓冲时的蓝色值。默认值：0。
-     * @param alpha 一个 GLclampf 类型的值，指定清除缓冲时的不透明度。默认值：0。 
+     * @param red 指定清除缓冲时的红色值。默认值：0。
+     * @param green 指定清除缓冲时的绿色值。默认值：0。
+     * @param blue 指定清除缓冲时的蓝色值。默认值：0。
+     * @param alpha 指定清除缓冲时的不透明度。默认值：0。 
      */
     clearColor(red: number, green: number, blue: number, alpha: number): void;
 
@@ -114,6 +118,20 @@ interface GL_Interface{
     detachShader(program: WebGLProgram | null, shader: WebGLShader | null): void;
     disable(cap: number): void;
     disableVertexAttribArray(index: number): void;
+
+    /**
+     * 从数组中绘制图元
+     * @param mode 绘制图元的方式。可能的值：gl.POINTS、gl.LINE_STRIP、gl.LINE_LOOP、gl.LINES、gl.TRIANGLE_STRIP、gl.TRIANGLE_FAN、gl.TRIANGLES
+     *  gl.POINTS： 绘制一系列点
+     *  gl.LINE_STRIP：绘制一个线条。即，绘制一系列线段，上一点连接下一点。
+     *  gl.LINE_LOOP：绘制一个线圈。即，绘制一系列线段，上一点连接下一点，并且最后一点与第一个点相连。
+     *  gl.LINES：绘制一系列单独线段。每两个点作为端点，线段之间不连接。
+     *  gl.TRIANGLE_STRIP：绘制一个三角带。
+     *  gl.TRIANGLE_FAN：绘制一个三角扇。
+     *  gl.TRIANGLES：绘制一系列三角形。每三个点作为顶点。
+     * @param first 指定从哪个点开始绘制
+     * @param count 指定绘制需要使用到多少个点
+     */
     drawArrays(mode: number, first: number, count: number): void;
     drawElements(mode: number, count: number, type: number, offset: number): void;
     enable(cap: number): void;
@@ -127,6 +145,12 @@ interface GL_Interface{
     getActiveAttrib(program: WebGLProgram | null, index: number): WebGLActiveInfo | null;
     getActiveUniform(program: WebGLProgram | null, index: number): WebGLActiveInfo | null;
     getAttachedShaders(program: WebGLProgram | null): WebGLShader[] | null;
+
+    /**
+     * 
+     * @param program 
+     * @param name 
+     */
     getAttribLocation(program: WebGLProgram | null, name: string): number;
     getBufferParameter(target: number, pname: number): any;
     getContextAttributes(): WebGLContextAttributes;
@@ -244,6 +268,17 @@ interface GL_Interface{
     vertexAttrib3fv(indx: number, values: Float32Array | number[]): void;
     vertexAttrib4f(indx: number, x: number, y: number, z: number, w: number): void;
     vertexAttrib4fv(indx: number, values: Float32Array | number[]): void;
-    vertexAttribPointer(indx: number, size: number, type: number, normalized: boolean, stride: number, offset: number): void;
+    
+    /**
+     * 告诉显卡从当前绑定的缓冲区（bindBuffer()指定的缓冲区）中读取顶点数据
+     * @param index 指定要修改的顶点属性的索引 
+     * @param size 修改的顶点属性的纬度，必须是1，2，3或4
+     * @param type 参数类型，指定一个数据占多少个字节，可能的值：gl.BYTE、gl.SHORT、gl.UNSIGNED_BYTE、gl.UNSIGNED_SHORT、gl.FLOAT
+     * @param normalized 是否标准化（化为0-1范围）
+     * @param stride 步长，每个顶点数据所占的字节数，
+     *                例：如[1,1,1,1,1,1]定点，这里步长 stride=6*4，stride=6*4的意思是每个步长24个字节读取一个v3Position数据（前三个数据传给v3Position）
+     * @param offset 绑定的缓冲区偏移offset个字节
+     */
+    vertexAttribPointer(index: number, size: number, type: number, normalized: boolean, stride: number, offset: number): void;
     viewport(x: number, y: number, width: number, height: number): void;
 }
