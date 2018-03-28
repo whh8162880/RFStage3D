@@ -1,83 +1,101 @@
 ///<reference path="../core/Config.ts"/>
-module rf
-{
-    export class VertexBuffer3D
-    {
-        private _numVertices: number; // int
-        private _data32PerVertex: number; //int
-        private _glBuffer: WebGLBuffer;
+module rf {
+    class Buffer3D implements IRecyclable {
+        preusetime: number = 0;
+        readly: boolean = false;
+        constructor() { }
 
-        private _data: number[];
+        awaken(): void { };
 
-        constructor(numVertices: number, data32PerVertex: number)
-        {
+        sleep(): void { };
 
-            this._numVertices = numVertices;
-            this._data32PerVertex = data32PerVertex;
+        onRecycle(): void {
+            this.readly = false;
+            this.preusetime = 0;
+        }
+    }
 
-            this._glBuffer = GL.createBuffer();
-            if (!this._glBuffer)
-                throw new Error("Failed to create buffer");
 
-           // GL.bindBuffer(GL.ARRAY_BUFFER, this._glBuffer);
-
+    export class VertexBuffer3D extends Buffer3D {
+        public numVertices: number = 0;
+        public data32PerVertex: number = 0;
+        public data: Float32Array;
+        buffer: WebGLBuffer = null;
+        constructor() {
+            super();
         }
 
-        get glBuffer(): WebGLBuffer
-        {
-            return this._glBuffer;
+        onRecycle(): void {
+            if (this.buffer) {
+                GL.deleteBuffer(this.buffer);
+                this.buffer = undefined;
+            }
+            this.readly = false;
+            this.preusetime = 0;
+            this.numVertices = 0;
+            this.data32PerVertex = 0;
+            this.data = null;
         }
 
-        get data32PerVertex(): number
-        {
-            return this._data32PerVertex
-        }
+        awaken(): void {
 
-        public uploadFromVector(data: number[], startVertex: number/* int */, numVertices: number/* int */): void
-        {
-            this._data = data;
-
-            if (startVertex != 0 || numVertices != this._numVertices) {
-                data = data.slice(startVertex * this._data32PerVertex, (numVertices * this._data32PerVertex));
+            if (!this.data || !this.data32PerVertex || !this.numVertices) {
+                this.readly = false;
+                ThrowError("vertexBuffer3D unavailable");
+                return;
             }
 
-            GL.bindBuffer(GL.ARRAY_BUFFER, this._glBuffer);
-            GL.bufferData(GL.ARRAY_BUFFER, new Float32Array(data), GL.STATIC_DRAW);
+            if (undefined == this.buffer) {
+                this.buffer = GL.createBuffer();
+            }
+
+            GL.bindBuffer(GL.ARRAY_BUFFER, this.buffer);
+            GL.bufferData(GL.ARRAY_BUFFER, this.data, GL.STATIC_DRAW);
             GL.bindBuffer(GL.ARRAY_BUFFER, null);
+
+            this.readly = true;
         }
 
-        public dispose(): void
-        {
-            GL.deleteBuffer(this._glBuffer);
-            this._glBuffer = null;
-            this._data.length = 0;
-            this._numVertices = 0;
-            this._data32PerVertex = 0;
+        public uploadFromVector(data: number[] | Float32Array, startVertex: number = 0, numVertices: number = -1): void {
+            if (0 > startVertex) {
+                startVertex = 0;
+            }
+            if (numVertices != -1) {
+                if (this.numVertices - startVertex < numVertices) {
+                    ThrowError("numVertices out of range");
+                    return;
+                }
+            }
+
+            if (0 < startVertex) {
+                let nd = new Float32Array(this.data32PerVertex * numVertices);
+                nd.set(data.slice(startVertex * this.data32PerVertex, numVertices * this.data32PerVertex));
+                data = nd;
+            } else {
+                data = new Float32Array(data);
+            }
+            this.data = data;
         }
-    } 
+    }
 
 
-    export class IndexBuffer3D
-    {
+    export class IndexBuffer3D {
         public numIndices: number;
-       // public buffer: WebGLBuffer;
+        // public buffer: WebGLBuffer;
         private _data: number[];
         private _glBuffer: WebGLBuffer;
 
-        constructor(numIndices: number /* int */)
-        {
+        constructor(numIndices: number /* int */) {
             this.numIndices = numIndices;
             this._glBuffer = GL.createBuffer();
             //GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this._glBuffer);
         }
 
-        get glBuffer(): WebGLBuffer
-        {
+        get glBuffer(): WebGLBuffer {
             return this._glBuffer;
         }
 
-        public uploadFromVector(data: number[] /* Vector.<uint> */, startOffset: number /* int */, count: number /* int */): void
-        {
+        public uploadFromVector(data: number[] /* Vector.<uint> */, startOffset: number /* int */, count: number /* int */): void {
 
             this._data = data;
 
@@ -90,8 +108,7 @@ module rf
             GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
         }
 
-        public dispose(): void
-        {
+        public dispose(): void {
             GL.deleteBuffer(this._glBuffer);
             this._glBuffer = null;
             this.numIndices = 0;
