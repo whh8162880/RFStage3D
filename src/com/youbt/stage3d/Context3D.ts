@@ -1,6 +1,5 @@
 ///<reference path="./Buffer3D.ts"/>
 ///<reference path="./Texture.ts"/>
-///<reference path="./Program3D.ts"/>
 namespace rf {
 	export let context3D: Context3D;
 
@@ -157,8 +156,21 @@ namespace rf {
 			GL.bindFramebuffer(GL.FRAMEBUFFER, null);
 		}
 
-		public createProgram(): Program3D {
-			return new Program3D();
+		public programs:{[key:string]:Recyclable<Program3D>} = {};
+
+		public createProgram(vertexCode:string,fragmentCode:string,key?:string): Recyclable<Program3D> {
+			var program:Recyclable<Program3D>
+			if(undefined != key){
+				program = this.programs[key];
+				if(undefined == program){
+					this.programs[key] = program = recyclable(Program3D);
+				}
+			}else{
+				program = recyclable(Program3D);
+			}
+			program.vertexCode = vertexCode;
+			program.fragmentCode = fragmentCode;
+			return program;
 		}
 
 		/**
@@ -174,7 +186,7 @@ namespace rf {
 				throw new Error("mast set Program first");
 			}
 
-			var location: number = GL.getAttribLocation(this._linkedProgram.glProgram, variable);
+			var location: number = GL.getAttribLocation(this._linkedProgram.program, variable);
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + variable);
 			}
@@ -222,8 +234,16 @@ namespace rf {
 		private _linkedProgram: Program3D = undefined;
 		public setProgram(program: Program3D): void {
 			if (program == null || program == this._linkedProgram) return;
+
+			if(false == program.readly){
+				if(false == program.awaken()){
+					ThrowError("program create error!");
+					return;
+				}
+			}
+
 			this._linkedProgram = program;
-			GL.useProgram(program.glProgram);
+			GL.useProgram(program.program);
 
 			// var k: string;
 			// for (k in this._vaCache) this.enableVA(k);
@@ -411,7 +431,7 @@ namespace rf {
 
 		private _vaCache: {} = {};
 		private enableVA(keyInCache: string): void {
-			var location: number = GL.getAttribLocation(this._linkedProgram.glProgram, keyInCache);
+			var location: number = GL.getAttribLocation(this._linkedProgram.program, keyInCache);
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + keyInCache);
 			}
@@ -425,7 +445,7 @@ namespace rf {
 
 		private _vcCache: {} = {}; // {variable:array}
 		private enableVC(keyInCache: string): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.glProgram, keyInCache);
+			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
 			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
 
 			var vc: number[] = this._vcCache[keyInCache];
@@ -434,7 +454,7 @@ namespace rf {
 
 		private _vcMCache: {} = {};
 		private enableVCM(keyInCache: string): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.glProgram, keyInCache);
+			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
 			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
 
 			GL.uniformMatrix4fv(index, false, this._vcMCache[keyInCache]); // bug:the second parameter must be false
@@ -444,7 +464,7 @@ namespace rf {
 		private enableTex(keyInCache): void {
 			var tex: Texture = this._texCache[keyInCache];
 			GL.activeTexture(GL['TEXTURE' + tex.textureUnit]);
-			var l: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.glProgram, keyInCache);
+			var l: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
 			GL.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		}
 	}
