@@ -149,6 +149,42 @@ module rf{
 
         }
 
+        private resTest() {
+
+            function onComplete(type: ResType, data: any, url: string) {
+                if (type == ResType.text) {
+                    console.log(`文本加载成功 url: ${url} data: ${data}`);
+                } else if (type == ResType.bin) {
+                    console.log(`二进制加载成功 url: ${url} data: ${(data as ByteArray).bytesAvailable}`);
+                } else if (type == ResType.image) {
+                    console.log(`图片加载成功 url: ${url} data: ${data}`);
+                }
+            }
+
+            Res.instance.maxLoader = 3;
+
+            Res.instance.load([
+                "http://shushanh5.com/web/config/zhcn/trunk/gonggao.js",
+                "http://shushanh5.com/web/config/zhcn/trunk/errorcode.js",
+            ], onComplete, this, ResType.text, LoadPriority.low);
+
+            Res.instance.load([
+                "http://shushanh5.com/web/data/zhcn/n/w/BW001/d.json",
+                "http://shushanh5.com/web/data/zhcn/n/a/B001/d.json",
+            ], onComplete, this, ResType.bin, LoadPriority.middle);
+
+            Res.instance.load([
+                "http://shushanh5.com/web/data/zhcn/n/a/B001/i3.png",
+                "http://shushanh5.com/web/data/zhcn/o/server/logo.png",
+                "http://shushanh5.com/web/data/zhcn/m/1/mini.jpg",
+            ], onComplete, this, ResType.image, LoadPriority.high);
+
+            setTimeout(() => {
+                console.log(Res.instance["_resMap"]);
+            }, 3000);
+
+        }
+
 
         public arrayTest(value:number):void{
             var array:Uint8Array = new Uint8Array(value);
