@@ -151,14 +151,25 @@ module rf{
 
         private resTest() {
 
-            function onComplete(type: ResType, data: any, url: string) {
-                if (type == ResType.text) {
-                    console.log(`文本加载成功 url: ${url} data: ${data}`);
-                } else if (type == ResType.bin) {
-                    console.log(`二进制加载成功 url: ${url} data: ${(data as ByteArray).bytesAvailable}`);
-                } else if (type == ResType.image) {
-                    console.log(`图片加载成功 url: ${url} data: ${data}`);
+            function onComplete(event: EventX) {
+                
+                if (event.type == EventX.COMPLETE) {
+                    console.log("加载完毕: " + event.type);
+
+                    let type = event.data.type;
+                    let url = event.data.url;
+                    let data = event.data.data;
+                    if (type == ResType.text) {
+                        console.log(`文本加载成功 url: ${url} data: ${data}`);
+                    } else if (type == ResType.bin) {
+                        console.log(`二进制加载成功 url: ${url} data: ${(data as ByteArray).bytesAvailable}`);
+                    } else if (type == ResType.image) {
+                        console.log(`图片加载成功 url: ${url} data: ${data}`);
+                    }
+                } else {
+                    console.log("加载失败: " + event.type + ", " + event.data.url);
                 }
+
             }
 
             Res.instance.maxLoader = 3;

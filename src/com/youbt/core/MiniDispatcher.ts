@@ -16,7 +16,8 @@ module rf
         /** Event type for a resized Flash Player. */
         public static RESIZE:string = "resize";
         /** Event type that may be used whenever something finishes. */
-        public static COMPLETE:string = "complete";
+		public static COMPLETE:string = "complete";
+		public static FAIL:string= "fail";
         /** Event type for a (re)created stage3D rendering context. */
         public static CONTEXT3D_CREATE:string = "context3DCreate";
         /** An event type to be utilized in custom events. Not used by Starling right now. */
