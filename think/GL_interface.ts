@@ -1,5 +1,5 @@
 interface GL_Interface{
-    
+    // 测试一下
     /**
      * 激活指定的纹理单元
      * @param texture 需要激活的纹理单元。其值是 gl.TEXTUREI ，其中的 I 在 0 到 gl.MAX_COMBINED_TEXTURE_IMAGE_UNITS - 1 范围内
