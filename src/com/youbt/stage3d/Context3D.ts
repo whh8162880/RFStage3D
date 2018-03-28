@@ -182,6 +182,11 @@ namespace rf {
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + variable);
 			}
+			if(false == buffer.readly){
+				if(false == buffer.awaken()){
+					throw new Error("create VertexBuffer error!");
+				}
+			}
 
 			GL.bindBuffer(GL.ARRAY_BUFFER,buffer.buffer); // Bind the buffer object to a target
 			GL.vertexAttribPointer(location,format, GL.FLOAT, false, buffer.data32PerVertex * 4, bufferOffset * 4);

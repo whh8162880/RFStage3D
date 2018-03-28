@@ -37,12 +37,16 @@ module rf {
             this.data = null;
         }
 
-        awaken(): void {
+        awaken(): boolean {
+
+            if(undefined != this.buffer){
+                return true;
+            }
 
             if (!this.data || !this.data32PerVertex || !this.numVertices) {
                 this.readly = false;
                 ThrowError("vertexBuffer3D unavailable");
-                return;
+                return false;
             }
 
             if (undefined == this.buffer) {
@@ -54,6 +58,7 @@ module rf {
             GL.bindBuffer(GL.ARRAY_BUFFER, null);
 
             this.readly = true;
+            return true;
         }
 
         public uploadFromVector(data: number[] | Float32Array, startVertex: number = 0, numVertices: number = -1): void {
