@@ -1,47 +1,46 @@
 /// <reference path="./ClassUtils.ts" />
-module rf
-{
-    export class LinkVO implements IRecyclable{
+module rf {
+    export class LinkVO implements IRecyclable {
 
-        public close:Boolean = true;
-        public data:any = undefined;
-        public args:any = undefined;
+        public close: Boolean = true;
+        public data: any = undefined;
+        public args: any = undefined;
 
-        public next:Recyclable<LinkVO> = undefined;
-        public pre:Recyclable<LinkVO> = undefined;
+        public next: Recyclable<LinkVO> = undefined;
+        public pre: Recyclable<LinkVO> = undefined;
 
-        public weight:number = 0;
-        
+        public weight: number = 0;
 
-        public onRecycle():void{
+
+        public onRecycle(): void {
             this.data = undefined;
             this.args = undefined;
             this.next = undefined;
             this.pre = undefined;
             this.weight = 0;
-            this.close = true;        
+            this.close = true;
         }
 
-        public onSpawn():void{
+        public onSpawn(): void {
             this.close = false;
         }
     }
 
     export class Link {
 
-        private last:Recyclable<LinkVO> = undefined;
-        private first:Recyclable<LinkVO> = undefined;
-        
-        public id:any = undefined;
-        public length:number = 0;
-        public warningMax:number = 200;
-        public checkSameData:boolean = true;
+        private last: Recyclable<LinkVO> = undefined;
+        private first: Recyclable<LinkVO> = undefined;
 
-        public getFrist():Recyclable<LinkVO>{
-            if(undefined == this.first) return undefined;
-            let vo:Recyclable<LinkVO> = this.first;
-            while(vo){
-                if(false == vo.close){
+        public id: any = undefined;
+        public length: number = 0;
+        public warningMax: number = 200;
+        public checkSameData: boolean = true;
+
+        public getFrist(): Recyclable<LinkVO> {
+            if (undefined == this.first) return undefined;
+            let vo: Recyclable<LinkVO> = this.first;
+            while (vo) {
+                if (false == vo.close) {
                     return vo;
                 }
                 vo = vo.next;
@@ -49,11 +48,11 @@ module rf
             return undefined;
         }
 
-        public getLast():Recyclable<LinkVO>{
-            if(undefined == this.last) return undefined;
-            let vo:Recyclable<LinkVO> = this.last;
-            while(vo){
-                if(false == vo.close){
+        public getLast(): Recyclable<LinkVO> {
+            if (undefined == this.last) return undefined;
+            let vo: Recyclable<LinkVO> = this.last;
+            while (vo) {
+                if (false == vo.close) {
                     return vo;
                 }
                 vo = vo.pre
@@ -62,12 +61,12 @@ module rf
         }
 
 
-        public getValueLink(value:any):Recyclable<LinkVO>{
-            let vo:Recyclable<LinkVO> = this.getFrist();
-            if(undefined == vo) return undefined;
-            while(vo){
-                if(false == vo.close){
-                    if(value == vo.data){
+        public getValueLink(value: any): Recyclable<LinkVO> {
+            let vo: Recyclable<LinkVO> = this.getFrist();
+            if (undefined == vo) return undefined;
+            while (vo) {
+                if (false == vo.close) {
+                    if (value == vo.data) {
                         return vo;
                     }
                 }
@@ -77,41 +76,41 @@ module rf
         }
 
 
-        public add(value:any,args?:any):Recyclable<LinkVO>{
-            if(!value) return undefined;
-            var vo:Recyclable<LinkVO>
-            if(this.checkSameData){
+        public add(value: any, args?: any): Recyclable<LinkVO> {
+            if (!value) return undefined;
+            var vo: Recyclable<LinkVO>
+            if (this.checkSameData) {
                 vo = this.getValueLink(value);
-                if(vo) return vo;
+                if (vo) return vo;
             }
-            
+
 
             vo = recyclable(LinkVO);
             vo.data = value;
             vo.args = args;
             length++;
 
-            if(undefined == this.first){
+            if (undefined == this.first) {
                 this.first = this.last = vo;
-            }else{
+            } else {
                 vo.pre = this.last;
                 this.last.next = vo;
                 this.last = vo
             }
-            
+
 
             return vo;
         }
 
 
-        public addByWeight(value:any,weight:number,args?:any):Recyclable<LinkVO>{
-            if(!value) return undefined;
-            var vo:Recyclable<LinkVO>
+        public addByWeight(value: any, weight: number, args?: any): Recyclable<LinkVO> {
+            if (!value) return undefined;
+            var vo: Recyclable<LinkVO>
 
-            if(this.checkSameData){
+            if (this.checkSameData) {
                 vo = this.getValueLink(value);
-                if(vo){
-                    if(weight == vo.weight){
+                if (vo) {
+                    if (weight == vo.weight) {
                         return vo;
                     }
                     vo.close = true;
@@ -124,25 +123,25 @@ module rf
             vo.args = args;
             length++;
 
-            if(undefined == this.first){
+            if (undefined == this.first) {
                 this.first = this.last = vo;
-            }else{
+            } else {
                 let tempvo = this.getFrist();
-                if(undefined == tempvo){
+                if (undefined == tempvo) {
                     vo.pre = this.last;
                     this.last.next = vo;
                     this.last = vo;
-                }else{
-                    while(tempvo){
-                        if(false == tempvo.close){
-                            if(tempvo.weight < weight){
+                } else {
+                    while (tempvo) {
+                        if (false == tempvo.close) {
+                            if (tempvo.weight < weight) {
                                 vo.next = tempvo;
                                 vo.pre = tempvo.pre;
-                                if(undefined != tempvo.pre){
+                                if (undefined != tempvo.pre) {
                                     tempvo.pre.next = vo;
                                 }
                                 tempvo.pre = vo;
-                                if(tempvo == this.first){
+                                if (tempvo == this.first) {
                                     this.first = vo;
                                 }
                                 break;
@@ -156,41 +155,41 @@ module rf
         }
 
 
-        public remove(value:any):void{
-            let vo:Recyclable<LinkVO> = this.getValueLink(value);
-            if(!vo) return;
+        public remove(value: any): void {
+            let vo: Recyclable<LinkVO> = this.getValueLink(value);
+            if (!vo) return;
             this.removeLink(vo);
         }
 
-        public removeLink(vo:Recyclable<LinkVO>):void{
-            this.length --;
+        public removeLink(vo: Recyclable<LinkVO>): void {
+            this.length--;
             vo.close = true;
             vo.data = null;
-            TimerUtil.add(this.clean,1000);
+            TimerUtil.add(this.clean, 1000);
         }
 
-        protected clean():void{
+        protected clean(): void {
             let vo = this.first;
             var next;
             length = 0;
-            while(vo){
+            while (vo) {
                 next = vo.next;
-                if(true == vo.close){
-                    if(vo == this.first){
+                if (true == vo.close) {
+                    if (vo == this.first) {
                         this.first = vo.next;
                         this.first.pre = undefined;
-                    }else{
+                    } else {
                         vo.pre.next = vo.next;
                     }
 
-                    if(vo == this.last){
+                    if (vo == this.last) {
                         this.last = vo;
                         this.last.next = undefined;
-                    }else{
+                    } else {
                         vo.next.pre = vo.pre;
                     }
                     vo.recycle();
-                }else{
+                } else {
                     length++;
                 }
                 vo = next;
@@ -198,9 +197,9 @@ module rf
         }
 
 
-        public pop():any{
+        public pop(): any {
             let vo = this.getLast();
-            if(vo){
+            if (vo) {
                 let data = vo.data;
                 this.removeLink(vo);
                 return data;
@@ -208,22 +207,22 @@ module rf
             return undefined;
         }
 
-        public shift():any{
+        public shift(): any {
             let vo = this.getFrist();
-            if(vo){
+            if (vo) {
                 let data = vo.data;
                 this.removeLink(vo);
                 return data;
             }
             return undefined;
-        } 
+        }
 
-        public exec(f:Function):void{
-            if(undefined == f) return;
+        public exec(f: Function): void {
+            if (undefined == f) return;
             let vo = this.getFrist();
-            while(vo){
+            while (vo) {
                 let next = vo.next;
-                if(false == vo.close){
+                if (false == vo.close) {
                     f(vo.data);
                 }
                 vo = vo.next;
@@ -231,13 +230,13 @@ module rf
         }
 
 
-        public onRecycle():void{
+        public onRecycle(): void {
             let vo = this.first;
             var next;
             length = 0;
-            while(vo){
+            while (vo) {
                 next = vo.next;
-                vo.recycle(); 
+                vo.recycle();
                 vo = next;
             }
             this.first = this.last = undefined;
@@ -245,13 +244,13 @@ module rf
             this.checkSameData = true;
         }
 
-        public toString():string{
+        public toString(): string {
             let vo = this.getFrist();
-            let s:string = "list:";
-            while(vo){
+            let s: string = "list:";
+            while (vo) {
                 let next = vo.next;
-                if(false == vo.close){
-                    s += vo.data+","
+                if (false == vo.close) {
+                    s += vo.data + ","
                 }
                 vo = vo.next;
             }

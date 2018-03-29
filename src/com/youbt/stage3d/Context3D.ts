@@ -1,5 +1,4 @@
 ///<reference path="./Buffer3D.ts"/>
-///<reference path="./Texture.ts"/>
 namespace rf {
 	export let context3D: Context3D;
 
@@ -113,7 +112,7 @@ namespace rf {
         * @format only support Context3DTextureFormat.BGRA
         * @optimizeForRenderToTexture not implement
         */
-		public createTexture(width: number, height: number, format: string, optimizeForRenderToTexture: boolean, streamingLevels: number = 0): Texture {
+		public createTexture(width: number, height: number, format:number, optimizeForRenderToTexture: boolean, streamingLevels: number = 0): Texture {
 			return new Texture(width, height, format, optimizeForRenderToTexture, streamingLevels);
 		}
 
@@ -145,7 +144,7 @@ namespace rf {
 				gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, 512, 512); //force 512
 
 				gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER,	gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,	texture.__getGLTexture(),	0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER,	gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,	texture.texture,	0);
 			}
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 		}
@@ -199,8 +198,7 @@ namespace rf {
 
 		public setTextureAt(sampler: string, texture: Texture): void {
 			this._texCache[sampler] = texture;
-
-			if (this._linkedProgram) this.enableTex(sampler);
+			// if (this._linkedProgram) this.enableTex(sampler);
 		}
 
 		private _linkedProgram: Program3D = undefined;
@@ -455,12 +453,14 @@ namespace rf {
 		}
 
 		private _texCache: {} = {}; //{sampler:Texture}
-		private enableTex(keyInCache): void {
-			var tex: Texture = this._texCache[keyInCache];
-			gl.activeTexture(gl['TEXTURE' + tex.textureUnit]);
-			var l: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
-			gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
-		}
+		// private enableTex(keyInCache): void {
+		// 	var tex: Texture = this._texCache[keyInCache];
+		// 	gl.activeTexture(gl['TEXTURE' + tex.textureUnit]);
+
+		// 	gl.TEXTURE31\
+		// 	var l: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
+		// 	gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
+		// }
 	}
 
 

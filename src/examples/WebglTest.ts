@@ -11,7 +11,8 @@ module rf{
                 return;
             }
             Engine.addResize(this);
-            this.render();
+            // this.render();
+            this.loadImage();
         }
 
         public render():void{
@@ -30,6 +31,71 @@ module rf{
             context3D.setProgram(p);
             v.uploadContext(p);
             context3D.drawTriangles(i);
+        }
+
+
+
+        public loadImage():void{
+            loadRes("http://127.0.0.1/ts/skeleton/ranger.png",this.renderImage,this,ResType.image);
+        }
+
+        protected renderImage(event:EventX):void{
+            if(event.type != EventX.COMPLETE){
+                return;
+            }
+            let res:ResItem = event.data;
+            var image:HTMLImageElement = res.data;
+            // var bitmapdata:BitmapData = new BitmapData(image.width,image.height,true);
+            // bitmapdata.draw(image);
+
+            context3D.configureBackBuffer(stageWidth,stageHeight,0);
+            context3D.clear(0,0,0,1);
+
+            let vertexCode:string = 
+            `
+                attribute vec3 pos;
+                attribute vec2 uv;
+                varying vec2 v_TexCoord;
+                void main(void){
+                    gl_Position = vec4(pos,1.0);
+                    v_TexCoord = uv;
+                }
+            `
+            let fragmentCode:string = `
+                precision mediump float;
+                uniform sampler2D diff;
+                varying vec2 v_TexCoord;
+                void main(void){
+                    gl_FragColor = texture2D(diff, v_TexCoord);
+                }
+            `;
+
+            
+
+            let vertices = new Float32Array(
+                [
+                    -1.0,1.0,0.0,0.0,
+                    1.0,1.0,1.0,0.0,
+                    1.0,-1.0,1.0,1.0,
+                    -1.0,-1.0,0.0,1.0
+                ]
+            );
+            let indexs = new Uint16Array([0,1,3,1,2,3]);
+            let v = context3D.createVertexBuffer(vertices,4);
+            v.regVariable(VA.pos,0,2);
+            v.regVariable(VA.uv,2,2);
+            
+            let i = context3D.createIndexBuffer(indexs);
+            let p = context3D.createProgram(vertexCode,fragmentCode);
+            context3D.setProgram(p);
+
+            let texture = context3D.createTexture(image.width,image.height,gl.RGBA,false);
+            texture.pixels = image;//bitmapdata.canvas;
+            texture.uploadContext(p,0,FS.diff);
+            v.uploadContext(p);
+
+            context3D.drawTriangles(i);
+           
         }
 
 
