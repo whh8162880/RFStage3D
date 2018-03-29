@@ -1,13 +1,13 @@
 
 module rf {
-    export class HttpResponseType {
-        static TEXT: string = "text";
-        static ARRAY_BUFFER: string = "arraybuffer";
+    export enum HttpResponseType {
+        TEXT,
+        ARRAY_BUFFER
     }
 
-    export class HttpMethod {
-        static GET: string = "GET";
-        static POST: string = "POST";
+    export enum HttpMethod {
+        GET,
+        POST
     }
 
     /**
@@ -15,9 +15,9 @@ module rf {
      */
     export class HttpRequest extends MiniDispatcher {
         protected _url: string;
-        protected _method: string;
+        protected _method: HttpMethod;
 
-        protected _responseType: string;
+        protected _responseType: HttpResponseType;
         protected _withCredentials: boolean;
         
         headerObj: {[key: string]: string};
@@ -30,28 +30,28 @@ module rf {
 
         get response(): any {
             if (!this._xhr) {
-                return null;
+                return undefined;
             }
             if (this._xhr.response != undefined) {
                 return this._xhr.response;
             }
-            if (this._responseType == "text") {
+            if (this._responseType == HttpResponseType.TEXT) {
                 return this._xhr.responseText;
             }
-            if (this._responseType == "arraybuffer" && /msie 9.0/i.test(navigator.userAgent)) {
+            if (this._responseType == HttpResponseType.ARRAY_BUFFER && /msie 9.0/i.test(navigator.userAgent)) {
                 var w = window;
                 return w["convertResponseBodyToText"](this._xhr["responseBody"]);
             }
-            if (this._responseType == "document") {
-                return this._xhr.responseXML;
-            }
-            return null;
+            // if (this._responseType == "document") {
+            //     return this._xhr.responseXML;
+            // }
+            return undefined;
         }
 
-        set responseType(value: string) {
+        set responseType(value: HttpResponseType) {
             this._responseType = value;
         }
-        get responseType(): string {
+        get responseType(): HttpResponseType {
             return this._responseType;
         }
 
@@ -74,7 +74,7 @@ module rf {
 
         getResponseHeader(header: string): string {
             if (!this._xhr) {
-                return null;
+                return undefined;
             }
             let result = this._xhr.getResponseHeader(header);
             return result ? result : "";
@@ -82,23 +82,23 @@ module rf {
 
         getAllResponseHeaders(): string {
             if (!this._xhr) {
-                return null;
+                return undefined;
             }
             let result = this._xhr.getAllResponseHeaders();
             return result ? result : "";
         }
 
-        open(url: string, method: string = "GET"): void {
+        open(url: string, method: HttpMethod = HttpMethod.GET): void {
             this._url = url;
             this._method = method;
             if (this._xhr) {
                 this._xhr.abort();
-                this._xhr = null;
+                this._xhr = undefined;
             }
             this._xhr = this.getXHR();
             this._xhr.onreadystatechange = this.onReadyStateChange.bind(this);
             this._xhr.onprogress = this.updateProgress.bind(this);
-            this._xhr.open(this._method, this._url, true);
+            this._xhr.open(this._method == HttpMethod.POST ? "POST" : "GET", this._url, true);
         }
 
         protected getXHR(): XMLHttpRequest {
@@ -133,10 +133,10 @@ module rf {
         }
 
         send(data?: any): void {
-            if (this._responseType != null) {
-                this._xhr.responseType = <any> this._responseType;
+            if (this._responseType != undefined) {
+                this._xhr.responseType = this._responseType == HttpResponseType.TEXT ? "text" : "arraybuffer";
             }
-            if (this._withCredentials != null) {
+            if (this._withCredentials != undefined) {
                 this._xhr.withCredentials = this._withCredentials;
             }
             if (this.headerObj) {
@@ -196,7 +196,7 @@ module rf {
 
         load(url: string): void {
             let image = new Image();
-            this._data = null;
+            this._data = undefined;
             this._currentImage = image;
             if (this._hasCrossOriginSet) {
                 if (this._crossOrigin) {
@@ -233,12 +233,12 @@ module rf {
 
         protected getImage(event: any): any {
             let image = event.target;
-            image.onerror = null;
-            image.onload = null;
+            image.onerror = undefined;
+            image.onload = undefined;
             if (this._currentImage !== image) {
-                return null;
+                return undefined;
             }
-            this._currentImage = null;
+            this._currentImage = undefined;
             return image;
         }
     }
@@ -411,7 +411,7 @@ module rf {
         }
 
         close() {
-            if (this._webSocket != null) {
+            if (this._webSocket != undefined) {
                 try {
                     this._webSocket.close();
                 } catch (e) {
