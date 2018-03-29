@@ -71,13 +71,15 @@ module rf{
                     gl_FragColor = texture2D(diff, v_TexCoord);
                 }
             `;
+
+            
             ROOT.camera2D.updateSceneTransform();
             let vertices = new Float32Array(
                 [
                     0,0,0.0,0.0,
-                    512,0,1.0,0.0,
-                    512,512,1.0,1.0,
-                    0,512,0.0,1.0
+                    image.width,0,1.0,0.0,
+                    image.width,image.height,1.0,1.0,
+                    0,image.height,0.0,1.0
                 ]
             );
             let indexs = new Uint16Array([0,1,3,1,2,3]);
