@@ -1,5 +1,13 @@
 ///<reference path="../core/Config.ts"/>
 module rf {
+    export enum VA{
+        pos = "pos",
+        normal = "normal",
+        tangent = "tangent",
+        color = "color",
+        uv = "uv"
+    }
+
     class Buffer3D implements IRecyclable {
         preusetime: number = 0;
         readly: boolean = false;
