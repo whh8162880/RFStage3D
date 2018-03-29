@@ -358,7 +358,7 @@ module rf {
                 this.awaken();
             }
 
-            gl.activeTexture(gl.TEXTURE0);
+            gl.activeTexture(gl["TEXTURE"+index]);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             var index_tex = gl.getUniformLocation(program.program, variable);
             gl.uniform1i(index_tex, index);
