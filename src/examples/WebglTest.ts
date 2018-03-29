@@ -91,9 +91,9 @@ module rf{
             matrix.appendTranslation(200,100,0);
             matrix.append(ROOT.camera2D.worldTranform);
             context3D.setProgramConstantsFromMatrix(VC.mvp,matrix)
-            let texture = context3D.createTexture(image.width,image.height,gl.RGBA,false);
-            texture.pixels = image;//bitmapdata.canvas;
-            texture.uploadContext(p,0,FS.diff);
+            let t = context3D.createTexture(image.width,image.height,gl.RGBA,false);
+            t.pixels = image;//bitmapdata.canvas;
+            t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
             context3D.drawTriangles(i);
         }
