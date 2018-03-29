@@ -36,16 +36,17 @@ module rf{
         /**
          * Creates a Matrix3D object.
          */
-        constructor(v:Array<number> = null)
+        constructor(v?:number[])
         {
-            if (v != null && v.length == 16)
-                this.rawData = new Float32Array(v.slice(0));
+            if (undefined != v && v.length == 16)
+                this.rawData = new Float32Array(v);
             else
                 this.rawData = new Float32Array([
                     1, 0, 0, 0,
                     0, 1, 0, 0,
                     0, 0, 1, 0,
-                    0, 0, 0, 1]);
+                    0, 0, 0, 1
+                ]);
         }
 
         /**

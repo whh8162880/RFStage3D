@@ -7,8 +7,11 @@ module rf{
 
         public canvas:HTMLCanvasElement;
 
+        public camera2D:Canmera2D
+
         constructor(){
             super();
+            this.camera2D = new Canmera2D();
         }
 
         public requestContext3D(canvas:HTMLCanvasElement):boolean{
@@ -45,7 +48,7 @@ module rf{
 
 
         public resize(width:number,height:number):void{
-            
+            this.camera2D.resize(width,height);
         }
     }
 }

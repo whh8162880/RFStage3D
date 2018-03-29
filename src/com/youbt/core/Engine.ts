@@ -4,10 +4,10 @@
 
 namespace rf {
 	export interface IResizeable {
-		resize(width: number, height: number): void;
+		resize?(width: number, height: number): void;
 	}
 	export interface ITickable {
-		update(now: number, interval: number): void;
+		update?(now: number, interval: number): void;
 	}
 
 	export class EngineEvent {
