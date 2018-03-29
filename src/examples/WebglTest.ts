@@ -36,7 +36,7 @@ module rf{
 
 
         public loadImage():void{
-            loadRes("http://127.0.0.1/ts/skeleton/ranger.png",this.renderImage,this,ResType.image);
+            loadRes("assets/ranger.png",this.renderImage,this,ResType.image);
         }
 
         protected renderImage(event:EventX):void{
