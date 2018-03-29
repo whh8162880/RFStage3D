@@ -17,12 +17,14 @@ module rf{
 
 
             var c:HTMLCanvasElement=<HTMLCanvasElement>document.createElement("canvas");
+            
             // c.style.cssText = "width:100px;height:100px";
             c.width = 200;
             c.height = 200;
             
             var ctx:CanvasRenderingContext2D=c.getContext("2d");
             ctx.fillRect(0,0,c.width,c.height);
+            // ctx.putImageData()
             // ctx.drawImage()
 
             var getPixelRatio = function(context) {
