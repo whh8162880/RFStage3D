@@ -71,23 +71,7 @@ module rf{
                     gl_FragColor = texture2D(diff, v_TexCoord);
                 }
             `;
-
-
-            
-
-            
-
-            // let vertices = new Float32Array(
-            //     [
-            //         -1.0,1.0,0.0,0.0,
-            //         1.0,1.0,1.0,0.0,
-            //         1.0,-1.0,1.0,1.0,
-            //         -1.0,-1.0,0.0,1.0
-            //     ]
-            // );
-
             ROOT.camera2D.updateSceneTransform();
-
             let vertices = new Float32Array(
                 [
                     0,0,0.0,0.0,
@@ -100,28 +84,18 @@ module rf{
             let v = context3D.createVertexBuffer(vertices,4);
             v.regVariable(VA.pos,0,2);
             v.regVariable(VA.uv,2,2);
-            
-            
             let i = context3D.createIndexBuffer(indexs);
             let p = context3D.createProgram(vertexCode,fragmentCode);
             context3D.setProgram(p);
-
             let matrix = new Matrix3D();
             matrix.appendTranslation(200,100,0);
             matrix.append(ROOT.camera2D.worldTranform);
-
-            // let matrix = ROOT.camera2D.worldTranform.clone();
-            // matrix.transpose();
-
             context3D.setProgramConstantsFromMatrix(VC.mvp,matrix)
-
             let texture = context3D.createTexture(image.width,image.height,gl.RGBA,false);
             texture.pixels = image;//bitmapdata.canvas;
             texture.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
-
             context3D.drawTriangles(i);
-           
         }
 
 
