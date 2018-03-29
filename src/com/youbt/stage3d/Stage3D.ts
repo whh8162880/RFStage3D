@@ -15,16 +15,17 @@ module rf{
             this.canvas = canvas;
             for(var name of Stage3D.names){
                 try {
-                    GL = <WebGLRenderingContext> this.canvas.getContext(name);
+                    gl = <WebGLRenderingContext> this.canvas.getContext(name);
                 } catch (e) { 
 
                 }
-                if(GL){
+                if(gl){
                     break;
                 }
             }
+            
 
-            if(undefined == GL){
+            if(undefined == gl){
                 context3D = null;
                 this.simpleDispatch(EventX.ERROR,"webgl is not available");
                 return false;
@@ -32,7 +33,7 @@ module rf{
 
             context3D = singleton(Context3D);
 
-            this.simpleDispatch(EventX.CONTEXT3D_CREATE,GL);
+            this.simpleDispatch(EventX.CONTEXT3D_CREATE,gl);
             return true;
         }
 

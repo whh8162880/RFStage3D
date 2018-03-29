@@ -9,7 +9,8 @@ module rf{
         public init():void{
             // this.bitmapDataTest();
             // new MaxRectsBinPackTest();
-            new WebglTest();
+            // new WebglTest();
+            new MaxRectsTest();
         }
 
         public linktest():void{
@@ -172,10 +173,10 @@ module rf{
 
             }
 
-            Res.instance.maxLoader = 3;
+            Res.instance.maxLoader = 1;
 
             Res.instance.load([
-                "http://shushanh5.com/web/config/zhcn/trunk/gonggao.js",
+                // "http://shushanh5.com/web/config/zhcn/trunk/gonggao.js",
                 "http://shushanh5.com/web/config/zhcn/trunk/errorcode.js",
             ], onComplete, this, ResType.text, LoadPriority.low);
 
@@ -192,6 +193,13 @@ module rf{
 
             setTimeout(() => {
                 console.log(Res.instance["_resMap"]);
+
+                Res.instance.load([
+                    "http://shushanh5.com/web/config/zhcn/trunk/gonggao.js",
+                    "http://shushanh5.com/web/config/zhcn/trunk/gonggao.js",
+                    "http://shushanh5.com/web/config/zhcn/trunk/gonggao.js",
+                ], onComplete, this, ResType.text, LoadPriority.low);
+
             }, 3000);
 
         }

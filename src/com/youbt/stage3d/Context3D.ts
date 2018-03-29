@@ -1,71 +1,69 @@
 ///<reference path="./Buffer3D.ts"/>
 ///<reference path="./Texture.ts"/>
-///<reference path="./Program3D.ts"/>
 namespace rf {
 	export let context3D: Context3D;
 
-	export class Context3DCompareMode {
-		static ALWAYS: string = 'always';
-		static EQUAL: string = 'equal';
-		static GREATER: string = 'greater';
-		static GREATER_EQUAL: string = 'greaterEqual';
-		static LESS: string = 'less';
-		static LESS_EQUAL: string = 'lessEqual';
-		static NEVER: string = 'never';
-		static NOT_EQUAL: string = 'notEqual';
+	// export enum Context3DCompareMode {
+	// 	ALWAYS = 'always',
+	// 	EQUAL = 'equal',
+	// 	GREATER = 'greater',
+	// 	GREATER_EQUAL = 'greaterEqual',
+	// 	LESS = 'less',
+	// 	LESS_EQUAL = 'lessEqual',
+	// 	NEVER = 'never',
+	// 	NOT_EQUAL = 'notEqual'
+	// }
+
+	export enum Context3DTextureFormat {
+		BGRA = 'bgra'
 	}
 
-	export class Context3DTextureFormat {
-		static BGRA: string = 'bgra';
+	// export class Context3DBlendFactor {
+	// 	static ONE: number;
+	// 	static ZERO: number;
+
+	// 	static SOURCE_COLOR: number;
+	// 	static DESTINATION_COLOR: number;
+
+	// 	static SOURCE_ALPHA: number;
+	// 	static DESTINATION_ALPHA: number;
+
+	// 	static ONE_MINUS_SOURCE_COLOR: number;
+	// 	static ONE_MINUS_DESTINATION_COLOR: number;
+
+	// 	static ONE_MINUS_SOURCE_ALPHA: number;
+	// 	static ONE_MINUS_DESTINATION_ALPHA: number;
+
+	// 	static init(): void {
+	// 		Context3DBlendFactor.ONE = GL.ONE;
+	// 		Context3DBlendFactor.ZERO = GL.ZERO;
+	// 		Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
+	// 		Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
+	// 		Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
+	// 		Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
+	// 		Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
+	// 		Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
+	// 		Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
+	// 		Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
+	// 		//CONSTANT_COLOR
+	// 		//ONE_MINUS_CONSTANT_COLOR
+	// 		//ONE_MINUS_CONSTANT_ALPHA
+	// 	}
+	// }
+
+	export enum Context3DVertexBufferFormat {
+		BYTES_4 = 4,
+		FLOAT_1 = 1,
+		FLOAT_2 = 2,
+		FLOAT_3 = 3,
+		FLOAT_4 = 4
 	}
 
-	export class Context3DBlendFactor {
-		static ONE: number;
-		static ZERO: number;
-
-		static SOURCE_COLOR: number;
-		static DESTINATION_COLOR: number;
-
-		static SOURCE_ALPHA: number;
-		static DESTINATION_ALPHA: number;
-
-		static ONE_MINUS_SOURCE_COLOR: number;
-		static ONE_MINUS_DESTINATION_COLOR: number;
-
-		static ONE_MINUS_SOURCE_ALPHA: number;
-		static ONE_MINUS_DESTINATION_ALPHA: number;
-
-		static init(): void {
-			Context3DBlendFactor.ONE = GL.ONE;
-			Context3DBlendFactor.ZERO = GL.ZERO;
-			Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
-			Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
-			Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
-			Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
-			Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
-			Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
-			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
-			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
-
-			//CONSTANT_COLOR
-			//ONE_MINUS_CONSTANT_COLOR
-			//ONE_MINUS_CONSTANT_ALPHA
-		}
-	}
-
-	export class Context3DVertexBufferFormat {
-		static BYTES_4: number = 4;
-		static FLOAT_1: number = 1;
-		static FLOAT_2: number = 2;
-		static FLOAT_3: number = 3;
-		static FLOAT_4: number = 4;
-	}
-
-	export class Context3DTriangleFace {
-		static BACK: string = 'back'; //CCW
-		static FRONT: string = 'front'; //CW
-		static FRONT_AND_BACK: string = 'frontAndBack';
-		static NONE: string = 'none';
+	export enum Context3DTriangleFace {
+		BACK	= 'back', //CCW
+		FRONT	= 'front', //CW
+		FRONT_AND_BACK = 'frontAndBack',
+		NONE = 'none'
 	}
 
 	export class Context3D {
@@ -74,7 +72,6 @@ namespace rf {
 		private _bendDisabled: boolean = true;
 		private _depthDisabled: boolean = true;
 		constructor() {
-			Context3DBlendFactor.init();
 		}
 
 		public configureBackBuffer(
@@ -83,19 +80,19 @@ namespace rf {
 			antiAlias: number,
 			enableDepthAndStencil: boolean = true
 		): void {
-			GL.viewport(0, 0, width, height);
-			GL.canvas.width = width;
-			GL.canvas.height = height;
+			gl.viewport(0, 0, width, height);
+			gl.canvas.width = width;
+			gl.canvas.height = height;
 			this._depthDisabled = enableDepthAndStencil;
 			//TODO: antiAlias , Stencil
 			if (enableDepthAndStencil) {
-				this._clearBit = GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT | GL.STENCIL_BUFFER_BIT;
-				GL.enable(GL.DEPTH_TEST);
-				GL.enable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT;
+				gl.enable(gl.DEPTH_TEST);
+				gl.enable(gl.STENCIL_TEST);
 			} else {
-				this._clearBit = GL.COLOR_BUFFER_BIT;
-				GL.disable(GL.DEPTH_TEST);
-				GL.disable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT;
+				gl.disable(gl.DEPTH_TEST);
+				gl.disable(gl.STENCIL_TEST);
 			}
 		}
 
@@ -107,7 +104,9 @@ namespace rf {
 		}
 
 		public createIndexBuffer(numIndices: number): IndexBuffer3D {
-			return new IndexBuffer3D(numIndices);
+			let buffer = recyclable(IndexBuffer3D);
+			buffer.numIndices = numIndices;
+			return buffer
 		}
 
 		/**
@@ -127,42 +126,49 @@ namespace rf {
 			colorOutputIndex: number /*int*/ = 0
 		): void {
 			if (enableDepthAndStencil) {
-				this._clearBit = GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT | GL.STENCIL_BUFFER_BIT;
-				GL.enable(GL.DEPTH_TEST);
-				GL.enable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT;
+				gl.enable(gl.DEPTH_TEST);
+				gl.enable(gl.STENCIL_TEST);
 			} else {
-				this._clearBit = GL.COLOR_BUFFER_BIT;
-				GL.disable(GL.DEPTH_TEST);
-				GL.disable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT;
+				gl.disable(gl.DEPTH_TEST);
+				gl.disable(gl.STENCIL_TEST);
 			}
 
 			//TODO: antiAlias surfaceSelector colorOutputIndex
 			if (!this._rttFramebuffer) {
-				this._rttFramebuffer = GL.createFramebuffer();
-				GL.bindFramebuffer(GL.FRAMEBUFFER, this._rttFramebuffer);
+				this._rttFramebuffer = gl.createFramebuffer();
+				gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 
-				var renderbuffer: WebGLRenderbuffer = GL.createRenderbuffer();
-				GL.bindRenderbuffer(GL.RENDERBUFFER, renderbuffer);
-				GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, 512, 512); //force 512
+				var renderbuffer: WebGLRenderbuffer = gl.createRenderbuffer();
+				gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+				gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, 512, 512); //force 512
 
-				GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
-				GL.framebufferTexture2D(
-					GL.FRAMEBUFFER,
-					GL.COLOR_ATTACHMENT0,
-					GL.TEXTURE_2D,
-					texture.__getGLTexture(),
-					0
-				);
+				gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER,	gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,	texture.__getGLTexture(),	0);
 			}
-			GL.bindFramebuffer(GL.FRAMEBUFFER, this._rttFramebuffer);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 		}
 
 		public setRenderToBackBuffer(): void {
-			GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		}
 
-		public createProgram(): Program3D {
-			return new Program3D();
+		public programs:{[key:string]:Recyclable<Program3D>} = {};
+
+		public createProgram(vertexCode:string,fragmentCode:string,key?:string): Recyclable<Program3D> {
+			var program:Recyclable<Program3D>
+			if(undefined != key){
+				program = this.programs[key];
+				if(undefined == program){
+					this.programs[key] = program = recyclable(Program3D);
+				}
+			}else{
+				program = recyclable(Program3D);
+			}
+			program.vertexCode = vertexCode;
+			program.fragmentCode = fragmentCode;
+			return program;
 		}
 
 		/**
@@ -174,33 +180,35 @@ namespace rf {
 				return;
 			}
 
-			if(undefined == this._linkedProgram){
-				throw new Error("mast set Program first");
+			if (undefined == this._linkedProgram) {
+				throw new Error("must predefined Program3D");
 			}
 
-			var location: number = GL.getAttribLocation(this._linkedProgram.glProgram, variable);
+			var location: number = gl.getAttribLocation(this._linkedProgram.program, variable);
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + variable);
 			}
-			if(false == buffer.readly){
-				if(false == buffer.awaken()){
+			if (false == buffer.readly) {
+				if (false == buffer.awaken()) {
 					throw new Error("create VertexBuffer error!");
 				}
 			}
 
-			GL.bindBuffer(GL.ARRAY_BUFFER,buffer.buffer); // Bind the buffer object to a target
-			GL.vertexAttribPointer(location,format, GL.FLOAT, false, buffer.data32PerVertex * 4, bufferOffset * 4);
-			GL.enableVertexAttribArray(location);
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.buffer); // Bind the buffer object to a target
+			gl.vertexAttribPointer(location, format, gl.FLOAT, false, buffer.data32PerVertex * 4, bufferOffset * 4);
+			gl.enableVertexAttribArray(location);
 		}
 
 		/**
-        *  @variable must predefined in glsl
-        */
-		public setProgramConstantsFromVector(variable: string, data: number[] /* Vector.<Number> */): void {
-			if (data.length > 4) throw new Error('data length > 4');
-
-			this._vcCache[variable] = data;
-			if (this._linkedProgram) this.enableVC(variable);
+		 * 
+		 * @param variable 
+		 * @param data 
+		 * @param format FLOAT_1 2 3 4
+		 */
+		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array,format:number): void {
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
+			if (!index) throw new Error('Fail to get uniform ' + variable);
+			gl['uniform' + format + 'fv'](index, data);
 		}
 
 		/**
@@ -223,22 +231,25 @@ namespace rf {
 			if (this._linkedProgram) this.enableTex(sampler);
 		}
 
-		private _linkedProgram: Program3D = null;
+		private _linkedProgram: Program3D = undefined;
 		public setProgram(program: Program3D): void {
 			if (program == null || program == this._linkedProgram) return;
 
+			if(false == program.readly){
+				if(false == program.awaken()){
+					ThrowError("program create error!");
+					return;
+				}
+			}
+
 			this._linkedProgram = program;
+			gl.useProgram(program.program);
 
-			GL.useProgram(program.glProgram);
-
-			var k: string;
-			for (k in this._vaCache) this.enableVA(k);
-
-			for (k in this._vcCache) this.enableVC(k);
-
-			for (k in this._vcMCache) this.enableVCM(k);
-
-			for (k in this._texCache) this.enableTex(k);
+			// var k: string;
+			// for (k in this._vaCache) this.enableVA(k);
+			// for (k in this._vcCache) this.enableVC(k);
+			// for (k in this._vcMCache) this.enableVCM(k);
+			// for (k in this._texCache) this.enableTex(k);
 		}
 
 		public clear(
@@ -250,161 +261,157 @@ namespace rf {
 			stencil: number /*uint*/ = 0,
 			mask: number /* uint */ = 0xffffffff
 		): void {
-			GL.clearColor(red, green, blue, alpha);
-			GL.clearDepth(depth); // TODO:dont need to call this every time
-			GL.clearStencil(stencil); //stencil buffer
+			gl.clearColor(red, green, blue, alpha);
+			gl.clearDepth(depth); // TODO:dont need to call this every time
+			gl.clearStencil(stencil); //stencil buffer
 
-			GL.clear(this._clearBit);
+			gl.clear(this._clearBit);
 		}
 
+
+		// export enum Context3DTriangleFace {
+		// 	BACK	= 'back', //CCW
+		// 	FRONT	= 'front', //CW
+		// 	FRONT_AND_BACK = 'frontAndBack',
+		// 	NONE = 'none'
+		// }
+
 		public setCulling(triangleFaceToCull: string): void {
-			GL.frontFace(GL.CW);
+			gl.frontFace(gl.CW);
 			switch (triangleFaceToCull) {
 				case Context3DTriangleFace.NONE:
-					GL.disable(GL.CULL_FACE);
+					gl.disable(gl.CULL_FACE);
 					break;
 				case Context3DTriangleFace.BACK:
-					GL.enable(GL.CULL_FACE);
-					GL.cullFace(GL.BACK);
+					gl.enable(gl.CULL_FACE);
+					gl.cullFace(gl.BACK);
 					break;
 				case Context3DTriangleFace.FRONT:
-					GL.enable(GL.CULL_FACE);
-					GL.cullFace(GL.FRONT);
+					gl.enable(gl.CULL_FACE);
+					gl.cullFace(gl.FRONT);
 					break;
 				case Context3DTriangleFace.FRONT_AND_BACK:
-					GL.enable(GL.CULL_FACE);
-					GL.cullFace(GL.FRONT_AND_BACK);
+					gl.enable(gl.CULL_FACE);
+					gl.cullFace(gl.FRONT_AND_BACK);
 					break;
 			}
 		}
 
-		public setDepthTest(depthMask: boolean, passCompareMode: string): void {
+		/**
+		 * 
+		 * @param depthMask 
+		 * @param passCompareMode 
+		 * 
+		 * Context3DCompareMode.LESS			GL.LESS
+		 * Context3DCompareMode.NEVER			GL.NEVER
+		 * Context3DCompareMode.EQUAL			GL.EQUAL
+		 * Context3DCompareMode.GREATER			GL.GREATER
+		 * Context3DCompareMode.NOT_EQUAL		GL.NOTEQUAL
+		 * Context3DCompareMode.ALWAYS			GL.ALWAYS
+		 * Context3DCompareMode.LESS_EQUAL		GL.LEQUAL
+		 * Context3DCompareMode.GREATER_EQUAL	GL.GEQUAL
+		 */
+		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
 			if (this._depthDisabled) {
-				GL.enable(GL.DEPTH_TEST);
+				gl.enable(gl.DEPTH_TEST);
 				this._depthDisabled = false;
 			}
 
-			GL.depthMask(depthMask);
-
-			switch (passCompareMode) {
-				case Context3DCompareMode.LESS:
-					GL.depthFunc(GL.LESS); //default
-					break;
-				case Context3DCompareMode.NEVER:
-					GL.depthFunc(GL.NEVER);
-					break;
-				case Context3DCompareMode.EQUAL:
-					GL.depthFunc(GL.EQUAL);
-					break;
-				case Context3DCompareMode.GREATER:
-					GL.depthFunc(GL.GREATER);
-					break;
-				case Context3DCompareMode.NOT_EQUAL:
-					GL.depthFunc(GL.NOTEQUAL);
-					break;
-				case Context3DCompareMode.ALWAYS:
-					GL.depthFunc(GL.ALWAYS);
-					break;
-				case Context3DCompareMode.LESS_EQUAL:
-					GL.depthFunc(GL.LEQUAL);
-					break;
-				case Context3DCompareMode.GREATER_EQUAL:
-					GL.depthFunc(GL.GEQUAL);
-					break;
-			}
+			gl.depthMask(depthMask);
+			gl.depthFunc(passCompareMode);
 		}
+
+
+		/**
+		  	Context3DBlendFactor.ONE = GL.ONE;
+			Context3DBlendFactor.ZERO = GL.ZERO;
+			Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
+			Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
+			Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
+			Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
+			Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
+			Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
+			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
+			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
+		 */
 
 		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
 			if (this._bendDisabled) {
-				GL.enable(GL.BLEND); //stage3d cant disable blend?
+				gl.enable(gl.BLEND); //stage3d cant disable blend?
 				this._bendDisabled = false;
 			}
-			GL.blendFunc(sourceFactor, destinationFactor);
+			gl.blendFunc(sourceFactor, destinationFactor);
 		}
 
-		public drawTriangles(
-			indexBuffer: IndexBuffer3D,
-			firstIndex: number = 0,
-			numTriangles: number = -1
-		): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(
-				GL.TRIANGLES,
-				numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3,
-				GL.UNSIGNED_SHORT,
-				firstIndex * 2
-			);
+		public drawTriangles(indexBuffer: IndexBuffer3D,firstIndex: number = 0,numTriangles: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
+
 
 		/*
          *  [Webgl only]
          *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
          *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
          */
-		public drawLines(
-			indexBuffer: IndexBuffer3D,
-			firstIndex: number = 0,
-			numLines: number = -1
-		): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(
-				GL.LINES,
-				numLines < 0 ? indexBuffer.numIndices : numLines * 2,
-				GL.UNSIGNED_SHORT,
-				firstIndex * 2
-			);
+		public drawLines(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numLines: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.LINES, numLines < 0 ? indexBuffer.numIndices : numLines * 2, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 		/*
          * [Webgl only]
          *  For instance indices = [1,2,3] ; will only render vertices number 1, number 2, and number 3 
          */
-		public drawPoints(
-			indexBuffer: IndexBuffer3D,
-			firstIndex: number = 0,
-			numPoints: number = -1
-		): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(
-				GL.POINTS,
-				numPoints < 0 ? indexBuffer.numIndices : numPoints,
-				GL.UNSIGNED_SHORT,
-				firstIndex * 2
-			);
+		public drawPoints(indexBuffer: IndexBuffer3D,firstIndex: number = 0,numPoints: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.POINTS, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 		/**
          * [Webgl only]
          * draws a closed loop connecting the vertices defined in the indexBuffer to the next one
          */
-		public drawLineLoop(
-			indexBuffer: IndexBuffer3D,
-			firstIndex: number = 0,
-			numPoints: number = -1
-		): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(
-				GL.LINE_LOOP,
-				numPoints < 0 ? indexBuffer.numIndices : numPoints,
-				GL.UNSIGNED_SHORT,
-				firstIndex * 2
-			);
+		public drawLineLoop(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.LINE_LOOP, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 		/**
          * [Webgl only]
          * It is similar to drawLineLoop(). The difference here is that WebGL does not connect the last vertex to the first one (not a closed loop).
          */
-		public drawLineStrip(
-			indexBuffer: IndexBuffer3D,
-			firstIndex: number = 0,
-			numPoints: number = -1
-		): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(
-				GL.LINE_STRIP,
+		public drawLineStrip(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(
+				gl.LINE_STRIP,
 				numPoints < 0 ? indexBuffer.numIndices : numPoints,
-				GL.UNSIGNED_SHORT,
+				gl.UNSIGNED_SHORT,
 				firstIndex * 2
 			);
 		}
@@ -414,8 +421,13 @@ namespace rf {
         *  indices = [0, 1, 2, 3, 4];, then we will generate the triangles:(0, 1, 2), (1, 2, 3), and(2, 3, 4).
         */
 		public drawTriangleStrip(indexBuffer: IndexBuffer3D): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(GL.TRIANGLE_STRIP, indexBuffer.numIndices, GL.UNSIGNED_SHORT, 0);
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.TRIANGLE_STRIP, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
 		}
 
 		/**
@@ -425,8 +437,13 @@ namespace rf {
          * In our example, indices = [0, 1, 2, 3, 4]; will create the triangles: (0, 1, 2) and(0, 3, 4).
          */
 		public drawTriangleFan(indexBuffer: IndexBuffer3D): void {
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.glBuffer);
-			GL.drawElements(GL.TRIANGLE_FAN, indexBuffer.numIndices, GL.UNSIGNED_SHORT, 0);
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.TRIANGLE_FAN, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
 		}
 
 		/**
@@ -436,41 +453,72 @@ namespace rf {
 
 		private _vaCache: {} = {};
 		private enableVA(keyInCache: string): void {
-			var location: number = GL.getAttribLocation(this._linkedProgram.glProgram, keyInCache);
+			var location: number = gl.getAttribLocation(this._linkedProgram.program, keyInCache);
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + keyInCache);
 			}
 			var va: { size: number; buffer: WebGLBuffer; stride: number; offset: number } = this._vaCache[keyInCache];
 
-			GL.bindBuffer(GL.ARRAY_BUFFER, va.buffer); // Bind the buffer object to a target
-			GL.vertexAttribPointer(location, va.size, GL.FLOAT, false, va.stride, va.offset);
-			GL.enableVertexAttribArray(location);
+			gl.bindBuffer(gl.ARRAY_BUFFER, va.buffer); // Bind the buffer object to a target
+			gl.vertexAttribPointer(location, va.size, gl.FLOAT, false, va.stride, va.offset);
+			gl.enableVertexAttribArray(location);
 			// GL.bindBuffer(GL.ARRAY_BUFFER, null);
 		}
 
 		private _vcCache: {} = {}; // {variable:array}
 		private enableVC(keyInCache: string): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.glProgram, keyInCache);
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
 			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
 
 			var vc: number[] = this._vcCache[keyInCache];
-			GL['uniform' + vc.length + 'fv'](index, vc);
+			gl['uniform' + vc.length + 'fv'](index, vc);
 		}
 
 		private _vcMCache: {} = {};
 		private enableVCM(keyInCache: string): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.glProgram, keyInCache);
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
 			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
 
-			GL.uniformMatrix4fv(index, false, this._vcMCache[keyInCache]); // bug:the second parameter must be false
+			gl.uniformMatrix4fv(index, false, this._vcMCache[keyInCache]); // bug:the second parameter must be false
 		}
 
 		private _texCache: {} = {}; //{sampler:Texture}
 		private enableTex(keyInCache): void {
 			var tex: Texture = this._texCache[keyInCache];
-			GL.activeTexture(GL['TEXTURE' + tex.textureUnit]);
-			var l: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.glProgram, keyInCache);
-			GL.uniform1i(l, tex.textureUnit); // TODO:multiple textures
+			gl.activeTexture(gl['TEXTURE' + tex.textureUnit]);
+			var l: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
+			gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		}
+	}
+
+
+	/**
+	 * todo
+	 */
+	export function webGLSimpleReport():Object{
+		//http://webglreport.com/
+
+		// Vertex Shader
+		// Max Vertex Attributes:
+		// Max Vertex Uniform Vectors:
+		// Max Vertex Texture Image Units:
+		// Max Varying Vectors:
+
+		gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+		gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+		gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+		gl.getParameter(gl.MAX_VARYING_VECTORS);
+		gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
+
+
+
+		// Fragment Shader
+		// Max Fragment Uniform Vectors:
+		// Max Texture Image Units:
+		// float/int precision:highp/highp
+
+
+
+		return {};
 	}
 }

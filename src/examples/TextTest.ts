@@ -57,6 +57,7 @@ module rf{
             ctx.strokeText('汪鸿海!', 20, 100);
             ctx.fillStyle = 'red';
             ctx.fillText('汪鸿海!', 20, 100);
+            ctx.measureText("汪").width
 
             // var d:TextMetrics=ctx.measureText("你");
             // alert(d.width)
