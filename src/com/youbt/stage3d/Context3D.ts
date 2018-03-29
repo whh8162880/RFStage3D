@@ -80,19 +80,19 @@ namespace rf {
 			antiAlias: number,
 			enableDepthAndStencil: boolean = true
 		): void {
-			GL.viewport(0, 0, width, height);
-			GL.canvas.width = width;
-			GL.canvas.height = height;
+			gl.viewport(0, 0, width, height);
+			gl.canvas.width = width;
+			gl.canvas.height = height;
 			this._depthDisabled = enableDepthAndStencil;
 			//TODO: antiAlias , Stencil
 			if (enableDepthAndStencil) {
-				this._clearBit = GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT | GL.STENCIL_BUFFER_BIT;
-				GL.enable(GL.DEPTH_TEST);
-				GL.enable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT;
+				gl.enable(gl.DEPTH_TEST);
+				gl.enable(gl.STENCIL_TEST);
 			} else {
-				this._clearBit = GL.COLOR_BUFFER_BIT;
-				GL.disable(GL.DEPTH_TEST);
-				GL.disable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT;
+				gl.disable(gl.DEPTH_TEST);
+				gl.disable(gl.STENCIL_TEST);
 			}
 		}
 
@@ -126,32 +126,32 @@ namespace rf {
 			colorOutputIndex: number /*int*/ = 0
 		): void {
 			if (enableDepthAndStencil) {
-				this._clearBit = GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT | GL.STENCIL_BUFFER_BIT;
-				GL.enable(GL.DEPTH_TEST);
-				GL.enable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT;
+				gl.enable(gl.DEPTH_TEST);
+				gl.enable(gl.STENCIL_TEST);
 			} else {
-				this._clearBit = GL.COLOR_BUFFER_BIT;
-				GL.disable(GL.DEPTH_TEST);
-				GL.disable(GL.STENCIL_TEST);
+				this._clearBit = gl.COLOR_BUFFER_BIT;
+				gl.disable(gl.DEPTH_TEST);
+				gl.disable(gl.STENCIL_TEST);
 			}
 
 			//TODO: antiAlias surfaceSelector colorOutputIndex
 			if (!this._rttFramebuffer) {
-				this._rttFramebuffer = GL.createFramebuffer();
-				GL.bindFramebuffer(GL.FRAMEBUFFER, this._rttFramebuffer);
+				this._rttFramebuffer = gl.createFramebuffer();
+				gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 
-				var renderbuffer: WebGLRenderbuffer = GL.createRenderbuffer();
-				GL.bindRenderbuffer(GL.RENDERBUFFER, renderbuffer);
-				GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, 512, 512); //force 512
+				var renderbuffer: WebGLRenderbuffer = gl.createRenderbuffer();
+				gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
+				gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, 512, 512); //force 512
 
-				GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, renderbuffer);
-				GL.framebufferTexture2D(GL.FRAMEBUFFER,	GL.COLOR_ATTACHMENT0,GL.TEXTURE_2D,	texture.__getGLTexture(),	0);
+				gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER,	gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,	texture.__getGLTexture(),	0);
 			}
-			GL.bindFramebuffer(GL.FRAMEBUFFER, this._rttFramebuffer);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 		}
 
 		public setRenderToBackBuffer(): void {
-			GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		}
 
 		public programs:{[key:string]:Recyclable<Program3D>} = {};
@@ -184,7 +184,7 @@ namespace rf {
 				throw new Error("must predefined Program3D");
 			}
 
-			var location: number = GL.getAttribLocation(this._linkedProgram.program, variable);
+			var location: number = gl.getAttribLocation(this._linkedProgram.program, variable);
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + variable);
 			}
@@ -194,9 +194,9 @@ namespace rf {
 				}
 			}
 
-			GL.bindBuffer(GL.ARRAY_BUFFER, buffer.buffer); // Bind the buffer object to a target
-			GL.vertexAttribPointer(location, format, GL.FLOAT, false, buffer.data32PerVertex * 4, bufferOffset * 4);
-			GL.enableVertexAttribArray(location);
+			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.buffer); // Bind the buffer object to a target
+			gl.vertexAttribPointer(location, format, gl.FLOAT, false, buffer.data32PerVertex * 4, bufferOffset * 4);
+			gl.enableVertexAttribArray(location);
 		}
 
 		/**
@@ -206,9 +206,9 @@ namespace rf {
 		 * @param format FLOAT_1 2 3 4
 		 */
 		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array,format:number): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, variable);
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
 			if (!index) throw new Error('Fail to get uniform ' + variable);
-			GL['uniform' + format + 'fv'](index, data);
+			gl['uniform' + format + 'fv'](index, data);
 		}
 
 		/**
@@ -243,7 +243,7 @@ namespace rf {
 			}
 
 			this._linkedProgram = program;
-			GL.useProgram(program.program);
+			gl.useProgram(program.program);
 
 			// var k: string;
 			// for (k in this._vaCache) this.enableVA(k);
@@ -261,11 +261,11 @@ namespace rf {
 			stencil: number /*uint*/ = 0,
 			mask: number /* uint */ = 0xffffffff
 		): void {
-			GL.clearColor(red, green, blue, alpha);
-			GL.clearDepth(depth); // TODO:dont need to call this every time
-			GL.clearStencil(stencil); //stencil buffer
+			gl.clearColor(red, green, blue, alpha);
+			gl.clearDepth(depth); // TODO:dont need to call this every time
+			gl.clearStencil(stencil); //stencil buffer
 
-			GL.clear(this._clearBit);
+			gl.clear(this._clearBit);
 		}
 
 
@@ -277,22 +277,22 @@ namespace rf {
 		// }
 
 		public setCulling(triangleFaceToCull: string): void {
-			GL.frontFace(GL.CW);
+			gl.frontFace(gl.CW);
 			switch (triangleFaceToCull) {
 				case Context3DTriangleFace.NONE:
-					GL.disable(GL.CULL_FACE);
+					gl.disable(gl.CULL_FACE);
 					break;
 				case Context3DTriangleFace.BACK:
-					GL.enable(GL.CULL_FACE);
-					GL.cullFace(GL.BACK);
+					gl.enable(gl.CULL_FACE);
+					gl.cullFace(gl.BACK);
 					break;
 				case Context3DTriangleFace.FRONT:
-					GL.enable(GL.CULL_FACE);
-					GL.cullFace(GL.FRONT);
+					gl.enable(gl.CULL_FACE);
+					gl.cullFace(gl.FRONT);
 					break;
 				case Context3DTriangleFace.FRONT_AND_BACK:
-					GL.enable(GL.CULL_FACE);
-					GL.cullFace(GL.FRONT_AND_BACK);
+					gl.enable(gl.CULL_FACE);
+					gl.cullFace(gl.FRONT_AND_BACK);
 					break;
 			}
 		}
@@ -313,12 +313,12 @@ namespace rf {
 		 */
 		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
 			if (this._depthDisabled) {
-				GL.enable(GL.DEPTH_TEST);
+				gl.enable(gl.DEPTH_TEST);
 				this._depthDisabled = false;
 			}
 
-			GL.depthMask(depthMask);
-			GL.depthFunc(passCompareMode);
+			gl.depthMask(depthMask);
+			gl.depthFunc(passCompareMode);
 		}
 
 
@@ -337,10 +337,10 @@ namespace rf {
 
 		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
 			if (this._bendDisabled) {
-				GL.enable(GL.BLEND); //stage3d cant disable blend?
+				gl.enable(gl.BLEND); //stage3d cant disable blend?
 				this._bendDisabled = false;
 			}
-			GL.blendFunc(sourceFactor, destinationFactor);
+			gl.blendFunc(sourceFactor, destinationFactor);
 		}
 
 		public drawTriangles(indexBuffer: IndexBuffer3D,firstIndex: number = 0,numTriangles: number = -1): void {
@@ -349,8 +349,8 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(GL.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, GL.UNSIGNED_SHORT, firstIndex * 2);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 
@@ -365,8 +365,8 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(GL.LINES, numLines < 0 ? indexBuffer.numIndices : numLines * 2, GL.UNSIGNED_SHORT, firstIndex * 2);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.LINES, numLines < 0 ? indexBuffer.numIndices : numLines * 2, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 		/*
@@ -379,8 +379,8 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(GL.POINTS, numPoints < 0 ? indexBuffer.numIndices : numPoints, GL.UNSIGNED_SHORT, firstIndex * 2);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.POINTS, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 		/**
@@ -393,8 +393,8 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(GL.LINE_LOOP, numPoints < 0 ? indexBuffer.numIndices : numPoints, GL.UNSIGNED_SHORT, firstIndex * 2);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.LINE_LOOP, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}
 
 		/**
@@ -407,11 +407,11 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(
-				GL.LINE_STRIP,
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(
+				gl.LINE_STRIP,
 				numPoints < 0 ? indexBuffer.numIndices : numPoints,
-				GL.UNSIGNED_SHORT,
+				gl.UNSIGNED_SHORT,
 				firstIndex * 2
 			);
 		}
@@ -426,8 +426,8 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(GL.TRIANGLE_STRIP, indexBuffer.numIndices, GL.UNSIGNED_SHORT, 0);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.TRIANGLE_STRIP, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
 		}
 
 		/**
@@ -442,8 +442,8 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			GL.drawElements(GL.TRIANGLE_FAN, indexBuffer.numIndices, GL.UNSIGNED_SHORT, 0);
+			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			gl.drawElements(gl.TRIANGLE_FAN, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
 		}
 
 		/**
@@ -453,41 +453,41 @@ namespace rf {
 
 		private _vaCache: {} = {};
 		private enableVA(keyInCache: string): void {
-			var location: number = GL.getAttribLocation(this._linkedProgram.program, keyInCache);
+			var location: number = gl.getAttribLocation(this._linkedProgram.program, keyInCache);
 			if (location < 0) {
 				throw new Error('Fail to get the storage location of' + keyInCache);
 			}
 			var va: { size: number; buffer: WebGLBuffer; stride: number; offset: number } = this._vaCache[keyInCache];
 
-			GL.bindBuffer(GL.ARRAY_BUFFER, va.buffer); // Bind the buffer object to a target
-			GL.vertexAttribPointer(location, va.size, GL.FLOAT, false, va.stride, va.offset);
-			GL.enableVertexAttribArray(location);
+			gl.bindBuffer(gl.ARRAY_BUFFER, va.buffer); // Bind the buffer object to a target
+			gl.vertexAttribPointer(location, va.size, gl.FLOAT, false, va.stride, va.offset);
+			gl.enableVertexAttribArray(location);
 			// GL.bindBuffer(GL.ARRAY_BUFFER, null);
 		}
 
 		private _vcCache: {} = {}; // {variable:array}
 		private enableVC(keyInCache: string): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
 			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
 
 			var vc: number[] = this._vcCache[keyInCache];
-			GL['uniform' + vc.length + 'fv'](index, vc);
+			gl['uniform' + vc.length + 'fv'](index, vc);
 		}
 
 		private _vcMCache: {} = {};
 		private enableVCM(keyInCache: string): void {
-			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
 			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
 
-			GL.uniformMatrix4fv(index, false, this._vcMCache[keyInCache]); // bug:the second parameter must be false
+			gl.uniformMatrix4fv(index, false, this._vcMCache[keyInCache]); // bug:the second parameter must be false
 		}
 
 		private _texCache: {} = {}; //{sampler:Texture}
 		private enableTex(keyInCache): void {
 			var tex: Texture = this._texCache[keyInCache];
-			GL.activeTexture(GL['TEXTURE' + tex.textureUnit]);
-			var l: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
-			GL.uniform1i(l, tex.textureUnit); // TODO:multiple textures
+			gl.activeTexture(gl['TEXTURE' + tex.textureUnit]);
+			var l: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
+			gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		}
 	}
 
@@ -503,6 +503,12 @@ namespace rf {
 		// Max Vertex Uniform Vectors:
 		// Max Vertex Texture Image Units:
 		// Max Varying Vectors:
+
+		gl.getParameter(gl.MAX_VERTEX_ATTRIBS);
+		gl.getParameter(gl.MAX_VERTEX_UNIFORM_VECTORS);
+		gl.getParameter(gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+		gl.getParameter(gl.MAX_VARYING_VECTORS);
+		gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
 
 
 

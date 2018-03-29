@@ -23,7 +23,7 @@ module rf {
         }
         onRecycle(): void {
             if (this.buffer) {
-                GL.deleteBuffer(this.buffer);
+                gl.deleteBuffer(this.buffer);
                 this.buffer = undefined;
             }
             this.readly = false;
@@ -42,11 +42,11 @@ module rf {
                 return false;
             }
             if (undefined == this.buffer) {
-                this.buffer = GL.createBuffer();
+                this.buffer = gl.createBuffer();
             }
-            GL.bindBuffer(GL.ARRAY_BUFFER, this.buffer);
-            GL.bufferData(GL.ARRAY_BUFFER, this.data, GL.STATIC_DRAW);
-            GL.bindBuffer(GL.ARRAY_BUFFER, null);
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+            gl.bufferData(gl.ARRAY_BUFFER, this.data, gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ARRAY_BUFFER, null);
             this.readly = true;
             return true;
         }
@@ -81,7 +81,7 @@ module rf {
         }
         onRecycle(): void {
             if (this.buffer) {
-                GL.deleteBuffer(this.buffer);
+                gl.deleteBuffer(this.buffer);
                 this.buffer = undefined;
             }
             this.readly = false;
@@ -104,10 +104,10 @@ module rf {
                 ThrowError("indexData unavailable");
                 return false;
             }
-            this.buffer = GL.createBuffer();
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, this.buffer);
-            GL.bufferData(GL.ELEMENT_ARRAY_BUFFER, this.data, GL.STATIC_DRAW);
-            GL.bindBuffer(GL.ELEMENT_ARRAY_BUFFER, null);
+            this.buffer = gl.createBuffer();
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
+            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.data, gl.STATIC_DRAW);
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
 
         }
         public uploadFromVector(data: number[] | Uint16Array, startOffset: number = 0, count: number = -1): void {
@@ -161,17 +161,17 @@ module rf {
             }
 
             //创建 vertexShader
-            this.vShader = this.createShader(this.vertexCode,GL.VERTEX_SHADER);
-            this.fShader = this.createShader(this.fragmentCode,GL.FRAGMENT_SHADER);
-            this.program = GL.createProgram();
-            
-            GL.attachShader(this.program, this.vShader) ;
-            GL.attachShader(this.program, this.fShader);
-            GL.linkProgram(this.program);
-            if (!GL.getProgramParameter(this.program, GL.LINK_STATUS))
+            this.vShader = this.createShader(this.vertexCode,gl.VERTEX_SHADER);
+            this.fShader = this.createShader(this.fragmentCode,gl.FRAGMENT_SHADER);
+            this.program = gl.createProgram();
+
+            gl.attachShader(this.program, this.vShader) ;
+            gl.attachShader(this.program, this.fShader);
+            gl.linkProgram(this.program);
+            if (!gl.getProgramParameter(this.program, gl.LINK_STATUS))
             {
                 this.dispose();
-                ThrowError(`create program error:${GL.getProgramInfoLog(this.program)}`);
+                ThrowError(`create program error:${gl.getProgramInfoLog(this.program)}`);
                 return false;
             }
 
@@ -182,20 +182,20 @@ module rf {
         dispose():void{
             if (this.vShader)
             {
-                GL.detachShader(this.program, this.vShader);
-                GL.deleteShader(this.vShader);
+                gl.detachShader(this.program, this.vShader);
+                gl.deleteShader(this.vShader);
                 this.vShader = null;
             }
 
             if (this.fShader)
             {
-                GL.detachShader(this.program, this.fShader);
-                GL.deleteShader(this.fShader);
+                gl.detachShader(this.program, this.fShader);
+                gl.deleteShader(this.fShader);
                 this.fShader = null;
             }
 
             if(this.program){
-                GL.deleteProgram(this.program);
+                gl.deleteProgram(this.program);
                 this.program = null;
             }
         }
@@ -214,14 +214,14 @@ module rf {
             // var script: HTMLObjectElement = <HTMLObjectElement>document.getElementById(elementId);
             // if (!script)
                 // throw new Error("cant find elementId: " + elementId);
-            var shader: WebGLShader = GL.createShader(type);
-            GL.shaderSource(shader, code);
-            GL.compileShader(shader);
+            var shader: WebGLShader = gl.createShader(type);
+            gl.shaderSource(shader, code);
+            gl.compileShader(shader);
             // Check the result of compilation
-            if (!GL.getShaderParameter(shader, GL.COMPILE_STATUS))
+            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS))
             {
-                GL.deleteShader(shader);
-                let error:string = GL.getShaderInfoLog(shader);
+                gl.deleteShader(shader);
+                let error:string = gl.getShaderInfoLog(shader);
                 throw new Error(error);
             }
             return shader;
