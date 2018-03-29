@@ -9,8 +9,8 @@ module rf{
         public init():void{
             // this.bitmapDataTest();
             // new MaxRectsBinPackTest();
-            // new WebglTest();
-            new MaxRectsTest();
+            new WebglTest();
+            // new MaxRectsTest();
         }
 
         public linktest():void{

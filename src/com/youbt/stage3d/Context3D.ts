@@ -96,16 +96,16 @@ namespace rf {
 			}
 		}
 
-		public createVertexBuffer(numVertices: number, data32PerVertex: number): VertexBuffer3D {
+		public createVertexBuffer(data: number[] | Float32Array,data32PerVertex: number,startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
 			let buffer: VertexBuffer3D = recyclable(VertexBuffer3D);
-			buffer.numVertices = numVertices;
 			buffer.data32PerVertex = data32PerVertex;
+			buffer.uploadFromVector(data,startVertex,numVertices);			
 			return buffer;
 		}
 
-		public createIndexBuffer(numIndices: number): IndexBuffer3D {
+		public createIndexBuffer(data:number[] | Uint16Array): IndexBuffer3D {
 			let buffer = recyclable(IndexBuffer3D);
-			buffer.numIndices = numIndices;
+			buffer.uploadFromVector(data);
 			return buffer
 		}
 
@@ -169,34 +169,6 @@ namespace rf {
 			program.vertexCode = vertexCode;
 			program.fragmentCode = fragmentCode;
 			return program;
-		}
-
-		/**
-        *  @variable must predefined in glsl
-        */
-		public setVertexBufferAt(variable: string, buffer: VertexBuffer3D, bufferOffset: number = 0, format: number = 4): void {
-			if (format <= 0 || format > 4) {
-				ThrowError(`VertexBufferFormat[1-4]:${format}?`);
-				return;
-			}
-
-			if (undefined == this._linkedProgram) {
-				throw new Error("must predefined Program3D");
-			}
-
-			var location: number = gl.getAttribLocation(this._linkedProgram.program, variable);
-			if (location < 0) {
-				throw new Error('Fail to get the storage location of' + variable);
-			}
-			if (false == buffer.readly) {
-				if (false == buffer.awaken()) {
-					throw new Error("create VertexBuffer error!");
-				}
-			}
-
-			gl.bindBuffer(gl.ARRAY_BUFFER, buffer.buffer); // Bind the buffer object to a target
-			gl.vertexAttribPointer(location, format, gl.FLOAT, false, buffer.data32PerVertex * 4, bufferOffset * 4);
-			gl.enableVertexAttribArray(location);
 		}
 
 		/**
