@@ -1,7 +1,10 @@
 step1.服务器上创建一个issues(问题) 指定开发者 指定完成事件 [项目管理者 创建] 如创建的issuesid 为#1
-setp2.服务器上创建一个新branch(分支)  [项目管理者 创建] 如创建分支:1-test
+step2.服务器上创建一个新branch(分支)  [项目管理者 创建规则[issuesid-branchname]] 如创建分支:1-test
 
-step3.本地 git fetch origin 同步服务器分支  可通过git branch查看
+step3.本地 git fetch origin 同步服务器分支  同步后可通过 git branch 查看本地分支列表
 step4.本地 git checkout 1-test[分支id]
 
-... 未写完
+step5.本地功能开发完全之后 提交到服务器
+step6.由有合并代码权限的人合并分支到master
+step7.服务器上关闭issues
+step8.服务器上删除分支。[可选]
