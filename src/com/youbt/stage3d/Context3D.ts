@@ -181,7 +181,7 @@ namespace rf {
 			}
 
 			if (undefined == this._linkedProgram) {
-				throw new Error("mast set Program first");
+				throw new Error("must predefined Program3D");
 			}
 
 			var location: number = GL.getAttribLocation(this._linkedProgram.program, variable);
@@ -200,13 +200,15 @@ namespace rf {
 		}
 
 		/**
-        *  @variable must predefined in glsl
-        */
-		public setProgramConstantsFromVector(variable: string, data: number[] /* Vector.<Number> */): void {
-			if (data.length > 4) throw new Error('data length > 4');
-
-			this._vcCache[variable] = data;
-			if (this._linkedProgram) this.enableVC(variable);
+		 * 
+		 * @param variable 
+		 * @param data 
+		 * @param format FLOAT_1 2 3 4
+		 */
+		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array,format:number): void {
+			var index: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, variable);
+			if (!index) throw new Error('Fail to get uniform ' + variable);
+			GL['uniform' + format + 'fv'](index, data);
 		}
 
 		/**
