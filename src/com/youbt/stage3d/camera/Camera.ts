@@ -1,3 +1,4 @@
+///<reference path="../display/DisplayObject.ts" />
 module rf{
     class Canmera extends DisplayObject implements IResizeable{
         len:Matrix3D;
@@ -37,12 +38,12 @@ module rf{
             rawData[10] = 1/this.far;
             rawData[11] = 0;
 
-            rawData[12] = 0;
-            rawData[13] = 0;
+            rawData[12] = -1;
+            rawData[13] = 1;
             rawData[14] = 0;
             rawData[15] = 1;
 
-            
+            this._change = true;
         }
 
         public updateSceneTransform():void{

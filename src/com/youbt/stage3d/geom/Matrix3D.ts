@@ -56,36 +56,54 @@ module rf{
         public append(lhs: Matrix3D): void
         {
             //lhs * this
-            var a11: number = lhs.rawData[0]; var a12: number = lhs.rawData[1]; var a13: number = lhs.rawData[2]; var a14: number = lhs.rawData[3];
-            var a21: number = lhs.rawData[4]; var a22: number = lhs.rawData[5]; var a23: number = lhs.rawData[6]; var a24: number = lhs.rawData[7];
-            var a31: number = lhs.rawData[8]; var a32: number = lhs.rawData[9]; var a33: number = lhs.rawData[10]; var a34: number = lhs.rawData[11];
-            var a41: number = lhs.rawData[12]; var a42: number = lhs.rawData[13]; var a43: number = lhs.rawData[14]; var a44: number = lhs.rawData[15];
-
-            var b11: number = this.rawData[0]; var b12: number = this.rawData[1]; var b13: number = this.rawData[2]; var b14: number = this.rawData[3];
-            var b21: number = this.rawData[4]; var b22: number = this.rawData[5]; var b23: number = this.rawData[6]; var b24: number = this.rawData[7];
-            var b31: number = this.rawData[8]; var b32: number = this.rawData[9]; var b33: number = this.rawData[10]; var b34: number = this.rawData[11];
-            var b41: number = this.rawData[12]; var b42: number = this.rawData[13]; var b43: number = this.rawData[14]; var b44: number = this.rawData[15];
-
-            // a * b
-            this.rawData[0] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
-            this.rawData[1] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
-            this.rawData[2] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
-            this.rawData[3] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
-
-            this.rawData[4] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
-            this.rawData[5] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
-            this.rawData[6] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
-            this.rawData[7] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
-
-            this.rawData[8] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
-            this.rawData[9] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
-            this.rawData[10] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
-            this.rawData[11] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
-
-            this.rawData[12] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
-            this.rawData[13] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
-            this.rawData[14] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
-            this.rawData[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+            let m111 = this.rawData[0];
+			let m121 = this.rawData[4];
+			let m131 = this.rawData[8];
+			let m141 = this.rawData[12];
+			let m112 = this.rawData[1];
+			let m122 = this.rawData[5];
+			let m132 = this.rawData[9];
+			let m142 = this.rawData[13];
+			let m113 = this.rawData[2];
+			let m123 = this.rawData[6];
+			let m133 = this.rawData[10];
+			let m143 = this.rawData[14];
+			let m114 = this.rawData[3];
+			let m124 = this.rawData[7];
+			let m134 = this.rawData[11];
+			let m144 = this.rawData[15];
+			let m211 = lhs.rawData[0];
+			let m221 = lhs.rawData[4];
+			let m231 = lhs.rawData[8];
+			let m241 = lhs.rawData[12];
+			let m212 = lhs.rawData[1];
+			let m222 = lhs.rawData[5];
+			let m232 = lhs.rawData[9];
+			let m242 = lhs.rawData[13];
+			let m213 = lhs.rawData[2];
+			let m223 = lhs.rawData[6];
+			let m233 = lhs.rawData[10];
+			let m243 = lhs.rawData[14];
+			let m214 = lhs.rawData[3];
+			let m224 = lhs.rawData[7];
+			let m234 = lhs.rawData[11];
+			let m244 = lhs.rawData[15];
+			this.rawData[0] = m111 * m211 + m112 * m221 + m113 * m231 + m114 * m241;
+			this.rawData[1] = m111 * m212 + m112 * m222 + m113 * m232 + m114 * m242;
+			this.rawData[2] = m111 * m213 + m112 * m223 + m113 * m233 + m114 * m243;
+			this.rawData[3] = m111 * m214 + m112 * m224 + m113 * m234 + m114 * m244;
+			this.rawData[4] = m121 * m211 + m122 * m221 + m123 * m231 + m124 * m241;
+			this.rawData[5] = m121 * m212 + m122 * m222 + m123 * m232 + m124 * m242;
+			this.rawData[6] = m121 * m213 + m122 * m223 + m123 * m233 + m124 * m243;
+			this.rawData[7] = m121 * m214 + m122 * m224 + m123 * m234 + m124 * m244;
+			this.rawData[8] = m131 * m211 + m132 * m221 + m133 * m231 + m134 * m241;
+			this.rawData[9] = m131 * m212 + m132 * m222 + m133 * m232 + m134 * m242;
+			this.rawData[10] = m131 * m213 + m132 * m223 + m133 * m233 + m134 * m243;
+			this.rawData[11] = m131 * m214 + m132 * m224 + m133 * m234 + m134 * m244;
+			this.rawData[12] = m141 * m211 + m142 * m221 + m143 * m231 + m144 * m241;
+			this.rawData[13] = m141 * m212 + m142 * m222 + m143 * m232 + m144 * m242;
+			this.rawData[14] = m141 * m213 + m142 * m223 + m143 * m233 + m144 * m243;
+			this.rawData[15] = m141 * m214 + m142 * m224 + m143 * m234 + m144 * m244;
         }
 
         /**
@@ -174,12 +192,16 @@ module rf{
              *             0 0 0 1
              */
 
-            this.rawData[0] += this.rawData[12] * x; this.rawData[1] += this.rawData[13] * x;
-            this.rawData[2] += this.rawData[14] * x; this.rawData[3] += this.rawData[15] * x;
-            this.rawData[4] += this.rawData[12] * y; this.rawData[5] += this.rawData[14] * y;
-            this.rawData[6] += this.rawData[14] * y; this.rawData[7] += this.rawData[15] * y;
-            this.rawData[8] += this.rawData[12] * z; this.rawData[9] += this.rawData[13] * z;
-            this.rawData[10] += this.rawData[14] * z; this.rawData[11] += this.rawData[15] *z;
+            // this.rawData[0] += this.rawData[12] * x; this.rawData[1] += this.rawData[13] * x;
+            // this.rawData[2] += this.rawData[14] * x; this.rawData[3] += this.rawData[15] * x;
+            // this.rawData[4] += this.rawData[12] * y; this.rawData[5] += this.rawData[14] * y;
+            // this.rawData[6] += this.rawData[14] * y; this.rawData[7] += this.rawData[15] * y;
+            // this.rawData[8] += this.rawData[12] * z; this.rawData[9] += this.rawData[13] * z;
+            // this.rawData[10] += this.rawData[14] * z; this.rawData[11] += this.rawData[15] *z;
+
+            this.rawData[12] += x;
+            this.rawData[13] += y;
+            this.rawData[14] += z;
 
         }
 
@@ -596,12 +618,12 @@ module rf{
 			switch(orientationStyle) {
 			case Orientation3D.EULER_ANGLES:
 			{
-				var cx : number = Math.cos(components[1].x);
-				var cy : number = Math.cos(components[1].y);
-				var cz : number = Math.cos(components[1].z);
-				var sx : number = Math.sin(components[1].x);
-				var sy : number = Math.sin(components[1].y);
-				var sz : number = Math.sin(components[1].z);
+				var cx = Math.cos(components[1].x);
+				var cy = Math.cos(components[1].y);
+				var cz = Math.cos(components[1].z);
+				var sx = Math.sin(components[1].x);
+				var sy = Math.sin(components[1].y);
+				var sz = Math.sin(components[1].z);
 				this.rawData[0] = cy * cz * scale[0];
 				this.rawData[1] = cy * sz * scale[1];
 				this.rawData[2] = -sy * scale[2];
@@ -622,10 +644,10 @@ module rf{
 			break;
 			default:
 			{
-				var x : number = components[1].x;
-				var y : number = components[1].y;
-				var z : number = components[1].z;
-				var w : number = components[1].w;
+				var x = components[1].x;
+				var y = components[1].y;
+				var z = components[1].z;
+				var w = components[1].w;
 				if(orientationStyle==Orientation3D.AXIS_ANGLE) {
 					x *= Math.sin(w / 2);
 					y *= Math.sin(w / 2);

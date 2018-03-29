@@ -185,15 +185,11 @@ namespace rf {
 		/**
         *  @variable must predefined in glsl
         */
-		public setProgramConstantsFromMatrix(
-			variable: string,
-			matrix: Matrix3D,
-			transposedMatrix: boolean = false
-		): void {
-			if (transposedMatrix) matrix.transpose();
-
-			this._vcMCache[variable] = matrix.rawData;
-			if (this._linkedProgram) this.enableVCM(variable);
+		public setProgramConstantsFromMatrix(variable: string,matrix: Matrix3D): void {
+			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
+			if(index){
+				gl.uniformMatrix4fv(index,false,matrix.rawData);
+			}
 		}
 
 		public setTextureAt(sampler: string, texture: Texture): void {

@@ -55,9 +55,11 @@ module rf{
             `
                 attribute vec3 pos;
                 attribute vec2 uv;
+                uniform mat4 mvp;
                 varying vec2 v_TexCoord;
                 void main(void){
-                    gl_Position = vec4(pos,1.0);
+                    vec4 temp = vec4(pos,1.0);
+                    gl_Position = mvp * temp;
                     v_TexCoord = uv;
                 }
             `
@@ -75,12 +77,23 @@ module rf{
 
             
 
+            // let vertices = new Float32Array(
+            //     [
+            //         -1.0,1.0,0.0,0.0,
+            //         1.0,1.0,1.0,0.0,
+            //         1.0,-1.0,1.0,1.0,
+            //         -1.0,-1.0,0.0,1.0
+            //     ]
+            // );
+
+            ROOT.camera2D.updateSceneTransform();
+
             let vertices = new Float32Array(
                 [
-                    -1.0,1.0,0.0,0.0,
-                    1.0,1.0,1.0,0.0,
-                    1.0,-1.0,1.0,1.0,
-                    -1.0,-1.0,0.0,1.0
+                    0,0,0.0,0.0,
+                    512,0,1.0,0.0,
+                    512,512,1.0,1.0,
+                    0,512,0.0,1.0
                 ]
             );
             let indexs = new Uint16Array([0,1,3,1,2,3]);
@@ -88,9 +101,19 @@ module rf{
             v.regVariable(VA.pos,0,2);
             v.regVariable(VA.uv,2,2);
             
+            
             let i = context3D.createIndexBuffer(indexs);
             let p = context3D.createProgram(vertexCode,fragmentCode);
             context3D.setProgram(p);
+
+            let matrix = new Matrix3D();
+            matrix.appendTranslation(200,100,0);
+            matrix.append(ROOT.camera2D.worldTranform);
+
+            // let matrix = ROOT.camera2D.worldTranform.clone();
+            // matrix.transpose();
+
+            context3D.setProgramConstantsFromMatrix(VC.mvp,matrix)
 
             let texture = context3D.createTexture(image.width,image.height,gl.RGBA,false);
             texture.pixels = image;//bitmapdata.canvas;

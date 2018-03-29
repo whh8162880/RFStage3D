@@ -12,6 +12,13 @@ module rf {
         diff = "diff"
     }
 
+    export enum VC{
+        mv = "mv",
+        p = "p",
+        mvp = "mvp"
+
+    }
+
     class Buffer3D implements IRecyclable {
         preusetime: number = 0;
         readly: boolean = false;
