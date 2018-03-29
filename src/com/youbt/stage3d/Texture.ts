@@ -19,7 +19,7 @@ module rf
 
         constructor(width:number,height:number,format:string,optimizeForRenderToTexture:boolean,streamingLevels:number)
         {
-            this._glTexture = GL.createTexture();
+            this._glTexture = gl.createTexture();
             this._streamingLevels = streamingLevels;
 
             this._textureUnit = Texture.__texUnit ++;
@@ -33,28 +33,28 @@ module rf
             if(this._forRTT)
             {
 
-                GL.bindTexture(GL.TEXTURE_2D, this._glTexture);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+                gl.bindTexture(gl.TEXTURE_2D, this._glTexture);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
                // GL.generateMipmap(GL.TEXTURE_2D);
 
-                GL.texImage2D(GL.TEXTURE_2D,
+                gl.texImage2D(gl.TEXTURE_2D,
                     0,
-                    GL.RGBA,
+                    gl.RGBA,
                     512,//this._width,
                     512,//this._height,
                     0,
-                    GL.RGBA,
-                    GL.UNSIGNED_BYTE,
+                    gl.RGBA,
+                    gl.UNSIGNED_BYTE,
                     null);
 
                 if(Texture._bindingTexture)
-                    GL.bindTexture(GL.TEXTURE_2D , Texture._bindingTexture);
+                    gl.bindTexture(gl.TEXTURE_2D , Texture._bindingTexture);
                 else
-                    GL.bindTexture(GL.TEXTURE_2D, null);
+                    gl.bindTexture(gl.TEXTURE_2D, null);
 
-                GL.bindRenderbuffer(GL.RENDERBUFFER, null);
-                GL.bindFramebuffer(GL.FRAMEBUFFER, null);
+                gl.bindRenderbuffer(gl.RENDERBUFFER, null);
+                gl.bindFramebuffer(gl.FRAMEBUFFER, null);
             }
         }
 
@@ -87,29 +87,24 @@ module rf
         {
             //GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1); //uv原点在左下角，v朝上时时才需翻转
             //GL.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
-            GL.activeTexture(GL["TEXTURE"+this.textureUnit]);
-            GL.bindTexture(GL.TEXTURE_2D, this._glTexture);
+            gl.activeTexture(gl["TEXTURE"+this.textureUnit]);
+            gl.bindTexture(gl.TEXTURE_2D, this._glTexture);
 
             Texture._bindingTexture = this._glTexture;
 
             //TODO: set filter mode API
-            GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER,GL.LINEAR  ); //GL.NEAREST
+            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER,gl.LINEAR  ); //GL.NEAREST
             if (this._streamingLevels == 0)
             {
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER,GL.LINEAR);// GL.NEAREST
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER,gl.LINEAR);// GL.NEAREST
             } else {
-                GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_LINEAR); //linnear生成mipmap,缩放也linear
-                GL.generateMipmap(GL.TEXTURE_2D);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); //linnear生成mipmap,缩放也linear
+                gl.generateMipmap(gl.TEXTURE_2D);
             }
 
-            GL.texImage2D(GL.TEXTURE_2D,
-                miplevel,
-                GL.RGBA,
-                GL.RGBA,
-                GL.UNSIGNED_BYTE,
-                source);
+            gl.texImage2D(gl.TEXTURE_2D,miplevel,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,source);
 
-            if (!GL.isTexture(this._glTexture)) {
+            if (!gl.isTexture(this._glTexture)) {
                 throw new Error("Error:Texture is invalid");
             }
             //bind null 会不显示贴图 why?
@@ -118,9 +113,9 @@ module rf
 
         public dispose(): void
         {
-            GL.bindTexture(GL.TEXTURE_2D, null);
+            gl.bindTexture(gl.TEXTURE_2D, null);
             Texture._bindingTexture = null;
-            GL.deleteTexture(this._glTexture);
+            gl.deleteTexture(this._glTexture);
             this._glTexture = null;
             this._streamingLevels = 0;
         }
