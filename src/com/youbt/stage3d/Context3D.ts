@@ -18,53 +18,52 @@ namespace rf {
 		BGRA = 'bgra'
 	}
 
-	export class Context3DBlendFactor {
-		static ONE: number;
-		static ZERO: number;
+	// export class Context3DBlendFactor {
+	// 	static ONE: number;
+	// 	static ZERO: number;
 
-		static SOURCE_COLOR: number;
-		static DESTINATION_COLOR: number;
+	// 	static SOURCE_COLOR: number;
+	// 	static DESTINATION_COLOR: number;
 
-		static SOURCE_ALPHA: number;
-		static DESTINATION_ALPHA: number;
+	// 	static SOURCE_ALPHA: number;
+	// 	static DESTINATION_ALPHA: number;
 
-		static ONE_MINUS_SOURCE_COLOR: number;
-		static ONE_MINUS_DESTINATION_COLOR: number;
+	// 	static ONE_MINUS_SOURCE_COLOR: number;
+	// 	static ONE_MINUS_DESTINATION_COLOR: number;
 
-		static ONE_MINUS_SOURCE_ALPHA: number;
-		static ONE_MINUS_DESTINATION_ALPHA: number;
+	// 	static ONE_MINUS_SOURCE_ALPHA: number;
+	// 	static ONE_MINUS_DESTINATION_ALPHA: number;
 
-		static init(): void {
-			Context3DBlendFactor.ONE = GL.ONE;
-			Context3DBlendFactor.ZERO = GL.ZERO;
-			Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
-			Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
-			Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
-			Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
-			Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
-			Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
-			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
-			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
+	// 	static init(): void {
+	// 		Context3DBlendFactor.ONE = GL.ONE;
+	// 		Context3DBlendFactor.ZERO = GL.ZERO;
+	// 		Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
+	// 		Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
+	// 		Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
+	// 		Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
+	// 		Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
+	// 		Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
+	// 		Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
+	// 		Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
+	// 		//CONSTANT_COLOR
+	// 		//ONE_MINUS_CONSTANT_COLOR
+	// 		//ONE_MINUS_CONSTANT_ALPHA
+	// 	}
+	// }
 
-			//CONSTANT_COLOR
-			//ONE_MINUS_CONSTANT_COLOR
-			//ONE_MINUS_CONSTANT_ALPHA
-		}
+	export enum Context3DVertexBufferFormat {
+		BYTES_4 = 4,
+		FLOAT_1 = 1,
+		FLOAT_2 = 2,
+		FLOAT_3 = 3,
+		FLOAT_4 = 4
 	}
 
-	export class Context3DVertexBufferFormat {
-		static BYTES_4: number = 4;
-		static FLOAT_1: number = 1;
-		static FLOAT_2: number = 2;
-		static FLOAT_3: number = 3;
-		static FLOAT_4: number = 4;
-	}
-
-	export class Context3DTriangleFace {
-		static BACK: string = 'back'; //CCW
-		static FRONT: string = 'front'; //CW
-		static FRONT_AND_BACK: string = 'frontAndBack';
-		static NONE: string = 'none';
+	export enum Context3DTriangleFace {
+		BACK	= 'back', //CCW
+		FRONT	= 'front', //CW
+		FRONT_AND_BACK = 'frontAndBack',
+		NONE = 'none'
 	}
 
 	export class Context3D {
@@ -73,7 +72,6 @@ namespace rf {
 		private _bendDisabled: boolean = true;
 		private _depthDisabled: boolean = true;
 		constructor() {
-			Context3DBlendFactor.init();
 		}
 
 		public configureBackBuffer(
@@ -268,6 +266,14 @@ namespace rf {
 			GL.clear(this._clearBit);
 		}
 
+
+		// export enum Context3DTriangleFace {
+		// 	BACK	= 'back', //CCW
+		// 	FRONT	= 'front', //CW
+		// 	FRONT_AND_BACK = 'frontAndBack',
+		// 	NONE = 'none'
+		// }
+
 		public setCulling(triangleFaceToCull: string): void {
 			GL.frontFace(GL.CW);
 			switch (triangleFaceToCull) {
@@ -312,6 +318,20 @@ namespace rf {
 			GL.depthMask(depthMask);
 			GL.depthFunc(passCompareMode);
 		}
+
+
+		/**
+		  	Context3DBlendFactor.ONE = GL.ONE;
+			Context3DBlendFactor.ZERO = GL.ZERO;
+			Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
+			Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
+			Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
+			Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
+			Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
+			Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
+			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
+			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
+		 */
 
 		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
 			if (this._bendDisabled) {
@@ -467,5 +487,30 @@ namespace rf {
 			var l: WebGLUniformLocation = GL.getUniformLocation(this._linkedProgram.program, keyInCache);
 			GL.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		}
+	}
+
+
+	/**
+	 * todo
+	 */
+	export function webGLSimpleReport():Object{
+		//http://webglreport.com/
+
+		// Vertex Shader
+		// Max Vertex Attributes:
+		// Max Vertex Uniform Vectors:
+		// Max Vertex Texture Image Units:
+		// Max Varying Vectors:
+
+
+
+		// Fragment Shader
+		// Max Fragment Uniform Vectors:
+		// Max Texture Image Units:
+		// float/int precision:highp/highp
+
+
+
+		return {};
 	}
 }

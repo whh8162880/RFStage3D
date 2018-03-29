@@ -23,6 +23,7 @@ module rf{
                     break;
                 }
             }
+            
 
             if(undefined == GL){
                 context3D = null;

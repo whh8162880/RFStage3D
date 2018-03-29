@@ -14,9 +14,6 @@ module rf{
             this.render();
         }
 
-
-
-
         public render():void{
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             context3D.clear(0,0,0,1);
