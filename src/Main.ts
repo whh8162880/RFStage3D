@@ -10,7 +10,7 @@ module rf{
             Engine.addTick(this);
             // this.bitmapDataTest();
             // new MaxRectsBinPackTest();
-            // new WebglTest();
+            new WebglTest();
             // new MaxRectsTest();
         }
 

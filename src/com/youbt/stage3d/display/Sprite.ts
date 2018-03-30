@@ -2,7 +2,7 @@
 ///<reference path="../camera/Camera.ts" />
 module rf{
     export interface I3DRender extends IRecyclable{
-        render(camera:Camera,now:number,interval:number):void
+        render?(camera:Camera,now:number,interval:number):void
     }
     export class HitArea{
         left:number = 0;
@@ -94,7 +94,7 @@ module rf{
         }
 
         private addPoint(position:number,x:number,y:number,z:number,u:number,v:number,index:number,r:number,g:number,b:number,a:number):void{
-            this.byte.addPoint(position   ,x,y,z,0,0,0,r,g,b,a);
+            this.byte.addUIPoint(position   ,x,y,z,0,0,0,r,g,b,a);
             this.target.hitArea.updateArea(x,y,z);
         }
 
@@ -113,9 +113,6 @@ module rf{
         }
     }
 
-
-
-
     export class Batcher implements I3DRender{
         target:Sprite;
         geometry:Link;
@@ -127,7 +124,20 @@ module rf{
 
         public render(camera:Camera,now:number,interval:number):void{
             if(this.target._change | DChange.vertex){
-
+                this.batch(this.target);
+                this.target._change &= ~DChange.vertex;
+            }
+            let vo = this.geometry.getFrist();
+            while(vo){
+                if(vo.close == false){
+                    let render:I3DRender = vo.data;
+                    if(render instanceof BatchGeometry){
+                        this.dc(<BatchGeometry>render);
+                    }else{
+                        render.render(camera,now,interval);
+                    }
+                }
+                vo = vo.next;
             }
         }
 
@@ -150,19 +160,22 @@ module rf{
             }
             this.geometry.clean();
         }
+
+
+
+        dc(geo:BatchGeometry):void{
+
+        }
     }
 
 
     class BatchGeometry implements I3DRender,IGeometry{
         vertex:VertexInfo;
         index:Uint16Array;
+        vci:number = 0;
         constructor(){
             this.vertex = new VertexInfo();
         }
-        render(camera:Camera,now:number,interval:number):void{
-            
-        }
-
         onRecycle():void{
             this.vertex = undefined;
             this.index = undefined;

@@ -114,4 +114,88 @@ module rf{
             return Math.asin(Math.sqrt(Math.sin(a * .5) ** 2 + Math.cos(radlat1) * Math.cos(radlat2) * (Math.sin(b * .5) ** 2))) * 12756274;
         }
     }
+
+    export class Float32Byte{
+        public array:Float32Array;
+       
+        constructor(array:Float32Array){
+            this.array = array;
+        }
+
+        get length():number{
+            return this.array.length;
+        }
+
+        set length(value:number){
+            if(this.array.length  == value){
+                return;
+            }
+            let nd = new Float32Array(value);
+            let len = value < this.array.length ? value : this.array.length;
+            nd.set(this.array.slice(0,len),0);
+            this.array = nd;
+        }
+
+        public append(byte:Float32Byte,offset:number = 0,len:number = -1):void{
+            var position:number = 0;
+            if(0 > offset){
+                offset = 0;
+            }
+
+            if(-1 == len){
+                len = byte.length - offset;
+            }else{
+                if(len > byte.length - offset){
+                    len = byte.length - offset;
+                }
+            }
+
+            position = this.array.length;
+            length = this.array.length + byte.length;
+
+            if(len == byte.length){
+                this.array.set(byte.array,position);
+            }else{
+                this.array.set(byte.array.slice(offset,len),position);
+            }
+        }
+
+        
+
+
+        public addPoint1(position:number,x:number):void{
+            this.array[position] = x;
+        }
+
+        public addPoint2(position:number,x:number,y:number):void{
+            this.array[position    ] = x;
+            this.array[position + 1] = y;
+        }
+
+        public addPoint3(position:number,x:number,y:number,z:number):void{
+            this.array[position    ] = x;
+            this.array[position + 1] = y;
+            this.array[position + 2] = z;
+        }
+
+        public addPoint4(position:number,x:number,y:number,z:number,w:number):void{
+            this.array[position    ] = x;
+            this.array[position + 1] = y;
+            this.array[position + 2] = z;
+            this.array[position + 3] = w;
+        }
+
+        public addUIPoint(position:number,x:number,y:number,z:number,u:number,v:number,index:number,r:number,g:number,b:number,a:number):void{
+            this.array[position    ] = x;
+            this.array[position + 1] = y;
+            this.array[position + 2] = z;
+            this.array[position + 3] = u;
+            this.array[position + 4] = v;
+            this.array[position + 5] = index;
+            this.array[position + 6] = r;
+            this.array[position + 7] = g;
+            this.array[position + 8] = b;
+            this.array[position + 9] = a;
+        }
+    }
 }

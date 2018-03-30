@@ -11,24 +11,57 @@ module rf{
                 return;
             }
             Engine.addResize(this);
-            // this.render();
-            this.loadImage();
+            this.render();
+            // this.loadImage();
         }
 
         public render():void{
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             context3D.clear(0,0,0,1);
 
-            let vertexCode:string = `attribute vec3 pos;void main(void){gl_Position = vec4(pos,1.0);}`
-            let fragmentCode:string = "void main(void){gl_FragColor=vec4(1.0,0.8,1.0,1.0);}";
-            let vertices = new Float32Array([-1.0,1.0,0.0,  1.0,1.0,0.0,    -1.0,-1.0,0.0]);
+            let vertexCode:string = `
+                attribute vec2 pos;
+                attribute float index;
+                uniform vec4 color[100];
+                varying vec4 vColor;
+                void main(void){
+                    gl_Position = vec4(pos,0.0,1.0);
+                    vColor = color[int(index)];
+                }
+            `
+
+            let fragmentCode:string =  `
+                precision mediump float;
+                varying vec4 vColor;
+                void main(void){
+                    gl_FragColor = vColor;
+                }
+                
+                
+                `;
+            let vertices = new Float32Array(
+                [
+                    -1.0,1.0,0,
+                    1.0,1.0,1,
+                    -1.0,-1.0,2
+                ]
+            );
             let indexs = new Uint16Array([0,1,2]);
+            let color = new Float32Array([
+                1,0,0,1,
+                0,1,0,1,
+                0,0,1,0.5
+            ])
             let v = context3D.createVertexBuffer(vertices,3);
-            v.regVariable(VA.pos,0,3);
+            v.regVariable(VA.pos,0,2);
+            v.regVariable("index",2,1);
+
             
             let i = context3D.createIndexBuffer(indexs);
             let p = context3D.createProgram(vertexCode,fragmentCode);
             context3D.setProgram(p);
+            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+            context3D.setProgramConstantsFromVector("color",color,4);
             v.uploadContext(p);
             context3D.drawTriangles(i);
         }
