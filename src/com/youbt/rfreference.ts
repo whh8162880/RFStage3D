@@ -8,6 +8,7 @@
 ///<reference path="./core/Engine.ts" />
 ///<reference path="./core/Net.ts" />
 ///<reference path="./core/Res.ts" />
+///<reference path="./core/Capabilities.ts" />
 
 ///<reference path="./stage3d/geom/Matrix3D.ts" />
 ///<reference path="./stage3d/geom/Vector3D.ts" />
