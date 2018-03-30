@@ -7,9 +7,12 @@ module rf{
 
 
         public init():void{
+
+            Engine.addTick(this);
+
             // this.bitmapDataTest();
             // new MaxRectsBinPackTest();
-            new WebglTest();
+            // new WebglTest();
             // new MaxRectsTest();
         }
 
@@ -32,14 +35,7 @@ module rf{
 
         public engineTest():void{
             // Engine.addTick(this);
-            
         }
-
-        public update(now:number,interval:number):void{
-         //   document.title = now+","+interval;
-            // console.log(now+","+interval);
-        }
-
 
         public callLaterTest():void{
             function sayHello(msg:string,age:number):void{

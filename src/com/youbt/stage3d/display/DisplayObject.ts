@@ -2,7 +2,7 @@
 module rf {
     export var ROOT: Stage3D;
 
-    
+
 
     export let BIT_CLEAR: number = 0x1;
     export let BIT_VERTEX: number = 0x2;
@@ -66,6 +66,9 @@ module rf {
 
         public set change(value: boolean) {
             this._change = value;
+            if (undefined != this.parent) {
+                this.parent.childrenChange();
+            }
         }
 
         public setDirty(value: number): void {
@@ -125,7 +128,7 @@ module rf {
             this.pos.z = this._z = z;
             if (update) {
                 this.setDirty(BIT_VC);
-                this._change = true;
+                this.change = true;
             }
         }
 

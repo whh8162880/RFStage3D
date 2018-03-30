@@ -6,6 +6,14 @@ module rf{
             this.childrens = [];
         }
 
+        private _childrenChange:boolean = false;
+        public childrenChange(){
+            this._childrenChange = true;
+            if(undefined != this.parent){
+                this.parent.childrenChange()
+            }
+        }
+
         public childrens:DisplayObject[];
 
         public get numChildren():number{
