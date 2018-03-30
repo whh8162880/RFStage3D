@@ -22,14 +22,26 @@ interface GL_Interface{
     bindAttribLocation(program: WebGLProgram | null, index: number, name: string): void;
 
     /**
-     * 将给定的WebGLBuffer绑定到目标  
+     * 给指定的 tagrget 绑定 WebGLBuffer 对象
      * @param target 指定数据类型。可能的值有：gl.ARRAY_BUFFER、gl.ELEMENT_ARRAY_BUFFER
      *  gl.ARRAY_BUFFER: 包含顶点属性的Buffer，如顶点坐标，纹理坐标数据或顶点颜色数据。
      *  gl.ELEMENT_ARRAY_BUFFER: 用于元素索引的Buffer。
      * @param buffer 要绑定的 WebGLBuffer
      */
     bindBuffer(target: number, buffer: WebGLBuffer | null): void;
+
+    /**
+     * 给指定的 tagrget 绑定 WebGLFramebuffer 对象
+     * @param target 指定的绑定目标。可能的值：gl.FRAMEBUFFER、gl.DRAW_FRAMEBUFFER、gl.READ_FRAMEBUFFER
+     * @param framebuffer 要绑定的 WebGLFramebuffer
+     */
     bindFramebuffer(target: number, framebuffer: WebGLFramebuffer | null): void;
+
+    /**
+     * 给指定的 tagrget 绑定 WebGLRenderbuffer 对象，它必须是gl.RENDERBUFFER
+     * @param target gl.RENDERBUFFER
+     * @param renderbuffer 要绑定的 WebGLRenderbuffer
+     */
     bindRenderbuffer(target: number, renderbuffer: WebGLRenderbuffer | null): void;
 
     /**
@@ -38,10 +50,45 @@ interface GL_Interface{
      * @param texture WebGLTexture对象
      */
     bindTexture(target: number, texture: WebGLTexture | null): void;
+
+    /**
+     * 用于设置颜色混合模式
+     * @param red  红色分量的范围为0到1
+     * @param green  绿色分量的范围为0到1
+     * @param blue  蓝色分量的范围为0到1
+     * @param alpha 透明度
+     */
     blendColor(red: number, green: number, blue: number, alpha: number): void;
+
+    /**
+     * 指定帧缓存区与源颜色混合的方式 。默认值：gl.FUNC_ADD
+     * @param mode 指定如何组合源和目标颜色.可能的值：gl.FUNC_ADD、gl.FUNC_SUBTRACT、gl.FUNC_REVERSE_SUBTRACT、
+     * 在使用EXT_blend_minmax扩展时:ext.MIN_EXT:最小的源和目标，ext.MAX_EXT:最大的源和目的地。
+     * 在使用WebGL 2 Context时，还可以使用以下值:gl.MIN:最小的源和目标、gl.MAX：最大的源和目标
+     */
     blendEquation(mode: number): void;
+
+    /**
+     * 允许RGB和Alpha使用不同的混合方式  
+     * @param modeRGB 指定如何组合源和目标颜色.
+     * @param modeAlpha 指定如何组合源和目标Alpha值.
+     */
     blendEquationSeparate(modeRGB: number, modeAlpha: number): void;
+
+    /**
+     * 控制被处理片段（源片段）的颜色值如何与已经存储在帧缓冲区的像素（目标像素）的颜色值进行组合
+     * @param sfactor 如何计算源混合因子 
+     * @param dfactor 计算目标混合因子
+     */
     blendFunc(sfactor: number, dfactor: number): void;
+
+    /**
+     * 控制被处理片段（源片段）的颜色值如何与已经存储在帧缓冲区的像素（目标像素）的颜色值进行组合
+     * @param srcRGB 颜色值的源混合因子
+     * @param dstRGB 颜色在的目标混合因子
+     * @param srcAlpha Alpha值的源混合因子
+     * @param dstAlpha Alpha值在的目标混合因子
+     */
     blendFuncSeparate(srcRGB: number, dstRGB: number, srcAlpha: number, dstAlpha: number): void;
 
     /**
@@ -56,6 +103,7 @@ interface GL_Interface{
      *  gl.GL_DYNAMIC_DRAW:缓冲区数据经常变动
      */
     bufferData(target: number, size: number | ArrayBufferView | ArrayBuffer, usage: number): void;
+    
     bufferSubData(target: number, offset: number, data: ArrayBufferView | ArrayBuffer): void;
     checkFramebufferStatus(target: number): number;
 
@@ -103,6 +151,10 @@ interface GL_Interface{
      * 创建和初始化一个 WebGLProgram 对象 
      */
     createProgram(): WebGLProgram | null;
+
+    /**
+     * 创建和初始化一个 WebGLRenderbuffer 对象 
+     */
     createRenderbuffer(): WebGLRenderbuffer | null;
     
 
@@ -120,16 +172,56 @@ interface GL_Interface{
     createTexture(): WebGLTexture | null;
 
     cullFace(mode: number): void;
+
+    /**
+     * 删除一个 WebGLBuffer 对象. 如果该 WebGLBuffer 对象已经被删除，该方法不会产生任何作用
+     * @param buffer 需要被删除的 WebGLBuffer 对象
+     */
     deleteBuffer(buffer: WebGLBuffer | null): void;
+
+    /**
+     * 删除一个 WebGLFramebuffer 对象. 如果该 WebGLFramebuffer 对象已经被删除，该方法不会产生任何作用
+     * @param framebuffer 需要被删除的 WebGLFramebuffer 对象
+     */
     deleteFramebuffer(framebuffer: WebGLFramebuffer | null): void;
+
+    /**
+     * 删除一个 WebGLProgram 对象. 如果该WebGLProgram 对象已经被删除，该方法不会产生任何作用
+     * @param program 需要被删除的WebGLProgram 对象
+     */
     deleteProgram(program: WebGLProgram | null): void;
+
+    /**
+     * 删除一个 WebGLRenderbuffer 对象. 如果该 WebGLRenderbuffer 对象已经被删除，该方法不会产生任何作用
+     * @param renderbuffer 需要被删除的 WebGLRenderbuffer 对象
+     */
     deleteRenderbuffer(renderbuffer: WebGLRenderbuffer | null): void;
+
+    /**
+     * 用于删除一个参数提供的 WebGLShader对象. 如果该 WebGLShader对象已经被删除，该方法不会有任何作用。
+     * @param shader 需要被删除的 WebGLShader 对象
+     */
     deleteShader(shader: WebGLShader | null): void;
+
+    /**
+     * 用于删除一个参数提供的 WebGLTexture对象. 如果该WebGLTexture对象已经被删除，该方法不会有任何作用。
+     * @param texture 需要被删除的vWebGLTexture 对象
+     */
     deleteTexture(texture: WebGLTexture | null): void;
     depthFunc(func: number): void;
+
+    /**
+     * 设置是否启用写入深度缓冲
+     * @param flag 用于设置是否启用写入深度缓冲。默认值：true，表示启用写入
+     */
     depthMask(flag: boolean): void;
     depthRange(zNear: number, zFar: number): void;
     detachShader(program: WebGLProgram | null, shader: WebGLShader | null): void;
+
+    /**
+     * 关闭gl.enable打开的功能
+     * @param cap 让WebGL开启某种功能项.可能的值：gl.BLEND、gl.CULL_FACE、gl.DEPTH_TEST、gl.DITHER、gl.POLYGON_OFFSET_FILL、gl.SAMPLE_ALPHA_TO_COVERAGE、gl.SAMPLE_COVERAGE、gl.SCISSOR_TEST、gl.STENCIL_TEST
+     */
     disable(cap: number): void;
 
     /**
@@ -168,6 +260,11 @@ interface GL_Interface{
      * @param offset 指从索引缓冲区首地址偏移offset字节的地方开始绘制
      */
     drawElements(mode: number, count: number, type: number, offset: number): void;
+
+    /**
+     * 用于启用指定的功能
+     * @param cap 让WebGL开启某种特性.可能的值：gl.BLEND、gl.CULL_FACE、gl.DEPTH_TEST、gl.DITHER、gl.POLYGON_OFFSET_FILL、gl.SAMPLE_ALPHA_TO_COVERAGE、gl.SAMPLE_COVERAGE、gl.SCISSOR_TEST、gl.STENCIL_TEST
+     */
     enable(cap: number): void;
     
     /**
@@ -175,16 +272,39 @@ interface GL_Interface{
      * @param index 顶点索引
      */
     enableVertexAttribArray(index: number): void;
+
+    /**
+     * 将缓冲区的指令立即送往硬件执行，但是要一直等到硬件执行完这些指令之后才返回
+     */
     finish(): void;
+
+    /**
+     * 清空缓冲区，将指令送往缓硬件立即执行，但是它是将命令传送完毕之后立即返回，不会等待指令执行完毕。这些指令会在有限时间内执行完毕
+     */
     flush(): void;
     framebufferRenderbuffer(target: number, attachment: number, renderbuffertarget: number, renderbuffer: WebGLRenderbuffer | null): void;
     framebufferTexture2D(target: number, attachment: number, textarget: number, texture: WebGLTexture | null, level: number): void;
     frontFace(mode: number): void;
     generateMipmap(target: number): void;
     
- 
+    /**
+     * 返回一个 WebGLActiveInfo 对象，该对象包含一个顶点属性的大小、类型和名称。这个定点是attribute类型
+     * @param program 使用的 WebGLProgram对象
+     * @param index 指定顶点属性的索引
+     */
     getActiveAttrib(program: WebGLProgram | null, index: number): WebGLActiveInfo | null;
+
+    /**
+     * 返回一个 WebGLActiveInfo 对象，该对象包含一个顶点属性的大小、类型和名称。这个定点是uniform类型
+     * @param program 使用的 WebGLProgram对象
+     * @param index 指定顶点属性的索引
+     */
     getActiveUniform(program: WebGLProgram | null, index: number): WebGLActiveInfo | null;
+    
+    /**
+     * 获取 WebGLProgram 关联的所有shader
+     * @param program 使用的 WebGLProgram 对象
+     */
     getAttachedShaders(program: WebGLProgram | null): WebGLShader[] | null;
 
     /**
@@ -194,32 +314,151 @@ interface GL_Interface{
      */
     getAttribLocation(program: WebGLProgram | null, name: string): number;
     getBufferParameter(target: number, pname: number): any;
+
+    /**
+     * 返回一个包含实际Context参考的WebGLContextAttributes对象，如果Context丢失，返回null
+     */
     getContextAttributes(): WebGLContextAttributes;
     getError(): number;
+    
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "EXT_blend_minmax"): EXT_blend_minmax | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "EXT_texture_filter_anisotropic"): EXT_texture_filter_anisotropic | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "EXT_frag_depth"): EXT_frag_depth | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "EXT_shader_texture_lod"): EXT_shader_texture_lod | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "EXT_sRGB"): EXT_sRGB | null;
     getExtension(extensionName: "OES_vertex_array_object"): OES_vertex_array_object | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_color_buffer_float"): WEBGL_color_buffer_float | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_compressed_texture_astc"): WEBGL_compressed_texture_astc | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_compressed_texture_s3tc_srgb"): WEBGL_compressed_texture_s3tc_srgb | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_debug_shaders"): WEBGL_debug_shaders | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_draw_buffers"): WEBGL_draw_buffers | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_lose_context"): WEBGL_lose_context | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_depth_texture"): WEBGL_depth_texture | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_debug_renderer_info"): WEBGL_debug_renderer_info | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "WEBGL_compressed_texture_s3tc"): WEBGL_compressed_texture_s3tc | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "OES_texture_half_float_linear"): OES_texture_half_float_linear | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "OES_texture_half_float"): OES_texture_half_float | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "OES_texture_float_linear"): OES_texture_float_linear | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "OES_texture_float"): OES_texture_float | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "OES_standard_derivatives"): OES_standard_derivatives | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "OES_element_index_uint"): OES_element_index_uint | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: "ANGLE_instanced_arrays"): ANGLE_instanced_arrays | null;
+
+    /**
+     * 支持WebGL扩展
+     * @param extensionName 
+     */
     getExtension(extensionName: string): any;
     getFramebufferAttachmentParameter(target: number, attachment: number, pname: number): any;
+    
+    /**
+     * 传入的参数名称返回一个值
+     * @param pname 一个指定要返回哪个参数值.可能的值：gl.ACTIVE_TEXTURE、gl.ALIASED_LINE_WIDTH_RANGE、gl.ALIASED_POINT_SIZE_RANGE等等
+     */
     getParameter(pname: number): any;
     getProgramInfoLog(program: WebGLProgram | null): string | null;
     getProgramParameter(program: WebGLProgram | null, pname: number): any;
@@ -228,6 +467,10 @@ interface GL_Interface{
     getShaderParameter(shader: WebGLShader | null, pname: number): any;
     getShaderPrecisionFormat(shadertype: number, precisiontype: number): WebGLShaderPrecisionFormat | null;
     getShaderSource(shader: WebGLShader | null): string | null;
+
+    /**
+     * 返回一个所有的支持WebGL 扩展的列表
+     */
     getSupportedExtensions(): string[] | null;
     getTexParameter(target: number, pname: number): any;
     getUniform(program: WebGLProgram | null, location: WebGLUniformLocation | null): any;
@@ -241,8 +484,22 @@ interface GL_Interface{
     getVertexAttrib(index: number, pname: number): any;
     getVertexAttribOffset(index: number, pname: number): number;
     hint(target: number, mode: number): void;
+
+    /**
+     * 如果传递的 WebGLBuffer 有效则返回 true，否则返回 false
+     * @param buffer 需要判断的WebGLBuffer对象
+     */
     isBuffer(buffer: WebGLBuffer | null): boolean;
+
+    /**
+     * 标记WebGL的Context是否已经丢失
+     */
     isContextLost(): boolean;
+
+    /**
+     * 用来检测给定的 WebGL 功能项在当前Context是否可用。默认的，除了 gl.DITHER，所有的功能项都是未启用的
+     * @param cap 指定待检测的 WebGL 功能项。可能的值：gl.BLEND、gl.CULL_FACE、gl.DEPTH_TEST、gl.DITHER、gl.POLYGON_OFFSET_FILL、gl.SAMPLE_ALPHA_TO_COVERAGE、gl.SAMPLE_COVERAGE、gl.SCISSOR_TEST、gl.STENCIL_TEST
+     */
     isEnabled(cap: number): boolean;
     isFramebuffer(framebuffer: WebGLFramebuffer | null): boolean;
     isProgram(program: WebGLProgram | null): boolean;
@@ -256,6 +513,12 @@ interface GL_Interface{
      * @param program 一个用于链接的 WebGLProgram
      */
     linkProgram(program: WebGLProgram | null): void;
+    
+    /**
+     * 用于图像预处理的函数
+     * @param pname 预处理的方式。可能的值：gl.PACK_ALIGNMENT、gl.UNPACK_ALIGNMENT、gl.UNPACK_FLIP_Y_WEBGL、gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL、gl.UNPACK_COLORSPACE_CONVERSION_WEBGL
+     * @param param 表示pname处理方式的参数。可能的值
+     */
     pixelStorei(pname: number, param: number | boolean): void;
     polygonOffset(factor: number, units: number): void;
     readPixels(x: number, y: number, width: number, height: number, format: number, type: number, pixels: ArrayBufferView | null): void;
@@ -481,6 +744,11 @@ interface GL_Interface{
      * @param program 需要添加的WebGLProgram对象
      */
     useProgram(program: WebGLProgram | null): void;
+
+    /**
+     * 
+     * @param program 
+     */
     validateProgram(program: WebGLProgram | null): void;
     vertexAttrib1f(indx: number, x: number): void;
     vertexAttrib1fv(indx: number, values: Float32Array | number[]): void;
@@ -502,5 +770,13 @@ interface GL_Interface{
      * @param offset 绑定的缓冲区偏移offset个字节
      */
     vertexAttribPointer(index: number, size: number, type: number, normalized: boolean, stride: number, offset: number): void;
+
+    /**
+     * 用来设置视口，即指定从标准设备到窗口坐标的x、y仿射变换。
+     * @param x 用来设定视口的左下角水平坐标。默认值：0
+     * @param y 用来设定视口的左下角垂直坐标。默认值：0
+     * @param width 用来设定视口的宽度。默认值：canvas的宽度
+     * @param height 用来设定视口的高度。默认值：canvas的高度
+     */
     viewport(x: number, y: number, width: number, height: number): void;
 }
