@@ -1,6 +1,6 @@
 ///<reference path="../display/DisplayObject.ts" />
 module rf{
-    class Canmera extends DisplayObject implements IResizeable{
+    export class Camera extends DisplayObject implements IResizeable{
         len:Matrix3D;
         far :number;
         worldTranform:Matrix3D;
@@ -15,7 +15,7 @@ module rf{
     }
 
 
-    export class Canmera2D extends Canmera{
+    export class Camera2D extends Camera{
         
         resize(width: number, height: number): void{
             this._width = width;
@@ -43,17 +43,17 @@ module rf{
             rawData[14] = 0;
             rawData[15] = 1;
 
-            this._change = true;
+            this._change = DChange.trasnform;
         }
 
-        public updateSceneTransform():void{
-            if(true == this._change){
+        public updateSceneTransform(sceneTransform?:Matrix3D):void{
+            if( this._change | DChange.trasnform){
                 this.updateTransform();
                 this.sceneTransform.copyFrom(this.transform);
                 this.sceneTransform.invert();
                 this.worldTranform.copyFrom(this.sceneTransform);
                 this.worldTranform.append(this.len);
-                this._change = false;
+                this._change &= ~DChange.trasnform;
             }
         }
     }

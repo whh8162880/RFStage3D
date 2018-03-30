@@ -168,7 +168,7 @@ module rf {
             TimerUtil.add(this.clean, 1000);
         }
 
-        protected clean(): void {
+        public clean(): void {
             let vo = this.first;
             var next;
             length = 0;

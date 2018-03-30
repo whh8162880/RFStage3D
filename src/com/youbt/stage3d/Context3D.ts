@@ -192,11 +192,6 @@ namespace rf {
 			}
 		}
 
-		public setTextureAt(sampler: string, texture: Texture): void {
-			this._texCache[sampler] = texture;
-			// if (this._linkedProgram) this.enableTex(sampler);
-		}
-
 		private _linkedProgram: Program3D = undefined;
 		public setProgram(program: Program3D): void {
 			if (program == null || program == this._linkedProgram) return;
@@ -210,12 +205,6 @@ namespace rf {
 
 			this._linkedProgram = program;
 			gl.useProgram(program.program);
-
-			// var k: string;
-			// for (k in this._vaCache) this.enableVA(k);
-			// for (k in this._vcCache) this.enableVC(k);
-			// for (k in this._vcMCache) this.enableVCM(k);
-			// for (k in this._texCache) this.enableTex(k);
 		}
 
 		public clear(
@@ -233,14 +222,6 @@ namespace rf {
 
 			gl.clear(this._clearBit);
 		}
-
-
-		// export enum Context3DTriangleFace {
-		// 	BACK	= 'back', //CCW
-		// 	FRONT	= 'front', //CW
-		// 	FRONT_AND_BACK = 'frontAndBack',
-		// 	NONE = 'none'
-		// }
 
 		public setCulling(triangleFaceToCull: string): void {
 			gl.frontFace(gl.CW);
@@ -417,38 +398,6 @@ namespace rf {
         */
 		public present(): void { }
 
-		private _vaCache: {} = {};
-		private enableVA(keyInCache: string): void {
-			var location: number = gl.getAttribLocation(this._linkedProgram.program, keyInCache);
-			if (location < 0) {
-				throw new Error('Fail to get the storage location of' + keyInCache);
-			}
-			var va: { size: number; buffer: WebGLBuffer; stride: number; offset: number } = this._vaCache[keyInCache];
-
-			gl.bindBuffer(gl.ARRAY_BUFFER, va.buffer); // Bind the buffer object to a target
-			gl.vertexAttribPointer(location, va.size, gl.FLOAT, false, va.stride, va.offset);
-			gl.enableVertexAttribArray(location);
-			// GL.bindBuffer(GL.ARRAY_BUFFER, null);
-		}
-
-		private _vcCache: {} = {}; // {variable:array}
-		private enableVC(keyInCache: string): void {
-			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
-			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
-
-			var vc: number[] = this._vcCache[keyInCache];
-			gl['uniform' + vc.length + 'fv'](index, vc);
-		}
-
-		private _vcMCache: {} = {};
-		private enableVCM(keyInCache: string): void {
-			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
-			if (!index) throw new Error('Fail to get uniform ' + keyInCache);
-
-			gl.uniformMatrix4fv(index, false, this._vcMCache[keyInCache]); // bug:the second parameter must be false
-		}
-
-		private _texCache: {} = {}; //{sampler:Texture}
 		// private enableTex(keyInCache): void {
 		// 	var tex: Texture = this._texCache[keyInCache];
 		// 	gl.activeTexture(gl['TEXTURE' + tex.textureUnit]);

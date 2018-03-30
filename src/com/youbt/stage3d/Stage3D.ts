@@ -7,11 +7,11 @@ module rf{
 
         public canvas:HTMLCanvasElement;
 
-        public camera2D:Canmera2D
+        public camera2D:Camera2D
 
         constructor(){
             super();
-            this.camera2D = new Canmera2D();
+            this.camera2D = new Camera2D();
         }
 
         public requestContext3D(canvas:HTMLCanvasElement):boolean{
@@ -43,6 +43,9 @@ module rf{
 
         //在这里驱动渲染
         public update(now:number,interval:number):void{
+            if(this._childrenChange){
+                this.updateTransform();
+            }
             
         }
 

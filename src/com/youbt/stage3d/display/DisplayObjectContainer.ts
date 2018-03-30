@@ -6,7 +6,7 @@ module rf{
             this.childrens = [];
         }
 
-        private _childrenChange:boolean = false;
+        protected _childrenChange:boolean = false;
         public childrenChange(){
             this._childrenChange = true;
             if(undefined != this.parent){
@@ -27,6 +27,8 @@ module rf{
 
             this.childrens.push(child);
             child.parent = this;
+            //需要更新Transform
+            child.change = DChange.trasnform;
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -49,6 +51,8 @@ module rf{
             this.childrens.splice(index,0,child);
 
             child.parent = this;
+            //需要更新Transform
+            child.change = DChange.trasnform;
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -102,14 +106,64 @@ module rf{
 				child.stage = this.stage;
 				child.addToStage();
 			}
-		}
-		
+        }
+        
+		/**
+         * 讲真  这块更新逻辑还没有到最优化的结果 判断不会写了
+         */
 		public updateTransform():void{
-			super.updateTransform();
-			for(let child of this.childrens){
-				child.change = true;
-			}
-		}
+            if(this._change | DChange.trasnform){
+                //如果自己的transform发生了变化
+                //  step1 : 更新自己的transform
+                //  step2 : 全部子集都要更新sceneTransform;
+                super.updateTransform();
+                this.updateSceneTransform();
+            }
 
+            if(this._change | DChange.alpha){
+                this.updateAlpha(this.parent.sceneAlpha);
+            }
+
+            if(true == this._childrenChange){
+                for(let child of this.childrens){
+                    if(child instanceof DisplayObjectContainer){
+                        if(child._change || (<DisplayObjectContainer>child)._childrenChange){
+                            child.updateTransform();
+                        }
+                    }else{
+                        if(child._change | DChange.trasnform){
+                            child.updateTransform();
+                            child.updateSceneTransform(this.sceneTransform);
+                        }
+
+                        if(child._change | DChange.alpha){
+                            child.updateAlpha(this.sceneAlpha);
+                        }
+                    }
+                }
+                this._childrenChange = false;
+            }
+        }
+        
+
+        public updateSceneTransform(): void {
+            this.sceneTransform.copyFrom(this.transform);
+            if (this.parent) this.sceneTransform.append(this.parent.sceneTransform);
+            for(let child of this.childrens){
+                if( (child._change | DChange.trasnform) != 0){
+                    //这里不更新其transform 是因为后续有人来让其更新
+                    child.updateSceneTransform(this.sceneTransform);
+                }
+            }
+        }
+
+
+        public updateAlpha(sceneAlpha:number):void{
+            this.sceneAlpha = sceneAlpha * this._alpha;
+            for(let child of this.childrens){
+                child.updateAlpha(this.sceneAlpha);
+            }
+            this._change &= ~DChange.alpha;
+        }
     }
 }

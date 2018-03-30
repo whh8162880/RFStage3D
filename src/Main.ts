@@ -7,9 +7,7 @@ module rf{
 
 
         public init():void{
-
             Engine.addTick(this);
-
             // this.bitmapDataTest();
             // new MaxRectsBinPackTest();
             // new WebglTest();
