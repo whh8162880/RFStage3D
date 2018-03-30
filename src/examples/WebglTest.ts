@@ -2,21 +2,62 @@
 module rf{
     export class WebglTest implements IResizeable{
         constructor(){
-            var canvas:HTMLCanvasElement = document.createElement("canvas");
-            document.body.appendChild(canvas);
-            var stage3d:Stage3D = singleton(Stage3D);
-            var b:boolean = stage3d.requestContext3D(canvas);
-            if(false == b){
-                console.log("GL create fail");
-                return;
-            }
+            // var canvas:HTMLCanvasElement = document.createElement("canvas");
+            // document.body.appendChild(canvas);
+            // var stage3d:Stage3D = singleton(Stage3D);
+            // var b:boolean = stage3d.requestContext3D(canvas);
+            // if(false == b){
+                // console.log("GL create fail");
+                // return;
+            // }
             Engine.addResize(this);
-            this.render();
+            this.render2();
             // this.loadImage();
         }
 
+        public render2():void{
+            context3D.clear(0,0,0,1);
+
+
+            let vcode = `
+                attribute vec3 pos;
+                uniform mat4 mvp;
+                void main(void){
+                    vec4 p = vec4(pos,1.0);
+                    gl_Position = mvp * p;
+                }
+            `
+            let fcode = `
+                precision mediump float;
+                void main(void){
+                    gl_FragColor = vec4(1,0,0,1);
+                }
+            `
+            let p = context3D.createProgram(vcode,fcode);
+            let v = context3D.createVertexBuffer(
+                [
+                    0,0,0,
+                    100,0,0,
+                    100,100,0,
+                    0,100,0
+                ],3
+            )
+            v.data.regVariable("pos",0,3);
+            let i = context3D.getIndexByQuad(1);
+
+            ROOT.camera2D.updateSceneTransform();
+
+
+            context3D.setProgram(p);
+            context3D.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform)
+            v.uploadContext(p);
+            context3D.drawTriangles(i);
+
+        }
+
+
         public render():void{
-            context3D.configureBackBuffer(stageWidth,stageHeight,0);
+            // context3D.configureBackBuffer(stageWidth,stageHeight,0);
             context3D.clear(0,0,0,1);
 
             let vertexCode:string = `
@@ -60,7 +101,7 @@ module rf{
             let i = context3D.createIndexBuffer(indexs);
             let p = context3D.createProgram(vertexCode,fragmentCode);
             context3D.setProgram(p);
-            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+            
             context3D.setProgramConstantsFromVector("color",color,4);
             v.uploadContext(p);
             context3D.drawTriangles(i);

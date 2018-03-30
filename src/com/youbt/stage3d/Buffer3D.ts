@@ -16,8 +16,8 @@ module rf {
     export enum VC{
         mv = "mv",
         p = "p",
-        mvp = "mvp"
-
+        mvp = "mvp",
+        ui = "ui"
     }
 
     class Buffer3D implements IRecyclable {
@@ -159,7 +159,14 @@ module rf {
             return true;
         }
 
-        public uploadFromVector(data: number[] | Float32Array, startVertex: number = 0, numVertices: number = -1): void {
+        public uploadFromVector(data: number[]|Float32Array|VertexInfo, startVertex: number = 0, numVertices: number = -1): void {
+
+            if(data instanceof VertexInfo){
+                this.data = data;
+                this.numVertices = data.numVertices;
+                return;
+            }
+
             if (0 > startVertex) {
                 startVertex = 0;
             }
@@ -193,7 +200,7 @@ module rf {
                 }
                 this.numVertices = data.length / this.data32PerVertex;
             }
-            this.data = new VertexInfo(<Float32Array>data);
+            this.data = new VertexInfo(<Float32Array>data,this.data32PerVertex);
         }
 
 
@@ -220,7 +227,7 @@ module rf {
                     continue;
                 }
                 let o = variables[variable];
-                gl.vertexAttribPointer(location, o.size, gl.FLOAT, false, this.data32PerVertex * 4, o.offset);
+                gl.vertexAttribPointer(location, o.size, gl.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
                 gl.enableVertexAttribArray(location);
             }
         }

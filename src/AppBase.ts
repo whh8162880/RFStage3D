@@ -8,6 +8,21 @@ module rf {
             Engine.addResize(this);
         }
 
+
+        init(cancas?:HTMLCanvasElement):void{
+            if(undefined == cancas){
+                var canvas:HTMLCanvasElement = document.createElement("canvas");
+                document.body.appendChild(canvas);
+            }
+            var b:boolean = ROOT.requestContext3D(canvas);
+            if(false == b){
+                console.log("GL create fail");
+                return;
+            }
+            Engine.addTick(this);
+        }
+
+
         public update(now: number, interval: number): void {
             //todo
             ROOT.update(now,interval);

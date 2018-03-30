@@ -43,7 +43,7 @@ module rf{
             rawData[14] = 0;
             rawData[15] = 1;
 
-            this._change = DChange.trasnform;
+            this._change |= DChange.trasnform;
         }
 
         public updateSceneTransform(sceneTransform?:Matrix3D):void{

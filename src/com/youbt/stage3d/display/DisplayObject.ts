@@ -5,7 +5,8 @@ module rf {
     export enum DChange {
         trasnform = 0x1,
         alpha = 0x2,
-        vertex = 0x4
+        vertex = 0x4,
+        vcdata = 0x8
     }
 
     export let BIT_CLEAR: number = 0x1;
@@ -67,19 +68,29 @@ module rf {
         }
 
         public set change(value: number) {
-            this._change = value;
+            this._change |= value;
             if (undefined != this.parent) {
                 this.parent.childrenChange();
             }
         }
 
-        public setDirty(value: number): void {
-
+        batchChange(value:number):void{
+            if (undefined != this.parent) {
+                this.parent.batchChange(value);
+            }
         }
-
 
         public get visible(): Boolean { return this._visible; }
         public set visible(value: Boolean) { this._visible = value; }
+
+        public set alpha(value:number){
+            this._alpha = value;
+            this.change = DChange.alpha;
+        }
+
+        public get alpha():number{
+            return this._alpha;
+        }
 
         public get scaleX(): number { return this._scaleX; }
         public set scaleX(value: number) { this._scaleX = value; this.sca.x = value; this.change = DChange.trasnform; }
@@ -90,6 +101,8 @@ module rf {
         public get rotationX(): number { return this._rotationX * RADIANS_TO_DEGREES; }
         public get rotationY(): number { return this._rotationY * RADIANS_TO_DEGREES; }
         public get rotationZ(): number { return this._rotationZ * RADIANS_TO_DEGREES; }
+
+        
         public set rotationX(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationX) return;
@@ -129,7 +142,7 @@ module rf {
             this.pos.y = this._y = y;
             this.pos.z = this._z = z;
             if (update) {
-                this.setDirty(BIT_VC);
+                this.batchChange(DChange.vcdata);
                 this.change = DChange.trasnform;
             }
         }
@@ -212,7 +225,6 @@ module rf {
             this.rot.y = this._rotationY = ry * DEGREES_TO_RADIANS;
             this.rot.z = this._rotationZ = rz * DEGREES_TO_RADIANS;
             if (update) {
-                this.setDirty(BIT_VC);
                 this.change = DChange.trasnform;
             }
         }
@@ -230,7 +242,6 @@ module rf {
             this.rot.y = this._rotationY = ry;
             this.rot.z = this._rotationZ = rz;
             if (update) {
-                this.setDirty(BIT_VC);
                 this.change = DChange.trasnform;
             }
         }
@@ -251,7 +262,6 @@ module rf {
             this.sca.y = this._scaleY = sy;
             this.sca.z = this._scaleZ = sz;
             if (update) {
-                this.setDirty(BIT_VC);
                 this.change = DChange.trasnform;
             }
         }
@@ -304,7 +314,7 @@ module rf {
                 this.transform.recompose(this.transformComponents);
             }
 
-            this._change |= ~DChange.trasnform;
+            this._change &= ~DChange.trasnform;
         }
 
 

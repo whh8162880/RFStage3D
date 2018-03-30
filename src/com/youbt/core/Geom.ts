@@ -163,6 +163,27 @@ module rf {
         }
 
 
+        set(position:number, byte: Float32Byte, offset: number = 0, len: number = -1):void{
+            if (0 > offset) {
+                offset = 0;
+            }
+
+            if (-1 == len) {
+                len = byte.length - offset;
+            } else {
+                if (len > byte.length - offset) {
+                    len = byte.length - offset;
+                }
+            }
+
+            if (len == byte.length) {
+                this.array.set(byte.array, position);
+            } else {
+                this.array.set(byte.array.slice(offset, len), position);
+            }
+        }
+
+
 
 
         addPoint1(position: number, x: number): void {

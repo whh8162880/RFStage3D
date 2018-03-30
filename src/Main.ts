@@ -6,11 +6,32 @@ module rf{
         }
 
 
-        public init():void{
-            Engine.addTick(this);
+        public init(cancas?:HTMLCanvasElement):void{
+            super.init(cancas);
+
+            if(undefined == gl){
+                return;
+            }
+
+            context3D.configureBackBuffer(stageWidth,stageHeight,0);
+            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+            let sp = new Sprite();
+            sp.x = 100;
+            sp.y = 100;
+            sp.alpha = 0.5;
+            let g = sp.graphics;
+            g.clear();
+            g.drawRect(0,0,100,100,0xFFDD00);
+            g.end();
+            ROOT.addChild(sp);
+
+            // Engine.removeTick(this);
+            // ROOT.update(10,10);
+
             // this.bitmapDataTest();
             // new MaxRectsBinPackTest();
-            new WebglTest();
+            // new WebglTest();
             // new MaxRectsTest();
         }
 

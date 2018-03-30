@@ -12,6 +12,8 @@ module rf{
         constructor(){
             super();
             this.camera2D = new Camera2D();
+            this.batcher = new Batcher(this);
+            this.stage = this;
         }
 
         public requestContext3D(canvas:HTMLCanvasElement):boolean{
@@ -46,7 +48,14 @@ module rf{
             if(this._childrenChange){
                 this.updateTransform();
             }
-            
+            context3D.clear(0,0,0,1);
+            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+            if(this.camera2D._change){
+                this.camera2D.updateSceneTransform();
+            }
+
+            this.render(this.camera2D,now,interval);
         }
 
 

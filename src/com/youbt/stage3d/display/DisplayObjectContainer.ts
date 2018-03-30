@@ -112,7 +112,7 @@ module rf{
          * 讲真  这块更新逻辑还没有到最优化的结果 判断不会写了
          */
 		public updateTransform():void{
-            if(this._change | DChange.trasnform){
+            if(this._change & DChange.trasnform){
                 //如果自己的transform发生了变化
                 //  step1 : 更新自己的transform
                 //  step2 : 全部子集都要更新sceneTransform;
@@ -120,7 +120,7 @@ module rf{
                 this.updateSceneTransform();
             }
 
-            if(this._change | DChange.alpha){
+            if(this._change & DChange.alpha){
                 this.updateAlpha(this.parent.sceneAlpha);
             }
 
@@ -150,7 +150,7 @@ module rf{
             this.sceneTransform.copyFrom(this.transform);
             if (this.parent) this.sceneTransform.append(this.parent.sceneTransform);
             for(let child of this.childrens){
-                if( (child._change | DChange.trasnform) != 0){
+                if( (child._change & DChange.trasnform) != 0){
                     //这里不更新其transform 是因为后续有人来让其更新
                     child.updateSceneTransform(this.sceneTransform);
                 }

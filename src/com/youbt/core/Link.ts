@@ -88,7 +88,7 @@ module rf {
             vo = recyclable(LinkVO);
             vo.data = value;
             vo.args = args;
-            length++;
+            this.length++;
 
             if (undefined == this.first) {
                 this.first = this.last = vo;
@@ -121,7 +121,7 @@ module rf {
             vo.weight = weight;
             vo.data = value;
             vo.args = args;
-            length++;
+            this.length++;
 
             if (undefined == this.first) {
                 this.first = this.last = vo;
@@ -177,14 +177,18 @@ module rf {
                 if (true == vo.close) {
                     if (vo == this.first) {
                         this.first = vo.next;
-                        this.first.pre = undefined;
+                        if(undefined != this.first){
+                            this.first.pre = undefined;
+                        }
                     } else {
                         vo.pre.next = vo.next;
                     }
 
                     if (vo == this.last) {
                         this.last = vo;
-                        this.last.next = undefined;
+                        if(undefined != this.last){
+                            this.last.next = undefined;
+                        }
                     } else {
                         vo.next.pre = vo.pre;
                     }

@@ -81,9 +81,28 @@ module rf{
             return this.$graphics;
         }
 
+        batchChange(value:number):void{
+            if(undefined != this.batcher){
+                this._change |= value;
+                this.childrenChange();
+            }else{
+                if(this.parent){
+                    this.parent.batchChange(value);
+                }
+            }
+        }
+
 
         public render(camera:Camera,now:number,interval:number):void{
-            
+            if(undefined != this.batcher){
+                this.batcher.render(camera,now,interval);
+            }
+        }
+
+        addToStage(){
+            if(this.$graphics && this.$graphics.numVertices){
+                this.batchChange(DChange.vertex);
+            }
         }
     }
 
@@ -92,7 +111,9 @@ module rf{
     export class Graphics{
         target:Sprite;
         byte:Float32Byte;
-        numVertices:number;
+        numVertices:number = 0;
+
+        $batchOffset:number = 0;
         constructor(target:Sprite){
             this.target = target;
             this.byte = new Float32Byte(new Float32Array(0));
@@ -109,14 +130,14 @@ module rf{
             this.numVertices = 0;
         }
 
-        over():void{
-
+        end():void{
+            this.target.batchChange(DChange.vertex)
         }
 
         public drawRect(x:number, y:number,width:number, height:number,color:number,alpha:number = 1,z:number = 0):void{
-            let red = (color & 0x00ff0000) >>> 16;
-            let green = (color & 0x0000ff00) >>> 8;
-            let blue = color & 0x000000ff;
+            let red = ((color & 0x00ff0000) >>> 16)/0xFF;
+            let green = ((color & 0x0000ff00) >>> 8)/0xFF;
+            let blue = (color & 0x000000ff)/0xFF;
             let r = x + width;
             let b = y + height;
             let p = this.byte.array.length;
@@ -131,11 +152,18 @@ module rf{
 
     export abstract class RenderBase implements I3DRender{
         triangleFaceToCull:string = Context3DTriangleFace.NONE;
-        sourceFactor:number = gl.SRC_ALPHA;
-        destinationFactor:number = gl.ONE_MINUS_CONSTANT_ALPHA;
+        sourceFactor:number;
+        destinationFactor:number;
         depthMask:boolean = false;
-        passCompareMode:number = gl.ALWAYS;
+        passCompareMode:number;
         public render(camera:Camera,now:number,interval:number):void{}
+        constructor(){
+            if(undefined != gl){
+                this.sourceFactor = gl.SRC_ALPHA;
+                this.destinationFactor = gl.ONE_MINUS_CONSTANT_ALPHA;
+                this.passCompareMode = gl.ALWAYS;
+            }
+        }
     }
 
     export class Batcher extends RenderBase implements I3DRender{
@@ -143,17 +171,17 @@ module rf{
         renders:Link;
         geo:BatchGeometry = undefined;
         program:Program3D;
+        worldTransform:Matrix3D;
         constructor(target:Sprite){
             super();
             this.target = target;
             this.renders = new Link();
+            this.worldTransform = new Matrix3D();
         }
 
         public render(camera:Camera,now:number,interval:number):void{
-            if(this.target._change | DChange.vertex){
+            if(this.target._change & DChange.vertex){
                 this.cleanBatch();
-
-
                 //step1 收集所有可合并对象
                 this.getBatchTargets(this.target,-this.target._x,-this.target._y,1/this.target._scaleX);
                 //step2 合并模型 和 vc信息
@@ -162,18 +190,93 @@ module rf{
                 this.geo = undefined;
                 this.target._change &= ~DChange.vertex;
             }
+
+            if(undefined == this.program){
+                this.createProgram();
+            }
+
+            this.worldTransform.copyFrom(this.target.sceneTransform);
+            this.worldTransform.append(camera.worldTranform);
+
+
             let vo = this.renders.getFrist();
             while(vo){
                 if(vo.close == false){
                     let render:I3DRender = vo.data;
                     if(render instanceof BatchGeometry){
-                        this.dc(<BatchGeometry>render);
+                        this.dc(render);
                     }else{
                         render.render(camera,now,interval);
                     }
                 }
                 vo = vo.next;
             }
+        }
+
+        dc(geo:BatchGeometry):void{
+            // context3D.setBlendFactors()
+            let v:VertexBuffer3D = geo.$vertexBuffer;
+            if(undefined == v){
+                geo.$vertexBuffer = v = context3D.createVertexBuffer(geo.vertex,geo.vertex.data32PerVertex);
+                v.data.regVariable("pos",0,3);
+            }
+            let i:IndexBuffer3D = context3D.getIndexByQuad(geo.quadcount);
+            context3D.setProgram(this.program);
+            context3D.setProgramConstantsFromMatrix(VC.mvp,this.worldTransform);
+            context3D.setProgramConstantsFromVector(VC.ui,geo.vcData.array,4);
+            v.uploadContext(this.program);
+            context3D.drawTriangles(i);
+        }
+        
+
+        createProgram():void{
+            let vcode = `
+                attribute vec3 pos;
+                attribute vec3 uv;
+                attribute vec4 color;
+                uniform mat4 mvp;
+                uniform vec4 ui[100];
+                varying vec2 vUV;
+                varying vec4 vColor;
+                void main(void){
+                    vec4 p = vec4(pos,1.0);
+                    vec4 t = ui[int(uv.z)];
+                    p.xy = p.xy + t.xy;
+                    p.xy = p.xy * t.zz;
+                    gl_Position = mvp * p;
+                    vUV.xy = uv.xy;
+                    p = color;
+                    p.w = color.w * t.w;
+                    vColor = p;
+                }
+            `
+
+            let fcode = `
+                precision mediump float;
+                varying vec4 vColor;
+                void main(void){
+                    vec4 color = vColor;
+                    gl_FragColor = color;
+                }
+            `
+
+            // let vcode = `
+            //     attribute vec3 pos;
+            //     uniform mat4 mvp;
+            //     void main(void){
+            //         vec4 p = vec4(pos,1.0);
+            //         gl_Position = mvp * p;
+            //     }
+            // `
+
+            // let fcode = `
+            //     precision mediump float;
+            //     void main(void){
+            //         gl_FragColor = vec4(1,0,0,1);
+            //     }
+            // `
+
+            this.program = context3D.createProgram(vcode,fcode);
         }
 
         cleanBatch():void{
@@ -202,32 +305,31 @@ module rf{
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if(null == target.batcher && true == target.batcherAvailable){
+            if(target == this.target || (null == target.batcher && true == target.batcherAvailable)){
                 if(undefined == g || 0 >= g.numVertices){
                     target.$vcIndex = -1;
                     target.$batchGeometry = null;
-                    return;
-                }
-
-                if(undefined == this.geo){
-                    this.geo = recyclable(BatchGeometry);
-                    this.renders.add(this.geo);
-                }
-
-                let i = this.geo.add(target,g);
-                target.$vcox = ox;
-                target.$vcoy = oy;
-                target.$vcos = os;
-
-                if(i >= max_vc){
-                    this.geo = undefined;
+                }else{
+                    if(undefined == this.geo){
+                        this.geo = recyclable(BatchGeometry);
+                        this.renders.add(this.geo);
+                    }
+    
+                    let i = this.geo.add(target,g);
+                    target.$vcox = ox;
+                    target.$vcoy = oy;
+                    target.$vcos = os;
+    
+                    if(i >= max_vc){
+                        this.geo = undefined;
+                    }
                 }
             }else{
                 this.renders.add(target);
                 this.geo = undefined;
             }
 
-            for(let child of this.target.childrens){
+            for(let child of target.childrens){
                 if(child instanceof Sprite){
                     this.getBatchTargets(child,ox,oy,os);
                 }
@@ -248,21 +350,17 @@ module rf{
             }
         }
 
-        dc(geo:BatchGeometry):void{
-            // context3D.setBlendFactors()
-            let v:VertexBuffer3D = geo.$vertexBuffer;
-            if(undefined == v){
-                geo.$vertexBuffer = v = context3D.createVertexBuffer(geo.vertex.vertex.array,10);
-            }
-            let i:IndexBuffer3D = context3D.getIndexByQuad(geo.quadcount);
-
-            
-            
-        }
+        
     }
 
 
     class BatchGeometry implements I3DRender,IGeometry{
+
+        static variables: { [key: string]: { size: number, offset: number } } = {
+            "pos":{size:3,offset:0},
+            "uv":{size:3,offset:3},
+            "color":{size:4,offset:6}
+        }
         vertex:VertexInfo;
         $vertexBuffer:VertexBuffer3D;
         quadcount:number;
@@ -278,20 +376,24 @@ module rf{
             }
             target.$vcIndex = this.vci++;
             target.$batchGeometry = this;
+            g.$batchOffset = this.verlen;
             this.verlen += g.byte.length;
+            this.link.add(target);
             return this.vci;
         }
 
 
         build():void{
             this.quadcount = this.link.length;
-            this.vertex = new VertexInfo(this.verlen);
+            this.vertex = new VertexInfo(this.verlen,10);
+            this.vertex.variables = BatchGeometry.variables;
             this.vcData = new Float32Byte(new Float32Array(this.quadcount * 4))
             let byte = this.vertex.vertex;
             let vo  = this.link.getFrist();
             if(vo.close == false){
                 let sp:Sprite = vo.data;
-                byte.append(sp.$graphics.byte);
+                let g = sp.$graphics;
+                byte.set(g.$batchOffset,g.byte);
                 this.vcData.addPoint4(sp.$vcIndex * 4,sp.$vcox,sp.$vcoy,sp.$vcos,sp.sceneAlpha)
             }
             vo = vo.next;

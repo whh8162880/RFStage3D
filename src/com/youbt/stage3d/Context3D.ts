@@ -95,7 +95,7 @@ namespace rf {
 			}
 		}
 
-		public createVertexBuffer(data: number[] | Float32Array,data32PerVertex: number,startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
+		public createVertexBuffer(data: number[]|Float32Array|VertexInfo,data32PerVertex: number,startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
 			let buffer: VertexBuffer3D = recyclable(VertexBuffer3D);
 			buffer.data32PerVertex = data32PerVertex;
 			buffer.uploadFromVector(data,startVertex,numVertices);			
@@ -105,7 +105,7 @@ namespace rf {
 		private indexs:{[key:number]:IndexBuffer3D};
 		private indexByte:Uint16Array = undefined;
 		private initIndexByQuadCount(count:number):void{
-			let byte = this.indexByte = new Uint16Array(count * 6 * 2);
+			let byte = this.indexByte = new Uint16Array(count * 6);
 			count *= 4;
 			let j = 0;
 			for(var i:number =0;i<count;i+=4){
@@ -128,7 +128,7 @@ namespace rf {
 				this.indexs = {};
 			}
 			let buffer = this.indexs[quadCount];
-			let length = quadCount * 6 * 2
+			let length = quadCount * 6;
 			if(undefined == buffer){
 				
 				let array = new Uint16Array(length)
@@ -218,8 +218,10 @@ namespace rf {
 		 */
 		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array,format:number): void {
 			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
-			if (!index) throw new Error('Fail to get uniform ' + variable);
-			gl['uniform' + format + 'fv'](index, data);
+			if(index){
+				gl['uniform' + format + 'fv'](index, data);;
+			}
+			
 		}
 
 		/**
