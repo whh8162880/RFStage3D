@@ -122,10 +122,12 @@ module rf {
 
 
     export class VertexBuffer3D extends Buffer3D {
-        private varibles: { [key: string]: { size: number, offset: number } } = undefined;
+        
+        // private varibles: { [key: string]: { size: number, offset: number } } = undefined;
         public numVertices: number = 0;
         public data32PerVertex: number = 0;
-        public data: Float32Array;
+        public data: VertexInfo;
+
         buffer: WebGLBuffer = null;
         constructor() {
             super();
@@ -142,9 +144,6 @@ module rf {
             this.data = null;
         }
         awaken(): boolean {
-            if (undefined != this.buffer) {
-                return true;
-            }
             if (!this.data || !this.data32PerVertex || !this.numVertices) {
                 this.readly = false;
                 ThrowError("vertexBuffer3D unavailable");
@@ -154,7 +153,7 @@ module rf {
                 this.buffer = gl.createBuffer();
             }
             gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, this.data, gl.STATIC_DRAW);
+            gl.bufferData(gl.ARRAY_BUFFER, this.data.vertex.array, gl.STATIC_DRAW);
             gl.bindBuffer(gl.ARRAY_BUFFER, null);
             this.readly = true;
             return true;
@@ -194,17 +193,16 @@ module rf {
                 }
                 this.numVertices = data.length / this.data32PerVertex;
             }
-
-            this.data = <Float32Array>data;
+            this.data = new VertexInfo(<Float32Array>data);
         }
 
 
-        public regVariable(variable: string, offset: number, size: number): void {
-            if (undefined == this.varibles) {
-                this.varibles = {};
-            }
-            this.varibles[variable] = { size: size, offset: offset * 4 };
-        }
+        // public regVariable(variable: string, offset: number, size: number): void {
+        //     if (undefined == this.varibles) {
+        //         this.varibles = {};
+        //     }
+        //     this.varibles[variable] = { size: size, offset: offset * 4 };
+        // }
 
 
         public uploadContext(program: Program3D): void {
@@ -215,12 +213,13 @@ module rf {
             }
             var location: number = -1;
             gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-            for (let variable in this.varibles) {
+            let variables = this.data.variables
+            for (let variable in variables) {
                 location = gl.getAttribLocation(program.program, variable);
                 if (location < 0) {
                     continue;
                 }
-                let o = this.varibles[variable];
+                let o = variables[variable];
                 gl.vertexAttribPointer(location, o.size, gl.FLOAT, false, this.data32PerVertex * 4, o.offset);
                 gl.enableVertexAttribArray(location);
             }
@@ -231,6 +230,8 @@ module rf {
         public numIndices: number;
         public data: Uint16Array;
         public buffer: WebGLBuffer;
+
+        public quadid:number = -1;
         constructor() {
             super();
         }

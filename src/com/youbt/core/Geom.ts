@@ -1,6 +1,6 @@
 ///<reference path="../stage3d/geom/Vector3D.ts" />
 ///<reference path="../stage3d/geom/Matrix3D.ts" />
-module rf{
+module rf {
     export declare type PosKey = "x" | "y";
     export declare type SizeKey = "width" | "height";
 
@@ -13,13 +13,12 @@ module rf{
     export class Point {
         public x: number;
         public y: number;
-        constructor(x:number = 0,y:number = 0){
+        constructor(x: number = 0, y: number = 0) {
             this.x = x;
             this.y = y;
         }
 
-        public get length() : Number
-        {
+        public get length(): Number {
             return Math.sqrt(this.x * this.x + this.y * this.y);
         }
 
@@ -35,18 +34,18 @@ module rf{
      * @extends {Point}
      * @extends {Size}
      */
-    export class Rect extends Point{
-        public width:number = 0;
-        public height:number = 0;
-        constructor(x:number = 0, y:number = 0, width:number = 0, height:number = 0){
-            super(x,y);
+    export class Rect extends Point {
+        public width: number = 0;
+        public height: number = 0;
+        constructor(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
+            super(x, y);
             this.width = width;
             this.height = height;
         }
 
 
-        public clone():Rect{
-            return new Rect(this.x,this.y,this.width,this.height);
+        public clone(): Rect {
+            return new Rect(this.x, this.y, this.width, this.height);
         }
 
     }
@@ -58,27 +57,27 @@ module rf{
     export let tempAxeY: Vector3D = new Vector3D();
     export let tempAxeZ: Vector3D = new Vector3D();
 
-    export let PI2:number = Math.PI*2;
+    export let PI2: number = Math.PI * 2;
 
-    export let RAW_DATA_CONTAINER:Float32Array = new Float32Array([
+    export let RAW_DATA_CONTAINER: Float32Array = new Float32Array([
         1, 0, 0, 0,
         0, 1, 0, 0,
         0, 0, 1, 0,
         0, 0, 0, 1]);
-    	
-	export let CALCULATION_MATRIX:Matrix3D = new Matrix3D();
-	// export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
-	export let CALCULATION_VECTOR3D:Vector3D = new Vector3D();
-	export let CALCULATION_DECOMPOSE:Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
+
+    export let CALCULATION_MATRIX: Matrix3D = new Matrix3D();
+    // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
+    export let CALCULATION_VECTOR3D: Vector3D = new Vector3D();
+    export let CALCULATION_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
 
 
 
-     /**
-     * 经纬度 定位信息
-     * 
-     * @export
-     * @interface Location
-     */
+    /**
+    * 经纬度 定位信息
+    * 
+    * @export
+    * @interface Location
+    */
     export interface Location {
         /**维度*/
         latitude: number;
@@ -115,37 +114,40 @@ module rf{
         }
     }
 
-    export class Float32Byte{
-        public array:Float32Array;
-       
-        constructor(array:Float32Array){
+    export class Float32Byte {
+        public array: Float32Array;
+
+        constructor(array?: Float32Array) {
+            if(undefined == array){
+                array = new Float32Array(0);
+            }
             this.array = array;
         }
 
-        get length():number{
+        get length(): number {
             return this.array.length;
         }
 
-        set length(value:number){
-            if(this.array.length  == value){
+        set length(value: number) {
+            if (this.array.length == value) {
                 return;
             }
             let nd = new Float32Array(value);
             let len = value < this.array.length ? value : this.array.length;
-            nd.set(this.array.slice(0,len),0);
+            nd.set(this.array.slice(0, len), 0);
             this.array = nd;
         }
 
-        public append(byte:Float32Byte,offset:number = 0,len:number = -1):void{
-            var position:number = 0;
-            if(0 > offset){
+        append(byte: Float32Byte, offset: number = 0, len: number = -1): void {
+            var position: number = 0;
+            if (0 > offset) {
                 offset = 0;
             }
 
-            if(-1 == len){
+            if (-1 == len) {
                 len = byte.length - offset;
-            }else{
-                if(len > byte.length - offset){
+            } else {
+                if (len > byte.length - offset) {
                     len = byte.length - offset;
                 }
             }
@@ -153,40 +155,40 @@ module rf{
             position = this.array.length;
             length = this.array.length + byte.length;
 
-            if(len == byte.length){
-                this.array.set(byte.array,position);
-            }else{
-                this.array.set(byte.array.slice(offset,len),position);
+            if (len == byte.length) {
+                this.array.set(byte.array, position);
+            } else {
+                this.array.set(byte.array.slice(offset, len), position);
             }
         }
 
-        
 
 
-        public addPoint1(position:number,x:number):void{
+
+        addPoint1(position: number, x: number): void {
             this.array[position] = x;
         }
 
-        public addPoint2(position:number,x:number,y:number):void{
-            this.array[position    ] = x;
+        addPoint2(position: number, x: number, y: number): void {
+            this.array[position] = x;
             this.array[position + 1] = y;
         }
 
-        public addPoint3(position:number,x:number,y:number,z:number):void{
-            this.array[position    ] = x;
+        addPoint3(position: number, x: number, y: number, z: number): void {
+            this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;
         }
 
-        public addPoint4(position:number,x:number,y:number,z:number,w:number):void{
-            this.array[position    ] = x;
+        addPoint4(position: number, x: number, y: number, z: number, w: number): void {
+            this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;
             this.array[position + 3] = w;
         }
 
-        public addUIPoint(position:number,x:number,y:number,z:number,u:number,v:number,index:number,r:number,g:number,b:number,a:number):void{
-            this.array[position    ] = x;
+        addUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
+            this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;
             this.array[position + 3] = u;
@@ -196,6 +198,14 @@ module rf{
             this.array[position + 7] = g;
             this.array[position + 8] = b;
             this.array[position + 9] = a;
+        }
+
+
+        update(data32PerVertex: number, offset: number, v: number): void {
+            let len = this.array.length;
+            for (let i = 0; i < len; i += data32PerVertex) {
+                this.array[i + offset] = v;
+            }
         }
     }
 }

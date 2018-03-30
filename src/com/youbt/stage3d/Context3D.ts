@@ -102,6 +102,46 @@ namespace rf {
 			return buffer;
 		}
 
+		private indexs:{[key:number]:IndexBuffer3D};
+		private indexByte:Uint16Array = undefined;
+		private initIndexByQuadCount(count:number):void{
+			let byte = this.indexByte = new Uint16Array(count * 6 * 2);
+			count *= 4;
+			let j = 0;
+			for(var i:number =0;i<count;i+=4){
+				byte[j++] = i;
+				byte[j++] = i + 1;
+				byte[j++] = i + 3;
+				byte[j++] = i + 1;
+				byte[j++] = i + 2;
+				byte[j++] = i + 3;
+			}
+		}
+
+		public getIndexByQuad(quadCount:number):IndexBuffer3D{
+			if(quadCount > 2000){
+				ThrowError("你要这么多四边形干嘛？");
+				return null;
+			}
+
+			if(undefined == this.indexs){
+				this.indexs = {};
+			}
+			let buffer = this.indexs[quadCount];
+			let length = quadCount * 6 * 2
+			if(undefined == buffer){
+				
+				let array = new Uint16Array(length)
+				if(undefined == this.indexByte){
+					this.initIndexByQuadCount(2000);
+				}
+				array.set(this.indexByte.slice(0,length));
+
+				this.indexs[quadCount] = buffer = this.createIndexBuffer(array);
+			}
+			return buffer;
+		}
+
 		public createIndexBuffer(data:number[] | Uint16Array): IndexBuffer3D {
 			let buffer = recyclable(IndexBuffer3D);
 			buffer.uploadFromVector(data);

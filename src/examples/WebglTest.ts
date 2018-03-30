@@ -53,8 +53,8 @@ module rf{
                 0,0,1,0.5
             ])
             let v = context3D.createVertexBuffer(vertices,3);
-            v.regVariable(VA.pos,0,2);
-            v.regVariable("index",2,1);
+            v.data.regVariable(VA.pos,0,2);
+            v.data.regVariable("index",2,1);
 
             
             let i = context3D.createIndexBuffer(indexs);
@@ -117,8 +117,8 @@ module rf{
             );
             let indexs = new Uint16Array([0,1,3,1,2,3]);
             let v = context3D.createVertexBuffer(vertices,4);
-            v.regVariable(VA.pos,0,2);
-            v.regVariable(VA.uv,2,2);
+            v.data.regVariable(VA.pos,0,2);
+            v.data.regVariable(VA.uv,2,2);
             let i = context3D.createIndexBuffer(indexs);
             let p = context3D.createProgram(vertexCode,fragmentCode);
             context3D.setProgram(p);
