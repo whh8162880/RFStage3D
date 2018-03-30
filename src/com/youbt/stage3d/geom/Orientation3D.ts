@@ -1,8 +1,7 @@
 module rf {
-    export class Orientation3D
-    {
-        public static AXIS_ANGLE:string = "axisAngle";
-        public static EULER_ANGLES:string = "eulerAngles";
-        public static QUATERNION:string = "quaternion";
+    export const enum Orientation3D {
+        AXIS_ANGLE = "axisAngle",
+        EULER_ANGLES = "eulerAngles",
+        QUATERNION = "quaternion",
     }
 }

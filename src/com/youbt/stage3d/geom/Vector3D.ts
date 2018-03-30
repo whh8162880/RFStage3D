@@ -1,7 +1,5 @@
-module rf
-{
-    export class Vector3D
-    {
+module rf {
+    export class Vector3D {
 
         /**
          * The x axis defined as a Vector3D object with coordinates (1,0,0).
@@ -51,8 +49,7 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 0)
-        {
+        constructor(x: number = 0, y: number = 0, z: number = 0, w: number = 0) {
             this.x = x;
             this.y = y;
             this.z = z;
@@ -63,32 +60,28 @@ module rf
         /**
          * [read-only] The length, magnitude, of the current Vector3D object from the origin(0, 0, 0) to the object's x, y, and z coordinates.
          */
-        public get length(): number
-        {
+        public get length(): number {
             return Math.sqrt(this.lengthSquared);
         }
 
         /**
          * [read-only] The square of the length of the current Vector3D object, calculated using the x, y, and z properties.
          */
-        public get lengthSquared(): number
-        {
+        public get lengthSquared(): number {
             return this.x * this.x + this.y * this.y + this.z * this.z;
         }
 
         /**
          * [static] Returns the angle in radians between two vectors.
          */
-        public static angleBetween(a: Vector3D, b: Vector3D): number
-        {
+        public static angleBetween(a: Vector3D, b: Vector3D): number {
             return Math.acos(a.dotProduct(b) / (a.length * b.length));
         }
 
         /**
          * [static] Returns the distance between two Vector3D objects.
          */
-        public static distance(pt1: Vector3D, pt2: Vector3D): number
-        {
+        public static distance(pt1: Vector3D, pt2: Vector3D): number {
             var x: number = (pt1.x - pt2.x);
             var y: number = (pt1.y - pt2.y);
             var z: number = (pt1.z - pt2.z);
@@ -113,8 +106,7 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public add(a: Vector3D): Vector3D
-        {
+        public add(a: Vector3D): Vector3D {
             return new Vector3D(this.x + a.x, this.y + a.y, this.z + a.z);
         }
 
@@ -130,8 +122,7 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public subtract(a: Vector3D): Vector3D
-        {
+        public subtract(a: Vector3D): Vector3D {
             return new Vector3D(this.x - a.x, this.y - a.y, this.z - a.z);
         }
 
@@ -145,8 +136,7 @@ module rf
          * @playerversion	Flash 10
          * @playerversion	AIR 1.5
          */
-        public incrementBy(a: Vector3D): void
-        {
+        public incrementBy(a: Vector3D): void {
             this.x += a.x;
             this.y += a.y;
             this.z += a.z;
@@ -162,8 +152,7 @@ module rf
          * @playerversion	Flash 10
          * @playerversion	AIR 1.5
          */
-        public decrementBy(a: Vector3D): void
-        {
+        public decrementBy(a: Vector3D): void {
             this.x -= a.x;
             this.y -= a.y;
             this.z -= a.z;
@@ -185,8 +174,7 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public equals(toCompare: Vector3D, allFour: boolean = false): boolean
-        {
+        public equals(toCompare: Vector3D, allFour: boolean = false): boolean {
             return (this.x == toCompare.x && this.y == toCompare.y && this.z == toCompare.z && (allFour ? this.w == toCompare.w : true));
         }
 
@@ -210,10 +198,9 @@ module rf
          * @playerversion	Flash 10
          * @playerversion	AIR 1.5
          */
-        public nearEquals(toCompare: Vector3D, tolerance: number, allFour: boolean = false): boolean
-        {
-            var abs: Function = Math.abs;
-            return ((abs(this.x - toCompare.x) < tolerance) && (abs(this.y - toCompare.y) < tolerance) && (abs(this.z - toCompare.z) < tolerance) && (allFour? (abs(this.w - toCompare.w) < tolerance):true));
+        public nearEquals(toCompare: Vector3D, tolerance: number, allFour: boolean = false): boolean {
+            const abs = Math.abs;
+            return ((abs(this.x - toCompare.x) < tolerance) && (abs(this.y - toCompare.y) < tolerance) && (abs(this.z - toCompare.z) < tolerance) && (allFour ? (abs(this.w - toCompare.w) < tolerance) : true));
         }
 
 
@@ -224,16 +211,14 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public clone(): Vector3D
-        {
+        public clone(): Vector3D {
             return new Vector3D(this.x, this.y, this.z, this.w);
         }
 
         /**
          * Copies all of vector data from the source Vector3D object into the calling Vector3D object.
          */
-        public copyFrom(sourceVector3D: Vector3D): void
-        {
+        public copyFrom(sourceVector3D: Vector3D): void {
             this.x = sourceVector3D.x;
             this.y = sourceVector3D.y;
             this.z = sourceVector3D.z;
@@ -249,8 +234,7 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public negate(): void
-        {
+        public negate(): void {
             this.x = -this.x;
             this.y = -this.y;
             this.z = -this.z;
@@ -269,8 +253,7 @@ module rf
          * @playerversion	Flash 10
          * @playerversion	AIR 1.5
          */
-        public scaleBy(s: number): void
-        {
+        public scaleBy(s: number): void {
             this.x *= s;
             this.y *= s;
             this.z *= s;
@@ -279,8 +262,7 @@ module rf
         /**
          * Sets the members of Vector3D to the specified values
          */
-        public setTo(xa: number, ya: number, za: number): void
-        {
+        public setTo(xa: number, ya: number, za: number): void {
             this.x = xa;
             this.y = ya;
             this.z = za;
@@ -296,9 +278,8 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public normalize(): number
-        {
-            var leng: number = this.length;
+        public normalize() {
+            var leng = this.length;
             if (leng != 0)
                 this.scaleBy(1 / leng);
             return leng;
@@ -321,9 +302,10 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public crossProduct(a: Vector3D): Vector3D
-        {
-            return new Vector3D(this.y * a.z - this.z * a.y, this.z * a.x - this.x * a.z, this.x * a.y - this.y * a.x);
+        public crossProduct(a: Vector3D) {
+            const { x, y, z } = this;
+            const { x: ax, y: ay, z: az } = a;
+            return new Vector3D(y * az - z * ay, z * ax - x * az, x * ay - y * ax);
         }
 
 		/**
@@ -345,9 +327,8 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public dotProduct(a: Vector3D): number
-        {
-            return (this.x * a.x + this.y * a.y + this.z * a.z);
+        public dotProduct(a: Vector3D) {
+            return this.x * a.x + this.y * a.y + this.z * a.z;
         }
 
         /**
@@ -362,19 +343,18 @@ module rf
 		 * @playerversion	Flash 10
 		 * @playerversion	AIR 1.5
 		 */
-        public project(): void
-        {
-            if (this.w == 0) return;
-            this.x /= this.w;
-            this.y /= this.w;
-            this.z /= this.w;
+        public project(): void {
+            const w = this.w;
+            if (w == 0) return;
+            this.x /= w;
+            this.y /= w;
+            this.z /= w;
         }
 
         /**
          * Returns a string representation of the current Vector3D object.
          */
-        public toString(): string
-        {
+        public toString() {
             return "[Vector3D] (x:" + this.x + " ,y:" + this.y + ", z:" + this.z + ", w:" + this.w + ")";
         }
 
