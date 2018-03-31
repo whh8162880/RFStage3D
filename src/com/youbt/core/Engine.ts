@@ -15,9 +15,10 @@ namespace rf {
 		public static FPS_CHANGE: string = 'FPS_CHANGE';
 	}
 
-	export let nextUpdateTime:number = 0;
-	export let frameInterval:number = 0;
+	export let nextUpdateTime: number = 0;
+	export let frameInterval: number = 0;
 
+	export const getT: ({ (): number }) = window.performance ? performance.now.bind(performance) : Date.now;
 
 	// export let engie_animation_request:Function = undefined;
 	export class Engine {
@@ -45,8 +46,10 @@ namespace rf {
 		private static _fpsCount: number = 0;
 		private static _codeTime: number = 0;
 
+
+
 		public static start(): void {
-			Engine.startTime = Date.now();
+			Engine.startTime = getT();
 			Engine.now = 0;
 			Engine.frameRate = Engine._frameRate;
 			nextUpdateTime = Engine.startTime + frameInterval;
@@ -54,15 +57,15 @@ namespace rf {
 
 			//动画ENTER_FRAME;
 			let animationRequest =
-			window['requestAnimationFrame'] ||
-			window['webkitRequestAnimationFrame'] ||
-			window['mozRequestAnimationFrame'] ||
-			window['oRequestAnimationFrame'] ||
-			window['msRequestAnimationFrame'];
+				window['requestAnimationFrame'] ||
+				window['webkitRequestAnimationFrame'] ||
+				window['mozRequestAnimationFrame'] ||
+				window['oRequestAnimationFrame'] ||
+				window['msRequestAnimationFrame'];
 
-			function onAnimationChange():void{
+			function onAnimationChange(): void {
 				animationRequest(onAnimationChange);
-				let time: number = Date.now();
+				let time = getT();
 				if (time < nextUpdateTime) {
 					return;
 				}
@@ -77,7 +80,7 @@ namespace rf {
 			animationRequest(onAnimationChange);
 
 			//resize
-			window.onresize = function() {
+			window.onresize = function () {
 				isWindowResized = true;
 			};
 			stageWidth = window.innerWidth;
@@ -105,7 +108,7 @@ namespace rf {
 
 			document.addEventListener(
 				visibilityChange,
-				function() {
+				function () {
 					let stateDesc: string = document[state];
 					let hidden: boolean = stateDesc.toLocaleLowerCase().indexOf('hidden') != -1;
 					Engine.hidden = hidden;
@@ -188,7 +191,7 @@ namespace rf {
 		}
 
 		public static profile(): void {
-			let now: number = Date.now();
+			let now: number = getT();
 			Engine._fpsCount++;
 			Engine._codeTime += now - Engine.startTime - Engine.now;
 			if (now > Engine._nextProfileTime) {

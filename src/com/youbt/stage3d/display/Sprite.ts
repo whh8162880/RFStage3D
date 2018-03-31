@@ -197,8 +197,8 @@ module rf {
      *      6.dc()方法渲染 shader计算详看代码。
      */
     export class BatchRenderer extends RenderBase implements I3DRender {
-        target: Sprite;
-        renders: Link;
+        target: Sprite;        renders: Link;
+
         geo: BatchGeometry = undefined;
         program: Program3D;
         worldTransform: Matrix3D;
@@ -210,26 +210,27 @@ module rf {
         }
 
         public render(camera: Camera, now: number, interval: number): void {
-            if (this.target._change & DChange.vertex) {
+            let target:Sprite = this.target;
+            if (target._change & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
-                this.getBatchTargets(this.target, -this.target._x, -this.target._y, 1 / this.target._scaleX);
+                this.getBatchTargets(target, -target._x, -target._y, 1 / target._scaleX);
                 //step2 合并模型 和 vc信息
                 this.toBatch();
 
                 this.geo = undefined;
-                this.target._change &= ~DChange.vextex_all;
-            }else if(this.target._change & DChange.vcdata){
+                target._change &= ~DChange.vextex_all;
+            }else if(target._change & DChange.vcdata){
                 //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
-                this.updateVCData(this.target, -this.target._x, -this.target._y, 1 / this.target._scaleX);
-                this.target._change &= ~DChange.vcdata;
+                this.updateVCData(target, -target._x, -target._y, 1 / target._scaleX);
+                target._change &= ~DChange.vcdata;
             }
 
             if (undefined == this.program) {
                 this.createProgram();
             }
 
-            this.worldTransform.copyFrom(this.target.sceneTransform);
+            this.worldTransform.copyFrom(target.sceneTransform);
             this.worldTransform.append(camera.worldTranform);
 
 
