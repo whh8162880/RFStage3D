@@ -12,7 +12,7 @@ module rf{
         constructor(){
             super();
             this.camera2D = new Camera2D();
-            this.batcher = new Batcher(this);
+            this.renderer = new BatchRenderer(this);
             this.stage = this;
         }
 

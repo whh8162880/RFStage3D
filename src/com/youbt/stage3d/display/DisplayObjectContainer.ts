@@ -7,6 +7,17 @@ module rf{
         }
 
         protected _childrenChange:boolean = false;
+
+        setChange(value: number,p:boolean = false,c:boolean = false): void {
+            if(true == c){
+                this._childrenChange = p;
+                if(this.parent){
+                    this.parent.setChange(value,p,true);
+                }
+            }else{
+                super.setChange(value);
+            }
+        }
         public childrenChange(){
             this._childrenChange = true;
             if(undefined != this.parent){
@@ -28,7 +39,7 @@ module rf{
             this.childrens.push(child);
             child.parent = this;
             //需要更新Transform
-            child.change = DChange.trasnform;
+            this.setChange(DChange.trasnform)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -52,7 +63,7 @@ module rf{
 
             child.parent = this;
             //需要更新Transform
-            child.change = DChange.trasnform;
+            this.setChange(DChange.trasnform)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -127,7 +138,7 @@ module rf{
             if(true == this._childrenChange){
                 for(let child of this.childrens){
                     if(child instanceof DisplayObjectContainer){
-                        if(child._change || (<DisplayObjectContainer>child)._childrenChange){
+                        if(child._change || child._childrenChange){
                             child.updateTransform();
                         }
                     }else{

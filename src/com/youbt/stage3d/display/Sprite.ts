@@ -2,7 +2,7 @@
 ///<reference path="../camera/Camera.ts" />
 module rf {
     export interface I3DRender extends IRecyclable {
-        render?(camera: Camera, now: number, interval: number): void
+        render?(camera: Camera, now: number, interval: number,target?:Sprite): void
     }
     export class HitArea {
         left: number = 0;
@@ -59,7 +59,11 @@ module rf {
 
     export class Sprite extends DisplayObjectContainer implements I3DRender {
         hitArea: HitArea;
-        batcher: Batcher;
+        /**
+         * 1.Sprite本身有render方法可以渲染
+         * 2.考虑到可能会有一些需求 渲染器可以写在别的类或者方法中  所以加入renderer概念
+         */
+        renderer: I3DRender;
         batcherAvailable: boolean = true;
         $graphics: Graphics = undefined;
         $batchGeometry: BatchGeometry;
@@ -81,27 +85,30 @@ module rf {
             return this.$graphics;
         }
 
-        batchChange(value: number): void {
-            if (undefined != this.batcher) {
+        setChange(value: number,p:boolean = false,c:boolean = false): void {
+            if(undefined != this.renderer){
                 this._change |= value;
-                this.childrenChange();
-            } else {
-                if (this.parent) {
-                    this.parent.batchChange(value);
-                }
+                this._childrenChange = p && c;
+            }else{
+                super.setChange(value,p,c);
             }
         }
 
+        render(camera: Camera, now: number, interval: number): void {
+            if (undefined != this.renderer) {
 
-        public render(camera: Camera, now: number, interval: number): void {
-            if (undefined != this.batcher) {
-                this.batcher.render(camera, now, interval);
+                if(true == this._childrenChange){
+                    this.updateTransform();
+                }
+
+                this.renderer.render(camera, now, interval);
+
             }
         }
 
         addToStage() {
             if (this.$graphics && this.$graphics.numVertices) {
-                this.batchChange(DChange.vertex);
+                this.setChange(DChange.vertex);
             }
         }
     }
@@ -137,7 +144,7 @@ module rf {
                 this.preNumVertices = 0;
                 this.target.$batchGeometry.update(this.$batchOffset,this.byte);
             }else{
-                this.target.batchChange(DChange.vertex);
+                this.target.setChange(DChange.vertex);
             }
         }
 
@@ -173,7 +180,23 @@ module rf {
         }
     }
 
-    export class Batcher extends RenderBase implements I3DRender {
+
+    /**
+     *  自动模型合并 渲染器
+     *  原理:
+     *      1.Sprite graphics 可以生成 【矢量图 + 贴图】的【四边形】 模型数据 vertexData  : 点定义为 vertex_ui_variable
+     *      2.带有Batch渲染器的Sprite对象 自动收集children中所有graphics 模型信息 并生成合并的VertexData。VertexData会被封装进【BatchGeometry】进行渲染
+     *        模型合并触发条件
+     *          【1.children graphics 信息改变】
+     *          【2.children visible = false|true】
+     *          【3.children alpha = 0|>0】
+     *      3.考虑到Sprite对象的children对象 可能也会自带渲染器 所以会生成很多的模型信息【BatchGeometry】  所以batch的rendersLink会表现为 【BatchGeometry】-> I3DRender ->【BatchGeometry】这样的渲染顺序
+     *      4.被合并的children对象的x,y,scale,alpha等信息会被batch收集成一个Float32Array数据 每4位(vec4)为一个控制单元【x,y,scale,alpha】 用于shader计算 
+     *        所以children对象 x,y,scale,alpha 改变时 会重新收集数据【现在是只要chindren改变就全部无脑收集=。=】
+     *      5.考虑到用户电脑 Max Vertex Uniform Vectors 数据不同【http://webglreport.com/】 所以要注意shader对象中ui[${max_vc}]  
+     *      6.dc()方法渲染 shader计算详看代码。
+     */
+    export class BatchRenderer extends RenderBase implements I3DRender {
         target: Sprite;
         renders: Link;
         geo: BatchGeometry = undefined;
@@ -195,7 +218,10 @@ module rf {
                 this.toBatch();
 
                 this.geo = undefined;
-                this.target._change &= ~DChange.vertex;
+                this.target._change &= ~DChange.vextex_all;
+            }else if(this.target._change & DChange.vcdata){
+                //坐标发生了变化 需要更新vcdata
+                
             }
 
             if (undefined == this.program) {
@@ -241,7 +267,7 @@ module rf {
                 attribute vec3 uv;
                 attribute vec4 color;
                 uniform mat4 mvp;
-                uniform vec4 ui[100];
+                uniform vec4 ui[${max_vc}];
                 varying vec2 vUV;
                 varying vec4 vColor;
                 void main(void){
@@ -311,7 +337,7 @@ module rf {
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if (target == this.target || (null == target.batcher && true == target.batcherAvailable)) {
+            if (target == this.target || (null == target.renderer && true == target.batcherAvailable)) {
                 if (undefined == g || 0 >= g.numVertices) {
                     target.$vcIndex = -1;
                     target.$batchGeometry = null;

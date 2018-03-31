@@ -5,8 +5,10 @@ module rf {
     export enum DChange {
         trasnform = 0b1,
         alpha = 0b10,
+        base_all = (trasnform | alpha),
         vertex = 0b100,
         vcdata = 0b1000,
+        vextex_all = (vertex | vcdata)
     }
 
     export let BIT_CLEAR: number = 0x1;
@@ -67,16 +69,11 @@ module rf {
             this.sceneTransform = new Matrix3D();
         }
 
-        public set change(value: number) {
-            this._change |= value;
-            if (undefined != this.parent) {
-                this.parent.childrenChange();
-            }
-        }
 
-        batchChange(value:number):void{
+        setChange(value:number,p:boolean = false,c:boolean = false){
+            this._change |= (value & ~DChange.vextex_all);
             if (undefined != this.parent) {
-                this.parent.batchChange(value);
+                this.parent.setChange(value & ~DChange.base_all,this._change != 0,true);
             }
         }
 
@@ -85,7 +82,7 @@ module rf {
 
         public set alpha(value:number){
             this._alpha = value;
-            this.change = DChange.alpha;
+            this.setChange(DChange.alpha | DChange.vcdata);
         }
 
         public get alpha():number{
@@ -93,11 +90,11 @@ module rf {
         }
 
         public get scaleX(): number { return this._scaleX; }
-        public set scaleX(value: number) { this._scaleX = value; this.sca.x = value; this.change = DChange.trasnform; }
+        public set scaleX(value: number) { this._scaleX = value; this.sca.x = value; this.setChange(DChange.trasnform | DChange.vcdata); }
         public get scaleY(): number { return this._scaleY; }
-        public set scaleY(value: number) { this._scaleY = value; this.sca.y = value; this.change = DChange.trasnform; }
+        public set scaleY(value: number) { this._scaleY = value; this.sca.y = value; this.setChange(DChange.trasnform); }
         public get scaleZ(): number { return this._scaleZ; }
-        public set scaleZ(value: number) { this._scaleZ = value; this.sca.z = value; this.change = DChange.trasnform; }
+        public set scaleZ(value: number) { this._scaleZ = value; this.sca.z = value; this.setChange(DChange.trasnform); }
         public get rotationX(): number { return this._rotationX * RADIANS_TO_DEGREES; }
         public get rotationY(): number { return this._rotationY * RADIANS_TO_DEGREES; }
         public get rotationZ(): number { return this._rotationZ * RADIANS_TO_DEGREES; }
@@ -106,17 +103,17 @@ module rf {
         public set rotationX(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationX) return;
-            this._rotationX = value; this.rot.x = value; this.change = DChange.trasnform;
+            this._rotationX = value; this.rot.x = value; this.setChange(DChange.trasnform);
         }
         public set rotationY(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationY) return;
-            this._rotationY = value; this.rot.y = value; this.change = DChange.trasnform;
+            this._rotationY = value; this.rot.y = value; this.setChange(DChange.trasnform);
         }
         public set rotationZ(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationZ) return;
-            this._rotationZ = value; this.rot.z = value; this.change = DChange.trasnform;
+            this._rotationZ = value; this.rot.z = value; this.setChange(DChange.trasnform);
         }
 
         public get x(): number { return this._x; }
@@ -125,15 +122,18 @@ module rf {
 
         public set x(value: number) {
             if (value == this._x) return;
-            this._x = value; this.pos.x = value; this.change = DChange.trasnform;
+            this._x = value; this.pos.x = value; 
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
         public set y(value: number) {
             if (value == this._y) return;
-            this._y = value; this.pos.y = value; this.change = DChange.trasnform;
+            this._y = value; this.pos.y = value; 
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
         public set z(value: number) {
             if (value == this._z) return;
-            this._z = value; this.pos.z = value; this.change = DChange.trasnform;
+            this._z = value; this.pos.z = value; 
+            this.setChange(DChange.trasnform);
         }
 
 
@@ -142,8 +142,7 @@ module rf {
             this.pos.y = this._y = y;
             this.pos.z = this._z = z;
             if (update) {
-                this.batchChange(DChange.vcdata);
-                this.change = DChange.trasnform;
+                this.setChange(DChange.trasnform | DChange.vcdata);
             }
         }
 
@@ -151,7 +150,7 @@ module rf {
             this._rotationX = value.x * DEGREES_TO_RADIANS;
             this._rotationY = value.y * DEGREES_TO_RADIANS;
             this._rotationZ = value.z * DEGREES_TO_RADIANS;
-            this.change = DChange.trasnform;
+            this.setChange(DChange.trasnform);
         }
 
 		/**
@@ -174,7 +173,7 @@ module rf {
             this._x = this.pos.x;
             this._y = this.pos.y;
             this._z = this.pos.z;
-            this.change = DChange.trasnform;
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
 
 
@@ -192,7 +191,7 @@ module rf {
             this._x = this.pos.x;
             this._y = this.pos.y;
             this._z = this.pos.z;
-            this.change = DChange.trasnform;
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
 
 
@@ -210,7 +209,7 @@ module rf {
             this._x = this.pos.x;
             this._y = this.pos.y;
             this._z = this.pos.z;
-            this.change = DChange.trasnform;
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
 
 		/**
@@ -225,7 +224,7 @@ module rf {
             this.rot.y = this._rotationY = ry * DEGREES_TO_RADIANS;
             this.rot.z = this._rotationZ = rz * DEGREES_TO_RADIANS;
             if (update) {
-                this.change = DChange.trasnform;
+                this.setChange(DChange.trasnform);
             }
         }
 
@@ -242,7 +241,7 @@ module rf {
             this.rot.y = this._rotationY = ry;
             this.rot.z = this._rotationZ = rz;
             if (update) {
-                this.change = DChange.trasnform;
+                this.setChange(DChange.trasnform);
             }
         }
 
@@ -262,7 +261,7 @@ module rf {
             this.sca.y = this._scaleY = sy;
             this.sca.z = this._scaleZ = sz;
             if (update) {
-                this.change = DChange.trasnform;
+                this.setChange(DChange.trasnform | DChange.vcdata);
             }
         }
 
@@ -294,7 +293,7 @@ module rf {
             this._scaleX = this.sca.x;
             this._scaleY = this.sca.y;
             this._scaleZ = this.sca.z;
-            this.change = DChange.trasnform;
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
 
 
