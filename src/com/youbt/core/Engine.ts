@@ -15,6 +15,11 @@ namespace rf {
 		public static FPS_CHANGE: string = 'FPS_CHANGE';
 	}
 
+	export let nextUpdateTime:number = 0;
+	export let frameInterval:number = 0;
+
+
+	export let engie_animation_request:Function = undefined;
 	export class Engine {
 		public static dispatcher: MiniDispatcher = new MiniDispatcher();
 
@@ -36,8 +41,6 @@ namespace rf {
 		private static ticklink: Link = new Link();
 		private static resizeLink: Link = new Link();
 		private static _frameRate: number = 60;
-		private static _frameInterval: number = 0;
-		private static _nextUpdateTime: number = 0;
 		private static _nextProfileTime: number = 0;
 		private static _fpsCount: number = 0;
 		private static _codeTime: number = 0;
@@ -46,38 +49,34 @@ namespace rf {
 			Engine.startTime = Date.now();
 			Engine.now = 0;
 			Engine.frameRate = Engine._frameRate;
-			Engine._nextUpdateTime = Engine.startTime + Engine._frameInterval;
+			nextUpdateTime = Engine.startTime + frameInterval;
 			Engine._nextProfileTime = Engine.startTime + 1000;
 
 			//动画ENTER_FRAME;
-			let requestAnimationFrame =
-				window['requestAnimationFrame'] ||
-				window['webkitRequestAnimationFrame'] ||
-				window['mozRequestAnimationFrame'] ||
-				window['oRequestAnimationFrame'] ||
-				window['msRequestAnimationFrame'];
+			let animationRequest =
+			window['requestAnimationFrame'] ||
+			window['webkitRequestAnimationFrame'] ||
+			window['mozRequestAnimationFrame'] ||
+			window['oRequestAnimationFrame'] ||
+			window['msRequestAnimationFrame'];
 
-			if (!requestAnimationFrame) {
-				requestAnimationFrame = function(callback) {
-					return window.setTimeout(callback, 1000 / 60);
-				};
-			}
+			engie_animation_request = animationRequest;
 
-			function onAnimationChange(): void {
-				requestAnimationFrame(onAnimationChange);
+			function onAnimationChange():void{
+				engie_animation_request(onAnimationChange);
 				let time: number = Date.now();
-				if (time < Engine._nextUpdateTime) {
+				if (time < nextUpdateTime) {
 					return;
 				}
 				let now: number = time - Engine.startTime;
 				let interval: number = (Engine.interval = now - Engine.now);
-				Engine._nextUpdateTime += Engine._frameInterval;
+				nextUpdateTime += frameInterval;
 				Engine.now = now;
 				Engine.update(now, interval);
 				Engine.profile();
 			}
 
-			requestAnimationFrame(onAnimationChange);
+			engie_animation_request(onAnimationChange);
 
 			//resize
 			window.onresize = function() {
@@ -119,7 +118,7 @@ namespace rf {
 							let delayTime: number = Date.now() - Engine.hiddenTime;
 							Engine.startTime += delayTime;
 							Engine._nextProfileTime += delayTime;
-							Engine._nextUpdateTime += delayTime;
+							nextUpdateTime += delayTime;
 							Engine.hiddenTime = 0;
 						}
 					}
@@ -183,14 +182,14 @@ namespace rf {
 
 		public static set frameRate(value: number) {
 			Engine._frameRate = value;
-			Engine._frameInterval = 1000 / value;
+			frameInterval = 1000 / value;
 		}
 
 		public static get frameRate(): number {
 			return Engine._frameRate;
 		}
 
-		private static profile(): void {
+		public static profile(): void {
 			let now: number = Date.now();
 			Engine._fpsCount++;
 			Engine._codeTime += now - Engine.startTime - Engine.now;

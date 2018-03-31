@@ -21,21 +21,27 @@ module rf{
             context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-            sp = new Sprite();
-            sp.x = 50;
-            sp.y = 50;
-            sp.alpha = 0.5;
-            let g = sp.graphics;
-            g.clear();
-            g.drawRect(0,0,100,100,0xFFDD00);
-            g.end();
+           
+            
+            let g = undefined
+            for(let i = 0;i<100;i++){
+                sp = new Sprite();
+                sp.x = Math.random() * stageWidth;
+                sp.y = Math.random() * stageHeight;
+                sp.alpha = Math.random() * 0.3 + 0.2;
+                g = sp.graphics;
+                g.clear();
+                g.drawRect(0,0,100,100,0xFFDD00);
+                g.end();
+                ROOT.addChild(sp);
+            }
 
             g = ROOT.graphics;
             g.clear();
             g.drawRect(0,0,100,100,0xFF0000);
             g.end();
 
-            ROOT.addChild(sp);
+            
 
             // Engine.removeTick(this);
             // ROOT.update(10,10);
