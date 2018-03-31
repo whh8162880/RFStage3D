@@ -1,9 +1,12 @@
 /// <reference path="./com/youbt/rfreference.ts" />
 module rf{
+    export let sp;
     export class Main extends AppBase{
         constructor(){      
             super();
         }
+
+        
 
 
         public init(cancas?:HTMLCanvasElement):void{
@@ -18,7 +21,7 @@ module rf{
             context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-            let sp = new Sprite();
+            sp = new Sprite();
             sp.x = 50;
             sp.y = 50;
             sp.alpha = 0.5;

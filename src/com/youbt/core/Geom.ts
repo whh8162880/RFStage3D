@@ -186,29 +186,29 @@ module rf {
 
 
 
-        addPoint1(position: number, x: number): void {
+        wPoint1(position: number, x: number): void {
             this.array[position] = x;
         }
 
-        addPoint2(position: number, x: number, y: number): void {
+        wPoint2(position: number, x: number, y: number): void {
             this.array[position] = x;
             this.array[position + 1] = y;
         }
 
-        addPoint3(position: number, x: number, y: number, z: number): void {
+        wPoint3(position: number, x: number, y: number, z: number): void {
             this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;
         }
 
-        addPoint4(position: number, x: number, y: number, z: number, w: number): void {
+        wPoint4(position: number, x: number, y: number, z: number, w: number): void {
             this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;
             this.array[position + 3] = w;
         }
 
-        addUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
+        wUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
             this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;

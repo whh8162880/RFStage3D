@@ -4,10 +4,10 @@ module rf {
 
     export enum DChange {
         trasnform = 0b1,
-        alpha = 0b10,
+        alpha = trasnform<<1,
         base_all = (trasnform | alpha),
-        vertex = 0b100,
-        vcdata = 0b1000,
+        vertex = alpha<<1,
+        vcdata = vertex<<1,
         vextex_all = (vertex | vcdata)
     }
 
@@ -78,11 +78,26 @@ module rf {
         }
 
         public get visible(): Boolean { return this._visible; }
-        public set visible(value: Boolean) { this._visible = value; }
+        public set visible(value: Boolean) {
+            if(this._visible != value) {
+                 this._visible = value; 
+                 this.setChange(DChange.vertex)
+            }
+        }
 
         public set alpha(value:number){
+            if(this._alpha == value){
+                return;
+            }
+
+            let vertex = 0
+            
+            if(this._alpha <= 0 || value == 0){
+                vertex |= DChange.vertex;
+            }
+
             this._alpha = value;
-            this.setChange(DChange.alpha | DChange.vcdata);
+            this.setChange(vertex | DChange.alpha | DChange.vcdata);
         }
 
         public get alpha():number{
@@ -90,7 +105,12 @@ module rf {
         }
 
         public get scaleX(): number { return this._scaleX; }
-        public set scaleX(value: number) { this._scaleX = value; this.sca.x = value; this.setChange(DChange.trasnform | DChange.vcdata); }
+        public set scaleX(value: number) {
+            if(this._scaleX == value) return;
+             this._scaleX = value; 
+             this.sca.x = value; 
+             this.setChange(DChange.trasnform | DChange.vcdata); 
+        }
         public get scaleY(): number { return this._scaleY; }
         public set scaleY(value: number) { this._scaleY = value; this.sca.y = value; this.setChange(DChange.trasnform); }
         public get scaleZ(): number { return this._scaleZ; }

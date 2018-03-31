@@ -130,7 +130,7 @@ module rf {
 
         private addPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
             this.numVertices++;
-            this.byte.addUIPoint(position, x, y, z, 0, 0, 0, r, g, b, a);
+            this.byte.wUIPoint(position, x, y, z, 0, 0, 0, r, g, b, a);
             this.target.hitArea.updateArea(x, y, z);
         }
 
@@ -220,8 +220,9 @@ module rf {
                 this.geo = undefined;
                 this.target._change &= ~DChange.vextex_all;
             }else if(this.target._change & DChange.vcdata){
-                //坐标发生了变化 需要更新vcdata
-                
+                //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
+                this.updateVCData(this.target, -this.target._x, -this.target._y, 1 / this.target._scaleX);
+                this.target._change &= ~DChange.vcdata;
             }
 
             if (undefined == this.program) {
@@ -368,6 +369,34 @@ module rf {
             }
         }
 
+        
+        updateVCData(target: Sprite, ox: number, oy: number, os: number):void{
+            if (false == target._visible || 0.0 >= target.sceneAlpha) {
+                target.$vcIndex = -1;
+                target.$batchGeometry = null;
+                return;
+            }
+
+            let g = target.$graphics;
+            ox = target._x + ox;
+            oy = target._y + oy;
+            os = target._scaleX * os;
+            if (target == this.target || (null == target.renderer && true == target.batcherAvailable)) {
+                if(undefined != target.$batchGeometry){
+                    target.$vcox = ox;
+                    target.$vcoy = oy;
+                    target.$vcos = os;
+                    target.$batchGeometry.vcData.wPoint4(sp.$vcIndex * 4 ,sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha);
+                }
+            } 
+
+            for (let child of target.childrens) {
+                if (child instanceof Sprite) {
+                    this.updateVCData(child, ox, oy, os);
+                }
+            }
+        }
+
 
         toBatch(): void {
             let vo = this.renders.getFrist();
@@ -418,9 +447,11 @@ module rf {
                 if (vo.close == false) {
                     let sp: Sprite = vo.data;
                     let g = sp.$graphics;
-                    g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex);
+                    if(sp.$vcIndex > 0){
+                        g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex);
+                    }
                     byte.set(g.$batchOffset, g.byte);
-                    this.vcData.addPoint4(sp.$vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
+                    this.vcData.wPoint4(sp.$vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
                 }
                 vo = vo.next;
             }
@@ -435,12 +466,18 @@ module rf {
             }
         }
 
+        updateVC(sp:Sprite):void{
+            this.vcData.wPoint4(sp.$vcIndex * 4 ,sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
+        }
+
         //x,y,z,u,v,vci,r,g,b,a;
 
         onRecycle(): void {
             this.vertex = undefined;
             this.verlen = 0;
-
+            this.vci = 0;
+            this.$vertexBuffer = null;
+            this.vcData = null;
             let vo = this.link.getFrist();
             while(vo){
                 if (vo.close == false) {
@@ -453,6 +490,7 @@ module rf {
                         sp.$vcoy = 0;
                     }
                 }
+                vo = vo.next;
             }
 
             this.link.onRecycle();
