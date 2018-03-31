@@ -24,7 +24,7 @@ module rf{
            
             
             let g = undefined
-            for(let i = 0;i<100;i++){
+            for(let i = 0;i<1;i++){
                 sp = new Sprite();
                 sp.x = Math.random() * stageWidth;
                 sp.y = Math.random() * stageHeight;

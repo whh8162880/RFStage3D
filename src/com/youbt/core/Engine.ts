@@ -19,7 +19,7 @@ namespace rf {
 	export let frameInterval:number = 0;
 
 
-	export let engie_animation_request:Function = undefined;
+	// export let engie_animation_request:Function = undefined;
 	export class Engine {
 		public static dispatcher: MiniDispatcher = new MiniDispatcher();
 
@@ -60,10 +60,8 @@ namespace rf {
 			window['oRequestAnimationFrame'] ||
 			window['msRequestAnimationFrame'];
 
-			engie_animation_request = animationRequest;
-
 			function onAnimationChange():void{
-				engie_animation_request(onAnimationChange);
+				animationRequest(onAnimationChange);
 				let time: number = Date.now();
 				if (time < nextUpdateTime) {
 					return;
@@ -76,7 +74,7 @@ namespace rf {
 				Engine.profile();
 			}
 
-			engie_animation_request(onAnimationChange);
+			animationRequest(onAnimationChange);
 
 			//resize
 			window.onresize = function() {
