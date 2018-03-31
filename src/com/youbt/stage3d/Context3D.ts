@@ -291,14 +291,14 @@ namespace rf {
 		 * @param depthMask 
 		 * @param passCompareMode 
 		 * 
-		 * Context3DCompareMode.LESS			GL.LESS
-		 * Context3DCompareMode.NEVER			GL.NEVER
-		 * Context3DCompareMode.EQUAL			GL.EQUAL
-		 * Context3DCompareMode.GREATER			GL.GREATER
-		 * Context3DCompareMode.NOT_EQUAL		GL.NOTEQUAL
-		 * Context3DCompareMode.ALWAYS			GL.ALWAYS
-		 * Context3DCompareMode.LESS_EQUAL		GL.LEQUAL
-		 * Context3DCompareMode.GREATER_EQUAL	GL.GEQUAL
+		 * Context3DCompareMode.LESS			:GL.LESS
+		 * Context3DCompareMode.NEVER			:GL.NEVER
+		 * Context3DCompareMode.EQUAL			:GL.EQUAL
+		 * Context3DCompareMode.GREATER			:GL.GREATER
+		 * Context3DCompareMode.NOT_EQUAL		:GL.NOTEQUAL
+		 * Context3DCompareMode.ALWAYS			:GL.ALWAYS
+		 * Context3DCompareMode.LESS_EQUAL		:GL.LEQUAL
+		 * Context3DCompareMode.GREATER_EQUAL	:GL.GEQUAL
 		 */
 		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
 			if (this._depthDisabled) {

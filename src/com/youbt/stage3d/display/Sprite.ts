@@ -1,49 +1,49 @@
 ///<reference path="./DisplayObjectContainer.ts" />
 ///<reference path="../camera/Camera.ts" />
-module rf{
-    export interface I3DRender extends IRecyclable{
-        render?(camera:Camera,now:number,interval:number):void
+module rf {
+    export interface I3DRender extends IRecyclable {
+        render?(camera: Camera, now: number, interval: number): void
     }
-    export class HitArea{
-        left:number = 0;
-        right:number = 0;
-        top:number = 0;
-        bottom:number = 0;
-        front:number = 0;
-        back:number = 0;
+    export class HitArea {
+        left: number = 0;
+        right: number = 0;
+        top: number = 0;
+        bottom: number = 0;
+        front: number = 0;
+        back: number = 0;
 
-        public updateArea(x:number,y:number,z:number):boolean{
-            let b:boolean = false;
-            if(this.left < x){
+        public updateArea(x: number, y: number, z: number): boolean {
+            let b: boolean = false;
+            if (this.left < x) {
                 this.left = x;
                 b = true;
-            }else if(this.right > x){
+            } else if (this.right > x) {
                 this.right = x;
                 b = true;
             }
 
-            if(this.top < y){
+            if (this.top < y) {
                 this.top = y;
                 b = true;
-            }else if(this.top > y){
+            } else if (this.top > y) {
                 this.top = y;
                 b = true;
             }
 
-            if(this.front < z){
+            if (this.front < z) {
                 this.front = z;
                 b = true;
-            }else if(this.back > z){
+            } else if (this.back > z) {
                 this.back = z;
                 b = true;
             }
-            
+
             return b;
         }
 
 
-        public checkIn(x:number,y:number,scale:number = 1):boolean{
-            if(x < this.left * scale && x > this.right * scale && y < this.top * scale && y > this.bottom * scale){
+        public checkIn(x: number, y: number, scale: number = 1): boolean {
+            if (x < this.left * scale && x > this.right * scale && y < this.top * scale && y > this.bottom * scale) {
                 return false;
             }
             return true;
@@ -52,55 +52,55 @@ module rf{
 
 
 
-        public toString():string{
+        public toString(): string {
             return `HitArea left:${this.left} right:${this.right} top:${this.top} bottom:${this.bottom} front:${this.front} back:${this.back}`
         }
     }
 
-    export class Sprite extends DisplayObjectContainer implements I3DRender{
-        hitArea:HitArea;
-        batcher:Batcher;
-        batcherAvailable:boolean = true;
-        $graphics:Graphics = undefined;
-        $batchGeometry:BatchGeometry;
-        $vcIndex:number = -1;
-        $vcox:number = 0;
-        $vcoy:number = 0;
-        $vcos:number = 1;
-        constructor(){
+    export class Sprite extends DisplayObjectContainer implements I3DRender {
+        hitArea: HitArea;
+        batcher: Batcher;
+        batcherAvailable: boolean = true;
+        $graphics: Graphics = undefined;
+        $batchGeometry: BatchGeometry;
+        $vcIndex: number = -1;
+        $vcox: number = 0;
+        $vcoy: number = 0;
+        $vcos: number = 1;
+        constructor() {
             super();
             this.hitArea = new HitArea();
             // let g = this.graphics;
             // g.drawRect(0,0,100,100,0xFF0000);
         }
-        
-        get graphics():Graphics{
-            if(undefined == this.$graphics){
+
+        get graphics(): Graphics {
+            if (undefined == this.$graphics) {
                 this.$graphics = new Graphics(this);
             }
             return this.$graphics;
         }
 
-        batchChange(value:number):void{
-            if(undefined != this.batcher){
+        batchChange(value: number): void {
+            if (undefined != this.batcher) {
                 this._change |= value;
                 this.childrenChange();
-            }else{
-                if(this.parent){
+            } else {
+                if (this.parent) {
                     this.parent.batchChange(value);
                 }
             }
         }
 
 
-        public render(camera:Camera,now:number,interval:number):void{
-            if(undefined != this.batcher){
-                this.batcher.render(camera,now,interval);
+        public render(camera: Camera, now: number, interval: number): void {
+            if (undefined != this.batcher) {
+                this.batcher.render(camera, now, interval);
             }
         }
 
-        addToStage(){
-            if(this.$graphics && this.$graphics.numVertices){
+        addToStage() {
+            if (this.$graphics && this.$graphics.numVertices) {
                 this.batchChange(DChange.vertex);
             }
         }
@@ -108,57 +108,64 @@ module rf{
 
 
 
-    export class Graphics{
-        target:Sprite;
-        byte:Float32Byte;
-        numVertices:number = 0;
-
-        $batchOffset:number = 0;
-        constructor(target:Sprite){
+    export class Graphics {
+        target: Sprite;
+        byte: Float32Byte;
+        numVertices: number = 0;
+        $batchOffset: number = 0;
+        private 
+        preNumVertices:number = 0;
+        constructor(target: Sprite) {
             this.target = target;
             this.byte = new Float32Byte(new Float32Array(0));
             this.numVertices = 0;
         }
 
-        private addPoint(position:number,x:number,y:number,z:number,u:number,v:number,index:number,r:number,g:number,b:number,a:number):void{
+        private addPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
             this.numVertices++;
-            this.byte.addUIPoint(position,x,y,z,0,0,0,r,g,b,a);
-            this.target.hitArea.updateArea(x,y,z);
+            this.byte.addUIPoint(position, x, y, z, 0, 0, 0, r, g, b, a);
+            this.target.hitArea.updateArea(x, y, z);
         }
 
-        clear():void{
+        clear(): void {
+            this.preNumVertices = this.numVertices;
             this.numVertices = 0;
         }
 
-        end():void{
-            this.target.batchChange(DChange.vertex)
+        end(): void {
+            if(this.target.$batchGeometry && this.numVertices > 0 && this.preNumVertices == this.numVertices){
+                this.preNumVertices = 0;
+                this.target.$batchGeometry.update(this.$batchOffset,this.byte);
+            }else{
+                this.target.batchChange(DChange.vertex);
+            }
         }
 
-        public drawRect(x:number, y:number,width:number, height:number,color:number,alpha:number = 1,z:number = 0):void{
-            let red = ((color & 0x00ff0000) >>> 16)/0xFF;
-            let green = ((color & 0x0000ff00) >>> 8)/0xFF;
-            let blue = (color & 0x000000ff)/0xFF;
+        public drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, z: number = 0): void {
+            let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
+            let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
+            let blue = (color & 0x000000ff) / 0xFF;
             let r = x + width;
             let b = y + height;
             let p = this.byte.array.length;
-            this.byte.length = p+40;
-            this.addPoint(p   ,x,y,z,0,0,0,red,green,blue,alpha);
-            this.addPoint(p+10,r,y,z,0,0,0,red,green,blue,alpha);
-            this.addPoint(p+20,r,b,z,0,0,0,red,green,blue,alpha);
-            this.addPoint(p+30,x,b,z,0,0,0,red,green,blue,alpha);
+            this.byte.length = p + 40;
+            this.addPoint(p, x, y, z, 0, 0, 0, red, green, blue, alpha);
+            this.addPoint(p + 10, r, y, z, 0, 0, 0, red, green, blue, alpha);
+            this.addPoint(p + 20, r, b, z, 0, 0, 0, red, green, blue, alpha);
+            this.addPoint(p + 30, x, b, z, 0, 0, 0, red, green, blue, alpha);
         }
     }
 
 
-    export abstract class RenderBase implements I3DRender{
-        triangleFaceToCull:string = Context3DTriangleFace.NONE;
-        sourceFactor:number;
-        destinationFactor:number;
-        depthMask:boolean = false;
-        passCompareMode:number;
-        public render(camera:Camera,now:number,interval:number):void{}
-        constructor(){
-            if(undefined != gl){
+    export abstract class RenderBase implements I3DRender {
+        triangleFaceToCull: string = Context3DTriangleFace.NONE;
+        sourceFactor: number;
+        destinationFactor: number;
+        depthMask: boolean = false;
+        passCompareMode: number;
+        public render(camera: Camera, now: number, interval: number): void { }
+        constructor() {
+            if (undefined != gl) {
                 this.sourceFactor = gl.SRC_ALPHA;
                 this.destinationFactor = gl.ONE_MINUS_CONSTANT_ALPHA;
                 this.passCompareMode = gl.ALWAYS;
@@ -166,32 +173,32 @@ module rf{
         }
     }
 
-    export class Batcher extends RenderBase implements I3DRender{
-        target:Sprite;
-        renders:Link;
-        geo:BatchGeometry = undefined;
-        program:Program3D;
-        worldTransform:Matrix3D;
-        constructor(target:Sprite){
+    export class Batcher extends RenderBase implements I3DRender {
+        target: Sprite;
+        renders: Link;
+        geo: BatchGeometry = undefined;
+        program: Program3D;
+        worldTransform: Matrix3D;
+        constructor(target: Sprite) {
             super();
             this.target = target;
             this.renders = new Link();
             this.worldTransform = new Matrix3D();
         }
 
-        public render(camera:Camera,now:number,interval:number):void{
-            if(this.target._change & DChange.vertex){
+        public render(camera: Camera, now: number, interval: number): void {
+            if (this.target._change & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
-                this.getBatchTargets(this.target,-this.target._x,-this.target._y,1/this.target._scaleX);
+                this.getBatchTargets(this.target, -this.target._x, -this.target._y, 1 / this.target._scaleX);
                 //step2 合并模型 和 vc信息
                 this.toBatch();
-                
+
                 this.geo = undefined;
                 this.target._change &= ~DChange.vertex;
             }
 
-            if(undefined == this.program){
+            if (undefined == this.program) {
                 this.createProgram();
             }
 
@@ -200,36 +207,35 @@ module rf{
 
 
             let vo = this.renders.getFrist();
-            while(vo){
-                if(vo.close == false){
-                    let render:I3DRender = vo.data;
-                    if(render instanceof BatchGeometry){
+            while (vo) {
+                if (vo.close == false) {
+                    let render: I3DRender = vo.data;
+                    if (render instanceof BatchGeometry) {
                         this.dc(render);
-                    }else{
-                        render.render(camera,now,interval);
+                    } else {
+                        render.render(camera, now, interval);
                     }
                 }
                 vo = vo.next;
             }
         }
 
-        dc(geo:BatchGeometry):void{
+        dc(geo: BatchGeometry): void {
             // context3D.setBlendFactors()
-            let v:VertexBuffer3D = geo.$vertexBuffer;
-            if(undefined == v){
-                geo.$vertexBuffer = v = context3D.createVertexBuffer(geo.vertex,geo.vertex.data32PerVertex);
-                v.data.regVariable("pos",0,3);
+            let v: VertexBuffer3D = geo.$vertexBuffer;
+            if (undefined == v) {
+                geo.$vertexBuffer = v = context3D.createVertexBuffer(geo.vertex, geo.vertex.data32PerVertex);
             }
-            let i:IndexBuffer3D = context3D.getIndexByQuad(geo.quadcount);
+            let i: IndexBuffer3D = context3D.getIndexByQuad(geo.quadcount);
             context3D.setProgram(this.program);
-            context3D.setProgramConstantsFromMatrix(VC.mvp,this.worldTransform);
-            context3D.setProgramConstantsFromVector(VC.ui,geo.vcData.array,4);
+            context3D.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
+            context3D.setProgramConstantsFromVector(VC.ui, geo.vcData.array, 4);
             v.uploadContext(this.program);
             context3D.drawTriangles(i);
         }
-        
 
-        createProgram():void{
+
+        createProgram(): void {
             let vcode = `
                 attribute vec3 pos;
                 attribute vec3 uv;
@@ -276,15 +282,15 @@ module rf{
             //     }
             // `
 
-            this.program = context3D.createProgram(vcode,fcode);
+            this.program = context3D.createProgram(vcode, fcode);
         }
 
-        cleanBatch():void{
-            let vo  = this.renders.getFrist();
-            while(vo){
-                if(vo.close == false){
-                    let render:Recyclable<I3DRender> = vo.data;
-                    if(render instanceof BatchGeometry){
+        cleanBatch(): void {
+            let vo = this.renders.getFrist();
+            while (vo) {
+                if (vo.close == false) {
+                    let render: Recyclable<I3DRender> = vo.data;
+                    if (render instanceof BatchGeometry) {
                         render.recycle();
                     }
                     vo.close = true;
@@ -294,8 +300,8 @@ module rf{
             this.renders.clean();
         }
 
-        getBatchTargets(target:Sprite,ox:number,oy:number,os:number):void{
-            if(false == target._visible || 0.0 >= target.sceneAlpha){
+        getBatchTargets(target: Sprite, ox: number, oy: number, os: number): void {
+            if (false == target._visible || 0.0 >= target.sceneAlpha) {
                 target.$vcIndex = -1;
                 target.$batchGeometry = null;
                 return;
@@ -305,44 +311,44 @@ module rf{
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if(target == this.target || (null == target.batcher && true == target.batcherAvailable)){
-                if(undefined == g || 0 >= g.numVertices){
+            if (target == this.target || (null == target.batcher && true == target.batcherAvailable)) {
+                if (undefined == g || 0 >= g.numVertices) {
                     target.$vcIndex = -1;
                     target.$batchGeometry = null;
-                }else{
-                    if(undefined == this.geo){
+                } else {
+                    if (undefined == this.geo) {
                         this.geo = recyclable(BatchGeometry);
                         this.renders.add(this.geo);
                     }
-    
-                    let i = this.geo.add(target,g);
+
+                    let i = this.geo.add(target, g);
                     target.$vcox = ox;
                     target.$vcoy = oy;
                     target.$vcos = os;
-    
-                    if(i >= max_vc){
+
+                    if (i >= max_vc) {
                         this.geo = undefined;
                     }
                 }
-            }else{
+            } else {
                 this.renders.add(target);
                 this.geo = undefined;
             }
 
-            for(let child of target.childrens){
-                if(child instanceof Sprite){
-                    this.getBatchTargets(child,ox,oy,os);
+            for (let child of target.childrens) {
+                if (child instanceof Sprite) {
+                    this.getBatchTargets(child, ox, oy, os);
                 }
             }
         }
 
 
-        toBatch():void{
-            let vo  = this.renders.getFrist();
-            while(vo){
-                if(vo.close == false){
-                    let render:Recyclable<I3DRender> = vo.data;
-                    if(render instanceof BatchGeometry){
+        toBatch(): void {
+            let vo = this.renders.getFrist();
+            while (vo) {
+                if (vo.close == false) {
+                    let render: Recyclable<I3DRender> = vo.data;
+                    if (render instanceof BatchGeometry) {
                         render.build();
                     }
                 }
@@ -350,28 +356,21 @@ module rf{
             }
         }
 
-        
+
     }
 
 
-    class BatchGeometry implements I3DRender,IGeometry{
-
-        static variables: { [key: string]: { size: number, offset: number } } = {
-            "pos":{size:3,offset:0},
-            "uv":{size:3,offset:3},
-            "color":{size:4,offset:6}
-        }
-        vertex:VertexInfo;
-        $vertexBuffer:VertexBuffer3D;
-        quadcount:number;
-        vcData:Float32Byte;
-        vci:number = 0;
-        link:Link;
-        verlen:number = 0;
-        constructor(){};
-
-        add(target:Sprite,g:Graphics):number{
-            if(undefined == this.link){
+    class BatchGeometry implements I3DRender, IGeometry {
+        vertex: VertexInfo;
+        $vertexBuffer: VertexBuffer3D;
+        quadcount: number;
+        vcData: Float32Byte;
+        vci: number = 0;
+        link: Link;
+        verlen: number = 0;
+        constructor() { };
+        add(target: Sprite, g: Graphics): number {
+            if (undefined == this.link) {
                 this.link = new Link();
             }
             target.$vcIndex = this.vci++;
@@ -382,28 +381,54 @@ module rf{
             return this.vci;
         }
 
-
-        build():void{
+        build(): void {
             this.quadcount = this.link.length;
-            this.vertex = new VertexInfo(this.verlen,10);
-            this.vertex.variables = BatchGeometry.variables;
+            this.vertex = new VertexInfo(this.verlen, 10);
+            this.vertex.variables = vertex_ui_variable;
             this.vcData = new Float32Byte(new Float32Array(this.quadcount * 4))
             let byte = this.vertex.vertex;
-            let vo  = this.link.getFrist();
-            if(vo.close == false){
-                let sp:Sprite = vo.data;
-                let g = sp.$graphics;
-                byte.set(g.$batchOffset,g.byte);
-                this.vcData.addPoint4(sp.$vcIndex * 4,sp.$vcox,sp.$vcoy,sp.$vcos,sp.sceneAlpha)
+            let vo = this.link.getFrist();
+            while(vo){
+                if (vo.close == false) {
+                    let sp: Sprite = vo.data;
+                    let g = sp.$graphics;
+                    g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex);
+                    byte.set(g.$batchOffset, g.byte);
+                    this.vcData.addPoint4(sp.$vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
+                }
+                vo = vo.next;
             }
-            vo = vo.next;
         }
-        
+
+        update(position:number,byte:Float32Byte):void{
+            if(undefined != this.vcData){
+                this.vcData.set(position,byte);
+            }
+            if(undefined != this.$vertexBuffer){
+                this.$vertexBuffer.readly = false;
+            }
+        }
+
         //x,y,z,u,v,vci,r,g,b,a;
-        
-        onRecycle():void{
+
+        onRecycle(): void {
             this.vertex = undefined;
             this.verlen = 0;
+
+            let vo = this.link.getFrist();
+            while(vo){
+                if (vo.close == false) {
+                    let sp: Sprite = vo.data;
+                    if(sp.$batchGeometry == this){
+                        sp.$batchGeometry = null;
+                        sp.$vcIndex = -1;
+                        sp.$vcos = 1;
+                        sp.$vcox = 0;
+                        sp.$vcoy = 0;
+                    }
+                }
+            }
+
             this.link.onRecycle();
         }
     }

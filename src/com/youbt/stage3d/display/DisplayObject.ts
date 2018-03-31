@@ -3,10 +3,10 @@ module rf {
     export var ROOT: Stage3D;
 
     export enum DChange {
-        trasnform = 0x1,
-        alpha = 0x2,
-        vertex = 0x4,
-        vcdata = 0x8
+        trasnform = 0b1,
+        alpha = 0b10,
+        vertex = 0b100,
+        vcdata = 0b1000,
     }
 
     export let BIT_CLEAR: number = 0x1;

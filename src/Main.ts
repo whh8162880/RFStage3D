@@ -14,16 +14,24 @@ module rf{
             }
 
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
+            // context3D.setDepthTest(true,gl.LEQUAL);
+            context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
             let sp = new Sprite();
-            sp.x = 100;
-            sp.y = 100;
+            sp.x = 50;
+            sp.y = 50;
             sp.alpha = 0.5;
             let g = sp.graphics;
             g.clear();
             g.drawRect(0,0,100,100,0xFFDD00);
             g.end();
+
+            g = ROOT.graphics;
+            g.clear();
+            g.drawRect(0,0,100,100,0xFF0000);
+            g.end();
+
             ROOT.addChild(sp);
 
             // Engine.removeTick(this);
