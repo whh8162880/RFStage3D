@@ -89,7 +89,7 @@ function getCompileFiles(path,rootDir,include,exclude){
     return files;
 }
 
-function buildHtml(config) {
+function buildHtml(config) { 
     // var template = path.resolve(template);
     var tspath = path.resolve(config);
     // console.log(removeComments(grunt.file.read(tspath)));
