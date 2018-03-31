@@ -39,7 +39,7 @@ module rf{
             this.childrens.push(child);
             child.parent = this;
             //需要更新Transform
-            this.setChange(DChange.trasnform)
+            this.setChange(DChange.base_all)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -63,7 +63,7 @@ module rf{
 
             child.parent = this;
             //需要更新Transform
-            this.setChange(DChange.trasnform)
+            this.setChange(DChange.base_all)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
