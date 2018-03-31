@@ -111,10 +111,13 @@
 
 
 #2018/3/28
+
 [RES.ts 窦孝诚完成][]
 
 [Stage3D.ts][]
+
 [Buffer3D.ts][]
+
 [Context3D.ts][]
 
 #2018/3/29
@@ -126,10 +129,15 @@
 [Texture.ts][] 第一版 还不够完善
 
 #2018/3/30
+
 [Geometry.ts][VertexInfo]
-[Sprite3D.ts][Graphics BatchRenderer BatchGeometry] 模型合并已经初步完成 相见BatchRenderer
+
+[Sprite3D.ts][Graphics BatchRenderer BatchGeometry] 模型合并已经初步完成 详见BatchRenderer
+
 [Geom.ts][Float32Byte] 
+
 [Camera.ts][Camera2D]
+
 [Capabilities.ts 窦孝诚完成][]
 
 
