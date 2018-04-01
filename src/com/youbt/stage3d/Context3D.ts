@@ -59,8 +59,8 @@ namespace rf {
 	}
 
 	export enum Context3DTriangleFace {
-		BACK	= 'back', //CCW
-		FRONT	= 'front', //CW
+		BACK = 'back', //CCW
+		FRONT = 'front', //CW
 		FRONT_AND_BACK = 'frontAndBack',
 		NONE = 'none'
 	}
@@ -73,42 +73,38 @@ namespace rf {
 		constructor() {
 		}
 
-		public configureBackBuffer(
-			width: number,
-			height: number,
-			antiAlias: number,
-			enableDepthAndStencil: boolean = true
-		): void {
-			gl.viewport(0, 0, width, height);
-			gl.canvas.width = width;
-			gl.canvas.height = height;
+		public configureBackBuffer(width: number,height: number,antiAlias: number,enableDepthAndStencil: boolean = true): void {
+			let g = gl;
+			g.viewport(0, 0, width, height);
+			g.canvas.width = width;
+			g.canvas.height = height;
 			this._depthDisabled = enableDepthAndStencil;
 			//TODO: antiAlias , Stencil
 			if (enableDepthAndStencil) {
-				this._clearBit = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT;
-				gl.enable(gl.DEPTH_TEST);
-				gl.enable(gl.STENCIL_TEST);
+				this._clearBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
+				g.enable(g.DEPTH_TEST);
+				g.enable(g.STENCIL_TEST);
 			} else {
-				this._clearBit = gl.COLOR_BUFFER_BIT;
-				gl.disable(gl.DEPTH_TEST);
-				gl.disable(gl.STENCIL_TEST);
+				this._clearBit = g.COLOR_BUFFER_BIT;
+				g.disable(g.DEPTH_TEST);
+				g.disable(g.STENCIL_TEST);
 			}
 		}
 
-		public createVertexBuffer(data: number[]|Float32Array|VertexInfo,data32PerVertex: number,startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
+		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
 			let buffer: VertexBuffer3D = recyclable(VertexBuffer3D);
 			buffer.data32PerVertex = data32PerVertex;
-			buffer.uploadFromVector(data,startVertex,numVertices);			
+			buffer.uploadFromVector(data, startVertex, numVertices);
 			return buffer;
 		}
 
-		private indexs:{[key:number]:IndexBuffer3D};
-		private indexByte:Uint16Array = undefined;
-		private initIndexByQuadCount(count:number):void{
+		private indexs: { [key: number]: IndexBuffer3D };
+		private indexByte: Uint16Array = undefined;
+		private initIndexByQuadCount(count: number): void {
 			let byte = this.indexByte = new Uint16Array(count * 6);
 			count *= 4;
 			let j = 0;
-			for(var i:number =0;i<count;i+=4){
+			for (var i: number = 0; i < count; i += 4) {
 				byte[j++] = i;
 				byte[j++] = i + 1;
 				byte[j++] = i + 3;
@@ -118,42 +114,54 @@ namespace rf {
 			}
 		}
 
-		public getIndexByQuad(quadCount:number):IndexBuffer3D{
-			if(quadCount > 2000){
+		public getIndexByQuad(quadCount: number): IndexBuffer3D {
+			if (quadCount > 2000) {
 				ThrowError("你要这么多四边形干嘛？");
 				return null;
 			}
 
-			if(undefined == this.indexs){
+			if (undefined == this.indexs) {
 				this.indexs = {};
 			}
 			let buffer = this.indexs[quadCount];
 			let length = quadCount * 6;
-			if(undefined == buffer){
-				
+			if (undefined == buffer) {
+
 				let array = new Uint16Array(length)
-				if(undefined == this.indexByte){
+				if (undefined == this.indexByte) {
 					this.initIndexByQuadCount(2000);
 				}
-				array.set(this.indexByte.slice(0,length));
+				array.set(this.indexByte.slice(0, length));
 
 				this.indexs[quadCount] = buffer = this.createIndexBuffer(array);
 			}
 			return buffer;
 		}
 
-		public createIndexBuffer(data:number[] | Uint16Array): IndexBuffer3D {
+		public createIndexBuffer(data: number[] | Uint16Array): IndexBuffer3D {
 			let buffer = recyclable(IndexBuffer3D);
 			buffer.uploadFromVector(data);
 			return buffer
 		}
 
-		/**
-        * @format only support Context3DTextureFormat.BGRA
-        * @optimizeForRenderToTexture not implement
-        */
-		public createTexture(width: number, height: number, format:number, optimizeForRenderToTexture: boolean, streamingLevels: number = 0): Texture {
-			return new Texture(width, height, format, optimizeForRenderToTexture, streamingLevels);
+
+		public createTexture(pixels: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
+			let texture = recyclable(Texture);
+			texture.pixels = pixels;
+			texture.width = pixels.width;
+			texture.height = pixels.height;
+			texture.mipmap = mipmap
+			return texture;
+		}
+
+
+		public createEmptyTexture(width: number, height: number, mipmap: boolean = false): Texture {
+			let texture = recyclable(Texture);
+			texture.pixels = new BitmapData(width, height);
+			texture.width = width;
+			texture.height = height;
+			texture.mipmap = mipmap
+			return texture;
 		}
 
 		private _rttFramebuffer: WebGLFramebuffer;
@@ -184,7 +192,7 @@ namespace rf {
 				gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, 512, 512); //force 512
 
 				gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER,	gl.COLOR_ATTACHMENT0,gl.TEXTURE_2D,	texture.texture,	0);
+				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture.texture, 0);
 			}
 			gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 		}
@@ -193,16 +201,16 @@ namespace rf {
 			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 		}
 
-		public programs:{[key:string]:Recyclable<Program3D>} = {};
+		programs: { [key: string]: Recyclable<Program3D> } = {};
 
-		public createProgram(vertexCode:string,fragmentCode:string,key?:string): Recyclable<Program3D> {
-			var program:Recyclable<Program3D>
-			if(undefined != key){
+		public createProgram(vertexCode: string, fragmentCode: string, key?: string): Recyclable<Program3D> {
+			var program: Recyclable<Program3D>
+			if (undefined != key) {
 				program = this.programs[key];
-				if(undefined == program){
+				if (undefined == program) {
 					this.programs[key] = program = recyclable(Program3D);
 				}
-			}else{
+			} else {
 				program = recyclable(Program3D);
 			}
 			program.vertexCode = vertexCode;
@@ -216,21 +224,21 @@ namespace rf {
 		 * @param data 
 		 * @param format FLOAT_1 2 3 4
 		 */
-		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array,format:number): void {
+		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array, format: number): void {
 			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
-			if(index){
+			if (index) {
 				gl['uniform' + format + 'fv'](index, data);;
 			}
-			
+
 		}
 
 		/**
         *  @variable must predefined in glsl
         */
-		public setProgramConstantsFromMatrix(variable: string,matrix: Matrix3D): void {
+		public setProgramConstantsFromMatrix(variable: string, matrix: Matrix3D): void {
 			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
-			if(index){
-				gl.uniformMatrix4fv(index,false,matrix.rawData);
+			if (index) {
+				gl.uniformMatrix4fv(index, false, matrix.rawData);
 			}
 		}
 
@@ -238,8 +246,8 @@ namespace rf {
 		public setProgram(program: Program3D): void {
 			if (program == null || program == this._linkedProgram) return;
 
-			if(false == program.readly){
-				if(false == program.awaken()){
+			if (false == program.readly) {
+				if (false == program.awaken()) {
 					ThrowError("program create error!");
 					return;
 				}
@@ -332,7 +340,7 @@ namespace rf {
 			gl.blendFunc(sourceFactor, destinationFactor);
 		}
 
-		public drawTriangles(indexBuffer: IndexBuffer3D,firstIndex: number = 0,numTriangles: number = -1): void {
+		public drawTriangles(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numTriangles: number = -1): void {
 			if (false == indexBuffer.readly) {
 				if (false == indexBuffer.awaken()) {
 					throw new Error("create indexBuffer error!");
@@ -362,7 +370,7 @@ namespace rf {
          * [Webgl only]
          *  For instance indices = [1,2,3] ; will only render vertices number 1, number 2, and number 3 
          */
-		public drawPoints(indexBuffer: IndexBuffer3D,firstIndex: number = 0,numPoints: number = -1): void {
+		public drawPoints(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
 			if (false == indexBuffer.readly) {
 				if (false == indexBuffer.awaken()) {
 					throw new Error("create indexBuffer error!");
@@ -454,7 +462,7 @@ namespace rf {
 	/**
 	 * todo
 	 */
-	export function webGLSimpleReport():Object{
+	export function webGLSimpleReport(): Object {
 		//http://webglreport.com/
 
 		// Vertex Shader

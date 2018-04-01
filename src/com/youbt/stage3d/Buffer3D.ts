@@ -55,18 +55,19 @@ module rf {
                 ThrowError("vertexCode or fragmentCode is empty")
                 return false;
             }
+            let g = gl;
 
             //创建 vertexShader
-            this.vShader = this.createShader(this.vertexCode, gl.VERTEX_SHADER);
-            this.fShader = this.createShader(this.fragmentCode, gl.FRAGMENT_SHADER);
-            this.program = gl.createProgram();
+            this.vShader = this.createShader(this.vertexCode, g.VERTEX_SHADER);
+            this.fShader = this.createShader(this.fragmentCode, g.FRAGMENT_SHADER);
+            this.program = g.createProgram();
 
-            gl.attachShader(this.program, this.vShader);
-            gl.attachShader(this.program, this.fShader);
-            gl.linkProgram(this.program);
-            if (!gl.getProgramParameter(this.program, gl.LINK_STATUS)) {
+            g.attachShader(this.program, this.vShader);
+            g.attachShader(this.program, this.fShader);
+            g.linkProgram(this.program);
+            if (!g.getProgramParameter(this.program, gl.LINK_STATUS)) {
                 this.dispose();
-                ThrowError(`create program error:${gl.getProgramInfoLog(this.program)}`);
+                ThrowError(`create program error:${g.getProgramInfoLog(this.program)}`);
                 return false;
             }
 
@@ -75,20 +76,21 @@ module rf {
 
 
         dispose(): void {
+            let g = gl;
             if (this.vShader) {
-                gl.detachShader(this.program, this.vShader);
-                gl.deleteShader(this.vShader);
+                g.detachShader(this.program, this.vShader);
+                g.deleteShader(this.vShader);
                 this.vShader = null;
             }
 
             if (this.fShader) {
-                gl.detachShader(this.program, this.fShader);
-                gl.deleteShader(this.fShader);
+                g.detachShader(this.program, this.fShader);
+                g.deleteShader(this.fShader);
                 this.fShader = null;
             }
 
             if (this.program) {
-                gl.deleteProgram(this.program);
+                g.deleteProgram(this.program);
                 this.program = null;
             }
         }
@@ -104,16 +106,14 @@ module rf {
          * load shader from html file by document.getElementById
          */
         private createShader(code: string, type: number): WebGLShader {
-            // var script: HTMLObjectElement = <HTMLObjectElement>document.getElementById(elementId);
-            // if (!script)
-            // throw new Error("cant find elementId: " + elementId);
-            var shader: WebGLShader = gl.createShader(type);
-            gl.shaderSource(shader, code);
-            gl.compileShader(shader);
+            let g = gl;
+            var shader: WebGLShader = g.createShader(type);
+            g.shaderSource(shader, code);
+            g.compileShader(shader);
             // Check the result of compilation
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                let error: string = gl.getShaderInfoLog(shader);
-                gl.deleteShader(shader);
+            if (!g.getShaderParameter(shader, g.COMPILE_STATUS)) {
+                let error: string = g.getShaderInfoLog(shader);
+                g.deleteShader(shader);
                 throw new Error(error);
             }
             return shader;
@@ -149,12 +149,13 @@ module rf {
                 ThrowError("vertexBuffer3D unavailable");
                 return false;
             }
+            let g = gl;
             if (undefined == this.buffer) {
-                this.buffer = gl.createBuffer();
+                this.buffer = g.createBuffer();
             }
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
-            gl.bufferData(gl.ARRAY_BUFFER, this.data.vertex.array, gl.STATIC_DRAW);
-            gl.bindBuffer(gl.ARRAY_BUFFER, null);
+            g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
+            g.bufferData(g.ARRAY_BUFFER, this.data.vertex.array, g.STATIC_DRAW);
+            g.bindBuffer(g.ARRAY_BUFFER, null);
             this.readly = true;
             return true;
         }
@@ -171,8 +172,9 @@ module rf {
                 startVertex = 0;
             }
             var nd: Float32Array;
+            let data32PerVertex = this.data32PerVertex;
             if (numVertices != -1) {
-                this.numVertices = data.length / this.data32PerVertex;
+                this.numVertices = data.length / data32PerVertex;
                 if (this.numVertices - startVertex < numVertices) {
                     ThrowError("numVertices out of range");
                     return;
@@ -180,27 +182,27 @@ module rf {
 
                 if (this.numVertices != numVertices && startVertex == 0) {
                     this.numVertices = numVertices;
-                    nd = new Float32Array(this.data32PerVertex * numVertices);
-                    nd.set(data.slice(startVertex * this.data32PerVertex, numVertices * this.data32PerVertex));
+                    nd = new Float32Array(data32PerVertex * numVertices);
+                    nd.set(data.slice(startVertex * data32PerVertex, numVertices * data32PerVertex));
                     data = nd;
                 }
             }
 
             if (0 < startVertex) {
                 if (numVertices == -1) {
-                    numVertices = data.length / this.data32PerVertex - startVertex;
+                    numVertices = data.length / data32PerVertex - startVertex;
                 }
-                nd = new Float32Array(this.data32PerVertex * numVertices);
-                nd.set(data.slice(startVertex * this.data32PerVertex, numVertices * this.data32PerVertex));
+                nd = new Float32Array(data32PerVertex * numVertices);
+                nd.set(data.slice(startVertex * data32PerVertex, numVertices * data32PerVertex));
                 data = nd;
                 this.numVertices = numVertices;
             } else {
                 if (false == (data instanceof Float32Array)) {
                     data = new Float32Array(data);
                 }
-                this.numVertices = data.length / this.data32PerVertex;
+                this.numVertices = data.length / data32PerVertex;
             }
-            this.data = new VertexInfo(<Float32Array>data,this.data32PerVertex);
+            this.data = new VertexInfo(<Float32Array>data,data32PerVertex);
         }
 
 
@@ -218,17 +220,18 @@ module rf {
                     throw new Error("create VertexBuffer error!");
                 }
             }
-            var location: number = -1;
-            gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+            let loc = -1;
+            let g = gl;
+            g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
             let variables = this.data.variables
             for (let variable in variables) {
-                location = gl.getAttribLocation(program.program, variable);
-                if (location < 0) {
+                loc = g.getAttribLocation(program.program, variable);
+                if (loc < 0) {
                     continue;
                 }
                 let o = variables[variable];
-                gl.vertexAttribPointer(location, o.size, gl.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
-                gl.enableVertexAttribArray(location);
+                g.vertexAttribPointer(loc, o.size, g.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
+                g.enableVertexAttribArray(loc);
             }
         }
     }
@@ -267,10 +270,13 @@ module rf {
                 ThrowError("indexData unavailable");
                 return false;
             }
-            this.buffer = gl.createBuffer();
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.buffer);
-            gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this.data, gl.STATIC_DRAW);
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, null);
+            let g = gl;
+            if(undefined == this.buffer){
+                this.buffer = g.createBuffer();
+            }
+            g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, this.buffer);
+            g.bufferData(g.ELEMENT_ARRAY_BUFFER, this.data, g.STATIC_DRAW);
+            g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, null);
 
         }
         public uploadFromVector(data: number[] | Uint16Array, startOffset: number = 0, count: number = -1): void {
@@ -308,41 +314,41 @@ module rf {
     //TODO:cube texture
 
     export class Texture extends Buffer3D {
-
-        public texture: WebGLTexture;
-        public mipmap: number;
-        public width: number;
-        public height: number;
-        public format: number;
-        private _forRTT: boolean;
-
-        public pixels: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement
-
-        constructor(width: number, height: number, format: number, optimizeForRenderToTexture: boolean, mipmap: number) {
+        public texture: WebGLTexture = undefined;
+        public mipmap: boolean = false;
+        public width: number = 0;
+        public height: number = 0;
+        public pixels: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData = undefined;
+        constructor() {
             super();
-            this.mipmap = mipmap;
-            this.width = width;
-            this.height = height;
-            this.format = format;
-            this._forRTT = optimizeForRenderToTexture;
         }
 
-
         awaken(): boolean {
-            if (undefined != this.texture){
-                return true
+            
+            let tex = this.texture;
+            let g = gl;
+            let data = this.pixels;
+
+            if(undefined == data){
+                this.readly = false;
+                return false;
             }
 
-            var tex:WebGLTexture;
+            if(data instanceof BitmapData){
+                data = data.canvas;
+            }
 
-            this.texture = tex = gl.createTexture();
-            gl.bindTexture(gl.TEXTURE_2D, tex);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+            if(undefined == tex){
+                this.texture = tex = g.createTexture();
+            }
+            
+            g.bindTexture(g.TEXTURE_2D, tex);
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.pixels);  
-            gl.bindTexture(gl.TEXTURE_2D, null);
+            g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE,data);  
+            g.bindTexture(g.TEXTURE_2D, null);
             return true;
         }
 
@@ -356,47 +362,25 @@ module rf {
             gl.uniform1i(index_tex, index);
         }
 
-        // public uploadFromImage(source: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement, miplevel: number /* uint */ = 0): void {
-        //     //GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, 1); //uv原点在左下角，v朝上时时才需翻转
-        //     //GL.pixelStorei(GL.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
-
-        //     this.pixels = source;
-
-        //     // gl.activeTexture(gl["TEXTURE" + this.textureUnit]);
-        //     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-
-        //     //TODO: set filter mode API
-        //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR); //GL.NEAREST
-        //     if (this.mipmap == 0) {
-        //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);// GL.NEAREST
-        //     } else {
-        //         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR); //linnear生成mipmap,缩放也linear
-        //         gl.generateMipmap(gl.TEXTURE_2D);
-        //     }
-
-        //     gl.texImage2D(gl.TEXTURE_2D, miplevel, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
-
-        //     if (!gl.isTexture(this.texture)) {
-        //         throw new Error("Error:Texture is invalid");
-        //     }
-        //     //bind null 会不显示贴图 why?
-        //     //GL.bindTexture(GL.TEXTURE_2D, null);
-        // }
-
-
         onRecycle():void{
             if(this.texture){
                 gl.deleteTexture(this.texture);
                 this.texture = null;
-                this.mipmap = 0;
+                this.mipmap = false;
             }
             if(this.pixels){
                 this.pixels = null;
             }
-
             this.width = 0;
             this.height = 0;
-            
+        }
+    }
+
+
+    export class RttTexture extends Texture{
+        public create(width: number, height: number):void{
+            this.width = width;
+            this.height = height;
         }
     }
 }
