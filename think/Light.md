@@ -44,8 +44,47 @@ NORMAL?
     varying   vec4 vColor;          // 顶点着色器 给 片段着色器的桥梁变量
     void main(void){
         vec3  invLight = normalize(invMatrix * vec4(lightDirection, 0.0)).xyz;  <-----这句
-        float diffuse  = clamp(dot(normal, invLight), 0.1, 1.0);                <-----这句
+        float diffuse  = clamp(dot(normal, invLight), 0.0, 1.0);                <-----这句
         vColor         = color * vec4(vec3(diffuse), 1.0);                      <-----这句
         gl_Position    = mvpMatrix * vec4(position, 1.0);
     }
 ```
+
+    环境光(ambientColor):环境光是模拟现实世界中自然光不规则反射的概念
+```ts
+        ambientColor = [0.1,0.1,0.1,0]
+        vColor = color * vec4(vec3(diffuse), 1.0) + ambientColor;
+```
+
+    反射光(reflection):光在照射到物体身上时会发生反射现象 我们可以在金属上看到很耀眼的亮斑就是这样来的
+```ts
+    attribute vec3 position;
+    attribute vec3 normal;
+    attribute vec4 color;
+    uniform   mat4 mvpMatrix;
+    uniform   mat4 invMatrix;
+    uniform   vec3 lightDirection;
+    uniform   vec3 eyeDirection;        //摄像机位置
+    uniform   vec4 ambientColor;
+    varying   vec4 vColor;
+
+    void main(void){
+        vec3  invLight = normalize(invMatrix * vec4(lightDirection, 0.0)).xyz;
+        vec3  invEye   = normalize(invMatrix * vec4(eyeDirection, 0.0)).xyz;
+        vec3  halfLE   = normalize(invLight + invEye);
+        float diffuse  = clamp(dot(normal, invLight), 0.0, 1.0);
+        float specular = pow(clamp(dot(normal, halfLE), 0.0, 1.0), 50.0);                   <----反射光的简单计算
+        vec4  light    = color * vec4(vec3(diffuse), 1.0) + vec4(vec3(specular), 1.0);
+        vColor         = light + ambientColor;
+        gl_Position    = mvpMatrix * vec4(position, 1.0);
+    }
+```
+
+    颜色=顶点颜色*散射光+反射光+环境光
+
+
+    点光源(PointLight)
+
+
+
+    
