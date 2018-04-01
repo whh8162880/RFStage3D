@@ -29,7 +29,6 @@ module rf{
                 }
             }
             
-
             if(undefined == gl){
                 context3D = null;
                 this.simpleDispatch(EventX.ERROR,"webgl is not available");

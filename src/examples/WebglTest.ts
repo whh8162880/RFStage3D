@@ -167,7 +167,7 @@ module rf{
             matrix.appendTranslation(200,100,0);
             matrix.append(ROOT.camera2D.worldTranform);
             context3D.setProgramConstantsFromMatrix(VC.mvp,matrix)
-            let t = context3D.createTexture(image);
+            let t = context3D.createTexture("test",image);
             t.pixels = image;//bitmapdata.canvas;
             t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);

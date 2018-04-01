@@ -314,6 +314,7 @@ module rf {
     //TODO:cube texture
 
     export class Texture extends Buffer3D {
+        public key:number|string = undefined;
         public texture: WebGLTexture = undefined;
         public mipmap: boolean = false;
         public width: number = 0;
@@ -343,10 +344,13 @@ module rf {
             }
             
             g.bindTexture(g.TEXTURE_2D, tex);
+
+            //UV读取方式
             g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR);
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
+            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);
+            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
+
             g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE,data);  
             g.bindTexture(g.TEXTURE_2D, null);
             return true;

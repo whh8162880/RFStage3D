@@ -71,6 +71,13 @@ module rf {
     export let CALCULATION_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
 
 
+    export function hexToRGBACSS(d: number,a:number = 1): string {
+        var r: number = (d & 0x00ff0000) >>> 16;
+        var g: number = (d & 0x0000ff00) >>> 8;
+        var b: number = d & 0x000000ff;
+        return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; //"rgba(0, 0, 200, 0.5)";
+    }
+
 
     /**
     * 经纬度 定位信息

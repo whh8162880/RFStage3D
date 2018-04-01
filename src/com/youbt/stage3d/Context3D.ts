@@ -145,22 +145,28 @@ namespace rf {
 		}
 
 
-		public createTexture(pixels: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
+		public textureObj:{[key:string]:Texture} = {};
+
+		public createTexture(key:string,pixels: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
 			let texture = recyclable(Texture);
+			texture.key = key;
 			texture.pixels = pixels;
 			texture.width = pixels.width;
 			texture.height = pixels.height;
 			texture.mipmap = mipmap
+			this.textureObj[key] = texture;
 			return texture;
 		}
 
 
-		public createEmptyTexture(width: number, height: number, mipmap: boolean = false): Texture {
+		public createEmptyTexture(key:string,width: number, height: number, mipmap: boolean = false): Texture {
 			let texture = recyclable(Texture);
+			texture.key = key;
 			texture.pixels = new BitmapData(width, height);
 			texture.width = width;
 			texture.height = height;
 			texture.mipmap = mipmap
+			this.textureObj[key] = texture;
 			return texture;
 		}
 

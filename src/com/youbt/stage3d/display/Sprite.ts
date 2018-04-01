@@ -197,8 +197,8 @@ module rf {
      *      6.dc()方法渲染 shader计算详看代码。
      */
     export class BatchRenderer extends RenderBase implements I3DRender {
-        target: Sprite;        renders: Link;
-
+        target: Sprite;        
+        renders: Link;
         geo: BatchGeometry = undefined;
         program: Program3D;
         worldTransform: Matrix3D;
@@ -249,6 +249,7 @@ module rf {
         }
 
         dc(geo: BatchGeometry): void {
+            
             // context3D.setBlendFactors()
             let v: VertexBuffer3D = geo.$vertexBuffer;
             if (undefined == v) {
@@ -258,7 +259,10 @@ module rf {
             context3D.setProgram(this.program);
             context3D.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
             context3D.setProgramConstantsFromVector(VC.ui, geo.vcData.array, 4);
-            v.uploadContext(this.program);
+            let t = context3D.textureObj["test"];
+            let p = this.program; 
+            t.uploadContext(p,0,FS.diff);
+            v.uploadContext(p);
             context3D.drawTriangles(i);
         }
 
@@ -287,9 +291,11 @@ module rf {
 
             let fcode = `
                 precision mediump float;
+                uniform sampler2D diff;
                 varying vec4 vColor;
+                varying vec2 vUV;
                 void main(void){
-                    vec4 color = vColor;
+                    vec4 color = texture2D(diff, vUV);
                     gl_FragColor = color;
                 }
             `
