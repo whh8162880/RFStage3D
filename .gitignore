@@ -1,5 +1,4 @@
-/node_modules
-.tscache
+tscache
 /build
 .vs
 /bin-debug
