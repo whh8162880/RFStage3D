@@ -345,10 +345,23 @@ module rf {
             
             g.bindTexture(g.TEXTURE_2D, tex);
 
-            //UV读取方式
+            //设置纹理参数 https://blog.csdn.net/a23366192007/article/details/51264454
+            /**
+             * void texParameteri(GLenum target, GLenum pname, GLint param) ;
+                @pname:是纹理的参数：只能是下列四个
+                    GL_TEXTURE_MIN_FILTER：指定纹理图片缩小时用到的算法
+                    GL_TEXTURE_MAG_FILTER：指定纹理图片放大时用到的算法 
+                    GL_TEXTURE_WRAP_S ：纹理包装算法，在s(u)方向 
+                    GL_TEXTURE_WRAP_T ：纹理包装算法，在t(v)方向
+                @param:是第二个参数的值（value）
+                    放大和缩小所用的算法只有两个 NEAREST和LINEAR,
+                    （即第三个参数param的值是webgl.NEAREST或webgl.LINEAR）分别是最近点采样和线性采样，
+                    前者效率高单效果不好，后者效率不高单效果比较好。
+             */
+            
             g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR);
-            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
-            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);
+            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
+            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE); //UV（ST）坐标
             gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
 
             g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE,data);  
