@@ -320,32 +320,11 @@ module rf {
 
         constructor(width: number, height: number, format: number, optimizeForRenderToTexture: boolean, mipmap: number) {
             super();
-            // this.texture = gl.createTexture();
             this.mipmap = mipmap;
-            //rtt needs these properties
             this.width = width;
             this.height = height;
             this.format = format;
             this._forRTT = optimizeForRenderToTexture;
-
-            // if (this._forRTT) {
-            //     gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-            //     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-            //     // GL.generateMipmap(GL.TEXTURE_2D);
-            //     gl.texImage2D(gl.TEXTURE_2D,
-            //         0,
-            //         gl.RGBA,
-            //         512,//this._width,
-            //         512,//this._height,
-            //         0,
-            //         gl.RGBA,
-            //         gl.UNSIGNED_BYTE,
-            //         null);
-            //     gl.bindTexture(gl.TEXTURE_2D, null);
-            //     gl.bindRenderbuffer(gl.RENDERBUFFER, null);
-            //     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
-            // }
         }
 
 
@@ -362,10 +341,8 @@ module rf {
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
             // gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
             gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.pixels);  
             gl.bindTexture(gl.TEXTURE_2D, null);
-
             return true;
         }
 
@@ -373,7 +350,6 @@ module rf {
             if (false == this.readly) {
                 this.awaken();
             }
-
             gl.activeTexture(gl["TEXTURE"+index]);
             gl.bindTexture(gl.TEXTURE_2D, this.texture);
             var index_tex = gl.getUniformLocation(program.program, variable);
