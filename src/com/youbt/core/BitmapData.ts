@@ -44,13 +44,13 @@ module rf {
             return this._rect;
         }
 
-        public copyPixels(sourceBitmapData: BitmapData, sourceRect: { x: number; y: number; width: number; height: number }, destPoint: { x: number; y: number }): void;
-        public copyPixels(sourceBitmapData: HTMLImageElement, sourceRect: { x: number; y: number; width: number; height: number }, destPoint: { x: number; y: number }): void;
-        public copyPixels(sourceBitmapData: any, sourceRect: { x: number; y: number; width: number; height: number }, destPoint: { x: number; y: number }): void {
+        public copyPixels(sourceBitmapData: BitmapData, sourceRect: Size, destPoint: Point2D): void;
+        public copyPixels(sourceBitmapData: HTMLImageElement, sourceRect: Size, destPoint: Point2D): void;
+        public copyPixels(sourceBitmapData: any, sourceRect: Size, destPoint:Point2D): void {
             if (sourceBitmapData instanceof BitmapData)
-                this.context.drawImage(sourceBitmapData.canvas, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, destPoint.x, destPoint.y, sourceRect.width, sourceRect.height);
+                this.context.drawImage(sourceBitmapData.canvas, sourceRect.x, sourceRect.y, sourceRect.w, sourceRect.h, destPoint.x, destPoint.y, sourceRect.w, sourceRect.h);
             else {
-                this.context.drawImage(<HTMLImageElement>sourceBitmapData, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, destPoint.x, destPoint.y, sourceRect.width, sourceRect.height);
+                this.context.drawImage(<HTMLImageElement>sourceBitmapData, sourceRect.x, sourceRect.y, sourceRect.w, sourceRect.h, destPoint.x, destPoint.y, sourceRect.w, sourceRect.h);
             }
         }
         public draw(source: BitmapData /*,matrix:Matrix = null*/): void;

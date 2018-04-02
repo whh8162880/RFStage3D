@@ -119,6 +119,8 @@ module rf{
         name:string = undefined;
         width:number = 0;
         height:number = 0;
+        originU:number = 0;
+        originV:number = 0;
         areas:{[name:number]:BitmapSourceArea} = undefined;
         bmd:BitmapData;
         create(name:string,bmd:BitmapData,pack:boolean = false):BitmapSource{
@@ -156,6 +158,7 @@ module rf{
             }
             area.source = this;
             area.name = name;
+            area.init();
             this.areas[name] = area;
         }
 
@@ -165,6 +168,7 @@ module rf{
                 return undefined;
             }
             let vo = barea.getEmptyArea(name,w,h);
+            vo.refreshUV(this.width,this.height);
             return vo;
         }
 
