@@ -91,9 +91,17 @@ namespace rf {
 			}
 		}
 
-		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
+		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number = -1, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
 			let buffer: VertexBuffer3D = recyclable(VertexBuffer3D);
-			buffer.data32PerVertex = data32PerVertex;
+			if(data instanceof VertexInfo){
+				buffer.data32PerVertex = data.data32PerVertex;
+			}else{
+				if(data32PerVertex == -1){
+					ThrowError("mast set data32PerVertex")
+					return null;
+				}
+				buffer.data32PerVertex = data32PerVertex;
+			}
 			buffer.uploadFromVector(data, startVertex, numVertices);
 			return buffer;
 		}

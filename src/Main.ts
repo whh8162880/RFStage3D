@@ -22,31 +22,31 @@ module rf{
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
 
-            let bw = 100;
-            let ba = 1;
-            let bb = 1;
-            let bitmapData = new BitmapData(bw,bw,true,0xFFFFFFFF);
-            bitmapData.fillRect(0,0,ba,bb,"rgba(255,255,255,255)")
-            context3D.createTexture("test",bitmapData);
-            document.body.appendChild(bitmapData.canvas);
+            // let bw = 100;
+            // let ba = 1;
+            // let bb = 1;
+            // let bitmapData = new BitmapData(bw,bw,true,0xFFFFFFFF);
+            // bitmapData.fillRect(0,0,ba,bb,"rgba(255,255,255,255)")
+            // context3D.createTexture("test",bitmapData);
+            // document.body.appendChild(bitmapData.canvas);
             
-            let g = undefined
-            for(let i = 0;i<1;i++){
-                sp = new Sprite();
-                sp.x = Math.random() * stageWidth;
-                sp.y = Math.random() * stageHeight;
-                sp.alpha = Math.random() * 0.3 + 0.2;
-                g = sp.graphics;
-                g.clear();
-                g.drawRect(0,0,100,100,0xFFDD00);
-                g.end();
-                ROOT.addChild(sp);
-            }
+            // let g = undefined
+            // for(let i = 0;i<1;i++){
+            //     sp = new Sprite();
+            //     sp.x = Math.random() * stageWidth;
+            //     sp.y = Math.random() * stageHeight;
+            //     sp.alpha = Math.random() * 0.3 + 0.2;
+            //     g = sp.graphics;
+            //     g.clear();
+            //     g.drawRect(0,0,100,100,0xFFDD00);
+            //     g.end();
+            //     ROOT.addChild(sp);
+            // }
 
-            g = ROOT.graphics;
-            g.clear();
-            g.drawRect(0,0,100,100,0xFF0000);
-            g.end();
+            // g = ROOT.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFF0000);
+            // g.end();
 
             
 
@@ -57,6 +57,7 @@ module rf{
             // new MaxRectsBinPackTest();
             // new WebglTest();
             // new MaxRectsTest();
+            // new Dc_Texture();
         }
 
         public linktest():void{

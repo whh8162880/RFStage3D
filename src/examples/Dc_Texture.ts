@@ -16,6 +16,9 @@
 
         private vertexData:Float32Array;
         private indexData:Uint16Array;
+
+
+        private vertexInfo:VertexInfo;
         private vertexCode:string;
         private fragmentCode:string;
 
@@ -43,7 +46,8 @@
            //使用现在自研的引起引擎来绘制一张图片
             this.init();
             
-            this.renderNow();
+            // this.renderNow();
+            this.render3();
            //使用webgl接口来绘制一张图片
             // this.renderWebGL();
          }
@@ -83,6 +87,14 @@
                 ]
             );
             this.indexData = new Uint16Array([0,1,3,1,2,3]);
+
+
+            //这个VertexInfo以后可以是一个配置数据
+            let info = new VertexInfo(this.vertexData,4);
+            info.regVariable(VA.pos,0,2);
+            info.regVariable(VA.uv,2,2);
+            this.vertexInfo = info;
+
 
 
          }
@@ -200,6 +212,25 @@
 
             //draw
             context3D.drawTriangles(indexBuffer);
+         }
+
+
+         private render3(){
+            let c = context3D;
+            let v = c.createVertexBuffer(this.vertexInfo);
+            let i = c.getIndexByQuad(1);
+            let t = c.createTexture(this._url,this.image);
+            let p = c.createProgram(this.vertexCode,this.fragmentCode);
+
+            c.clear(1,1,1,1);
+            c.setProgram(p);
+
+            t.uploadContext(p,0,FS.diff);
+            v.uploadContext(p);
+            c.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform);
+
+            c.drawTriangles(i);
+
          }
 
 
