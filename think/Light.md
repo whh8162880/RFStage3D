@@ -56,7 +56,7 @@ NORMAL?
         vColor = color * vec4(vec3(diffuse), 1.0) + ambientColor;
 ```
 
-    反射光(reflection):光在照射到物体身上时会发生反射现象 我们可以在金属上看到很耀眼的亮斑就是这样来的
+     高光(specular):光在照射到物体身上时会发生反射现象 我们可以在金属上看到很耀眼的亮斑就是这样来的
 ```glsl
     attribute vec3 position;
     attribute vec3 normal;
@@ -73,7 +73,7 @@ NORMAL?
         vec3  invEye   = normalize(invMatrix * vec4(eyeDirection, 0.0)).xyz;
         vec3  halfLE   = normalize(invLight + invEye);
         float diffuse  = clamp(dot(normal, invLight), 0.0, 1.0);
-        float specular = pow(clamp(dot(normal, halfLE), 0.0, 1.0), 50.0);                   <----反射光的简单计算
+        float specular = pow(clamp(dot(normal, halfLE), 0.0, 1.0), 50.0);                   <----高光的简单计算
         vec4  light    = color * vec4(vec3(diffuse), 1.0) + vec4(vec3(specular), 1.0);
         vColor         = light + ambientColor;
         gl_Position    = mvpMatrix * vec4(position, 1.0);
