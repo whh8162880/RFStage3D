@@ -4,19 +4,21 @@ module rf {
         //x,y,z,u,v,index,r,g,b,a
         "pos":{size:3,offset:0},
         "uv":{size:3,offset:3}, //xy uv ~~ z index
-        "color":{size:4,offset:6}
+        "color":{size:4,offset:6},
+        "data32PerVertex":{size:10,offset:0}
     }
 
     export let vertex_mesh_variable:{ [key: string]: { size: number, offset: number } } = {
         "pos":{size:3,offset:0},
         "normal":{size:3,offset:3},
         "uv":{size:2,offset:6},
+        "data32PerVertex":{size:8,offset:0}
     }
 
 
     export class VertexInfo {
-        vertex: Float32Byte;
 
+        vertex: Float32Byte;
         numVertices: number = 0;
         data32PerVertex: number = 0;
         variables: { [key: string]: { size: number, offset: number } } = undefined;

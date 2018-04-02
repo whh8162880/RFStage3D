@@ -3,6 +3,48 @@
 module rf {
     export declare type PosKey = "x" | "y";
     export declare type SizeKey = "width" | "height";
+    
+/**
+     * 包含 x,y两个点的结构
+     * 
+     * @export
+     * @interface Point2D
+     */
+    export interface Point2D {
+        x: number;
+        y: number;
+    }
+    /**
+     * 包含 x,y,z 三个点的结构
+     * 
+     * @export
+     * @interface Point3D
+     * @extends {Point2D}
+     */
+    export interface Point3D extends Point2D {
+        z: number;
+    }
+    /**
+     * 包含 x,y,z,w 四个点的结构
+     * 
+     * @export
+     * @interface Point3DW
+     * @extends {Point3D}
+     */
+    export interface Point3DW extends Point3D {
+        w: number;
+    }
+
+    export interface Size extends Point2D{
+        w:number;
+        h:number;
+    }
+
+    export interface IFrame extends Size{
+        ix:number;
+        iy:number;
+    }
+
 
     /**
      * 有 `x` `y` 两个属性
@@ -121,6 +163,26 @@ module rf {
         }
     }
 
+    export let EMPTY_POINT2D = new Point();
+    export let EMPTY_POINT2D_2 = new Point();
+    export let EMPTY_POINT2D_3 = new Point();
+
+    export function m2dTransform(matrix:ArrayLike<number>,p:Point2D,out:Point2D):void{
+        const{
+            m11,m12,m13,
+            m21,m22,m23,
+            m31,m32,m33
+        } = matrix as any;
+        const{
+            x,y
+        } = p;
+        let dx = x * m11 + y * m21 + m31;
+        let dy = x * m12 + y * m22 + m32;
+        out.x = dx;
+        out.y = dy;
+    }
+
+
     export class Float32Byte {
         public array: Float32Array;
 
@@ -193,16 +255,16 @@ module rf {
 
 
 
-        wPoint1(position: number, x: number): void {
+        wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void {
             this.array[position] = x;
         }
 
-        wPoint2(position: number, x: number, y: number): void {
+        wPoint2(position: number, x: number, y: number, z?: number, w?: number): void {
             this.array[position] = x;
             this.array[position + 1] = y;
         }
 
-        wPoint3(position: number, x: number, y: number, z: number): void {
+        wPoint3(position: number, x: number, y: number, z: number, w?: number): void {
             this.array[position] = x;
             this.array[position + 1] = y;
             this.array[position + 2] = z;

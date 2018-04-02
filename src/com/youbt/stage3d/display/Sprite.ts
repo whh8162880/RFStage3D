@@ -59,6 +59,8 @@ module rf {
 
     export class Sprite extends DisplayObjectContainer implements I3DRender {
         hitArea: HitArea;
+        source:BitmapSource;
+        variables:{ [key: string]: { size: number, offset: number } };
         /**
          * 1.Sprite本身有render方法可以渲染
          * 2.考虑到可能会有一些需求 渲染器可以写在别的类或者方法中  所以加入renderer概念
@@ -66,21 +68,23 @@ module rf {
         renderer: I3DRender;
         batcherAvailable: boolean = true;
         $graphics: Graphics = undefined;
-        $batchGeometry: BatchGeometry;
+        $batchGeometry: BatchGeometry = undefined;
         $vcIndex: number = -1;
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
-        constructor() {
+        constructor(source:BitmapSource = undefined,variables:{ [key: string]: { size: number, offset: number } } = undefined) {
             super();
             this.hitArea = new HitArea();
+            this.source = source ? source : componentSource;
+            this.variables = variables ? variables : vertex_ui_variable;
             // let g = this.graphics;
             // g.drawRect(0,0,100,100,0xFF0000);
         }
 
         get graphics(): Graphics {
             if (undefined == this.$graphics) {
-                this.$graphics = new Graphics(this);
+                this.$graphics = new Graphics(this,vertex_ui_variable);
             }
             return this.$graphics;
         }
@@ -113,25 +117,71 @@ module rf {
         }
     }
 
+    export class Image3D extends Sprite{
+        _url:string;
+        constructor(){
+            super();
+        }
+        load(url:string):void
+        {
+            if(this._url == url)
+            {   
+                return;
+            }
+            //clear
+            if (url)
+			{
+				this._url = url;
+                loadRes(url,this.onImageComplete,this,ResType.image);
+			}
+        }
 
+        onImageComplete(e:EventX):void
+        {
+            if(e.type !=  EventX.COMPLETE)
+            {
+                return;
+            }
+            let res:ResItem = e.data;
+            let image:HTMLImageElement = res.data;
+            let source = this.source;
+            let vo = source.setSourceVO(this._url,image.width,image.height,1);
+            source.bmd.context.drawImage(image,vo.x,vo.y);
+
+            let g = this.graphics;
+            g.clear();
+            g.drawBitmap(vo)
+            g.end();
+        }
+    }
 
     export class Graphics {
         target: Sprite;
         byte: Float32Byte;
         numVertices: number = 0;
+        variables: { [key: string]: { size: number, offset: number } } = undefined;
         $batchOffset: number = 0;
         private 
         preNumVertices:number = 0;
-        constructor(target: Sprite) {
+        constructor(target: Sprite,variables: { [key: string]: { size: number, offset: number } }) {
             this.target = target;
+            this.variables = variables;
             this.byte = new Float32Byte(new Float32Array(0));
             this.numVertices = 0;
         }
 
-        private addPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
-            this.numVertices++;
-            this.byte.wUIPoint(position, x, y, z, 0, 0, 0, r, g, b, a);
-            this.target.hitArea.updateArea(x, y, z);
+        // private addPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
+        //     this.numVertices++;
+        //     this.byte.wUIPoint(position, x, y, z, 0, 0, 0, r, g, b, a);
+        //     this.target.hitArea.updateArea(x, y, z);
+        // }
+        
+        private addPro(i:number,p:string,desc:{size:number,offset:number},x: number, y?: number, z?: number, w?: number):void{
+            if(p == VA.pos){
+                this.numVertices++;
+                this.target.hitArea.updateArea(x,y,z);
+            }
+            
         }
 
         clear(): void {
@@ -140,26 +190,108 @@ module rf {
         }
 
         end(): void {
-            if(this.target.$batchGeometry && this.numVertices > 0 && this.preNumVertices == this.numVertices){
+            let target = this.target;
+            if(target.$batchGeometry && this.numVertices > 0 && this.preNumVertices == this.numVertices){
                 this.preNumVertices = 0;
-                this.target.$batchGeometry.update(this.$batchOffset,this.byte);
+                target.$batchGeometry.update(this.$batchOffset,this.byte);
             }else{
-                this.target.setChange(DChange.vertex);
+                target.setChange(DChange.vertex);
             }
         }
 
-        public drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, z: number = 0): void {
+        drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, matrix:Float32Array = undefined,z: number = 0): void {
             let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
             let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
             let blue = (color & 0x000000ff) / 0xFF;
             let r = x + width;
             let b = y + height;
-            let p = this.byte.array.length;
-            this.byte.length = p + 40;
-            this.addPoint(p, x, y, z, 0, 0, 0, red, green, blue, alpha);
-            this.addPoint(p + 10, r, y, z, 0, 0, 0, red, green, blue, alpha);
-            this.addPoint(p + 20, r, b, z, 0, 0, 0, red, green, blue, alpha);
-            this.addPoint(p + 30, x, b, z, 0, 0, 0, red, green, blue, alpha);
+            let position = this.byte.array.length;
+            let d = this.variables["data32PerVertex"].size;
+            let v = this.variables;
+            let f = m2dTransform;
+            let p = EMPTY_POINT2D;
+            let byte = this.byte;
+            const {originU,originV} = this.target.source;
+            this.byte.length = position + d * 4;
+            let pos = v[VA.pos];
+            let uv = v[VA.uv];
+            let vacolor = v[VA.color];
+            let normal = v[VA.normal];
+            let points = [x,y,r,y,r,b,x,b];
+            for(let i=0;i<8;i+=2){
+                let dp = position + (i / 2) * d;
+                p.x = points[i];
+                p.y = points[i+1];
+                if(undefined != matrix){
+                    f(matrix,p,p);
+                }
+                this.target.hitArea.updateArea(p.x,p.y,z);
+                byte.wPoint3(dp+pos.offset,p.x,p.y,z)
+
+                if(undefined != normal){
+                    byte.wPoint3(dp+normal.offset,0,0,1)
+                }
+                
+                if(undefined != uv){
+                    byte.wPoint3(dp+uv.offset,originU,originV,0)
+                }
+
+                if(undefined != vacolor){
+                    byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
+                }
+                this.numVertices += 1;
+            }
+
+            
+        }
+
+
+        drawBitmap(vo:BitmapSourceVO,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
+            const{x,y,w,h,ul,ur,vt,vb}=vo;
+            let r = x + w;
+            let b = y + h;
+            let d = this.variables["data32PerVertex"].size;
+            let position = this.byte.array.length;
+            this.byte.length = position + d*4;
+            let v = this.variables;
+            let f = m2dTransform;
+            let p = EMPTY_POINT2D;
+            let byte = this.byte;
+
+            let pos = v[VA.pos];
+            let uv = v[VA.uv];
+            let vacolor = v[VA.color];
+            let normal = v[VA.normal];
+            
+
+            let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
+            for(let i=0;i<16;i+=4){
+                let dp = position + (i / 4) * d;
+                p.x = points[i];
+                p.y = points[i+1];
+                if(undefined != matrix){
+                    f(matrix,p,p);
+                }
+                this.target.hitArea.updateArea(p.x,p.y,z);
+                byte.wPoint3(dp+pos.offset,p.x,p.y,z)
+
+                if(undefined != normal){
+                    byte.wPoint3(dp+normal.offset,0,0,1)
+                }
+                
+                if(undefined != uv){
+                    byte.wPoint3(dp+uv.offset,points[i+2],points[i+3],0)
+                }
+
+                if(undefined != vacolor){
+                    byte.wPoint4(dp+vacolor.offset,1,1,1,alpha)
+                }
+
+                this.numVertices += 1;
+            }
+
+           
+
         }
     }
 
@@ -179,6 +311,8 @@ module rf {
             }
         }
     }
+
+    
 
 
     /**
@@ -202,6 +336,7 @@ module rf {
         geo: BatchGeometry = undefined;
         program: Program3D;
         worldTransform: Matrix3D;
+        t:Texture
         constructor(target: Sprite) {
             super();
             this.target = target;
@@ -211,6 +346,19 @@ module rf {
 
         public render(camera: Camera, now: number, interval: number): void {
             let target:Sprite = this.target;
+
+            let source = target.source;
+            if(undefined == source){
+                return;
+            }
+            
+            let t = context3D.textureObj[source.name];
+            if(undefined == t){
+                t = context3D.createTexture(source.name,source.bmd);
+            }
+            this.t = t;
+
+
             if (target._change & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
@@ -249,21 +397,20 @@ module rf {
         }
 
         dc(geo: BatchGeometry): void {
-            
             // context3D.setBlendFactors()
+            let c = context3D;
             let v: VertexBuffer3D = geo.$vertexBuffer;
             if (undefined == v) {
-                geo.$vertexBuffer = v = context3D.createVertexBuffer(geo.vertex, geo.vertex.data32PerVertex);
+                geo.$vertexBuffer = v = c.createVertexBuffer(geo.vertex, geo.vertex.data32PerVertex);
             }
-            let i: IndexBuffer3D = context3D.getIndexByQuad(geo.quadcount);
-            context3D.setProgram(this.program);
-            context3D.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
-            context3D.setProgramConstantsFromVector(VC.ui, geo.vcData.array, 4);
-            let t = context3D.textureObj["test"];
+            let i: IndexBuffer3D = c.getIndexByQuad(geo.quadcount);
             let p = this.program; 
-            t.uploadContext(p,0,FS.diff);
+            c.setProgram(p);
+            c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
+            c.setProgramConstantsFromVector(VC.ui, geo.vcData.array, 4);
+            this.t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
-            context3D.drawTriangles(i);
+            c.drawTriangles(i);
         }
 
 
@@ -503,4 +650,5 @@ module rf {
             this.link.onRecycle();
         }
     }
+        
 }
