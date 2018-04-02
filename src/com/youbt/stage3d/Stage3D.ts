@@ -37,8 +37,19 @@ module rf{
 
             context3D = singleton(Context3D);
 
+            canvas.addEventListener('webglcontextlost',this.webglContextLostHandler);
+            canvas.addEventListener("webglcontextrestored",this.webglContextRestoredHandler)
+
             this.simpleDispatch(EventX.CONTEXT3D_CREATE,gl);
             return true;
+        }
+
+        private webglContextLostHandler(e):void{
+            console.log("Lost:"+e);
+        }
+
+        private webglContextRestoredHandler(e):void{
+            console.log("RestoredHandler:"+e);
         }
 
 
