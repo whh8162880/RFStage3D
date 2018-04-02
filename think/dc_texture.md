@@ -1,13 +1,13 @@
  加载并渲染一张贴图
- 1.设置画布
+ 1. 设置画布
     context3D.configureBackBuffer(stageWidth,stageHeight,0);
-    
+
     webGL具体实现：
         gl.vieport(0,0,width,heght);
         g.enable(g.DEPTH_TEST);
         g.enable(g.STENCIL_TEST);
 
-2.设置深度测试
+2. 设置深度测试
     context3D.setDepthTest(false,gl.ALWAYS);
 
     webGL具体实现：
@@ -15,20 +15,20 @@
         gl.depthMask(depthMask);
         gl.depthFunc(passCompareMode);
 
-3.设置blend模式
+3. 设置blend模式
     context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
     webGL具体实现：
         gl.enable(gl.BLEND); //stage3d cant disable blend?www
         gl.blendFunc(sourceFactor, destinationFactor);
 
-4.加载一张图片
+4. 加载一张图片
     loadRes("assets/ranger.png",this.renderImage,this,ResType.image);
     --->renderImage//加载完成后调用方法
     --->ResType.image //加载类型
     --->得到一个HTMLImageElement对象//texture数据
 
-5.开始渲染
+5. 开始渲染
 5.1 清空画布
     context3D.clear(0,0,0,1);
 
@@ -73,6 +73,8 @@
     let i = context3D.createIndexBuffer(indexs);
     //创建WebGLProgram对象，将glgs代码与WebGLProgram关联起来
     let p = context3D.createProgram(vertexCode,fragmentCode);
+    //使用当前program
+    context3D.setProgram(p);
 
     webGL具体实现：
         //顶点索引
@@ -151,4 +153,10 @@
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);//使用订点数据索引
         gl.drawElements(gl.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, gl.UNSIGNED_SHORT, firstIndex * 2);//根据数据画出图像
 
-    
+
+常见问题
+1. canvas是禁止跨域的，如果图像来自其他域，调用toDataURL()会抛出一个错误
+解决：<img>标签通过引入 crossorigin 属性能解决跨域， 即crossOrigin="Anonymous" 或 crossOrigin="*"  请注意手q环境下设置 ‘Anonymous’不支持，需要设置为 '*'，如果使用 crossorigin="anonymous"，则相当于匿名 CORS
+
+2. 设置了”crossOrigin”的<img>标签不能拉下跨域的图片，无法触发img.onload
+解决: 后台转发或nigix代理,设置Access-Control-Allow-Origin：“wx.qlogo.cn”，允许静态资源服务器图片跨域这种设置 解决获取图片跨域的问题。

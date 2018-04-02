@@ -196,6 +196,7 @@ module rf {
 
         load(url: string): void {
             let image = new Image();
+            image.crossOrigin = "Anonymous";
             this._data = undefined;
             this._currentImage = image;
             if (this._hasCrossOriginSet) {
