@@ -57,7 +57,10 @@ module rf{
             // new MaxRectsBinPackTest();
             // new WebglTest();
             // new MaxRectsTest();
-            new Dc_Texture();
+            // new Dc_Texture();
+            let _image:Image3D = new Image3D();
+            _image.load("http://shushanh5.com/web/data/zhcn/o/server/logo.png");
+            ROOT.addChild(_image);
         }
 
         public linktest():void{
