@@ -180,6 +180,137 @@ module rf {
         }
     }
 
+    export class Image3D extends Sprite{
+        _url:string;
+        _matrix:Matrix3D=new Matrix3D();
+        _image:HTMLImageElement;
+
+        vertexInfo:VertexInfo;
+
+        vertexData:Float32Array;
+        indexData:Uint16Array;
+
+        vertexCode:string;
+        fragmentCode:string;
+
+        constructor(){
+            super();
+            this.batcherAvailable = false;
+        }
+
+       
+        load(url:string):void
+        {
+            let _url = this._url;
+            if(_url == url)
+            {   
+                return;
+            }
+            _url=null; 
+            this.vertexInfo = null;
+            this._image = null;
+            //clear
+            if (url)
+			{
+				this._url = url;
+                loadRes(url,this.onImageComplete,this,ResType.image);
+			}
+        }
+
+        onImageComplete(e:EventX):void
+        {
+            if(e.type !=  EventX.COMPLETE)
+            {
+                console.log("error: load fail: "+this._url);
+                return;
+            }
+
+            let res:ResItem = e.data;
+            this._image = res.data;
+            this.draw();
+        }
+
+        draw():void{
+            let g:Graphics = this.graphics;
+            g.clear();
+            
+            let matrix:Matrix3D;
+            matrix= this._matrix;
+            
+            matrix.identity();
+            
+            let _image = this._image;
+            let drawW = _image.width;
+            let drawH = _image.height;
+
+        this.vertexCode = 
+        `
+            attribute vec3 pos;
+            attribute vec2 uv;
+            uniform mat4 mvp;
+            varying vec2 v_TexCoord;
+            void main(void){
+                vec4 temp = vec4(pos,1.0);
+                gl_Position = mvp * temp;
+                v_TexCoord = uv;
+            }
+        `
+        this.fragmentCode = `
+            precision mediump float;
+            uniform sampler2D diff;
+            varying vec2 v_TexCoord;
+            void main(void){
+                gl_FragColor = texture2D(diff, v_TexCoord);
+            }
+        `;
+
+        this.vertexData = new Float32Array(
+            [
+                0,0,0.0,0.0,
+                drawW,0,1.0,0.0,
+                drawW,drawH,1.0,1.0,
+                0,drawH,0.0,1.0
+            ]
+        );
+        this.indexData = new Uint16Array([0,1,3,1,2,3]);
+
+            let info =  new VertexInfo(this.vertexData,4);
+            info.regVariable(VA.pos,0,2);
+            info.regVariable(VA.uv,2,2);
+            this.vertexInfo = info;
+        }
+
+        render(camera: Camera, now: number, interval: number): void {
+            // super.render(camera,now,interval);
+            let _image = this._image;
+            let _url = this._url;
+            let info = this.vertexInfo;
+            if(_image == null || _url == null || info == null)
+            {
+                return;
+            }
+
+            let c = context3D;
+            let t = c.createTexture(_url,_image);
+
+            let v = c.createVertexBuffer(info);
+            let i = c.getIndexByQuad(1);
+  
+            let p = c.createProgram(this.vertexCode,this.fragmentCode);
+
+            c.clear(1,1,1,1);
+            c.setProgram(p);
+
+            t.uploadContext(p,0,FS.diff);
+            v.uploadContext(p);
+
+            
+            c.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform);
+
+            c.drawTriangles(i);
+        }
+    }
+
 
     /**
      *  自动模型合并 渲染器
@@ -503,4 +634,5 @@ module rf {
             this.link.onRecycle();
         }
     }
+        
 }
