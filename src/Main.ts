@@ -57,7 +57,7 @@ module rf{
             // new MaxRectsBinPackTest();
             // new WebglTest();
             // new MaxRectsTest();
-            // new Dc_Texture();
+            new Dc_Texture();
         }
 
         public linktest():void{

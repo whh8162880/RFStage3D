@@ -216,21 +216,19 @@
 
 
          private render3(){
+            let camera = ROOT.camera2D;
+            if(camera._change) camera.updateSceneTransform();  //更新下摄像机
             let c = context3D;
-            let v = c.createVertexBuffer(this.vertexInfo);
-            let i = c.getIndexByQuad(1);
-            let t = c.createTexture(this._url,this.image);
-            let p = c.createProgram(this.vertexCode,this.fragmentCode);
-
-            c.clear(1,1,1,1);
-            c.setProgram(p);
-
-            t.uploadContext(p,0,FS.diff);
-            v.uploadContext(p);
-            c.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform);
-
-            c.drawTriangles(i);
-
+            let v = c.createVertexBuffer(this.vertexInfo);  //创建顶点数据
+            let i = c.getIndexByQuad(1);                    //创建索引数据
+            let t = c.createTexture(this._url,this.image);  //创建贴图
+            let p = c.createProgram(this.vertexCode,this.fragmentCode); //创建shader
+            c.clear(1,1,1,1);       //清屏
+            c.setProgram(p);        //激活shader
+            t.uploadContext(p,0,FS.diff);   //上传贴图纹理
+            v.uploadContext(p);             //上传顶点数据
+            c.setProgramConstantsFromMatrix(VC.mvp,camera.worldTranform);   //上传mvp信息
+            c.drawTriangles(i);             //绘制
          }
 
 

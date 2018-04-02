@@ -66,7 +66,7 @@ module rf {
         renderer: I3DRender;
         batcherAvailable: boolean = true;
         $graphics: Graphics = undefined;
-        $batchGeometry: BatchGeometry;
+        $batchGeometry: BatchGeometry = undefined;
         $vcIndex: number = -1;
         $vcox: number = 0;
         $vcoy: number = 0;
