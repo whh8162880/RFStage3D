@@ -59,7 +59,7 @@ module rf{
             // new MaxRectsTest();
             // new Dc_Texture();
             let _image:Image3D = new Image3D();
-            _image.load("http://shushanh5.com/web/data/zhcn/o/server/logo.png");
+            _image.load("assets/ranger.png");
             ROOT.addChild(_image);
         }
 
