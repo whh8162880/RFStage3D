@@ -40,9 +40,12 @@
             }
 
       
-            //初始化信息
+           //使用现在自研的引起引擎来绘制一张图片
             this.init();
-  
+            
+            this.renderNow();
+           //使用webgl接口来绘制一张图片
+            // this.renderWebGL();
          }
 
 
