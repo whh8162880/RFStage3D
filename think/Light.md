@@ -1,8 +1,8 @@
 Matrix3D ?
 
     Matrix3D是由16个float每4个位一组组成的[缩放 角度 位置]信息。
-    简单来说 每个DisplayObject在屏幕中 【缩放 角度 位置】靠这个Martrix3D数据 就可以很好表达。
-    在不懂原理的情况下很难看懂这段话，但是这不重要，会用就行。就想象Martrix3D是把图像变成数字的工具吧。
+    简单来说 每个DisplayObject在屏幕中 【缩放 角度 位置】靠这个Matrix3D数据 就可以很好表达。
+    在不懂原理的情况下很难看懂这段话，但是这不重要，会用就行。就想象Matrix3D是把图像变成数字的工具吧。
 
     在我们DisplayObject中有2个Matrix3D 分别为 transform 和 sceneTransform。
     transform 表示我们对象相对自身的【缩放 角度 位置】信息
@@ -57,7 +57,7 @@ NORMAL?
 ```
 
     反射光(reflection):光在照射到物体身上时会发生反射现象 我们可以在金属上看到很耀眼的亮斑就是这样来的
-```ts
+```glsl
     attribute vec3 position;
     attribute vec3 normal;
     attribute vec4 color;
