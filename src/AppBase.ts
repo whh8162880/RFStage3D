@@ -19,6 +19,9 @@ module rf {
                 console.log("GL create fail");
                 return;
             }
+
+            componentSource = new BitmapSource().create("component",new BitmapData(2048,2048,true),true);
+
             Engine.addTick(this);
         }
 

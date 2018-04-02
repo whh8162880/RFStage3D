@@ -3,6 +3,48 @@
 module rf {
     export declare type PosKey = "x" | "y";
     export declare type SizeKey = "width" | "height";
+    
+/**
+     * 包含 x,y两个点的结构
+     * 
+     * @export
+     * @interface Point2D
+     */
+    export interface Point2D {
+        x: number;
+        y: number;
+    }
+    /**
+     * 包含 x,y,z 三个点的结构
+     * 
+     * @export
+     * @interface Point3D
+     * @extends {Point2D}
+     */
+    export interface Point3D extends Point2D {
+        z: number;
+    }
+    /**
+     * 包含 x,y,z,w 四个点的结构
+     * 
+     * @export
+     * @interface Point3DW
+     * @extends {Point3D}
+     */
+    export interface Point3DW extends Point3D {
+        w: number;
+    }
+
+    export interface Size extends Point2D{
+        w:number;
+        h:number;
+    }
+
+    export interface IFrame extends Size{
+        ix:number;
+        iy:number;
+    }
+
 
     /**
      * 有 `x` `y` 两个属性

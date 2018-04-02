@@ -11,6 +11,7 @@
 ///<reference path="./core/Capabilities.ts" />
 ///<reference path="./core/ThrowError.ts" />
 ///<reference path="./core/CallbackInfo.ts" />
+///<reference path="./core/SourceManager.ts" />
 
 ///<reference path="./stage3d/geom/Matrix3D.ts" />
 ///<reference path="./stage3d/geom/Vector3D.ts" />
