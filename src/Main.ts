@@ -21,7 +21,14 @@ module rf{
             context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-           
+
+            let bw = 100;
+            let ba = 1;
+            let bb = 1;
+            let bitmapData = new BitmapData(bw,bw,true,0xFFFFFFFF);
+            bitmapData.fillRect(0,0,ba,bb,"rgba(255,255,255,255)")
+            context3D.createTexture("test",bitmapData);
+            document.body.appendChild(bitmapData.canvas);
             
             let g = undefined
             for(let i = 0;i<1;i++){
