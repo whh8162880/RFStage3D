@@ -5,7 +5,7 @@ module rf {
         private _rect: { x: number; y: number; width: number; height: number };
         private _transparent;
         private _canvas: HTMLCanvasElement;
-        private _context: CanvasRenderingContext2D;
+        public context: CanvasRenderingContext2D;
         //private _imageData:ImageData;
 
         public constructor(width: number, height: number, transparent: boolean = true, fillColor: number = 0xFFFFFFFF) {
@@ -13,16 +13,15 @@ module rf {
             this._canvas = <HTMLCanvasElement>document.createElement("canvas");
             this._canvas.width = width;
             this._canvas.height = height;
-            this._context = this._canvas.getContext("2d");
+            this.context = this._canvas.getContext("2d");
             this._rect = { x: 0, y: 0, width: width, height: height };
-
             if (!transparent)
-                this.fillRect(this._rect, fillColor);
+                this.fillRect(0,0,width,height,hexToRGBACSS(fillColor,1));
         }
 
         public static fromImageElement(img: HTMLImageElement): BitmapData {
             var bmd: BitmapData = new BitmapData(img.width, img.height, true);
-            bmd._context.drawImage(<HTMLImageElement>img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
+            bmd.context.drawImage(<HTMLImageElement>img, 0, 0, img.width, img.height, 0, 0, img.width, img.height);
             return bmd;
         }
 
@@ -38,7 +37,7 @@ module rf {
         }
 
         public get imageData(): ImageData {
-            return this._context.getImageData(0, 0, this._canvas.width, this._canvas.height);
+            return this.context.getImageData(0, 0, this._canvas.width, this._canvas.height);
         }
 
         public get rect(): { x: number; y: number; width: number; height: number } {
@@ -49,9 +48,9 @@ module rf {
         public copyPixels(sourceBitmapData: HTMLImageElement, sourceRect: { x: number; y: number; width: number; height: number }, destPoint: { x: number; y: number }): void;
         public copyPixels(sourceBitmapData: any, sourceRect: { x: number; y: number; width: number; height: number }, destPoint: { x: number; y: number }): void {
             if (sourceBitmapData instanceof BitmapData)
-                this._context.drawImage(sourceBitmapData.canvas, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, destPoint.x, destPoint.y, sourceRect.width, sourceRect.height);
+                this.context.drawImage(sourceBitmapData.canvas, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, destPoint.x, destPoint.y, sourceRect.width, sourceRect.height);
             else {
-                this._context.drawImage(<HTMLImageElement>sourceBitmapData, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, destPoint.x, destPoint.y, sourceRect.width, sourceRect.height);
+                this.context.drawImage(<HTMLImageElement>sourceBitmapData, sourceRect.x, sourceRect.y, sourceRect.width, sourceRect.height, destPoint.x, destPoint.y, sourceRect.width, sourceRect.height);
             }
         }
         public draw(source: BitmapData /*,matrix:Matrix = null*/): void;
@@ -59,32 +58,24 @@ module rf {
         public draw(source: any /*,matrix:Matrix = null*/): void //todo:draw matrix
         {
             if (source instanceof BitmapData)
-                this._context.drawImage(source.canvas, 0, 0);
+                this.context.drawImage(source.canvas, 0, 0);
             else
-                this._context.drawImage(source, 0, 0);
+                this.context.drawImage(source, 0, 0);
         }
 
-        public fillRect(rect: { x: number; y: number; width: number; height: number }, color: number): void {
-            this._context.fillStyle = this.hexToRGBACSS(color);
-            this._context.fillRect(rect.x, rect.y, rect.width, rect.height);
+        /**
+         * rgbaCSS:string = "rgba(r,g,b,a)" rgba ∈ (0 ~ 255)
+         */
+        public fillRect( x: number, y: number, width: number, height: number,css:string| CanvasGradient | CanvasPattern): void {
+            this.context.fillStyle = css;
+            this.context.fillRect(x, y, width, height);
         }
 
 
         /**
          * convert decimal value to Hex
          */
-        private hexToRGBACSS(d: number): string {
-            var r: number = (d & 0x00ff0000) >>> 16;
-            var g: number = (d & 0x0000ff00) >>> 8;
-            var b: number = d & 0x000000ff;
-
-            if (this._transparent)
-                var a: number = ((d & 0xff000000) >>> 24) / 255;
-            else
-                var a: number = 1;
-
-            return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; //"rgba(0, 0, 200, 0.5)";
-        }
+        
     }
 
     export class MaxRectsBinPack {
