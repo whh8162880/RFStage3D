@@ -221,13 +221,16 @@
             let i = c.getIndexByQuad(1);
             let t = c.createTexture(this._url,this.image);
             let p = c.createProgram(this.vertexCode,this.fragmentCode);
+            let camera = ROOT.camera2D;
+            camera.updateSceneTransform();
 
             c.clear(1,1,1,1);
             c.setProgram(p);
 
+
             t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
-            c.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform);
+            c.setProgramConstantsFromMatrix(VC.mvp,camera.worldTranform);
 
             c.drawTriangles(i);
 
