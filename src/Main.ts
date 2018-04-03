@@ -73,7 +73,7 @@ module rf{
             t.y = 100;
             t.w = 200;
             t.wordWrap = true;
-            t.text = "<font color='#FF0000'>你好</font>啊\n<font size='20'>这是一个<font color='#00FF00'>HTMLTEXT</font></font>";
+            t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
             ROOT.addChild(t);
         }
 
