@@ -67,7 +67,7 @@ module rf{
 
             
 
-            let t = new TextFiled();
+            let t = new TextField();
             t.html = true;
             t.x = 100;
             t.y = 100;

@@ -57,7 +57,7 @@ module rf {
 
     let defalue_format = new TextFormat().init();
 
-    export class TextFiled extends Sprite {
+    export class TextField extends Sprite {
         html: boolean = false;
         $text: string = "";
         format: TextFormat;
@@ -839,7 +839,7 @@ module rf {
         }
     }
 
-    export class TextALink extends TextFiled {
+    export class TextALink extends TextField {
 
     }
 
