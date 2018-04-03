@@ -117,7 +117,7 @@ module rf {
         }
     }
 
-    export class Image3D extends Sprite{
+    export class Image extends Sprite{
         _url:string;
         constructor(){
             super();
