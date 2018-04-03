@@ -16,7 +16,7 @@ module rf {
             this.context = this._canvas.getContext("2d");
             this._rect = { x: 0, y: 0, width: width, height: height };
             if (!transparent)
-                this.fillRect(0,0,width,height,hexToRGBACSS(fillColor,1));
+                this.fillRect(0,0,width,height,hexToCSS(fillColor,1));
         }
 
         public static fromImageElement(img: HTMLImageElement): BitmapData {

@@ -18,8 +18,8 @@ module rf{
     export class Camera2D extends Camera{
         
         resize(width: number, height: number): void{
-            this._width = width;
-            this._height = height;
+            this.w = width;
+            this.h = height;
 
             let rawData = this.len.rawData;
 

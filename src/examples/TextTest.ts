@@ -1,20 +1,6 @@
 module rf{
     export class TextTest{
         constructor(){
-            var div:HTMLImageElement = new Image(200,200);
-            div.id = "fpsText"; 
-            div.style.cssText = "width:0px;height:0px;color:#0ff;font-family:Helvetica,Arial,sans-serif;font-size:12px;font-weight:bold;line-height:15px";
-            div.innerHTML = "你"; 
-            document.body.appendChild(div);
-            let a = div.getClientRects()[0];
-            // document.body.removeChild(div);
-            // alert(div.getClientRects()[0].width);
-
-            // alert("w:"+div.clientWidth+"  h:"+div.clientHeight);
-
-           
-
-
 
             var c:HTMLCanvasElement=<HTMLCanvasElement>document.createElement("canvas");
             

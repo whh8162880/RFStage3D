@@ -45,8 +45,8 @@ module rf {
 
         public sceneAlpha:number = 1;
 
-        public _width: number = 0;
-        public _height: number = 0;
+        public w: number = 0;
+        public h: number = 0;
 
         public _visible: Boolean = true;
         public _change: number = 0;
@@ -362,8 +362,8 @@ module rf {
         public removeFromStage(): void { };
 
         public setSize(width: number, height: number): void {
-            this._width = width;
-            this._height = height;
+            this.w = width;
+            this.h = height;
             this.invalidate();
         }
 
