@@ -115,6 +115,17 @@ module rf {
                 this.setChange(DChange.vertex);
             }
         }
+
+        cleanAll(){
+            if(this.childrens.length){
+                this.removeAllChild();
+            }
+            let g = this.$graphics
+            if(g && g.numVertices > 0){
+                g.clear();
+                g.end();
+            }
+        }
     }
 
     export class Image extends Sprite{
@@ -150,7 +161,7 @@ module rf {
 
             let g = this.graphics;
             g.clear();
-            g.drawBitmap(vo)
+            g.drawBitmap(0,0,vo)
             g.end();
         }
     }
@@ -246,8 +257,8 @@ module rf {
         }
 
 
-        drawBitmap(vo:BitmapSourceVO,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
-            const{x,y,w,h,ul,ur,vt,vb}=vo;
+        drawBitmap(x: number, y: number,vo:BitmapSourceVO,color:number = 0xFFFFFF,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
+            const{w,h,ul,ur,vt,vb}=vo;
             let r = x + w;
             let b = y + h;
             let d = this.variables["data32PerVertex"].size;
@@ -262,7 +273,10 @@ module rf {
             let uv = v[VA.uv];
             let vacolor = v[VA.color];
             let normal = v[VA.normal];
-            
+
+            let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
+            let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
+            let blue = (color & 0x000000ff) / 0xFF;
 
             let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
             for(let i=0;i<16;i+=4){
@@ -284,7 +298,7 @@ module rf {
                 }
 
                 if(undefined != vacolor){
-                    byte.wPoint4(dp+vacolor.offset,1,1,1,alpha)
+                    byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
                 }
 
                 this.numVertices += 1;
@@ -554,11 +568,12 @@ module rf {
 
         toBatch(): void {
             let vo = this.renders.getFrist();
+            let target = this.target;
             while (vo) {
                 if (vo.close == false) {
                     let render: Recyclable<I3DRender> = vo.data;
                     if (render instanceof BatchGeometry) {
-                        render.build();
+                        render.build(target);
                     }
                 }
                 vo = vo.next;
@@ -590,10 +605,11 @@ module rf {
             return this.vci;
         }
 
-        build(): void {
-            this.quadcount = this.link.length;
-            this.vertex = new VertexInfo(this.verlen, 10);
-            this.vertex.variables = vertex_ui_variable;
+        build(target:Sprite): void {
+            let variables = target.variables
+            this.vertex = new VertexInfo(this.verlen, variables["data32PerVertex"].size);
+            this.vertex.variables = variables;
+            this.quadcount = this.vertex.numVertices / 4;
             this.vcData = new Float32Byte(new Float32Array(this.quadcount * 4))
             let byte = this.vertex.vertex;
             let vo = this.link.getFrist();

@@ -60,9 +60,21 @@ module rf{
             // new WebglTest();
             // new MaxRectsTest();
             // new Dc_Texture();
-            let _image:Image3D = new Image3D();
+
+            let _image:Image = new Image();
             _image.load("assets/ranger.png");
             ROOT.addChild(_image);
+
+            
+
+            let t = new TextFiled();
+            t.html = true;
+            t.x = 100;
+            t.y = 100;
+            t.w = 200;
+            t.wordWrap = true;
+            t.text = "<font color='#FF0000'>你好</font>啊\n<font size='20'>这是一个<font color='#00FF00'>HTMLTEXT</font></font>";
+            ROOT.addChild(t);
         }
 
         public linktest():void{

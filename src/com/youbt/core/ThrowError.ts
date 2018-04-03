@@ -1,4 +1,7 @@
-///<reference path="./Config.ts" />
+declare let RELEASE;
+declare let DEBUG;
+RELEASE = false;
+DEBUG = true;
 module rf {
 
     export var ClientCheck = {
