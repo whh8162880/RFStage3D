@@ -45,6 +45,32 @@ module rf {
         iy:number;
     }
 
+    export interface IColor{
+        r:number,
+        g:number,
+        b:number,
+        a:number
+    }
+
+
+    export function hexToCSS(d: number,a:number = 1): string {
+        var r: number = (d & 0x00ff0000) >>> 16;
+        var g: number = (d & 0x0000ff00) >>> 8;
+        var b: number = d & 0x000000ff;
+        return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; //"rgba(0, 0, 200, 0.5)";
+    }
+
+
+    export function toRGB(color:number,out:IColor):void{
+        out.r = ((color & 0x00ff0000) >>> 16) / 0xFF;
+        out.g = ((color & 0x0000ff00) >>> 8) / 0xFF;
+        out.b = (color & 0x000000ff) / 0xFF;
+    }
+
+    export function toCSS(color:IColor):string{
+        return `rgba(${color.r*0xFF},${color.g*0xFF},${color.b*0xFF},${color.a*0xFF})`;
+    }
+
 
     /**
      * 有 `x` `y` 两个属性
@@ -111,14 +137,6 @@ module rf {
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
     export let CALCULATION_VECTOR3D: Vector3D = new Vector3D();
     export let CALCULATION_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
-
-
-    export function hexToRGBACSS(d: number,a:number = 1): string {
-        var r: number = (d & 0x00ff0000) >>> 16;
-        var g: number = (d & 0x0000ff00) >>> 8;
-        var b: number = d & 0x000000ff;
-        return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; //"rgba(0, 0, 200, 0.5)";
-    }
 
 
     /**
