@@ -16,6 +16,8 @@ module rf{
                 return;
             }
 
+            Capabilities.init();
+
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             // context3D.setDepthTest(true,gl.LEQUAL);
             context3D.setDepthTest(false,gl.ALWAYS);
