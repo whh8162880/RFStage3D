@@ -33,7 +33,8 @@ module rf {
 		MouseDown = "mousedown",
 		MouseUp = "mouseup",
 		MouseWheel = "mousewheel",
-		MouseMove = 50
+		MouseMove = 50,
+		CLICK
 	}
 
 
