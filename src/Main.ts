@@ -79,11 +79,35 @@ module rf{
 
             let t = new TextField();
             t.html = true;
+<<<<<<< HEAD
             t.x = 50;
             t.y = 50;
             // t.w = 200;
             // t.wordWrap = true;
             // t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
+=======
+            t.x = 100;
+            t.y = 100;
+            t.w = 200;
+            t.wordWrap = true;
+
+            t.format = new TextFormat();
+            t.format.size = 30;
+            t.format.italic = "italic";
+            t.format.bold = "bold";
+            // t.format.gradient = [{color: 0xffff00}];
+            t.format.gradient = [{color: 0xff0000, percent: 0}, {color: 0x00ff00, percent: 1}];
+            t.format.stroke = {size: 2, color: 0x556600};
+            t.format.shadow = {color: 0xffffff, blur: 4, offsetX: 10, offsetY: 10};
+            t.format.init();
+
+            t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
+            // t.text = "你好啊\n这是一个HTMLTEXT";
+
+            // 测试代码：document.body.appendChild(aaa.source.bmd.canvas);
+            window["aaa"] = t;
+
+>>>>>>> 8cfc59b896e12d7245d1f4dcbb01eec27d05570c
             ROOT.addChild(t);
 
             Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){

@@ -12,11 +12,11 @@ module rf {
         // "italic " : "normal "
         italic: string = "normal";
         // [描边颜色color,描边大小width]
-        stroke: any;
+        stroke: {size: number, color?: number};
         //[阴影颜色shadowColor,阴影模糊shadowBlur,阴影偏移shadowOffsetX,阴影偏移shadowOffsetY]
-        shadow: any;
-        // 渐变色
-        gradient: any;
+        shadow: {color: number, blur: number, offsetX?: number, offsetY?: number};
+        // [渐变色,渐变色位置百分比上0下1]
+        gradient: {color: number, percent?: number}[];
 
         font: string;
         init(): TextFormat {
@@ -29,14 +29,63 @@ module rf {
             context.font = this.font;
             out.x = context.measureText(text).width;
             out.y = size;
+
+            if (this.stroke) {
+                out.x += this.stroke.size * 2;
+                out.y += this.stroke.size * 2;
+            }
+
+            if (this.shadow) {
+                out.x += this.shadow.blur * 2 + Math.abs(this.shadow.offsetX || 0);
+                out.y += this.shadow.blur * 2 + Math.abs(this.shadow.offsetY || 0);
+            }
         }
         draw(context: CanvasRenderingContext2D, text: string, s: Size): void {
             const { x, y, w, h } = s;
             const { oy, family, size, bold, italic, stroke, shadow, gradient } = this;
             //设置字体
             context.font = this.font;
-            context.fillStyle = c_white //如果只是文字 没渐变色 那文字颜色永远用白色;
+
+            //只有一个渐变色则文字颜色为渐变色
+            if (gradient && gradient.length == 1) {
+                context.fillStyle = this.getColorStr(gradient[0].color);
+            }
+            //有多个渐变色
+            else if (gradient && gradient.length > 1) {
+                let style = context.createLinearGradient(x, y - h, x, y + h);
+                for (let g of gradient) {
+					let v = g.percent || 0;
+					let c = this.getColorStr(g.color);
+					style.addColorStop(v, c);
+                }
+                context.fillStyle = style;
+            }
+            //如果只是文字 没渐变色 那文字颜色永远用白色;
+            else {
+                context.fillStyle = c_white;
+            }
+
+            //阴影
+            if (shadow) {
+                context.shadowColor = this.getColorStr(shadow.color);
+				context.shadowBlur = shadow.blur;
+				context.shadowOffsetX = shadow.offsetX || 0;
+				context.shadowOffsetY = shadow.offsetY || 0;
+            }
+
+            //描边
+            if (stroke) {
+				context.strokeStyle = this.getColorStr(stroke.color || 0);
+				context.lineWidth = stroke.size * 2;
+                context.strokeText(text, x, y + h - oy, w);
+            }
+
             context.fillText(text, x, y + h - oy, w);
+        }
+
+        private getColorStr(color: number): string {
+            let s = color.toString(16);
+            return "#000000".substr(0, 7 - s.length) + s;
         }
 
         clone(format?: TextFormat): TextFormat {
