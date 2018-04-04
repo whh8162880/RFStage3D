@@ -4,16 +4,16 @@ module rf {
     export class BitmapData {
         private _rect: { x: number; y: number; width: number; height: number };
         private _transparent;
-        private _canvas: HTMLCanvasElement;
+        public canvas: HTMLCanvasElement;
         public context: CanvasRenderingContext2D;
         //private _imageData:ImageData;
 
         public constructor(width: number, height: number, transparent: boolean = true, fillColor: number = 0xFFFFFFFF) {
             this._transparent = transparent;
-            this._canvas = <HTMLCanvasElement>document.createElement("canvas");
-            this._canvas.width = width;
-            this._canvas.height = height;
-            this.context = this._canvas.getContext("2d");
+            let canvas = this.canvas = <HTMLCanvasElement>document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            this.context = this.canvas.getContext("2d");
             this._rect = { x: 0, y: 0, width: width, height: height };
             if (!transparent)
                 this.fillRect(0,0,width,height,hexToCSS(fillColor,1));
@@ -26,18 +26,14 @@ module rf {
         }
 
         public get width(): number {
-            return this._canvas.width;
+            return this.canvas.width;
         }
         public get height(): number {
-            return this._canvas.height;
-        }
-
-        public get canvas(): HTMLCanvasElement {
-            return this._canvas;
+            return this.canvas.height;
         }
 
         public get imageData(): ImageData {
-            return this.context.getImageData(0, 0, this._canvas.width, this._canvas.height);
+            return this.context.getImageData(0, 0, this.canvas.width, this.canvas.height);
         }
 
         public get rect(): { x: number; y: number; width: number; height: number } {

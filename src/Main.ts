@@ -9,8 +9,8 @@ module rf{
         
 
 
-        public init(cancas?:HTMLCanvasElement):void{
-            super.init(cancas);
+        public init(canvas?:HTMLCanvasElement):void{
+            super.init(canvas);
 
             if(undefined == gl){
                 return;
@@ -18,10 +18,20 @@ module rf{
 
             Capabilities.init();
 
+            
+
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             // context3D.setDepthTest(true,gl.LEQUAL);
             context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+
+
+            let bmd = componentSource.bmd.canvas;
+            canvas.id = "component";
+            let div = document.getElementById("game");
+            div.appendChild(bmd);
+            // canvas.style="position:absolutly;left:100px;top:100px";
+            // 
 
 
             // let bw = 100;
@@ -61,20 +71,24 @@ module rf{
             // new MaxRectsTest();
             // new Dc_Texture();
 
-            let _image:Image = new Image();
-            _image.load("assets/ranger.png");
-            ROOT.addChild(_image);
+            // let _image:Image = new Image();
+            // _image.load("assets/ranger.png");
+            // ROOT.addChild(_image);
 
             
 
             let t = new TextField();
             t.html = true;
-            t.x = 100;
-            t.y = 100;
-            t.w = 200;
-            t.wordWrap = true;
-            t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
+            t.x = 50;
+            t.y = 50;
+            // t.w = 200;
+            // t.wordWrap = true;
+            // t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
             ROOT.addChild(t);
+
+            Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
+                t.text =`<b><font size="40">fps:<font color="#00FF00">${Engine.fps}</font></font></b>`
+            });
         }
 
         public linktest():void{

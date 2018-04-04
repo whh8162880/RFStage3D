@@ -128,6 +128,10 @@ module rf {
             this.layout();
         }
 
+        cleanAll():void{
+            super.cleanAll();
+        }
+
         layout(): void {
             // 			if(transfromEnabled){
             // 				_height = 0;
@@ -440,8 +444,9 @@ module rf {
         }
     }
 
-    let regHTML: RegExp = /\<(?<HtmlTag>(font|u|a|image))([^\>]*?)\>(.*?)\<\/\k<HtmlTag>\>/m;
-    let regPro: RegExp = /(color|size|face|href|target|width|height)=(?<m>['|"])(.*?)\k<m>/;
+    // let regHTML: RegExp = /\<(?<HtmlTag>(font|u|a|image))([^\>]*?)\>(.*?)\<\/\k<HtmlTag>\>/m;
+    // let regPro: RegExp = /(color|size|face|href|target|width|height)=(?<m>['|"])(.*?)\k<m>/;
+    let regPro: RegExp = /(color|size|face|href|target|width|height)=(['|"])(.*?)(['|"])/; //兼容手机机机机机机
     let regTag: RegExp = /<(font|u|a|image|b)([^\>]*?)\>/;
     let _imgtag: RegExp = /({tag (.*?) (.*?)})/g;
     let _emotiontag: RegExp = /\#[0-9]/g;

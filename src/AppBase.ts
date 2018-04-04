@@ -10,9 +10,9 @@ module rf {
         }
 
 
-        init(cancas?:HTMLCanvasElement):void{
-            if(undefined == cancas){
-                var canvas:HTMLCanvasElement = document.createElement("canvas");
+        init(canvas?:HTMLCanvasElement):void{
+            if(undefined == canvas){
+                canvas = document.createElement("canvas");
                 document.body.appendChild(canvas);
             }
             var b:boolean = ROOT.requestContext3D(canvas);
