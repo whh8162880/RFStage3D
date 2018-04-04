@@ -30,7 +30,7 @@
 
          private onComplete(e:EventX)
          {
-            if(e.type != EventX.COMPLETE)
+            if(e.type != EventT.COMPLETE)
             {
                 return;
             }

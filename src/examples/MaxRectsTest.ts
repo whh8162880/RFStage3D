@@ -17,7 +17,7 @@ module rf {
         }
 
         private onComplete(event: EventX) {
-            if (event.type == EventX.COMPLETE) {
+            if (event.type == EventT.COMPLETE) {
                 let data = event.data as ResItem;
                 if (data.type == ResType.image) {
                     this._images.push(data.data);

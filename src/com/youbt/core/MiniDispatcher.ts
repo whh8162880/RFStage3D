@@ -1,68 +1,60 @@
 ///<reference path="../core/ClassUtils.ts" />
-module rf
-{
-	export interface IEventDispatcherX{
-		addEventListener(type:string,listener:Function,thisObject?:any,priority?:number):void;
-		removeEventListener(type:string, listener:Function):void;
-		hasEventListener?(type:string):boolean;
-		dispatchEvent(event:EventX):boolean;
-		simpleDispatch?(type:string,data?:any,bubbles?:boolean):boolean;
+module rf {
+	export interface IEventDispatcherX {
+		on(type: string|number, listener: Function, thisObject?: any, priority?: number): void;
+		off(type: string|number, listener: Function): void;
+		has?(type: string|number): boolean;
+		dispatchEvent(event: EventX): boolean;
+		simpleDispatch?(type: string|number, data?: any, bubbles?: boolean): boolean;
 	}
 
 
-	export class EventX implements IRecyclable{
-        /** Event type for a display object that is entering a new frame. */
-        public static ENTER_FRAME:string = "enterFrame";
-        /** Event type for a resized Flash Player. */
-        public static RESIZE:string = "resize";
-        /** Event type that may be used whenever something finishes. */
-		public static COMPLETE:string = "complete";
-		public static FAIL:string= "fail";
-        /** Event type for a (re)created stage3D rendering context. */
-        public static CONTEXT3D_CREATE:string = "context3DCreate";
-        /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static CHANGE:string = "change";
-        /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static CANCEL:string = "cancel";
-        /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static SCROLL:string = "scroll";
-        /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static OPEN:string = "open";
-        /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static CLOSE:string = "close";
-        /** An event type to be utilized in custom events. Not used by Starling right now. */
-        public static SELECT:string = "select";
-		
-		public static DISPOSE:string="dispose";
-		
-		public static DATA:string="data";
-		
-		public static ERROR:string="eventError";
-
-		public static PROGRESS:string="progress";
-		public static IO_ERROR:string="ioError";
-
-		public static MESSAGE:string="message";
-		
-		public static RECYCLE:string="recycle";
+	export enum EventT {
+		ENTER_FRAME,
+		RESIZE,
+		COMPLETE,
+		FAIL,
+		CONTEXT3D_CREATE,
+		CHANGE,
+		CANCEL,
+		SCROLL,
+		OPEN,
+		CLOSE,
+		SELECT,
+		DISPOSE,
+		DATA,
+		ERROR,
+		PROGRESS,
+		IO_ERROR,
+		MESSAGE,
+		RECYCLE
+	}
+	export enum MouseEventX {
+		MouseDown = "mousedown",
+		MouseUp = "mouseup",
+		MouseWheel = "mousewheel",
+		MouseMove = 50,
+		CLICK
+	}
 
 
-		public type:string = undefined;
-		public data:any = undefined;
-		public bubbles:boolean = false;
-		public target:IEventDispatcherX = undefined;
-		public currentTarget:IEventDispatcherX = undefined;
+	export class EventX implements IRecyclable {
+		public type: string|number = undefined;
+		public data: any;
+		public bubbles: boolean;
+		public target: IEventDispatcherX;
+		public currentTarget: IEventDispatcherX;
 
-		public stopPropagation:boolean = false;
-		public stopImmediatePropagation:boolean = false;
+		public stopPropagation: boolean;
+		public stopImmediatePropagation: boolean;
 
-		constructor(type?:string,data?:any,bubbles?:boolean){
+		constructor(type?: string|number, data?: any, bubbles?: boolean) {
 			this.type = type;
 			this.data = data;
 			this.bubbles = bubbles;
 		}
 
-		public onRecycle():void{
+		public onRecycle(): void {
 			this.data = undefined;
 			this.type = undefined;
 			this.target = undefined;
@@ -77,93 +69,86 @@ module rf
 	 * 
 	 * @author crl
 	 * 
-	 */	
-	export class MiniDispatcher implements IEventDispatcherX,IRecyclable
-	{
-		public mEventListeners:Object;
-		public mTarget:IEventDispatcherX;
+	 */
+	export class MiniDispatcher implements IEventDispatcherX, IRecyclable {
+		public mEventListeners: Object;
+		public mTarget: IEventDispatcherX;
 
 		/** Creates an EventDispatcher. */
-		constructor(target:IEventDispatcherX=null)
-		{
-			if(target==null){
-				target=this;
+		constructor(target: IEventDispatcherX = null) {
+			if (target == null) {
+				target = this;
 			}
-			this.mTarget=target;
+			this.mTarget = target;
 		}
-		
+
 		/** Registers an event listener at a certain object. */
-		public addEventListener(type:string,listener:Function,thisObject?:any,priority:number=0):void
-		{
-			if (undefined == this.mEventListeners){
+		
+		on(type: string|number, listener: Function, thisObject?: any, priority: number = 0): void {
+			if (undefined == this.mEventListeners) {
 				this.mEventListeners = {};
-			}	
-			var signal:Link = this.mEventListeners[type];
-			if (signal == null){
+			}
+			var signal: Link = this.mEventListeners[type];
+			if (signal == null) {
 				signal = this.mEventListeners[type] = recyclable(Link);
 			}
-			
-			signal.addByWeight(listener,priority,thisObject);
+
+			signal.addByWeight(listener, priority, thisObject);
 		}
-		
+
 		/** Removes an event listener from the object. */
-		public removeEventListener(type:string, listener:Function):void
-		{
-			if (undefined == this.mEventListeners)
-			{
-				var signal:Recyclable<Link> = this.mEventListeners[type];
+		off(type: string|number, listener: Function): void {
+			if (undefined == this.mEventListeners) {
+				var signal: Recyclable<Link> = this.mEventListeners[type];
 				if (undefined == signal) return;
 				signal.remove(listener);
-				if(0 >= signal.length){
+				if (0 >= signal.length) {
 					signal.recycle();
 				}
 			}
 		}
-		
 		/** Removes all event listeners with a certain type, or all of them if type is null. 
 		 *  Be careful when removing all event listeners: you never know who else was listening. */
-		public removeEventListeners(type:string=undefined):void
-		{
-			var signal:Recyclable<Link>;
+		public removeEventListeners(type: string = undefined): void {
+			var signal: Recyclable<Link>;
 
-			if (type && this.mEventListeners){
+			if (type && this.mEventListeners) {
 				signal = this.mEventListeners[type];
-				if(undefined != signal){
+				if (undefined != signal) {
 					signal.recycle();
 				}
 				delete this.mEventListeners[type];
-			}else if(this.mEventListeners){
-				for(type in this.mEventListeners){
+			} else if (this.mEventListeners) {
+				for (type in this.mEventListeners) {
 					signal = this.mEventListeners[type];
-					if(undefined != signal){
+					if (undefined != signal) {
 						signal.recycle();
 					}
 				}
 				this.mEventListeners = undefined
 			}
 		}
-		
+
 		/** Dispatches an event to all objects that have registered listeners for its type. 
 		 *  If an event with enabled 'bubble' property is dispatched to a display object, it will 
 		 *  travel up along the line of parents, until it either hits the root object or someone
 		 *  stops its propagation manually. */
-		public dispatchEvent(event:EventX):boolean
-		{
-			if (undefined == this.mEventListeners || false == (event.type in this.mEventListeners)){
+		public dispatchEvent(event: EventX): boolean {
+			if (undefined == this.mEventListeners || false == (event.type in this.mEventListeners)) {
 				return false;
 			}
 
 			event.currentTarget = this.mTarget;
-			let signal:Link = this.mEventListeners[event.type];
-			let vo:LinkVO = signal.getFrist();
-			while(vo){
-				if(event.stopPropagation || event.stopImmediatePropagation){
+			let signal: Link = this.mEventListeners[event.type];
+			let vo: LinkVO = signal.getFrist();
+			while (vo) {
+				if (event.stopPropagation || event.stopImmediatePropagation) {
 					break;
 				}
-				if(false == vo.close){
-					let f:Function = vo.data;
-					if(undefined != f){
-						f.call(vo.args,event);
+				if (false == vo.close) {
+					let f: Function = vo.data;
+					if (undefined != f) {
+						f.call(vo.args, event);
 						// f(vo.args,event);
 					}
 				}
@@ -172,39 +157,43 @@ module rf
 
 			return false == event.stopPropagation;
 		}
-	
-		public simpleDispatch(type:string,data:any = undefined,bubbles:boolean = false):boolean
-		{
-			if(!bubbles && (undefined == this.mEventListeners || false == (type in this.mEventListeners))){
+
+		public simpleDispatch(type: string|number, data: any = undefined, bubbles: boolean = false): boolean {
+			if (!bubbles && (undefined == this.mEventListeners || false == (type in this.mEventListeners))) {
 				return false;
 			}
 
-			let event:Recyclable<EventX> = recyclable(EventX);
+			let event: Recyclable<EventX> = recyclable(EventX);
 			event.type = type;
 			event.data = data;
 			event.bubbles = bubbles;
 			event.target = this.mTarget;
-			let bool:boolean=this.dispatchEvent(event);
+			let bool: boolean = this.dispatchEvent(event);
 			event.recycle();
 			return bool;
 		}
-		
+
 		/** Returns if there are listeners registered for a certain event type. */
-		public hasEventListener(type:string):boolean
-		{
-			if(undefined == this.mEventListeners){
+		public has(type: string|number): boolean {
+			if (undefined == this.mEventListeners) {
 				return false;
 			}
-			let signal:Link = this.mEventListeners[type];
-			if(undefined == signal || 0 >= signal.length){
+			let signal: Link = this.mEventListeners[type];
+			if (undefined == signal || 0 >= signal.length) {
 				return false;
 			}
 
 			return true;
 		}
-		
-		public onRecycle():void{
+
+		public onRecycle(): void {
 			this.removeEventListeners();
 		}
+
+
+		addEventListener = this.on;
+		removeEventListener = this.off;
+
+		hasEventListener = this.has;
 	}
 }

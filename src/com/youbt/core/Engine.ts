@@ -18,6 +18,9 @@ namespace rf {
 	export let nextUpdateTime: number = 0;
 	export let frameInterval: number = 0;
 
+	//当前程序运行了多长时间
+	export let engineNow:number = 0;
+
 	export const getT: ({ (): number }) = window.performance ? performance.now.bind(performance) : Date.now;
 
 	// export let engie_animation_request:Function = undefined;
@@ -26,8 +29,7 @@ namespace rf {
 
 		//当前程序开始时间
 		public static startTime: number = 0;
-		//当前程序运行了多长时间
-		public static now: number = 0;
+		
 		//上一帧到本帧间隔时间
 		public static interval: number = 0;
 		//窗口是否最小化
@@ -50,7 +52,7 @@ namespace rf {
 
 		public static start(): void {
 			Engine.startTime = getT();
-			Engine.now = 0;
+			engineNow = 0;
 			Engine.frameRate = Engine._frameRate;
 			nextUpdateTime = Engine.startTime + frameInterval;
 			Engine._nextProfileTime = Engine.startTime + 1000;
@@ -70,9 +72,9 @@ namespace rf {
 					return;
 				}
 				let now: number = time - Engine.startTime;
-				let interval: number = (Engine.interval = now - Engine.now);
+				let interval: number = (Engine.interval = now - engineNow);
 				nextUpdateTime += frameInterval;
-				Engine.now = now;
+				engineNow = now;
 				Engine.update(now, interval);
 				Engine.profile();
 			}
@@ -149,7 +151,7 @@ namespace rf {
 				}
 				vo = next;
 			}
-			Engine.dispatcher.simpleDispatch(EventX.RESIZE);
+			Engine.dispatcher.simpleDispatch(EventT.RESIZE);
 		}
 
 		public static addTick(tick: ITickable): void {
@@ -178,7 +180,7 @@ namespace rf {
 				}
 				vo = next;
 			}
-			Engine.dispatcher.simpleDispatch(EventX.ENTER_FRAME);
+			Engine.dispatcher.simpleDispatch(EventT.ENTER_FRAME);
 		}
 
 		public static set frameRate(value: number) {
@@ -193,7 +195,7 @@ namespace rf {
 		public static profile(): void {
 			let now: number = getT();
 			Engine._fpsCount++;
-			Engine._codeTime += now - Engine.startTime - Engine.now;
+			Engine._codeTime += now - Engine.startTime - engineNow;
 			if (now > Engine._nextProfileTime) {
 				Engine._nextProfileTime += 1000;
 				Engine.fps = Engine._fpsCount;
@@ -319,7 +321,7 @@ namespace rf {
 			if (undefined == f) {
 				return;
 			}
-			super.add(f, args).weight = Engine.now + time;
+			super.add(f, args).weight = engineNow + time;
 		}
 
 		public add(func: Function, args?: any): LinkVO {
@@ -327,7 +329,7 @@ namespace rf {
 		}
 
 		public timerHandler(event: EventX): void {
-			let now = Engine.now;
+			let now = engineNow;
 			let vo = this.link.getFrist();
 			while (vo) {
 				let next = vo.next;

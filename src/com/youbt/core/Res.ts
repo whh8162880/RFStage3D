@@ -94,7 +94,7 @@ module rf {
 
                     setTimeout(() => {
                         if (complete) {
-                            let event = new EventX(EventX.COMPLETE, item);
+                            let event = new EventX(EventT.COMPLETE, item);
                             complete.call(thisObj, event);
                         }
                     }, 0);
@@ -277,8 +277,8 @@ module rf {
 
             this._httpRequest = new HttpRequest();
             this._httpRequest.responseType = this.getType();
-            this._httpRequest.addEventListener(EventX.COMPLETE, this.onComplete, this);
-            this._httpRequest.addEventListener(EventX.IO_ERROR, this.onIOError, this);
+            this._httpRequest.addEventListener(EventT.COMPLETE, this.onComplete, this);
+            this._httpRequest.addEventListener(EventT.IO_ERROR, this.onIOError, this);
         }
 
         protected getType(): HttpResponseType {
@@ -365,14 +365,14 @@ module rf {
     export class ResImageLoader extends ResLoaderBase {
         loadFile(resItem: ResItem, compFunc: Function, thisObject: any): void {
             let imageLoader = new ImageLoader();
-            imageLoader.addEventListener(EventX.COMPLETE, (e: EventX) => {
+            imageLoader.addEventListener(EventT.COMPLETE, (e: EventX) => {
                 if (compFunc) {
                     resItem.data = imageLoader.data;
                     e.data = resItem;
                     compFunc.call(thisObject, this, e);
                 }
             }, this);
-            imageLoader.addEventListener(EventX.IO_ERROR, (e: EventX) => {
+            imageLoader.addEventListener(EventT.IO_ERROR, (e: EventX) => {
                 if (compFunc) {
                     e.data = resItem;
                     compFunc.call(thisObject, this, e);
