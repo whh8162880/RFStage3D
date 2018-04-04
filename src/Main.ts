@@ -79,13 +79,6 @@ module rf{
 
             let t = new TextField();
             t.html = true;
-<<<<<<< HEAD
-            t.x = 50;
-            t.y = 50;
-            // t.w = 200;
-            // t.wordWrap = true;
-            // t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
-=======
             t.x = 100;
             t.y = 100;
             t.w = 200;
@@ -107,7 +100,6 @@ module rf{
             // 测试代码：document.body.appendChild(aaa.source.bmd.canvas);
             window["aaa"] = t;
 
->>>>>>> 8cfc59b896e12d7245d1f4dcbb01eec27d05570c
             ROOT.addChild(t);
 
             Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
