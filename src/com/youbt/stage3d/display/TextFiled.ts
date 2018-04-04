@@ -5,7 +5,7 @@ module rf {
 
     export class TextFormat {
         family: string = "微软雅黑";
-        oy:number = 2;
+        oy: number = 2;
         size: number = 12;
         // "bold " : "normal "
         bold: string = "normal";
@@ -31,12 +31,12 @@ module rf {
             out.y = size;
         }
         draw(context: CanvasRenderingContext2D, text: string, s: Size): void {
-            const { x, y, w,h} = s;
-            const {oy,family, size, bold, italic, stroke, shadow, gradient } = this;
+            const { x, y, w, h } = s;
+            const { oy, family, size, bold, italic, stroke, shadow, gradient } = this;
             //设置字体
             context.font = this.font;
             context.fillStyle = c_white //如果只是文字 没渐变色 那文字颜色永远用白色;
-            context.fillText(text, x, y+h-oy, w);
+            context.fillText(text, x, y + h - oy, w);
         }
 
         clone(format?: TextFormat): TextFormat {
@@ -66,10 +66,10 @@ module rf {
         gap: number = 0;
         wordWrap: boolean;
         init(source?: BitmapSource, format?: TextFormat): void {
-            if(undefined != source){
+            if (undefined != source) {
                 this.source = source;
             }
-            if(undefined == format){
+            if (undefined == format) {
                 format = defalue_format.clone();
             }
             this.format = format;
@@ -90,7 +90,7 @@ module rf {
                 element.clear();
             }
             let format = this.format;
-            if(undefined == format){
+            if (undefined == format) {
                 this.format = format = defalue_format.clone();
             }
 
@@ -110,7 +110,7 @@ module rf {
             for (let i = 0; i < len; i++) {
                 let line = lines[i]
                 let textLine = this.textLines[i];
-                if(undefined == textLine){
+                if (undefined == textLine) {
                     this.textLines[i] = textLine = recyclable(TextLine);
                 }
                 textLine.y = oy;
@@ -120,7 +120,7 @@ module rf {
                 this.addChild(textLine);
             }
 
-            while(lines.length > len){
+            while (lines.length > len) {
                 let textLine = lines.pop();
                 textLine.recycle();
             }
@@ -128,43 +128,43 @@ module rf {
             this.layout();
         }
 
-        layout():void{
-// 			if(transfromEnabled){
-// 				_height = 0;
-// 				_width = 0;
-// 			}
-// 			var line:Text3DLine;
-// 			var lx:int = 1;
-// 			if(align){
-// 				if(align == TextFormatAlign.CENTER){
-// 					for each(line in lines){
-// 						line.x = _width - line.width >> 1
-// 						lx = line.x;
-// 					}
-// 				}else if(align == TextFormatAlign.RIGHT){
-// 					for each(line in lines){
-// 						line.x = _width - line.width;
-// 					}
-// 				}
-// 			}
-			
-// 			transfromflag = true;
-			
-// 			if(u){
-// //				-偏移量
-// 				var _offy:int = txtSet ? currentHtml.text2dDefine.offsety : 0;
-				
-// 				graphics.clear();
-// 				_graphics.lineStyle(1,_textColor);
-// 				_graphics.moveTo(lx,height+reduceLineHeight - _offy);
-// 				_graphics.lineTo(lx + textWidth + reduceLineWidth,height+reduceLineHeight - _offy);
-// 				_graphics.endFill();
-// 			}
-// 			else
-// 			{
-// 				graphics.clear();
-// 			}
-		}
+        layout(): void {
+            // 			if(transfromEnabled){
+            // 				_height = 0;
+            // 				_width = 0;
+            // 			}
+            // 			var line:Text3DLine;
+            // 			var lx:int = 1;
+            // 			if(align){
+            // 				if(align == TextFormatAlign.CENTER){
+            // 					for each(line in lines){
+            // 						line.x = _width - line.width >> 1
+            // 						lx = line.x;
+            // 					}
+            // 				}else if(align == TextFormatAlign.RIGHT){
+            // 					for each(line in lines){
+            // 						line.x = _width - line.width;
+            // 					}
+            // 				}
+            // 			}
+
+            // 			transfromflag = true;
+
+            // 			if(u){
+            // //				-偏移量
+            // 				var _offy:int = txtSet ? currentHtml.text2dDefine.offsety : 0;
+
+            // 				graphics.clear();
+            // 				_graphics.lineStyle(1,_textColor);
+            // 				_graphics.moveTo(lx,height+reduceLineHeight - _offy);
+            // 				_graphics.lineTo(lx + textWidth + reduceLineWidth,height+reduceLineHeight - _offy);
+            // 				_graphics.endFill();
+            // 			}
+            // 			else
+            // 			{
+            // 				graphics.clear();
+            // 			}
+        }
 
 
 
@@ -751,14 +751,14 @@ module rf {
         regPro.lastIndex = 0;
         value = value.replace(/\s/g, "");
         let o = regPro.exec(value);
-        var cloneFormat:TextFormat;
+        var cloneFormat: TextFormat;
         while (o) {
             let p = o[1];
             let v = o[3];
             p = p.trim();
-            if(p == "color"){
-                html.color = Number(v.replace("#","0x"));
-            }else if (p == "href") {
+            if (p == "color") {
+                html.color = Number(v.replace("#", "0x"));
+            } else if (p == "href") {
                 if (v.indexOf("event:") == 0) {
                     v = v.replace("event:", "");
                 }
@@ -832,7 +832,7 @@ module rf {
                     display.y = (h - display.h) >> 1
                     this.addChild(display);
                 } else {
-                    g.drawBitmap(char.sx,h-display.h,display, ele.color);
+                    g.drawBitmap(char.sx, h - display.h, display, ele.color);
                 }
             }
             g.end();
@@ -867,5 +867,5 @@ module rf {
 
 
 
-    
+
 }

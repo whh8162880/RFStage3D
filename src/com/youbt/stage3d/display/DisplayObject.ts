@@ -2,29 +2,123 @@
 module rf {
     export var ROOT: Stage3D;
 
-    export enum DChange {
-        trasnform = 0b1,
-        alpha = trasnform<<1,
-        base_all = (trasnform | alpha),
-        vertex = alpha<<1,
-        vcdata = vertex<<1,
-        vextex_all = (vertex | vcdata)
+    export interface IMouse {
+        mouseEnabled?:boolean,
+        mouseChildren?:boolean,
+        checkmouse?(dx: number, dy: number,scale:number): DisplayObject
     }
 
-    export let BIT_CLEAR: number = 0x1;
-    export let BIT_VERTEX: number = 0x2;
-    export let BIT_VC: number = 0x4;
-    export let BIT_ALL_VERTEX: number = BIT_CLEAR | BIT_VERTEX | BIT_VC;
-    export let BIT_COLOR: number = 0x10;
-    export let BIT_TRIANGLES: number = 0x20;
-    export let BIT_ALPHA: number = 0x40;
-    export let BIT_PROGRAM: number = 0x100;
-    export let BIT_FRAGMENT_DATA: number = 0x200;
-    export let BIT_VERTEX_DATA: number = 0x400;
-    export let BIT_ALL_PROGRAM: number = BIT_PROGRAM | BIT_FRAGMENT_DATA | BIT_VERTEX_DATA;
+    export enum DChange {
+        trasnform = 0b1,
+        alpha = trasnform << 1,
+        vertex = alpha << 1,
+        vcdata = vertex << 1,
+        //底层transfrom改变
+        ct = vcdata << 1,
+        area = ct << 1,
+        //底层htiArea改变
+        ca = area << 1,
+        c_all = (ct | ca),  
+        ac = (area | ca),
+        ta = (trasnform | alpha),
+        batch = (vertex | vcdata),
+        base = (trasnform | alpha | area),
+        /**
+         *  自己有transform变化 或者 下层有transform变化
+         */
+        t_all = (trasnform | alpha | ct)
 
-    export class DisplayObject extends MiniDispatcher {
+    }
 
+
+    export class HitArea {
+        left: number = 0;
+        right: number = 0;
+        top: number = 0;
+        bottom: number = 0;
+        front: number = 0;
+        back: number = 0;
+        clean():void{
+            this.left = this.right = this.top = this.bottom = this.front = this.back = 0;
+        }
+
+        combine(hitArea:HitArea,x:number,y:number):boolean{
+            let b = false;
+            if(this.left > hitArea.left+x){
+                this.left = hitArea.left+x;
+                b = true;
+            }
+
+            if(this.right < hitArea.right+x){
+                this.right = hitArea.right+x;
+                b = true;
+            }
+
+            if(this.top > hitArea.top+y){
+                this.top = hitArea.top+y;
+                b = true;
+            }
+
+            if(this.bottom < hitArea.bottom+y){
+                this.bottom = hitArea.bottom+y;
+                b = true;
+            }
+
+            if(this.front > hitArea.front){
+                this.front = hitArea.front;
+                b = true;
+            }
+
+            if(this.back < hitArea.back){
+                this.back = hitArea.back;
+                b = true;
+            }
+            return b
+        }
+
+        updateArea(x: number, y: number, z: number): boolean {
+            let b = false;
+            if (this.left > x) {
+                this.left = x;
+                b = true;
+            } else if (this.right < x) {
+                this.right = x;
+                b = true;
+            }
+
+            if (this.top > y) {
+                this.top = y;
+                b = true;
+            } else if (this.bottom < y) {
+                this.bottom = y;
+                b = true;
+            }
+
+            if (this.front > z) {
+                this.front = z;
+                b = true;
+            } else if (this.back < z) {
+                this.back = z;
+                b = true;
+            }
+
+            return b;
+        }
+        checkIn(x: number, y: number, scale: number = 1): boolean {
+            if (x > this.left * scale && x < this.right * scale && y > this.top * scale && y < this.bottom * scale) {
+                return true;
+            }
+            return false;
+        }
+        public toString(): string {
+            return `HitArea left:${this.left} right:${this.right} top:${this.top} bottom:${this.bottom} front:${this.front} back:${this.back}`
+        }
+    }
+
+    export class DisplayObject extends MiniDispatcher implements IMouse {
+        hitArea: HitArea;
+        mouseEnabled:boolean;
+        mouseChildren:boolean;
         public transformComponents: Vector3D[];
         public pos: Vector3D;
         public rot: Vector3D;
@@ -43,13 +137,13 @@ module rf {
         public _scaleZ: number = 1;
         public _alpha: number = 1;
 
-        public sceneAlpha:number = 1;
+        public sceneAlpha: number = 1;
 
         public w: number = 0;
         public h: number = 0;
 
         public _visible: Boolean = true;
-        public _change: number = 0;
+        public states: number = 0;
 
         public pivotZero: boolean = false;
         public pivotPonumber: Vector3D = undefined;
@@ -69,30 +163,43 @@ module rf {
             this.sceneTransform = new Matrix3D();
         }
 
-
-        setChange(value:number,p:boolean = false,c:boolean = false){
-            this._change |= (value & ~DChange.vextex_all);
+        /**
+         * 逻辑规则
+         * 改变对象 transform  alpha   vertexData  vcData  hitArea
+         * 1.transform alpha 改变需要递归计算 并且上层是需要下层有改变的 引申出 ct 对象 childTranformORAlphaChange
+         * 2.vertexData vcData 是要让batcher知道数据改变了 本层不需要做任何处理
+         * 3.hitArea 改变 需要递归计算，引申出 ca对象 childHitAreaChange
+         */
+        setChange(value: number, p: number = 0, c: boolean = false) {
+            //batcher相关的都和我无关
+            this.states |= (value & ~DChange.batch);    //本层不需要batcher对象识别
             if (undefined != this.parent) {
-                this.parent.setChange(value & ~DChange.base_all,this._change != 0,true);
+                if(value & DChange.ta){
+                    value |= DChange.ct;                //如果本层transform or alpha 改变了 那就得通知上层
+                }
+                if(value & DChange.area){
+                    value |= DChange.ca;                //如果本层hitArea改变了 那就得通知上层
+                }
+                this.parent.setChange(/*给batcher用的*/value & DChange.batch, /*给顶层通知说下层有情况用的*/value & DChange.c_all, true);
             }
         }
 
         public get visible(): Boolean { return this._visible; }
         public set visible(value: Boolean) {
-            if(this._visible != value) {
-                 this._visible = value; 
-                 this.setChange(DChange.vertex)
+            if (this._visible != value) {
+                this._visible = value;
+                this.setChange(DChange.vertex)
             }
         }
 
-        public set alpha(value:number){
-            if(this._alpha == value){
+        public set alpha(value: number) {
+            if (this._alpha == value) {
                 return;
             }
 
             let vertex = 0
-            
-            if(this._alpha <= 0 || value == 0){
+
+            if (this._alpha <= 0 || value == 0) {
                 vertex |= DChange.vertex;
             }
 
@@ -100,16 +207,16 @@ module rf {
             this.setChange(vertex | DChange.alpha | DChange.vcdata);
         }
 
-        public get alpha():number{
+        public get alpha(): number {
             return this._alpha;
         }
 
         public get scaleX(): number { return this._scaleX; }
         public set scaleX(value: number) {
-            if(this._scaleX == value) return;
-             this._scaleX = value; 
-             this.sca.x = value; 
-             this.setChange(DChange.trasnform | DChange.vcdata); 
+            if (this._scaleX == value) return;
+            this._scaleX = value;
+            this.sca.x = value;
+            this.setChange(DChange.trasnform | DChange.vcdata);
         }
         public get scaleY(): number { return this._scaleY; }
         public set scaleY(value: number) { this._scaleY = value; this.sca.y = value; this.setChange(DChange.trasnform); }
@@ -119,7 +226,7 @@ module rf {
         public get rotationY(): number { return this._rotationY * RADIANS_TO_DEGREES; }
         public get rotationZ(): number { return this._rotationZ * RADIANS_TO_DEGREES; }
 
-        
+
         public set rotationX(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationX) return;
@@ -142,17 +249,17 @@ module rf {
 
         public set x(value: number) {
             if (value == this._x) return;
-            this._x = value; this.pos.x = value; 
+            this._x = value; this.pos.x = value;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
         public set y(value: number) {
             if (value == this._y) return;
-            this._y = value; this.pos.y = value; 
+            this._y = value; this.pos.y = value;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
         public set z(value: number) {
             if (value == this._z) return;
-            this._z = value; this.pos.z = value; 
+            this._z = value; this.pos.z = value;
             this.setChange(DChange.trasnform);
         }
 
@@ -333,7 +440,7 @@ module rf {
                 this.transform.recompose(this.transformComponents);
             }
 
-            this._change &= ~DChange.trasnform;
+            this.states &= ~DChange.trasnform;
         }
 
 
@@ -341,15 +448,15 @@ module rf {
 		 * 
 		 * 
 		 */
-        public updateSceneTransform(sceneTransform:Matrix3D): void {
+        public updateSceneTransform(sceneTransform: Matrix3D): void {
             this.sceneTransform.copyFrom(this.transform);
             this.sceneTransform.append(sceneTransform);
         }
 
 
-        public updateAlpha(sceneAlpha:number):void{
+        public updateAlpha(sceneAlpha: number): void {
             this.sceneAlpha = this.sceneAlpha * this._alpha;
-            this._change &= ~DChange.alpha;
+            this.states &= ~DChange.alpha;
         }
 
         public remove(): void {
@@ -407,7 +514,7 @@ module rf {
 
 
         //==============================================================
-        public dispatchEvent(event: EventX): boolean {
+        dispatchEvent(event: EventX): boolean {
             var bool: boolean = false;
             if (undefined != this.mEventListeners && event.type in this.mEventListeners) {
                 bool = super.dispatchEvent(event);
@@ -419,6 +526,22 @@ module rf {
                 }
             }
             return bool;
+        }
+
+        public updateHitArea():void{
+            this.states &= ~DChange.ac;
+        }
+
+        checkmouse(dx: number, dy: number,scale:number): DisplayObject {
+            let area = this.hitArea;
+            if (undefined == area) {
+                return undefined;
+            }
+            if(area.checkIn(dx, dy, this._scaleX * scale) == true){
+                return this;
+            }
+
+            return undefined;
         }
     }
 }

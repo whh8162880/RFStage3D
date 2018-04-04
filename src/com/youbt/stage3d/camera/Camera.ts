@@ -43,17 +43,17 @@ module rf{
             rawData[14] = 0;
             rawData[15] = 1;
 
-            this._change |= DChange.trasnform;
+            this.states |= DChange.trasnform;
         }
 
         public updateSceneTransform(sceneTransform?:Matrix3D):void{
-            if( this._change | DChange.trasnform){
+            if( this.states | DChange.trasnform){
                 this.updateTransform();
                 this.sceneTransform.copyFrom(this.transform);
                 this.sceneTransform.invert();
                 this.worldTranform.copyFrom(this.sceneTransform);
                 this.worldTranform.append(this.len);
-                this._change &= ~DChange.trasnform;
+                this.states &= ~DChange.trasnform;
             }
         }
     }
