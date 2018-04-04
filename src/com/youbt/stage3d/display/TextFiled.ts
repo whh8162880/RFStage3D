@@ -28,7 +28,7 @@ module rf {
             //设置字体
             context.font = this.font;
             out.x = context.measureText(text).width;
-            out.y = size;
+            out.y = size + this.oy;
 
             if (this.stroke) {
                 out.x += this.stroke.size * 2;
@@ -100,6 +100,7 @@ module rf {
             format.shadow = this.shadow;
             format.gradient = this.gradient;
             format.font = this.font;
+            format.oy = this.oy;
             return format;
         }
     }
