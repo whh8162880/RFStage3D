@@ -30,10 +30,10 @@ module rf {
 		RECYCLE
 	}
 	export enum MouseEventX {
-		MouseDown = 50,
-		MouseUp,
-		MouseWheel,
-		MouseMove
+		MouseDown = "mousedown",
+		MouseUp = "mouseup",
+		MouseWheel = "mousewheel",
+		MouseMove = 50
 	}
 
 

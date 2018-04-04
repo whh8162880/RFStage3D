@@ -9,6 +9,10 @@ module rf{
             canvas.onmousewheel = this.mouseHanlder;
 
             canvas.onmousemove = this.mouseMoveHandler;
+
+            ROOT.addEventListener(MouseEventX.MouseDown,function (e:EventX):void{
+                console.log(e);
+            })
         }
 
         preMouseTime:number;
@@ -25,13 +29,10 @@ module rf{
             }
 
             if(undefined != d){
-                console.log(e.type);
                 d.simpleDispatch(e.type,e,true);
             }
         }
 
-        
-        
 
         mouseMoveHandler(e:MouseEvent):void{
             if(this.preMoveTime == engineNow){
@@ -39,7 +40,7 @@ module rf{
             }
             let d = ROOT.getMouseTarget(e.clientX,e.clientY,1);
             if(undefined != d){
-                d.simpleDispatch(e.type,e,true)
+                d.simpleDispatch(MouseEventX.MouseMove,e,true)
             }
         }
     }
