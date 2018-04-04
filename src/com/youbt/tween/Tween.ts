@@ -213,7 +213,7 @@ module rf {
                 this._useTicks = props.useTicks;
                 this.ignoreGlobalPause = props.ignoreGlobalPause;
                 this.loop = props.loop;
-                props.onChange && this.addEventListener(EventX.CHANGE, props.onChange, props.onChangeObj);
+                props.onChange && this.addEventListener(EventT.CHANGE, props.onChange, props.onChangeObj);
                 if (props.override) {
                     manager.removeTweens(target);
                 }
@@ -309,7 +309,7 @@ module rf {
                     this._runActions(prevPos, t);
                 }
             }
-            this.simpleDispatch(EventX.CHANGE);
+            this.simpleDispatch(EventT.CHANGE);
             return end;
         }
 

@@ -114,7 +114,7 @@ module rf{
         }
 
         protected renderImage(event:EventX):void{
-            if(event.type != EventX.COMPLETE){
+            if(event.type != EventT.COMPLETE){
                 return;
             }
             let res:ResItem = event.data;

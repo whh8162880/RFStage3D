@@ -5,7 +5,7 @@ module rf {
     export interface IMouse {
         mouseEnabled?:boolean,
         mouseChildren?:boolean,
-        checkmouse?(dx: number, dy: number,scale:number): DisplayObject
+        getMouseTarget?(dx: number, dy: number,scale:number): DisplayObject
     }
 
     export enum DChange {
@@ -477,7 +477,7 @@ module rf {
         protected invalidateFuncs: Function[] = [];
 
         protected invalidate(func: Function = null): void {
-            ROOT.addEventListener(EventX.ENTER_FRAME, this.onInvalidate, this);
+            ROOT.addEventListener(EventT.ENTER_FRAME, this.onInvalidate, this);
             if (null == func) {
                 func = this.doResize;
             }
@@ -495,13 +495,13 @@ module rf {
             if (i != -1) {
                 this.invalidateFuncs.splice(i, 1);
                 if (!this.invalidateFuncs.length) {
-                    ROOT.removeEventListener(EventX.ENTER_FRAME, this.onInvalidate);
+                    ROOT.removeEventListener(EventT.ENTER_FRAME, this.onInvalidate);
                 }
             }
         }
 
         protected onInvalidate(event: EventX): void {
-            event.currentTarget.removeEventListener(EventX.ENTER_FRAME, this.onInvalidate);
+            event.currentTarget.off(EventT.ENTER_FRAME, this.onInvalidate);
             var arr: Function[] = this.invalidateFuncs.concat();
             this.invalidateFuncs.length = 0;
             for (var func of arr) {
@@ -532,7 +532,7 @@ module rf {
             this.states &= ~DChange.ac;
         }
 
-        checkmouse(dx: number, dy: number,scale:number): DisplayObject {
+        getMouseTarget(dx: number, dy: number,scale:number): DisplayObject {
             let area = this.hitArea;
             if (undefined == area) {
                 return undefined;

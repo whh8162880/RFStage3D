@@ -34,7 +34,7 @@ module rf{
             
             if(undefined == gl){
                 context3D = null;
-                this.simpleDispatch(EventX.ERROR,"webgl is not available");
+                this.simpleDispatch(EventT.ERROR,"webgl is not available");
                 return false;
             }
 
@@ -43,7 +43,7 @@ module rf{
             canvas.addEventListener('webglcontextlost',this.webglContextLostHandler);
             canvas.addEventListener("webglcontextrestored",this.webglContextRestoredHandler);
             this.mouse.init();
-            this.simpleDispatch(EventX.CONTEXT3D_CREATE,gl);
+            this.simpleDispatch(EventT.CONTEXT3D_CREATE,gl);
             return true;
         }
 

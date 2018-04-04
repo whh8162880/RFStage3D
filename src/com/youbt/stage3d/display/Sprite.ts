@@ -86,7 +86,7 @@ module rf {
             this.states &= ~DChange.ac;
         }
 
-        checkmouse(dx: number, dy: number,scale:number): DisplayObject {
+        getMouseTarget(dx: number, dy: number,scale:number): DisplayObject {
             if(this.mouseEnabled == false && this.mouseChildren == false){
                 return undefined
             }
@@ -105,7 +105,7 @@ module rf {
                     let len = children.length;
                     for(let i = len - 1;i>=0;i--){
                         let child = children[i];
-                        let d = child.checkmouse(dx,dy,scale);
+                        let d = child.getMouseTarget(dx,dy,scale);
                         if(undefined != d){
                             return d;
                         }
@@ -147,7 +147,7 @@ module rf {
 
         onImageComplete(e:EventX):void
         {
-            if(e.type !=  EventX.COMPLETE)
+            if(e.type !=  EventT.COMPLETE)
             {
                 return;
             }

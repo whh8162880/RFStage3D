@@ -115,12 +115,12 @@ module rf {
                 let url = this._url;
                 setTimeout(() => {
                     if (ioError) {
-                        if (true && !this.hasEventListener(EventX.IO_ERROR)) {
+                        if (true && !this.hasEventListener(EventT.IO_ERROR)) {
                             ThrowError("http request error: " + url);
                         }
-                        this.simpleDispatch(EventX.IO_ERROR);
+                        this.simpleDispatch(EventT.IO_ERROR);
                     } else {
-                        this.simpleDispatch(EventX.COMPLETE);
+                        this.simpleDispatch(EventT.COMPLETE);
                     }
                 }, 0);
             }
@@ -128,7 +128,7 @@ module rf {
 
         protected updateProgress(event: any): void {
             if (event.lengthComputable) {
-                this.simpleDispatch(EventX.PROGRESS, [event.loaded, event.total]);
+                this.simpleDispatch(EventT.PROGRESS, [event.loaded, event.total]);
             }
         }
 
@@ -220,7 +220,7 @@ module rf {
             }
             this._data = image;
             setTimeout(() => {
-                this.simpleDispatch(EventX.COMPLETE);
+                this.simpleDispatch(EventT.COMPLETE);
             }, 0);
         }
 
@@ -229,7 +229,7 @@ module rf {
             if (!image) {
                 return;
             }
-            this.simpleDispatch(EventX.IO_ERROR, image.src);
+            this.simpleDispatch(EventT.IO_ERROR, image.src);
         }
 
         protected getImage(event: any): any {
@@ -338,7 +338,7 @@ module rf {
 
         protected onOpen(e: any): void {
             this._connected = true;
-            this.simpleDispatch(EventX.OPEN, e);
+            this.simpleDispatch(EventT.OPEN, e);
         }
 
         protected onMessage(msg: any): void {
@@ -348,7 +348,7 @@ module rf {
             let data = msg.data;
             // 不缓存接收的数据则直接抛出数据
             if (this.disableInput && data) {
-                this.simpleDispatch(EventX.MESSAGE, data);
+                this.simpleDispatch(EventT.MESSAGE, data);
                 return;
             }
             // 如果输入流全部被读取完毕则清空
@@ -375,16 +375,16 @@ module rf {
                 // 还原到当前的指针位置
                 this._input.position = pre;
             }
-            this.simpleDispatch(EventX.MESSAGE, data);
+            this.simpleDispatch(EventT.MESSAGE, data);
         }
 
         protected onClose(e: any): void {
             this._connected = false;
-            this.simpleDispatch(EventX.CLOSE, e);
+            this.simpleDispatch(EventT.CLOSE, e);
         }
 
         protected onError(e: any): void {
-            this.simpleDispatch(EventX.ERROR, e);
+            this.simpleDispatch(EventT.ERROR, e);
         }
 
         /**
@@ -406,7 +406,7 @@ module rf {
                 this._output.endian = this.endian;
                 this._output.clear();
                 if (evt) {
-                    this.simpleDispatch(EventX.ERROR, evt);
+                    this.simpleDispatch(EventT.ERROR, evt);
                 }
             }
         }
