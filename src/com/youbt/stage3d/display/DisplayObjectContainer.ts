@@ -172,13 +172,6 @@ module rf{
 
 
 
-        checkmouse(dx: number, dy: number,scale:number): DisplayObject {
-            if(this.states & DChange.ac){
-                this.updateHitArea()
-            }
-
-
-            return undefined;
-        }
+        
     }
 }

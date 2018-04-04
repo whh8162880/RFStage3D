@@ -217,7 +217,7 @@
 
          private render3(){
             let camera = ROOT.camera2D;
-            if(camera._change) camera.updateSceneTransform();  //更新下摄像机
+            if(camera.states & DChange.trasnform) camera.updateSceneTransform();  //更新下摄像机
             let c = context3D;
             let v = c.createVertexBuffer(this.vertexInfo);  //创建顶点数据
             let i = c.getIndexByQuad(1);                    //创建索引数据

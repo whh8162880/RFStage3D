@@ -3,6 +3,8 @@ module rf {
     export var ROOT: Stage3D;
 
     export interface IMouse {
+        mouseEnabled?:boolean,
+        mouseChildren?:boolean,
         checkmouse?(dx: number, dy: number,scale:number): DisplayObject
     }
 
@@ -40,25 +42,25 @@ module rf {
             this.left = this.right = this.top = this.bottom = this.front = this.back = 0;
         }
 
-        combine(hitArea:HitArea):boolean{
+        combine(hitArea:HitArea,x:number,y:number):boolean{
             let b = false;
-            if(this.left > hitArea.left){
-                this.left = hitArea.left;
+            if(this.left > hitArea.left+x){
+                this.left = hitArea.left+x;
                 b = true;
             }
 
-            if(this.right < hitArea.right){
-                this.right = hitArea.right;
+            if(this.right < hitArea.right+x){
+                this.right = hitArea.right+x;
                 b = true;
             }
 
-            if(this.top > hitArea.top){
-                this.top = hitArea.top;
+            if(this.top > hitArea.top+y){
+                this.top = hitArea.top+y;
                 b = true;
             }
 
-            if(this.bottom < hitArea.bottom){
-                this.bottom = hitArea.bottom;
+            if(this.bottom < hitArea.bottom+y){
+                this.bottom = hitArea.bottom+y;
                 b = true;
             }
 
@@ -87,8 +89,8 @@ module rf {
             if (this.top > y) {
                 this.top = y;
                 b = true;
-            } else if (this.top < y) {
-                this.top = y;
+            } else if (this.bottom < y) {
+                this.bottom = y;
                 b = true;
             }
 
@@ -103,10 +105,10 @@ module rf {
             return b;
         }
         checkIn(x: number, y: number, scale: number = 1): boolean {
-            if (x < this.left * scale && x > this.right * scale && y < this.top * scale && y > this.bottom * scale) {
-                return false;
+            if (x > this.left * scale && x < this.right * scale && y > this.top * scale && y < this.bottom * scale) {
+                return true;
             }
-            return true;
+            return false;
         }
         public toString(): string {
             return `HitArea left:${this.left} right:${this.right} top:${this.top} bottom:${this.bottom} front:${this.front} back:${this.back}`
@@ -115,6 +117,8 @@ module rf {
 
     export class DisplayObject extends MiniDispatcher implements IMouse {
         hitArea: HitArea;
+        mouseEnabled:boolean;
+        mouseChildren:boolean;
         public transformComponents: Vector3D[];
         public pos: Vector3D;
         public rot: Vector3D;
@@ -524,16 +528,15 @@ module rf {
             return bool;
         }
 
-        public updateHitArea():void{}
+        public updateHitArea():void{
+            this.states &= ~DChange.ac;
+        }
 
         checkmouse(dx: number, dy: number,scale:number): DisplayObject {
             let area = this.hitArea;
             if (undefined == area) {
                 return undefined;
             }
-
-            dx -= this._x;
-            dy -= this._y;
             if(area.checkIn(dx, dy, this._scaleX * scale) == true){
                 return this;
             }

@@ -24,6 +24,8 @@ module rf {
             this.hitArea = new HitArea();
             this.source = source ? source : componentSource;
             this.variables = variables ? variables : vertex_ui_variable;
+            this.mouseChildren = true;
+            this.mouseEnabled = true;
         }
 
         get graphics(): Graphics {
@@ -74,12 +76,53 @@ module rf {
                 if(child.states & DChange.ac){
                     child.updateHitArea();
                 }
-                hitArea.combine(child.hitArea);
+                hitArea.combine(child.hitArea,child._x,child._y);
             }
 
             if(this.$graphics){
-                hitArea.combine(this.$graphics.hitArea);
+                hitArea.combine(this.$graphics.hitArea,0,0);
             }
+            
+            this.states &= ~DChange.ac;
+        }
+
+        checkmouse(dx: number, dy: number,scale:number): DisplayObject {
+            if(this.mouseEnabled == false && this.mouseChildren == false){
+                return undefined
+            }
+
+            if(this.states & DChange.ac){
+                this.updateHitArea()
+            }
+
+            dx -= this._x;
+            dy -= this._y;
+            scale *= this._scaleX;
+            
+            if(this.hitArea.checkIn(dx,dy,scale) == true){
+                if(this.mouseChildren){
+                    let children = this.childrens;
+                    let len = children.length;
+                    for(let i = len - 1;i>=0;i--){
+                        let child = children[i];
+                        let d = child.checkmouse(dx,dy,scale);
+                        if(undefined != d){
+                            return d;
+                        }
+                    }
+                }
+                if(this.mouseEnabled){
+                    let g = this.$graphics;
+                    if(undefined != g){
+                        if( g.hitArea.checkIn(dx,dy,scale) == true ){
+                            return this;
+                        }
+                    }
+                }
+            }
+
+
+            return undefined;
         }
     }
 
@@ -153,7 +196,7 @@ module rf {
                 change |= DChange.vertex;
             }
 
-            if(target.hitArea.combine(this.hitArea)){
+            if(target.hitArea.combine(this.hitArea,0,0)){
                 change |= DChange.area;
             }
                 

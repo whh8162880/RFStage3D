@@ -5,14 +5,17 @@ module rf{
 
         static names: string[] = ["webgl", "experimental-webgl", "webkit-3d", "moz-webgl"];
 
-        public canvas:HTMLCanvasElement;
+        canvas:HTMLCanvasElement;
 
-        public camera2D:Camera2D
+        camera2D:Camera2D;
+
+        mouse:Mouse
 
         constructor(){
             super();
             this.camera2D = new Camera2D();
             this.renderer = new BatchRenderer(this);
+            this.mouse = new Mouse();
             this.stage = this;
         }
 
@@ -38,8 +41,8 @@ module rf{
             context3D = singleton(Context3D);
 
             canvas.addEventListener('webglcontextlost',this.webglContextLostHandler);
-            canvas.addEventListener("webglcontextrestored",this.webglContextRestoredHandler)
-
+            canvas.addEventListener("webglcontextrestored",this.webglContextRestoredHandler);
+            this.mouse.init();
             this.simpleDispatch(EventX.CONTEXT3D_CREATE,gl);
             return true;
         }
