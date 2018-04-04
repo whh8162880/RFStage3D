@@ -25,7 +25,7 @@ module rf{
             let now = engineNow;
             if(this.preMouseTime != now){
                 this.preMouseTime = now;
-                d = ROOT.getMouseTarget(e.clientX,e.clientY,1)
+                d = ROOT.getObjectByPoint(e.clientX,e.clientY,1)
             }else{
                 d = this.preTarget;
             }
@@ -58,7 +58,7 @@ module rf{
             if(this.preMoveTime == engineNow){
                 return;
             }
-            let d = ROOT.getMouseTarget(e.clientX,e.clientY,1);
+            let d = ROOT.getObjectByPoint(e.clientX,e.clientY,1);
             if(undefined != d){
                 d.simpleDispatch(MouseEventX.MouseMove,e,true)
             }

@@ -5,7 +5,7 @@ module rf {
     export interface IMouse {
         mouseEnabled?:boolean,
         mouseChildren?:boolean,
-        getMouseTarget?(dx: number, dy: number,scale:number): DisplayObject
+        getObjectByPoint?(dx: number, dy: number,scale:number): DisplayObject
     }
 
     export enum DChange {
@@ -532,7 +532,7 @@ module rf {
             this.states &= ~DChange.ac;
         }
 
-        getMouseTarget(dx: number, dy: number,scale:number): DisplayObject {
+        getObjectByPoint(dx: number, dy: number,scale:number): DisplayObject {
             let area = this.hitArea;
             if (undefined == area) {
                 return undefined;
