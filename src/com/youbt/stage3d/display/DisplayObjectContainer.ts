@@ -6,22 +6,14 @@ module rf{
             this.childrens = [];
         }
 
-        protected _childrenChange:boolean = false;
-
-        setChange(value: number,p:boolean = false,c:boolean = false): void {
+        setChange(value: number,p:number = 0,c:boolean = false): void {
             if(true == c){
-                this._childrenChange = p;
+                this.states |= p;
                 if(this.parent){
                     this.parent.setChange(value,p,true);
                 }
             }else{
                 super.setChange(value);
-            }
-        }
-        public childrenChange(){
-            this._childrenChange = true;
-            if(undefined != this.parent){
-                this.parent.childrenChange()
             }
         }
 
@@ -39,7 +31,7 @@ module rf{
             this.childrens.push(child);
             child.parent = this;
             //需要更新Transform
-            child.setChange(DChange.base_all | DChange.vertex)
+            child.setChange(DChange.base | DChange.vertex)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -63,7 +55,7 @@ module rf{
 
             child.parent = this;
             //需要更新Transform
-            child.setChange(DChange.base_all | DChange.vertex)
+            child.setChange(DChange.base | DChange.vertex)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -123,7 +115,8 @@ module rf{
          * 讲真  这块更新逻辑还没有到最优化的结果 判断不会写了
          */
 		public updateTransform():void{
-            if(this._change & DChange.trasnform){
+            let states = this.states;
+            if(states & DChange.trasnform){
                 //如果自己的transform发生了变化
                 //  step1 : 更新自己的transform
                 //  step2 : 全部子集都要更新sceneTransform;
@@ -131,28 +124,28 @@ module rf{
                 this.updateSceneTransform();
             }
 
-            if(this._change & DChange.alpha){
+            if(states & DChange.alpha){
                 this.updateAlpha(this.parent.sceneAlpha);
             }
 
-            if(true == this._childrenChange){
+            if(states & DChange.ct){
                 for(let child of this.childrens){
                     if(child instanceof DisplayObjectContainer){
-                        if(child._change || child._childrenChange){
+                        if(child.states & DChange.t_all){
                             child.updateTransform();
                         }
                     }else{
-                        if(child._change | DChange.trasnform){
+                        if(child.states & DChange.trasnform){
                             child.updateTransform();
                             child.updateSceneTransform(this.sceneTransform);
                         }
 
-                        if(child._change | DChange.alpha){
+                        if(child.states & DChange.alpha){
                             child.updateAlpha(this.sceneAlpha);
                         }
                     }
                 }
-                this._childrenChange = false;
+                this.states &= ~DChange.ct;
             }
         }
         
@@ -161,7 +154,7 @@ module rf{
             this.sceneTransform.copyFrom(this.transform);
             if (this.parent) this.sceneTransform.append(this.parent.sceneTransform);
             for(let child of this.childrens){
-                if( (child._change & DChange.trasnform) != 0){
+                if( (child.states & DChange.trasnform) != 0){
                     //这里不更新其transform 是因为后续有人来让其更新
                     child.updateSceneTransform(this.sceneTransform);
                 }
@@ -174,7 +167,18 @@ module rf{
             for(let child of this.childrens){
                 child.updateAlpha(this.sceneAlpha);
             }
-            this._change &= ~DChange.alpha;
+            this.states &= ~DChange.alpha;
+        }
+
+
+
+        checkmouse(dx: number, dy: number,scale:number): DisplayObject {
+            if(this.states & DChange.ac){
+                this.updateHitArea()
+            }
+
+
+            return undefined;
         }
     }
 }

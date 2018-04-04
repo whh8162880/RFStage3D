@@ -4,61 +4,7 @@ module rf {
     export interface I3DRender extends IRecyclable {
         render?(camera: Camera, now: number, interval: number,target?:Sprite): void
     }
-    export class HitArea {
-        left: number = 0;
-        right: number = 0;
-        top: number = 0;
-        bottom: number = 0;
-        front: number = 0;
-        back: number = 0;
-
-        public updateArea(x: number, y: number, z: number): boolean {
-            let b: boolean = false;
-            if (this.left < x) {
-                this.left = x;
-                b = true;
-            } else if (this.right > x) {
-                this.right = x;
-                b = true;
-            }
-
-            if (this.top < y) {
-                this.top = y;
-                b = true;
-            } else if (this.top > y) {
-                this.top = y;
-                b = true;
-            }
-
-            if (this.front < z) {
-                this.front = z;
-                b = true;
-            } else if (this.back > z) {
-                this.back = z;
-                b = true;
-            }
-
-            return b;
-        }
-
-
-        public checkIn(x: number, y: number, scale: number = 1): boolean {
-            if (x < this.left * scale && x > this.right * scale && y < this.top * scale && y > this.bottom * scale) {
-                return false;
-            }
-            return true;
-        }
-
-
-
-
-        public toString(): string {
-            return `HitArea left:${this.left} right:${this.right} top:${this.top} bottom:${this.bottom} front:${this.front} back:${this.back}`
-        }
-    }
-
     export class Sprite extends DisplayObjectContainer implements I3DRender {
-        hitArea: HitArea;
         source:BitmapSource;
         variables:{ [key: string]: { size: number, offset: number } };
         /**
@@ -78,8 +24,6 @@ module rf {
             this.hitArea = new HitArea();
             this.source = source ? source : componentSource;
             this.variables = variables ? variables : vertex_ui_variable;
-            // let g = this.graphics;
-            // g.drawRect(0,0,100,100,0xFF0000);
         }
 
         get graphics(): Graphics {
@@ -89,10 +33,9 @@ module rf {
             return this.$graphics;
         }
 
-        setChange(value: number,p:boolean = false,c:boolean = false): void {
+        setChange(value: number,p:number = 0,c:boolean = false): void {
             if(undefined != this.renderer){
-                this._change |= value;
-                this._childrenChange = p && c;
+                this.states |= (value | p);
             }else{
                 super.setChange(value,p,c);
             }
@@ -100,13 +43,10 @@ module rf {
 
         render(camera: Camera, now: number, interval: number): void {
             if (undefined != this.renderer) {
-
-                if(true == this._childrenChange){
+                if(this.states & DChange.t_all){ //如果本层或者下层有transform alpha 改编 那就进入updateTransform吧
                     this.updateTransform();
                 }
-
                 this.renderer.render(camera, now, interval);
-
             }
         }
 
@@ -124,6 +64,21 @@ module rf {
             if(g && g.numVertices > 0){
                 g.clear();
                 g.end();
+            }
+        }
+
+        public updateHitArea():void{
+            let hitArea = this.hitArea;
+            hitArea.clean();
+            for(let child of this.childrens){
+                if(child.states & DChange.ac){
+                    child.updateHitArea();
+                }
+                hitArea.combine(child.hitArea);
+            }
+
+            if(this.$graphics){
+                hitArea.combine(this.$graphics.hitArea);
             }
         }
     }
@@ -169,45 +124,40 @@ module rf {
     export class Graphics {
         target: Sprite;
         byte: Float32Byte;
+        hitArea:HitArea;
         numVertices: number = 0;
         variables: { [key: string]: { size: number, offset: number } } = undefined;
         $batchOffset: number = 0;
-        private 
-        preNumVertices:number = 0;
+        private preNumVertices:number = 0;
         constructor(target: Sprite,variables: { [key: string]: { size: number, offset: number } }) {
             this.target = target;
             this.variables = variables;
             this.byte = new Float32Byte(new Float32Array(0));
             this.numVertices = 0;
-        }
-
-        // private addPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
-        //     this.numVertices++;
-        //     this.byte.wUIPoint(position, x, y, z, 0, 0, 0, r, g, b, a);
-        //     this.target.hitArea.updateArea(x, y, z);
-        // }
-        
-        private addPro(i:number,p:string,desc:{size:number,offset:number},x: number, y?: number, z?: number, w?: number):void{
-            if(p == VA.pos){
-                this.numVertices++;
-                this.target.hitArea.updateArea(x,y,z);
-            }
-            
+            this.hitArea = new HitArea();
         }
 
         clear(): void {
             this.preNumVertices = this.numVertices;
             this.numVertices = 0;
+            this.hitArea.clean();
         }
 
         end(): void {
             let target = this.target;
+            let change = 0;
             if(target.$batchGeometry && this.numVertices > 0 && this.preNumVertices == this.numVertices){
                 this.preNumVertices = 0;
                 target.$batchGeometry.update(this.$batchOffset,this.byte);
             }else{
-                target.setChange(DChange.vertex);
+                change |= DChange.vertex;
             }
+
+            if(target.hitArea.combine(this.hitArea)){
+                change |= DChange.area;
+            }
+                
+            target.setChange(change);
         }
 
         drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, matrix:Float32Array = undefined,z: number = 0): void {
@@ -236,7 +186,7 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.target.hitArea.updateArea(p.x,p.y,z);
+                this.hitArea.updateArea(p.x,p.y,z);
                 byte.wPoint3(dp+pos.offset,p.x,p.y,z)
 
                 if(undefined != normal){
@@ -286,7 +236,7 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.target.hitArea.updateArea(p.x,p.y,z);
+                this.hitArea.updateArea(p.x,p.y,z);
                 byte.wPoint3(dp+pos.offset,p.x,p.y,z)
 
                 if(undefined != normal){
@@ -373,7 +323,7 @@ module rf {
             this.t = t;
 
 
-            if (target._change & DChange.vertex) {
+            if (target.states & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
                 this.getBatchTargets(target, -target._x, -target._y, 1 / target._scaleX);
@@ -381,11 +331,11 @@ module rf {
                 this.toBatch();
 
                 this.geo = undefined;
-                target._change &= ~DChange.vextex_all;
-            }else if(target._change & DChange.vcdata){
+                target.states &= ~DChange.batch;
+            }else if(target.states & DChange.vcdata){
                 //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
                 this.updateVCData(target, -target._x, -target._y, 1 / target._scaleX);
-                target._change &= ~DChange.vcdata;
+                target.states &= ~DChange.vcdata;
             }
 
             if (undefined == this.program) {
