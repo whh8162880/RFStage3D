@@ -27,9 +27,15 @@ module rf{
 
 
             let bmd = componentSource.bmd.canvas;
-            canvas.id = "component";
-            let div = document.getElementById("game");
-            div.appendChild(bmd);
+            let style = bmd.style;
+            style.position="fixed";
+            style.left = "500px";
+            style.top = "0px";
+            document.body.appendChild(bmd);
+            // canvas.id = "component";
+
+            // let div = document.getElementById("game");
+            // div.appendChild(bmd);
             // canvas.style="position:absolutly;left:100px;top:100px";
             // 
 
@@ -78,34 +84,39 @@ module rf{
             
 
             let t = new TextField();
+            t.init();
             t.html = true;
             t.x = 100;
             t.y = 100;
+            let format = t.format;
+            // format.oy = 0;
             // t.w = 200;
             // t.wordWrap = true;
 
-            t.format = new TextFormat();
-            t.format.size = 30;
-            t.format.oy = 3;
+            // t.format = new TextFormat();
+            // t.format.size = 30;
+            // t.format.oy = 3;
             // t.format.italic = "italic";
             // t.format.bold = "bold";
             // t.format.gradient = [{color: 0xffff00}];
             // t.format.gradient = [{color: 0xff0000, percent: 0}, {color: 0x00ff00, percent: 1}];
             // t.format.stroke = {size: 2, color: 0x556600};
             // t.format.shadow = {color: 0xffffff, blur: 4, offsetX: 10, offsetY: 10};
-            t.format.init();
+            // t.format.init();
 
             // t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
             // t.text = "你好啊\n这是一个HTMLTEXT";
-
-            // 测试代码：document.body.appendChild(aaa.source.bmd.canvas);
-            window["aaa"] = t;
-
+            
             ROOT.addChild(t);
 
-            Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
-                t.text =`<font size="12">fps:<font color="#00FF00">${Engine.fps}</font></font>`
-            });
+            format.size = 12;
+            format.init();
+
+            t.text = "FPS:60"
+
+            // Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
+            //     t.text =`<font size="12">fps:<font color="#00FF00">${Engine.fps}</font></font>`
+            // });
         }
 
         public linktest():void{
@@ -328,9 +339,5 @@ module rf{
             }
             console.log("time::"+(getTimer() - n));
         }
-
     }
 }
-
-
-let m =new rf.Main();

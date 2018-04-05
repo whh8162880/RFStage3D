@@ -102,9 +102,10 @@ function buildHtml(config) {
         outDir= ts.compilerOptions.outDir;
         files = getCompileFiles(path,ts.compilerOptions.rootDir,ts.include,ts.exclude);
     }else{
-        outDir = ts.compilerOptions.outFile;
-        files = [outDir];
-        outDir = outDir.slice(0,outDir.lastIndexOf("/"));
+        // outDir = ts.compilerOptions.outFile;
+        // files = [outDir];
+        // outDir = outDir.slice(0,outDir.lastIndexOf("/"));
+        return;
     }
 
     

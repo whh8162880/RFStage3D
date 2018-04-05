@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="renderer" content="webkit">
+    <meta name="viewport" content="width=device-width,initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="full-screen" content="true" />
+    <meta name="screen-orientation" content="portrait" />
+    <meta name="x5-fullscreen" content="true" />
+    <meta name="360-fullscreen" content="true" />
+    <style type="text/css" id="main_style">
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            overflow: hidden;
+        }
+
+        html,
+        body {
+            height: 100%;
+            font: 700/1.5 "微软雅黑", serif;
+            background-color: #ffffff;
+            overflow-y: hidden;
+        }
+
+        .center {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+        }
+
+        /* basic style */
+
+        .close {
+            /* still bad on picking color */
+            background: orange;
+            color: red;
+            /* make a round button */
+            /* border: 15px; */
+            border-radius: 12px;
+            /* center text */
+            line-height: 16px;
+            text-align: center;
+            height: 16px;
+            width: 16px;
+            font-size: 18px;
+            padding: 1px;
+            top: -8px;
+            right: -8px;
+            position: absolute;
+        }
+        /* use cross as close button */
+        .close::before {
+            content: "\2716";
+            color:#ffffff
+        }
+        /* place the button on top-right */
+    </style>
+
+    <script>
+        function main() {
+            var canvas, context
+            // canvas = document.getElementById("main")
+            canvas = document.createElement("canvas");
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            context = canvas.getContext("2d");
+            context.fillStyle = "rgba(255,200,255,255)";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            document.body.appendChild(canvas);
+
+
+            canvas = document.createElement("canvas");
+            canvas.width = 100;
+            canvas.height = 100;
+            context = canvas.getContext("2d");
+            context.fillStyle = "rgba(255,0,0,255)";
+            context.fillRect(0, 0, canvas.width, canvas.height);
+
+            var cw = canvas.width + 10;
+            var ch = canvas.height + 10;
+            var div = document.getElementById("game");
+            var style = div.style;
+            style.position = "fixed";
+            style.width = cw +"px";
+            style.height = ch+"px";
+            style.left = ((window.innerWidth -  cw) >> 1) + "px";
+            style.top = ((window.innerHeight - ch) >> 1) + "px";
+
+           
+
+            // div.appendChild(canvas);
+            var span = document.getElementById("closeBtn")
+
+            div.insertBefore(canvas, span)
+
+            style = canvas.style;
+            style.position = "absolute";
+            style.left = "5px";
+            style.top = "5px";
+
+
+
+
+
+
+        }
+    </script>
+</head>
+
+<body onload="main()">
+    <!-- <canvas width="100%" height="100%" id="main"> </canvas> -->
+    <div id="game" style="border: 1px solid rgb(255, 255, 255);">
+        <span id="closeBtn" class="close"></span>
+    </div>
+</body>
+
+</html>

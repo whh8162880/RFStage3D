@@ -1,6 +1,6 @@
 
 namespace rf {
-    interface ICapabilities {
+    export interface ICapabilities {
         /** 浏览器的平台 */
         readonly platform: string;
         /** 用户代理信息 */

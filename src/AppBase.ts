@@ -11,6 +11,7 @@ module rf {
 
 
         init(canvas?:HTMLCanvasElement):void{
+           
             if(undefined == canvas){
                 canvas = document.createElement("canvas");
                 document.body.appendChild(canvas);
@@ -47,5 +48,4 @@ module rf {
         }
 
     }
-
 }

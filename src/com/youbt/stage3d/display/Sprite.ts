@@ -578,7 +578,7 @@ module rf {
     }
 
 
-    class BatchGeometry implements I3DRender, IGeometry {
+    export class BatchGeometry implements I3DRender, IGeometry {
         vertex: VertexInfo;
         $vertexBuffer: VertexBuffer3D;
         quadcount: number;

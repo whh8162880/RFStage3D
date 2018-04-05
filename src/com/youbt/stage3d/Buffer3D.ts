@@ -20,7 +20,7 @@ module rf {
         ui = "ui"
     }
 
-    class Buffer3D implements IRecyclable {
+    export class Buffer3D implements IRecyclable {
         preusetime: number = 0;
         readly: boolean = false;
         constructor() { }

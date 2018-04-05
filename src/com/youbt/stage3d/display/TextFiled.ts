@@ -5,7 +5,7 @@ module rf {
 
     export class TextFormat {
         family: string = "微软雅黑";
-        oy: number = 2;
+        // oy: number = 2;
         size: number = 12;
         // "bold " : "normal "
         bold: string = "normal";
@@ -28,7 +28,7 @@ module rf {
             //设置字体
             context.font = this.font;
             out.x = context.measureText(text).width;
-            out.y = size + this.oy;
+            out.y = size;
 
             if (this.stroke) {
                 out.x += this.stroke.size * 2;
@@ -42,7 +42,7 @@ module rf {
         }
         draw(context: CanvasRenderingContext2D, text: string, s: Size): void {
             const { x, y, w, h } = s;
-            const { oy, family, size, bold, italic, stroke, shadow, gradient } = this;
+            const { family, size, bold, italic, stroke, shadow, gradient } = this;
             //设置字体
             context.font = this.font;
 
@@ -77,10 +77,10 @@ module rf {
             if (stroke) {
 				context.strokeStyle = this.getColorStr(stroke.color || 0);
 				context.lineWidth = stroke.size * 2;
-                context.strokeText(text, x, y + h - oy, w);
+                context.strokeText(text, x, y + h, w);
             }
 
-            context.fillText(text, x, y + h - oy, w);
+            context.fillText(text, x, y + h, w);
         }
 
         private getColorStr(color: number): string {
@@ -100,7 +100,7 @@ module rf {
             format.shadow = this.shadow;
             format.gradient = this.gradient;
             format.font = this.font;
-            format.oy = this.oy;
+            // format.oy = this.oy;
             return format;
         }
     }
@@ -430,7 +430,7 @@ module rf {
         }
     }
 
-    class HtmlElement {
+    export class HtmlElement {
 		/**
 		 * 是否需要换行 
 		 */
@@ -842,7 +842,7 @@ module rf {
     }
 
 
-    class Char implements IRecyclable {
+    export class Char implements IRecyclable {
         index: number;
         name: string;
         ox: number = 0;
@@ -860,7 +860,7 @@ module rf {
 
     }
 
-    class Line {
+    export class Line {
         w: number = 0;
         h: number = 0;
         chars: Recyclable<Char>[] = [];
