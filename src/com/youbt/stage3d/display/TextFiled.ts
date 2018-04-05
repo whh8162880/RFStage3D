@@ -5,7 +5,7 @@ module rf {
 
     export class TextFormat {
         family: string = "微软雅黑";
-        // oy: number = 2;
+        oy: number = 0.25;
         size: number = 12;
         // "bold " : "normal "
         bold: string = "normal";
@@ -20,6 +20,7 @@ module rf {
 
         font: string;
         init(): TextFormat {
+            this.oy = 0.25 * this.size;
             this.font = `${this.bold} ${this.italic} ${this.size}px ${this.family}`
             return this;
         }
@@ -27,8 +28,8 @@ module rf {
             const { family, size, bold, italic } = this;
             //设置字体
             context.font = this.font;
-            out.x = context.measureText(text).width;
-            out.y = size;
+            out.x = context.measureText(text).width + 1;
+            out.y = size + this.oy;
 
             if (this.stroke) {
                 out.x += this.stroke.size * 2;
@@ -42,7 +43,7 @@ module rf {
         }
         draw(context: CanvasRenderingContext2D, text: string, s: Size): void {
             const { x, y, w, h } = s;
-            const { family, size, bold, italic, stroke, shadow, gradient } = this;
+            const {oy, family, size, bold, italic, stroke, shadow, gradient } = this;
             //设置字体
             context.font = this.font;
 
@@ -80,7 +81,7 @@ module rf {
                 context.strokeText(text, x, y + h, w);
             }
 
-            context.fillText(text, x, y + h, w);
+            context.fillText(text, x, y + h - oy, w);
         }
 
         private getColorStr(color: number): string {
@@ -491,6 +492,10 @@ module rf {
 
             this.next = null;
             this.pre = null;
+            this.str = undefined;
+            this.color = 0;
+            this.image = undefined;
+            this.imageTag = undefined;
         }
     }
 

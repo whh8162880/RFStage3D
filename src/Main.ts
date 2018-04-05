@@ -112,7 +112,9 @@ module rf{
             format.size = 12;
             format.init();
 
-            t.text = "FPS:60"
+            // t.text = "FPS:60";
+            t.text = "fps:60";
+            t.text = "abc";
 
             // Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
             //     t.text =`<font size="12">fps:<font color="#00FF00">${Engine.fps}</font></font>`
