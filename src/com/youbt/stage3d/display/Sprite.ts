@@ -183,6 +183,7 @@ module rf {
         clear(): void {
             this.preNumVertices = this.numVertices;
             this.numVertices = 0;
+            this.byte.length = 0;
             this.hitArea.clean();
         }
 
@@ -577,7 +578,7 @@ module rf {
     }
 
 
-    class BatchGeometry implements I3DRender, IGeometry {
+    export class BatchGeometry implements I3DRender, IGeometry {
         vertex: VertexInfo;
         $vertexBuffer: VertexBuffer3D;
         quadcount: number;

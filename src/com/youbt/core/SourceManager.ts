@@ -45,7 +45,7 @@ module rf{
             vo.w = vo.rw = w;
             vo.h = vo.rh = h;
             vo.source = this.source;
-            frames[name] = vo;
+            this.frames[name] = vo;
             return vo;
         }
 

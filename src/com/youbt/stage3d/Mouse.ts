@@ -10,9 +10,10 @@ module rf{
 
             canvas.onmousemove = this.mouseMoveHandler;
 
-            ROOT.addEventListener(MouseEventX.MouseDown,function (e:EventX):void{
-                console.log(e);
-            })
+            canvas.ontouchstart = this.touchHandler;
+            canvas.ontouchmove = this.touchHandler;
+            canvas.ontouchend = this.touchHandler;
+            canvas.ontouchcancel = this.touchHandler;
         }
 
         preMouseTime:number;
@@ -44,16 +45,12 @@ module rf{
                     }
                     return;
                 }
-                
-
                 d.simpleDispatch(e.type,e,true);
-
-
-                
             }
         }
 
-
+        preRolled:DisplayObject;
+		preMouseMoveTime:number;
         mouseMoveHandler(e:MouseEvent):void{
             if(this.preMoveTime == engineNow){
                 return;
@@ -62,6 +59,12 @@ module rf{
             if(undefined != d){
                 d.simpleDispatch(MouseEventX.MouseMove,e,true)
             }
+        }
+
+
+
+        touchHandler(e:TouchEvent):void{
+            console.log(e);
         }
     }
 }

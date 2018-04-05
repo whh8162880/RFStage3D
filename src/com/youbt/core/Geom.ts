@@ -221,7 +221,10 @@ module rf {
             }
             let nd = new Float32Array(value);
             let len = value < this.array.length ? value : this.array.length;
-            nd.set(this.array.slice(0, len), 0);
+            if(len != 0){
+                // nd.set(this.array.slice(0, len), 0);
+                nd.set(this.array);
+            }
             this.array = nd;
         }
 
