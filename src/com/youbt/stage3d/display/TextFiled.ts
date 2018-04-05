@@ -108,6 +108,13 @@ module rf {
 
     let defalue_format = new TextFormat().init();
 
+
+    /**
+     * 优化计划
+     * 1. textformat.oy 这东西不应该存在 他的作用主要是用于修正微软雅黑取jqpy等下标超界值。 需要研究 如何取获得 渲染文字的定义。上标 下标等渲染值。
+     * 2. set text: 现在只要set text就会触发计算 绘制 渲染操作 如果后期一帧内频繁修改text可能会卡。所以应该换成1帧最多渲染1次的策略。
+     */
+
     export class TextField extends Sprite {
         html: boolean = false;
         $text: string = "";
