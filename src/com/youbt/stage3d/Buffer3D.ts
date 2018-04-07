@@ -370,12 +370,14 @@ module rf {
              */
             
             g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
-            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
-            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE); //UV（ST）坐标
-            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE); //UV（ST）坐标
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
 
             g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE,data);  
             g.bindTexture(g.TEXTURE_2D, null);
+
+            this.readly = true;
             return true;
         }
 
@@ -383,10 +385,25 @@ module rf {
             if (false == this.readly) {
                 this.awaken();
             }
-            gl.activeTexture(gl["TEXTURE"+index]);
-            gl.bindTexture(gl.TEXTURE_2D, this.texture);
-            var index_tex = gl.getUniformLocation(program.program, variable);
-            gl.uniform1i(index_tex, index);
+
+			let uniforms = program.uniforms;
+			let g = gl;
+            var index_tex;
+            
+            g.activeTexture(gl["TEXTURE"+index]);
+            g.bindTexture(g.TEXTURE_2D, this.texture);
+			if(true == uniforms.hasOwnProperty(variable)){
+				index_tex = uniforms[variable];
+			}else{
+				index_tex = g.getUniformLocation(program.program, variable);
+				uniforms[variable] = index_tex;
+			}
+            
+            // var index_tex = gl.getUniformLocation(program.program, variable);
+            if(undefined != index_tex){
+                g.uniform1i(index_tex, index);
+            }
+            
         }
 
         onRecycle():void{

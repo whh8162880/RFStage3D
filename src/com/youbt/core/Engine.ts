@@ -43,7 +43,7 @@ namespace rf {
 
 		private static ticklink: Link = new Link();
 		private static resizeLink: Link = new Link();
-		private static _frameRate: number = 30;
+		private static _frameRate: number = 60;
 		private static _nextProfileTime: number = 0;
 		private static _fpsCount: number = 0;
 		private static _codeTime: number = 0;
@@ -85,8 +85,8 @@ namespace rf {
 			window.onresize = function () {
 				isWindowResized = true;
 			};
-			stageWidth = window.innerWidth;
-			stageHeight = window.innerHeight;
+			stageWidth = window.innerWidth * pixelRatio;
+			stageHeight = window.innerHeight * pixelRatio;
 
 			//窗口最大化最小化监听
 			var hidden, state, visibilityChange;
@@ -165,8 +165,8 @@ namespace rf {
 		public static update(now: number, interval: number): void {
 			if (isWindowResized) {
 				isWindowResized = false;
-				stageWidth = window.innerWidth;
-				stageHeight = window.innerHeight;
+				stageWidth = window.innerWidth * pixelRatio;
+				stageHeight = window.innerHeight * pixelRatio;
 				Engine.resize(stageWidth, stageHeight);
 			}
 

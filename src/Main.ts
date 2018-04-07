@@ -29,13 +29,13 @@ module rf{
 
             var t = new TextField();
             t.init();
-            t.format.size = 14;
+            t.format.size = 30;
             t.format.init();
-            t.y = 20;
+            t.y = 40;
             ROOT.addChild(t);
 
             Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
-                let str = `fps:${Engine.fps}\ncode:${Engine.code.toFixed(2)}`
+                let str = `pixelRatio:${pixelRatio} fps:${Engine.fps} code:${Engine.code.toFixed(2)}`
                 span.innerHTML = str;
                 t.text = str;
             });

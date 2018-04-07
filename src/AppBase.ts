@@ -3,8 +3,8 @@
 module rf {
     export class AppBase implements ITickable,IResizeable{
         constructor() {
-            Engine.start();
             this.createSource();
+            Engine.start();
             ROOT = singleton(Stage3D);
             Engine.addResize(this);
         }
@@ -35,6 +35,19 @@ module rf {
             source.originU = vo.ul;
             source.originV = vo.vt;
             componentSource = source;
+
+            var getPixelRatio = function(context) {
+                var backingStore = context.backingStorePixelRatio ||
+                    context.webkitBackingStorePixelRatio ||
+                    context.mozBackingStorePixelRatio ||
+                    context.msBackingStorePixelRatio ||
+                    context.oBackingStorePixelRatio ||
+                    context.backingStorePixelRatio || 1;
+                return (window.devicePixelRatio || 1) / backingStore;
+			};
+            pixelRatio = getPixelRatio(bmd.context);
+
+            // pixelRatio = 1;
         }
 
 
