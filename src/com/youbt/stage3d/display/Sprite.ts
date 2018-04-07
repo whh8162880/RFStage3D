@@ -249,7 +249,7 @@ module rf {
 
             const uv = [originU,originV];
 
-            const noraml = [0,0,-1]
+            const noraml = [0,0,1]
             
             let r = x + width;
             let b = y + height;
@@ -322,7 +322,7 @@ module rf {
                 alpha
             ]
 
-            const noraml = [0,0,-1]
+            const noraml = [0,0,1]
 
             let f = m2dTransform;
             let p = [0,0,0];
