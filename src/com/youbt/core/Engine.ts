@@ -43,7 +43,7 @@ namespace rf {
 
 		private static ticklink: Link = new Link();
 		private static resizeLink: Link = new Link();
-		private static _frameRate: number = 60;
+		private static _frameRate: number = 30;
 		private static _nextProfileTime: number = 0;
 		private static _fpsCount: number = 0;
 		private static _codeTime: number = 0;
@@ -170,7 +170,6 @@ namespace rf {
 				Engine.resize(stageWidth, stageHeight);
 			}
 
-			//
 			let vo = Engine.ticklink.getFrist();
 			while (vo) {
 				let next = vo.next;

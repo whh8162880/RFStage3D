@@ -41,6 +41,9 @@ module rf {
         public vertexCode: string;
         public fragmentCode: string;
 
+        uniforms:Object = {};
+        attribs:Object = {};
+
 
         constructor() {
             super();
@@ -222,10 +225,17 @@ module rf {
             }
             let loc = -1;
             let g = gl;
+            let attribs = program.attribs;
+            let p = program.program;
             g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
             let variables = this.data.variables
             for (let variable in variables) {
-                loc = g.getAttribLocation(program.program, variable);
+                if(true == attribs.hasOwnProperty(variable)){
+                    loc = attribs[variable];
+                }else{
+                    loc = g.getAttribLocation(p, variable);
+                    attribs[variable] = loc;
+                }
                 if (loc < 0) {
                     continue;
                 }
@@ -359,8 +369,8 @@ module rf {
                     前者效率高单效果不好，后者效率不高单效果比较好。
              */
             
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR);
-            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
+            gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
             gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE); //UV（ST）坐标
             gl.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
 

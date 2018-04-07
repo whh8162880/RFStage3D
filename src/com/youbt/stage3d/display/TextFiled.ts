@@ -101,7 +101,7 @@ module rf {
             format.shadow = this.shadow;
             format.gradient = this.gradient;
             format.font = this.font;
-            // format.oy = this.oy;
+            format.oy = this.oy;
             return format;
         }
     }

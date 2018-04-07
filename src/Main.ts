@@ -19,19 +19,35 @@ module rf{
             Capabilities.init();
 
             
-
+            var g = undefined
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             // context3D.setDepthTest(true,gl.LEQUAL);
             context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
+            let span = document.getElementById("fps");
 
-            let bmd = componentSource.bmd.canvas;
-            let style = bmd.style;
-            style.position="fixed";
-            style.left = "500px";
-            style.top = "0px";
-            document.body.appendChild(bmd);
+            var t = new TextField();
+            t.init();
+            t.format.size = 14;
+            t.format.init();
+            t.y = 20;
+            ROOT.addChild(t);
+
+            Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
+                let str = `fps:${Engine.fps}\ncode:${Engine.code.toFixed(2)}`
+                span.innerHTML = str;
+                t.text = str;
+            });
+            
+
+
+            // let bmd = componentSource.bmd.canvas;
+            // let style = bmd.style;
+            // style.position="fixed";
+            // style.left = "500px";
+            // style.top = "0px";
+            // document.body.appendChild(bmd);
             // canvas.id = "component";
 
             // let div = document.getElementById("game");
@@ -48,7 +64,7 @@ module rf{
             // context3D.createTexture("test",bitmapData);
             // document.body.appendChild(bitmapData.canvas);
             
-            // let g = undefined
+            
             // for(let i = 0;i<1;i++){
             //     sp = new Sprite();
             //     sp.x = Math.random() * stageWidth;
@@ -61,10 +77,10 @@ module rf{
             //     ROOT.addChild(sp);
             // }
 
-            // g = ROOT.graphics;
-            // g.clear();
-            // g.drawRect(0,0,100,100,0xFF0000);
-            // g.end();
+            g = ROOT.graphics;
+            g.clear();
+            g.drawRect(0,0,100,100,0xFF0000);
+            g.end();
 
             
 
@@ -83,12 +99,11 @@ module rf{
 
             
 
-            let t = new TextField();
-            t.init();
-            t.html = true;
-            t.x = 100;
-            t.y = 100;
-            let format = t.format;
+            
+            // t.html = true;
+            // t.x = 10;
+            // t.y = 10;
+            // let format = t.format;
             // format.oy = 0;
             // t.w = 200;
             // t.wordWrap = true;
@@ -107,17 +122,16 @@ module rf{
             // t.text = "<font color='#FF0000'>你好</font>啊\n这是<font size='20'>一个<font color='#00FF00'>HTMLTEXT</font></font>";
             // t.text = "你好啊\n这是一个HTMLTEXT";
             
-            ROOT.addChild(t);
+            // ROOT.addChild(t);
 
-            format.size = 12;
-            format.init();
+            // format.size = 12;
+            // format.init();
 
             // t.text = "FPS:60";
-            t.text = "fps:60";
-            t.text = "abc";
-
+            // t.text = "fps:60";
+            // t.text = "abc";
             // Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
-            //     t.text =`<font size="12">fps:<font color="#00FF00">${Engine.fps}</font></font>`
+            //     t.text =`fps:${Engine.fps}\ncode:${Engine.code.toFixed(2)}`
             // });
         }
 
