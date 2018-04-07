@@ -20,7 +20,7 @@ module rf {
 
         font: string;
         init(): TextFormat {
-            this.oy = 0.25 * this.size;
+            this.oy = 0.25 * (this.size + 1);
             this.font = `${this.bold} ${this.italic} ${this.size}px ${this.family}`
             return this;
         }
@@ -101,7 +101,7 @@ module rf {
             format.shadow = this.shadow;
             format.gradient = this.gradient;
             format.font = this.font;
-            // format.oy = this.oy;
+            format.oy = this.oy;
             return format;
         }
     }
@@ -236,11 +236,16 @@ module rf {
             let vo = source.getSourceVO(name, 1);
             if (undefined == vo) {
                 let p = EMPTY_POINT2D;
-                let context = source.bmd.context;
+                let bmd = source.bmd;
+                let context = bmd.context;
                 format.test(context, char, p);
                 vo = source.setSourceVO(name, p.x, p.y, 1);
                 if (undefined != vo) {
                     format.draw(context, char, vo);
+                    let texture = context3D.textureObj[source.name];
+                    if(undefined != texture){
+                        texture.readly = false;
+                    }
                 }
             }
             return vo;

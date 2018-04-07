@@ -239,26 +239,44 @@ namespace rf {
 		 * @param format FLOAT_1 2 3 4
 		 */
 		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array, format: number): void {
-			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
-			if (index) {
-				gl['uniform' + format + 'fv'](index, data);;
+			let p = this.cProgram;
+			let uniforms = p.uniforms;
+			let g = gl;
+			var index;
+			if(true == uniforms.hasOwnProperty(variable)){
+				index = uniforms[variable];
+			}else{
+				index = g.getUniformLocation(p.program, variable);
+				uniforms[variable] = index;
 			}
 
+			if (undefined != index) {
+				gl['uniform' + format + 'fv'](index, data);
+			}
 		}
 
 		/**
         *  @variable must predefined in glsl
         */
 		public setProgramConstantsFromMatrix(variable: string, matrix: Matrix3D): void {
-			var index: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, variable);
-			if (index) {
-				gl.uniformMatrix4fv(index, false, matrix.rawData);
+			let p = this.cProgram;
+			let uniforms = p.uniforms;
+			let g = gl;
+			var index;
+			if(true == uniforms.hasOwnProperty(variable)){
+				index = uniforms[variable];
+			}else{
+				index = g.getUniformLocation(p.program, variable);
+				uniforms[variable] = index;
+			}
+			if (undefined != index) {
+				g.uniformMatrix4fv(index, false, matrix.rawData);
 			}
 		}
 
-		private _linkedProgram: Program3D = undefined;
+		private cProgram: Program3D = undefined;
 		public setProgram(program: Program3D): void {
-			if (program == null || program == this._linkedProgram) return;
+			if (program == null || program == this.cProgram) return;
 
 			if (false == program.readly) {
 				if (false == program.awaken()) {
@@ -267,7 +285,7 @@ namespace rf {
 				}
 			}
 
-			this._linkedProgram = program;
+			this.cProgram = program;
 			gl.useProgram(program.program);
 		}
 

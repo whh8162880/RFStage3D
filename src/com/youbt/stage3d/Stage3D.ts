@@ -63,11 +63,9 @@ module rf{
             }
             context3D.clear(0,0,0,1);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
             if(this.camera2D.states){
                 this.camera2D.updateSceneTransform();
             }
-
             this.render(this.camera2D,now,interval);
         }
         

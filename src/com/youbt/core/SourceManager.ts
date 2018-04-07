@@ -97,7 +97,7 @@ module rf{
         getEmptyArea(name:string,sw:number,sh:number):BitmapSourceVO{
             let rect = this.maxRect.insert(sw,sh);
             let vo;
-            if(rect.width != 0){
+            if(rect.w != 0){
                 vo = this.getArea(name,rect.x+this.l,rect.y+this.t,sw,sh);
             }else{
                 vo = this.getUnusedArea(name,sw,sh);

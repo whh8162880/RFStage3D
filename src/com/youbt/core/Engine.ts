@@ -85,8 +85,8 @@ namespace rf {
 			window.onresize = function () {
 				isWindowResized = true;
 			};
-			stageWidth = window.innerWidth;
-			stageHeight = window.innerHeight;
+			stageWidth = window.innerWidth * pixelRatio;
+			stageHeight = window.innerHeight * pixelRatio;
 
 			//窗口最大化最小化监听
 			var hidden, state, visibilityChange;
@@ -165,12 +165,11 @@ namespace rf {
 		public static update(now: number, interval: number): void {
 			if (isWindowResized) {
 				isWindowResized = false;
-				stageWidth = window.innerWidth;
-				stageHeight = window.innerHeight;
+				stageWidth = window.innerWidth * pixelRatio;
+				stageHeight = window.innerHeight * pixelRatio;
 				Engine.resize(stageWidth, stageHeight);
 			}
 
-			//
 			let vo = Engine.ticklink.getFrist();
 			while (vo) {
 				let next = vo.next;

@@ -103,17 +103,17 @@ module rf {
      * @extends {Size}
      */
     export class Rect extends Point {
-        public width: number = 0;
-        public height: number = 0;
-        constructor(x: number = 0, y: number = 0, width: number = 0, height: number = 0) {
+        public w: number = 0;
+        public h: number = 0;
+        constructor(x: number = 0, y: number = 0, w: number = 0, h: number = 0) {
             super(x, y);
-            this.width = width;
-            this.height = height;
+            this.w = w;
+            this.h = h;
         }
 
 
         public clone(): Rect {
-            return new Rect(this.x, this.y, this.width, this.height);
+            return new Rect(this.x, this.y, this.w, this.h);
         }
 
     }
@@ -185,19 +185,33 @@ module rf {
     export let EMPTY_POINT2D_2 = new Point();
     export let EMPTY_POINT2D_3 = new Point();
 
-    export function m2dTransform(matrix:ArrayLike<number>,p:Point2D,out:Point2D):void{
+    // export function m2dTransform(matrix:ArrayLike<number>,p:Point2D,out:Point2D):void{
+    //     const{
+    //         m11,m12,m13,
+    //         m21,m22,m23,
+    //         m31,m32,m33
+    //     } = matrix as any;
+    //     const{
+    //         x,y
+    //     } = p;
+    //     let dx = x * m11 + y * m21 + m31;
+    //     let dy = x * m12 + y * m22 + m32;
+    //     out.x = dx;
+    //     out.y = dy;
+    // }
+
+    export function m2dTransform(matrix:ArrayLike<number>,p:number[],out:number[]):void{
         const{
             m11,m12,m13,
             m21,m22,m23,
             m31,m32,m33
         } = matrix as any;
-        const{
-            x,y
-        } = p;
+        let x = p[0];
+        let y = p[1];
         let dx = x * m11 + y * m21 + m31;
         let dy = x * m12 + y * m22 + m32;
-        out.x = dx;
-        out.y = dy;
+        out[0] = dx;
+        out[1] = dy;
     }
 
 

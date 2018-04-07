@@ -6,7 +6,7 @@ module rf {
     }
     export class Sprite extends DisplayObjectContainer implements I3DRender {
         source:BitmapSource;
-        variables:{ [key: string]: { size: number, offset: number } };
+        variables:{ [key: string]: IVariable };
         /**
          * 1.Sprite本身有render方法可以渲染
          * 2.考虑到可能会有一些需求 渲染器可以写在别的类或者方法中  所以加入renderer概念
@@ -19,7 +19,7 @@ module rf {
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
-        constructor(source:BitmapSource = undefined,variables:{ [key: string]: { size: number, offset: number } } = undefined) {
+        constructor(source:BitmapSource = undefined,variables:{ [key: string]: IVariable } = undefined) {
             super();
             this.hitArea = new HitArea();
             this.source = source ? source : componentSource;
@@ -169,13 +169,11 @@ module rf {
         byte: Float32Byte;
         hitArea:HitArea;
         numVertices: number = 0;
-        variables: { [key: string]: { size: number, offset: number } } = undefined;
         $batchOffset: number = 0;
         private preNumVertices:number = 0;
         constructor(target: Sprite,variables: { [key: string]: { size: number, offset: number } }) {
             this.target = target;
-            this.variables = variables;
-            this.byte = new Float32Byte(new Float32Array(0));
+            // this.byte = new Float32Byte(new Float32Array(0));
             this.numVertices = 0;
             this.hitArea = new HitArea();
         }
@@ -183,71 +181,129 @@ module rf {
         clear(): void {
             this.preNumVertices = this.numVertices;
             this.numVertices = 0;
-            this.byte.length = 0;
+            this.byte = undefined;
             this.hitArea.clean();
         }
 
         end(): void {
             let target = this.target;
             let change = 0;
-            if(target.$batchGeometry && this.numVertices > 0 && this.preNumVertices == this.numVertices){
-                this.preNumVertices = 0;
-                target.$batchGeometry.update(this.$batchOffset,this.byte);
+
+            if(this.numVertices > 0){
+                let float = createGeometry(empty_float32_object,target.variables,this.numVertices);
+                this.byte = new Float32Byte(float);
+                if(target.$batchGeometry && this.preNumVertices == this.numVertices){
+                    target.$batchGeometry.update(this.$batchOffset,this.byte);
+                }else{
+                    change |= DChange.vertex;
+                }
+                if(target.hitArea.combine(this.hitArea,0,0)){
+                    change |= DChange.area;
+                }
             }else{
-                change |= DChange.vertex;
+                change |= (DChange.vertex | DChange.area);
+            }
+            
+            target.setChange(change);
+        }
+        
+
+        addPoint(pos:number[],noraml:number[],uv:number[],color:number[]):void{
+            let variables = this.target.variables;
+            let numVertices = this.numVertices;
+
+
+            function set(variable:IVariable,array:Float32Array,data:number[]):void{
+                if(undefined == data){
+                    return;
+                }
+                let size = variable.size;
+                let offset = numVertices * size;
+                for(let i = 0;i<size;i++){
+                    array[offset + i] = data[i];
+                }
             }
 
-            if(target.hitArea.combine(this.hitArea,0,0)){
-                change |= DChange.area;
-            }
-                
-            target.setChange(change);
+            set(variables[VA.pos],empty_float32_pos,pos);
+            set(variables[VA.normal],empty_float32_normal,noraml);
+            set(variables[VA.uv],empty_float32_uv,uv);
+            set(variables[VA.color],empty_float32_color,color);
+
+            this.hitArea.updateArea(pos[0],pos[1],pos[2]);
+
+
+
+            this.numVertices++
         }
 
         drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, matrix:Float32Array = undefined,z: number = 0): void {
-            let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
-            let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
-            let blue = (color & 0x000000ff) / 0xFF;
+
+            const {originU,originV} = this.target.source;
+
+            const rgba = [
+                ((color & 0x00ff0000) >>> 16) / 0xFF,
+                ((color & 0x0000ff00) >>> 8) / 0xFF,
+                (color & 0x000000ff) / 0xFF,
+                alpha
+            ]
+
+            const uv = [originU,originV];
+            
             let r = x + width;
             let b = y + height;
-            let position = this.byte.array.length;
-            let d = this.variables["data32PerVertex"].size;
-            let v = this.variables;
+
             let f = m2dTransform;
-            let p = EMPTY_POINT2D;
-            let byte = this.byte;
-            const {originU,originV} = this.target.source;
-            this.byte.length = position + d * 4;
-            let pos = v[VA.pos];
-            let uv = v[VA.uv];
-            let vacolor = v[VA.color];
-            let normal = v[VA.normal];
+            let p = [0,0,0];
+
             let points = [x,y,r,y,r,b,x,b];
             for(let i=0;i<8;i+=2){
-                let dp = position + (i / 2) * d;
-                p.x = points[i];
-                p.y = points[i+1];
+                p[0] = points[i];
+                p[1] = points[i+1];
+                p[2] = z;
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.hitArea.updateArea(p.x,p.y,z);
-                byte.wPoint3(dp+pos.offset,p.x,p.y,z)
-
-                if(undefined != normal){
-                    byte.wPoint3(dp+normal.offset,0,0,1)
-                }
-                
-                if(undefined != uv){
-                    byte.wPoint3(dp+uv.offset,originU,originV,0)
-                }
-
-                if(undefined != vacolor){
-                    byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
-                }
-                this.numVertices += 1;
+                this.addPoint(p,undefined,uv,rgba);
             }
 
-            
+
+
+            // let position = this.byte.array.length;
+            // let d = this.variables["data32PerVertex"].size;
+            // let v = this.variables;
+            // let f = m2dTransform;
+            // let p = EMPTY_POINT2D;
+            // let byte = this.byte;
+            // const {originU,originV} = this.target.source;
+            // this.byte.length = position + d * 4;
+            // let pos = v[VA.pos];
+            // let uv = v[VA.uv];
+            // let vacolor = v[VA.color];
+            // let normal = v[VA.normal];
+            // let points = [x,y,r,y,r,b,x,b];
+            // for(let i=0;i<8;i+=2){
+            //     let dp = position + (i / 2) * d;
+            //     p.x = points[i];
+            //     p.y = points[i+1];
+            //     if(undefined != matrix){
+            //         f(matrix,p,p);
+            //     }
+            //     this.hitArea.updateArea(p.x,p.y,z);
+            //     byte.wPoint3(dp+pos.offset,p.x,p.y,z)
+
+            //     if(undefined != normal){
+            //         byte.wPoint3(dp+normal.offset,0,0,1)
+            //     }
+                
+            //     if(undefined != uv){
+            //         byte.wPoint3(dp+uv.offset,originU,originV,0)
+            //     }
+
+            //     if(undefined != vacolor){
+            //         byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
+            //     }
+            //     this.numVertices += 1;
+            // }
         }
 
 
@@ -255,51 +311,72 @@ module rf {
             const{w,h,ul,ur,vt,vb}=vo;
             let r = x + w;
             let b = y + h;
-            let d = this.variables["data32PerVertex"].size;
-            let position = this.byte.array.length;
-            this.byte.length = position + d*4;
-            let v = this.variables;
+
+            
+            const rgba = [
+                ((color & 0x00ff0000) >>> 16) / 0xFF,
+                ((color & 0x0000ff00) >>> 8) / 0xFF,
+                (color & 0x000000ff) / 0xFF,
+                alpha
+            ]
+
             let f = m2dTransform;
-            let p = EMPTY_POINT2D;
-            let byte = this.byte;
-
-            let pos = v[VA.pos];
-            let uv = v[VA.uv];
-            let vacolor = v[VA.color];
-            let normal = v[VA.normal];
-
-            let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
-            let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
-            let blue = (color & 0x000000ff) / 0xFF;
+            let p = [0,0,0];
 
             let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
             for(let i=0;i<16;i+=4){
-                let dp = position + (i / 4) * d;
-                p.x = points[i];
-                p.y = points[i+1];
+                p[0] = points[i];
+                p[1] = points[i+1];
+                p[2] = z;
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.hitArea.updateArea(p.x,p.y,z);
-                byte.wPoint3(dp+pos.offset,p.x,p.y,z)
-
-                if(undefined != normal){
-                    byte.wPoint3(dp+normal.offset,0,0,1)
-                }
-                
-                if(undefined != uv){
-                    byte.wPoint3(dp+uv.offset,points[i+2],points[i+3],0)
-                }
-
-                if(undefined != vacolor){
-                    byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
-                }
-
-                this.numVertices += 1;
+                this.addPoint(p,undefined,[points[i+2],points[i+3]],rgba);
             }
 
-           
+            // let v = this.target.variables;
+            // let f = m2dTransform;
+            // let d = v["data32PerVertex"].size;
+            // let position = this.byte.array.length;
+            // this.byte.length = position + d*4;
+          
+            // let p = EMPTY_POINT2D;
+            // let byte = this.byte;
 
+            // let pos = v[VA.pos];
+            // let uv = v[VA.uv];
+            // let vacolor = v[VA.color];
+            // let normal = v[VA.normal];
+
+            // let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
+            // let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
+            // let blue = (color & 0x000000ff) / 0xFF;
+
+            // let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
+            // for(let i=0;i<16;i+=4){
+            //     let dp = position + (i / 4) * d;
+            //     p.x = points[i];
+            //     p.y = points[i+1];
+            //     if(undefined != matrix){
+            //         f(matrix,p,p);
+            //     }
+            //     this.hitArea.updateArea(p.x,p.y,z);
+            //     byte.wPoint3(dp+pos.offset,p.x,p.y,z)
+
+            //     if(undefined != normal){
+            //         byte.wPoint3(dp+normal.offset,0,0,1)
+            //     }
+                
+            //     if(undefined != uv){
+            //         byte.wPoint3(dp+uv.offset,points[i+2],points[i+3],0)
+            //     }
+
+            //     if(undefined != vacolor){
+            //         byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
+            //     }
+
+            //     this.numVertices += 1;
+            // }
         }
     }
 

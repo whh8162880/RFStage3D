@@ -103,8 +103,8 @@ module rf {
             var n: Rect = new Rect();
             n.x = 0;
             n.y = 0;
-            n.width = width;
-            n.height = height;
+            n.w = width;
+            n.h = height;
 
             this.usedRects.length = 0;
             this.freeRects.length = 0;
@@ -147,7 +147,7 @@ module rf {
                     break;
             }
 
-            if (newNode.height == 0)
+            if (newNode.h == 0)
                 return newNode;
 
             this.placeRect(newNode);
@@ -166,7 +166,7 @@ module rf {
                 for (var i: number = 0; i < Rects.length; ++i) {
                     var score1: number = 0;
                     var score2: number = 0;
-                    var newNode: Rect = this.scoreRect(Rects[i].width, Rects[i].height, method, score1, score2);
+                    var newNode: Rect = this.scoreRect(Rects[i].w, Rects[i].h, method, score1, score2);
 
                     if (score1 < bestScore1 || (score1 == bestScore1 && score2 < bestScore2)) {
                         bestScore1 = score1;
@@ -227,7 +227,7 @@ module rf {
             }
 
             // Cannot fit the current Rect.
-            if (newNode.height == 0) {
+            if (newNode.h == 0) {
                 score1 = Infinity;
                 score2 = Infinity;
             }
@@ -239,7 +239,7 @@ module rf {
         private occupancy(): number {
             var usedSurfaceArea: number = 0;
             for (var i: number = 0; i < this.usedRects.length; i++)
-                usedSurfaceArea += this.usedRects[i].width * this.usedRects[i].height;
+                usedSurfaceArea += this.usedRects[i].w * this.usedRects[i].h;
 
             return usedSurfaceArea / (this.binWidth * this.binHeight);
         }
@@ -255,24 +255,24 @@ module rf {
             for (var i: number = 0; i < this.freeRects.length; i++) {
                 rect = this.freeRects[i];
                 // Try to place the Rect in upright (non-flipped) orientation.
-                if (rect.width >= width && rect.height >= height) {
+                if (rect.w >= width && rect.h >= height) {
                     topSideY = rect.y + height;
                     if (topSideY < bestY || (topSideY == bestY && rect.x < bestX)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = width;
-                        bestNode.height = height;
+                        bestNode.w = width;
+                        bestNode.h = height;
                         bestY = topSideY;
                         bestX = rect.x;
                     }
                 }
-                if (this.allowRotations && rect.width >= height && rect.height >= width) {
+                if (this.allowRotations && rect.w >= height && rect.h >= width) {
                     topSideY = rect.y + width;
                     if (topSideY < bestY || (topSideY == bestY && rect.x < bestX)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = height;
-                        bestNode.height = width;
+                        bestNode.w = height;
+                        bestNode.h = width;
                         bestY = topSideY;
                         bestX = rect.x;
                     }
@@ -296,17 +296,17 @@ module rf {
             for (var i: number = 0; i < this.freeRects.length; i++) {
                 rect = this.freeRects[i];
                 // Try to place the Rect in upright (non-flipped) orientation.
-                if (rect.width >= width && rect.height >= height) {
-                    leftoverHoriz = Math.abs(rect.width - width);
-                    leftoverVert = Math.abs(rect.height - height);
+                if (rect.w >= width && rect.h >= height) {
+                    leftoverHoriz = Math.abs(rect.w - width);
+                    leftoverVert = Math.abs(rect.h - height);
                     shortSideFit = Math.min(leftoverHoriz, leftoverVert);
                     longSideFit = Math.max(leftoverHoriz, leftoverVert);
 
                     if (shortSideFit < this.bestShortSideFit || (shortSideFit == this.bestShortSideFit && longSideFit < this.bestLongSideFit)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = width;
-                        bestNode.height = height;
+                        bestNode.w = width;
+                        bestNode.h = height;
                         this.bestShortSideFit = shortSideFit;
                         this.bestLongSideFit = longSideFit;
                     }
@@ -315,17 +315,17 @@ module rf {
                 var flippedLeftoverVert: number;
                 var flippedShortSideFit: number;
                 var flippedLongSideFit: number;
-                if (this.allowRotations && rect.width >= height && rect.height >= width) {
-                    flippedLeftoverHoriz = Math.abs(rect.width - height);
-                    flippedLeftoverVert = Math.abs(rect.height - width);
+                if (this.allowRotations && rect.w >= height && rect.h >= width) {
+                    flippedLeftoverHoriz = Math.abs(rect.w - height);
+                    flippedLeftoverVert = Math.abs(rect.h - width);
                     flippedShortSideFit = Math.min(flippedLeftoverHoriz, flippedLeftoverVert);
                     flippedLongSideFit = Math.max(flippedLeftoverHoriz, flippedLeftoverVert);
 
                     if (flippedShortSideFit < this.bestShortSideFit || (flippedShortSideFit == this.bestShortSideFit && flippedLongSideFit < this.bestLongSideFit)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = height;
-                        bestNode.height = width;
+                        bestNode.w = height;
+                        bestNode.h = width;
                         this.bestShortSideFit = flippedShortSideFit;
                         this.bestLongSideFit = flippedLongSideFit;
                     }
@@ -348,33 +348,33 @@ module rf {
             for (var i: number = 0; i < this.freeRects.length; i++) {
                 rect = this.freeRects[i];
                 // Try to place the Rect in upright (non-flipped) orientation.
-                if (rect.width >= width && rect.height >= height) {
-                    leftoverHoriz = Math.abs(rect.width - width);
-                    leftoverVert = Math.abs(rect.height - height);
+                if (rect.w >= width && rect.h >= height) {
+                    leftoverHoriz = Math.abs(rect.w - width);
+                    leftoverVert = Math.abs(rect.h - height);
                     shortSideFit = Math.min(leftoverHoriz, leftoverVert);
                     longSideFit = Math.max(leftoverHoriz, leftoverVert);
 
                     if (longSideFit < bestLongSideFit || (longSideFit == bestLongSideFit && shortSideFit < bestShortSideFit)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = width;
-                        bestNode.height = height;
+                        bestNode.w = width;
+                        bestNode.h = height;
                         bestShortSideFit = shortSideFit;
                         bestLongSideFit = longSideFit;
                     }
                 }
 
-                if (this.allowRotations && rect.width >= height && rect.height >= width) {
-                    leftoverHoriz = Math.abs(rect.width - height);
-                    leftoverVert = Math.abs(rect.height - width);
+                if (this.allowRotations && rect.w >= height && rect.h >= width) {
+                    leftoverHoriz = Math.abs(rect.w - height);
+                    leftoverVert = Math.abs(rect.h - width);
                     shortSideFit = Math.min(leftoverHoriz, leftoverVert);
                     longSideFit = Math.max(leftoverHoriz, leftoverVert);
 
                     if (longSideFit < bestLongSideFit || (longSideFit == bestLongSideFit && shortSideFit < bestShortSideFit)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = height;
-                        bestNode.height = width;
+                        bestNode.w = height;
+                        bestNode.h = width;
                         bestShortSideFit = shortSideFit;
                         bestLongSideFit = longSideFit;
                     }
@@ -398,34 +398,34 @@ module rf {
 
             for (var i: number = 0; i < this.freeRects.length; i++) {
                 rect = this.freeRects[i];
-                areaFit = rect.width * rect.height - width * height;
+                areaFit = rect.w * rect.h - width * height;
 
                 // Try to place the Rect in upright (non-flipped) orientation.
-                if (rect.width >= width && rect.height >= height) {
-                    leftoverHoriz = Math.abs(rect.width - width);
-                    leftoverVert = Math.abs(rect.height - height);
+                if (rect.w >= width && rect.h >= height) {
+                    leftoverHoriz = Math.abs(rect.w - width);
+                    leftoverVert = Math.abs(rect.h - height);
                     shortSideFit = Math.min(leftoverHoriz, leftoverVert);
 
                     if (areaFit < bestAreaFit || (areaFit == bestAreaFit && shortSideFit < bestShortSideFit)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = width;
-                        bestNode.height = height;
+                        bestNode.w = width;
+                        bestNode.h = height;
                         bestShortSideFit = shortSideFit;
                         bestAreaFit = areaFit;
                     }
                 }
 
-                if (this.allowRotations && rect.width >= height && rect.height >= width) {
-                    leftoverHoriz = Math.abs(rect.width - height);
-                    leftoverVert = Math.abs(rect.height - width);
+                if (this.allowRotations && rect.w >= height && rect.h >= width) {
+                    leftoverHoriz = Math.abs(rect.w - height);
+                    leftoverVert = Math.abs(rect.h - width);
                     shortSideFit = Math.min(leftoverHoriz, leftoverVert);
 
                     if (areaFit < bestAreaFit || (areaFit == bestAreaFit && shortSideFit < bestShortSideFit)) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = height;
-                        bestNode.height = width;
+                        bestNode.w = height;
+                        bestNode.h = width;
                         bestShortSideFit = shortSideFit;
                         bestAreaFit = areaFit;
                     }
@@ -451,10 +451,10 @@ module rf {
             var rect: Rect;
             for (var i: number = 0; i < this.usedRects.length; i++) {
                 rect = this.usedRects[i];
-                if (rect.x == x + width || rect.x + rect.width == x)
-                    score += this.commonIntervalLength(rect.y, rect.y + rect.height, y, y + height);
-                if (rect.y == y + height || rect.y + rect.height == y)
-                    score += this.commonIntervalLength(rect.x, rect.x + rect.width, x, x + width);
+                if (rect.x == x + width || rect.x + rect.w == x)
+                    score += this.commonIntervalLength(rect.y, rect.y + rect.h, y, y + height);
+                if (rect.y == y + height || rect.y + rect.h == y)
+                    score += this.commonIntervalLength(rect.x, rect.x + rect.w, x, x + width);
             }
             return score;
         }
@@ -470,23 +470,23 @@ module rf {
             for (var i: number = 0; i < this.freeRects.length; i++) {
                 rect = this.freeRects[i];
                 // Try to place the Rect in upright (non-flipped) orientation.
-                if (rect.width >= width && rect.height >= height) {
+                if (rect.w >= width && rect.h >= height) {
                     score = this.contactPointScoreNode(rect.x, rect.y, width, height);
                     if (score > bestContactScore) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = width;
-                        bestNode.height = height;
+                        bestNode.w = width;
+                        bestNode.h = height;
                         bestContactScore = score;
                     }
                 }
-                if (this.allowRotations && rect.width >= height && rect.height >= width) {
+                if (this.allowRotations && rect.w >= height && rect.h >= width) {
                     score = this.contactPointScoreNode(rect.x, rect.y, height, width);
                     if (score > bestContactScore) {
                         bestNode.x = rect.x;
                         bestNode.y = rect.y;
-                        bestNode.width = height;
-                        bestNode.height = width;
+                        bestNode.w = height;
+                        bestNode.h = width;
                         bestContactScore = score;
                     }
                 }
@@ -496,40 +496,40 @@ module rf {
 
         private splitFreeNode(freeNode: Rect, usedNode: Rect): Boolean {
             // Test with SAT if the Rects even intersect.
-            if (usedNode.x >= freeNode.x + freeNode.width || usedNode.x + usedNode.width <= freeNode.x ||
-                usedNode.y >= freeNode.y + freeNode.height || usedNode.y + usedNode.height <= freeNode.y)
+            if (usedNode.x >= freeNode.x + freeNode.w || usedNode.x + usedNode.w <= freeNode.x ||
+                usedNode.y >= freeNode.y + freeNode.h || usedNode.y + usedNode.h <= freeNode.y)
                 return false;
             var newNode: Rect;
-            if (usedNode.x < freeNode.x + freeNode.width && usedNode.x + usedNode.width > freeNode.x) {
+            if (usedNode.x < freeNode.x + freeNode.w && usedNode.x + usedNode.w > freeNode.x) {
                 // New node at the top side of the used node.
-                if (usedNode.y > freeNode.y && usedNode.y < freeNode.y + freeNode.height) {
+                if (usedNode.y > freeNode.y && usedNode.y < freeNode.y + freeNode.h) {
                     newNode = freeNode.clone();
-                    newNode.height = usedNode.y - newNode.y;
+                    newNode.h = usedNode.y - newNode.y;
                     this.freeRects.push(newNode);
                 }
 
                 // New node at the bottom side of the used node.
-                if (usedNode.y + usedNode.height < freeNode.y + freeNode.height) {
+                if (usedNode.y + usedNode.h < freeNode.y + freeNode.h) {
                     newNode = freeNode.clone();
-                    newNode.y = usedNode.y + usedNode.height;
-                    newNode.height = freeNode.y + freeNode.height - (usedNode.y + usedNode.height);
+                    newNode.y = usedNode.y + usedNode.h;
+                    newNode.h = freeNode.y + freeNode.h - (usedNode.y + usedNode.h);
                     this.freeRects.push(newNode);
                 }
             }
 
-            if (usedNode.y < freeNode.y + freeNode.height && usedNode.y + usedNode.height > freeNode.y) {
+            if (usedNode.y < freeNode.y + freeNode.h && usedNode.y + usedNode.h > freeNode.y) {
                 // New node at the left side of the used node.
-                if (usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.width) {
+                if (usedNode.x > freeNode.x && usedNode.x < freeNode.x + freeNode.w) {
                     newNode = freeNode.clone();
-                    newNode.width = usedNode.x - newNode.x;
+                    newNode.w = usedNode.x - newNode.x;
                     this.freeRects.push(newNode);
                 }
 
                 // New node at the right side of the used node.
-                if (usedNode.x + usedNode.width < freeNode.x + freeNode.width) {
+                if (usedNode.x + usedNode.w < freeNode.x + freeNode.w) {
                     newNode = freeNode.clone();
-                    newNode.x = usedNode.x + usedNode.width;
-                    newNode.width = freeNode.x + freeNode.width - (usedNode.x + usedNode.width);
+                    newNode.x = usedNode.x + usedNode.w;
+                    newNode.w = freeNode.x + freeNode.w - (usedNode.x + usedNode.w);
                     this.freeRects.push(newNode);
                 }
             }
@@ -552,8 +552,8 @@ module rf {
 
         private isContainedIn(a: Rect, b: Rect): Boolean {
             return a.x >= b.x && a.y >= b.y
-                && a.x + a.width <= b.x + b.width
-                && a.y + a.height <= b.y + b.height;
+                && a.x + a.w <= b.x + b.w
+                && a.y + a.h <= b.y + b.h;
         }
     }
 }

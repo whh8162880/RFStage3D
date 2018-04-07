@@ -26,13 +26,16 @@
             function main(){
                 selectd("States");
                 var m = new rf.Main();
-                m.init(document.getElementById("game"))
+                m.init(document.getElementById("game"));
+                
+                init();
                 debugModel(false);
             }
         </script>
     </head>
     <body onload="main()" style="width:100%;height:100%">
         <canvas id="game" style="width:100%;height:100%"></canvas>
+        <span id="fps" style="position:absolute;color:azure"></span>
         <div id="debugContainer" style="position:absolute;right:0px;height:100%;width:500px;background-color: rgb(243, 243, 243);">
             <span class="bckg"></span>
             <header>
