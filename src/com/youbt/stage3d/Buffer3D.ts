@@ -368,13 +368,68 @@ module rf {
                     （即第三个参数param的值是webgl.NEAREST或webgl.LINEAR）分别是最近点采样和线性采样，
                     前者效率高单效果不好，后者效率不高单效果比较好。
              */
-            
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE); //UV（ST）坐标
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);
 
+            /**
+             *  Mag Modes
+             *      gl.NEAREST
+             *      gl.LINEAR
+             */
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
+             /**  Min Modes
+             *      gl.NEAREST
+             *      gl.LINEAR
+                    gl.NEAREST_MIPMAP_NEAREST;      limit:power of two   
+                    gl.NEAREST_MIPMAP_LINEAR;       limit:power of two
+                    gl.LINEAR_MIPMAP_LINEAR         limit:power of two
+                    gl.LINEAR_MIPMAP_NEAREST        limit:power of two
+             * */
+            //如果我们的贴图长宽不满足2的幂条件。那么MIN_FILTER 和 MAG_FILTER, 只能是 NEAREST或者LINEAR
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
+            
+           
+
+            //如果我们的贴图长宽不满足2的幂条件。那么wrap_s 和 wrap_t 必须是 clap_to_edge
+            //Wrapping Modes 
+            //g.REPEAT                  limit:power of two   
+            //g.MIRRORED_REPEAT         limit:power of two   
+            //g.CLAMP_TO_EDGE
+            
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);   //U方向上设置
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);   //v方向上设置
+
+
+
+            /**
+                ====format=====
+                g.ALPHA
+                g.RGB
+                g.RGBA
+                g.LUMINANCE
+                g.LUMINANCE_ALPHA
+                g.DEPTH_COMPONENT
+                g.DEPTH_STENCIL
+             */
+
+            /**
+                ===type====
+                g.UNSIGNED_BYTE
+                g.BYTE
+                g.SHORT
+                g.INT
+                g.FLOAT
+                g.UNSIGNED_BYTE;
+                g.UNSIGNED_INT
+                g.UNSIGNED_SHORT
+                g.UNSIGNED_SHORT_4_4_4_4;
+                g.UNSIGNED_SHORT_5_5_5_1;
+                g.UNSIGNED_SHORT_5_6_5;
+                //halfFloat
+                g.getExtension('OES_texture_half_float').HALF_FLOAT_OES
+                g.getExtension('WEBGL_depth_texture').UNSIGNED_INT_24_8_WEBGL
+             */
+            
             g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE,data);  
+            // g.generateMipmap() createmipmap  limit:power of two
             g.bindTexture(g.TEXTURE_2D, null);
 
             this.readly = true;
