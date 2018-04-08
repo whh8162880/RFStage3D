@@ -15,18 +15,65 @@ namespace rf {
 		public static FPS_CHANGE: string = 'FPS_CHANGE';
 	}
 
+	const enum Time {
+		/**
+		 * 一秒
+		 */
+		ONE_SECOND = 1000,
+		/**
+		 * 五秒
+		 */
+		FIVE_SECOND = 5000,
+		/**
+		 * 一分种
+		 */
+		ONE_MINUTE = 60000,
+		/**
+		 * 五分种
+		 */
+		FIVE_MINUTE = 300000,
+		/**
+		 * 半小时
+		 */
+		HALF_HOUR = 1800000,
+		/**
+		 * 一小时
+		 */
+		ONE_HOUR = 3600000,
+		/**
+		 * 一天
+		 */
+		ONE_DAY = 86400000
+	}
+
 	export let nextUpdateTime: number = 0;
 	export let frameInterval: number = 0;
 
 	//当前程序运行了多长时间
 	export let engineNow:number = 0;
 
+	export let serverTime:number = 0;
+
+	const _sharedDate = new Date();
+
+	let _utcOffset = -_sharedDate.getTimezoneOffset() * Time.ONE_MINUTE;
+
+	export function getUTCTime(time: number) {
+		return time + _utcOffset;
+	}
+
+	export function getFormatTime(time: number, format: string, isRaw = true):string {
+		if (isRaw) {
+			time = this.getUTCTime(time);
+		}
+		_sharedDate.setTime(time);
+		return _sharedDate.format(format);
+	}
+
 	export const getT: ({ (): number }) = window.performance ? performance.now.bind(performance) : Date.now;
 
 	// export let engie_animation_request:Function = undefined;
 	export class Engine {
-		public static dispatcher: MiniDispatcher = new MiniDispatcher();
-
 		//当前程序开始时间
 		public static startTime: number = 0;
 		
@@ -125,7 +172,7 @@ namespace rf {
 							Engine.hiddenTime = 0;
 						}
 					}
-					Engine.dispatcher.simpleDispatch(EngineEvent.VISIBILITY_CHANGE, hidden);
+					ROOT.simpleDispatch(EngineEvent.VISIBILITY_CHANGE, hidden);
 				},
 				false
 			);
@@ -151,7 +198,7 @@ namespace rf {
 				}
 				vo = next;
 			}
-			Engine.dispatcher.simpleDispatch(EventT.RESIZE);
+			ROOT.simpleDispatch(EventT.RESIZE);
 		}
 
 		public static addTick(tick: ITickable): void {
@@ -179,7 +226,7 @@ namespace rf {
 				}
 				vo = next;
 			}
-			Engine.dispatcher.simpleDispatch(EventT.ENTER_FRAME);
+			ROOT.simpleDispatch(EventT.ENTER_FRAME);
 		}
 
 		public static set frameRate(value: number) {
@@ -201,7 +248,7 @@ namespace rf {
 				Engine.code = Engine._codeTime;
 				Engine._fpsCount = 0;
 				Engine._codeTime = 0;
-				Engine.dispatcher.simpleDispatch(EngineEvent.FPS_CHANGE);
+				ROOT.simpleDispatch(EngineEvent.FPS_CHANGE);
 			}
 		}
 	}
