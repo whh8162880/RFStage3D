@@ -110,44 +110,45 @@ namespace rf {
 			return buffer;
 		}
 
-		private indexs: { [key: number]: IndexBuffer3D };
-		private indexByte: Uint16Array = undefined;
-		private initIndexByQuadCount(count: number): void {
-			let byte = this.indexByte = new Uint16Array(count * 6);
-			count *= 4;
-			let j = 0;
-			for (var i: number = 0; i < count; i += 4) {
-				byte[j++] = i;
-				byte[j++] = i + 1;
-				byte[j++] = i + 3;
-				byte[j++] = i + 1;
-				byte[j++] = i + 2;
-				byte[j++] = i + 3;
-			}
-		}
+		// private indexs: { [key: number]: IndexBuffer3D };
+		indexByte:IndexBuffer3D;
 
 		public getIndexByQuad(quadCount: number): IndexBuffer3D {
-			if (quadCount > 2000) {
+			let count = 1000;
+			if (quadCount > count) {
 				ThrowError("你要这么多四边形干嘛？");
 				return null;
 			}
 
-			if (undefined == this.indexs) {
-				this.indexs = {};
-			}
-			let buffer = this.indexs[quadCount];
-			let length = quadCount * 6;
-			if (undefined == buffer) {
+			// if (undefined == this.indexs) {
+			// 	this.indexs = {};
+			// }
+			// let buffer = this.indexs[quadCount];
+			// let length = quadCount * 6;
+			// if (undefined == buffer) {
 
-				let array = new Uint16Array(length)
-				if (undefined == this.indexByte) {
-					this.initIndexByQuadCount(2000);
+				// let array = new Uint16Array(length)
+
+			if (undefined == this.indexByte) {
+				let byte = new Uint16Array(count * 6);
+				count *= 4;
+				let j = 0;
+				for (var i: number = 0; i < count; i += 4) {
+					byte[j++] = i;
+					byte[j++] = i + 1;
+					byte[j++] = i + 3;
+					byte[j++] = i + 1;
+					byte[j++] = i + 2;
+					byte[j++] = i + 3;
 				}
-				array.set(this.indexByte.slice(0, length));
-
-				this.indexs[quadCount] = buffer = this.createIndexBuffer(array);
+				this.indexByte = this.createIndexBuffer(byte);
 			}
-			return buffer;
+
+			return this.indexByte;
+				// array.set(this.indexByte.slice(0, length));
+				// this.indexs[quadCount] = buffer = this.createIndexBuffer(array);
+			// }
+			// return buffer;
 		}
 
 		public createIndexBuffer(data: number[] | Uint16Array): IndexBuffer3D {
@@ -379,7 +380,7 @@ namespace rf {
 			gl.blendFunc(sourceFactor, destinationFactor);
 		}
 
-		public drawTriangles(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numTriangles: number = -1): void {
+		public drawTriangles(indexBuffer: IndexBuffer3D, numTriangles:number,firstIndex: number = 0): void {
 			if (false == indexBuffer.readly) {
 				if (false == indexBuffer.awaken()) {
 					throw new Error("create indexBuffer error!");

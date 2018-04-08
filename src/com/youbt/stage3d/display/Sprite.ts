@@ -499,7 +499,7 @@ module rf {
             c.setProgramConstantsFromVector(VC.ui, geo.vcData.array, 4);
             this.t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
-            c.drawTriangles(i);
+            c.drawTriangles(i,geo.quadcount * 2);
         }
 
 

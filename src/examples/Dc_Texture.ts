@@ -211,7 +211,7 @@
             context3D.setProgramConstantsFromMatrix(VC.mvp,matrix);
 
             //draw
-            context3D.drawTriangles(indexBuffer);
+            context3D.drawTriangles(indexBuffer,this.indexData.length / 3);
          }
 
 
@@ -228,7 +228,7 @@
             t.uploadContext(p,0,FS.diff);   //上传贴图纹理
             v.uploadContext(p);             //上传顶点数据
             c.setProgramConstantsFromMatrix(VC.mvp,camera.worldTranform);   //上传mvp信息
-            c.drawTriangles(i);             //绘制
+            c.drawTriangles(i,2);             //绘制
          }
 
 
