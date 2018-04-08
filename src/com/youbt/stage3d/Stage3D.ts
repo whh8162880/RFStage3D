@@ -9,7 +9,7 @@ module rf{
 
         camera2D:Camera2D;
 
-        mouse:Mouse
+        mouse:Mouse;
 
         constructor(){
             super();

@@ -875,5 +875,160 @@ module rf {
 
     }
 
+
+
+    export class Matrix{
+        public rawData:Float32Array;
+
+        constructor(a:number= 1,b:number = 0,c:number = 0,d:number = 1,tx:number =0,ty:number = 0){
+            this.rawData = new Float32Array(
+                [
+                    a,b,tx,
+                    c,d,ty,
+                    0,0,1
+                ]
+            )
+        }
+
+
+        public get determinant() {
+            const rawData = this.rawData;
+            //3 * 3 对角线法
+            return (rawData[0] * rawData[4] * rawData[8]
+                + rawData[1] * rawData[5] * rawData[6]
+                + rawData[2] * rawData[3] * rawData[7]
+                - rawData[2] * rawData[4] * rawData[6]
+                - rawData[7] * rawData[5] * rawData[0]
+                - rawData[8] * rawData[3] * rawData[1]
+            );
+        }
+        
+
+        public clone():Matrix
+        {
+            const rawData = this.rawData;
+            return new Matrix(
+                rawData[0],rawData[1],rawData[2],
+                rawData[3],rawData[4],rawData[5]
+            )
+        }
+
+
+        public copyFrom(m:Matrix):void{
+            this.rawData = m.rawData;
+        }
+
+        public identity():void{
+            this.rawData = new Float32Array([
+                1, 0, 0, 
+                0, 1, 0, 
+                0, 0, 1]);
+        }
+
+        public rotate(degrees: number):void{
+            let radians:number = degrees * DEG_2_RAD;
+            const rawData = this.rawData;
+            //X’ = cos(50)*X + sin(50)*Y + tx;
+            //Y’ = -sin(50)*X + cos(50)*Y + ty;
+            let rm = new Matrix(Math.cos(radians),-Math.sin(radians),0,Math.sin(radians),Math.cos(radians),0);
+            this.concat(rm);
+        }
+
+        public scale(a:number,b:number):void{
+            const rawData = this.rawData;
+            rawData[0] *= a;
+            rawData[4] *= b;
+        }
+
+        public concat(m:Matrix):void{
+            //m*m
+            const rawData = this.rawData;
+            const [
+                m111, m112, m113, 
+                m121, m122, m123, 
+                m131, m132, m133,
+            ] = rawData as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
+
+            const [
+                m211, m212, m213,
+                m221, m222, m223,
+                m231, m232, m233
+            ] = m.rawData as any;
+
+
+            rawData[0] = m111 * m211 + m112 * m221 + m113 * m231;
+            rawData[1] = m111 * m212 + m112 * m222 + m113 * m232;
+            rawData[2] = m111 * m213 + m112 * m223 + m113 * m233;
+
+            rawData[3] = m121 * m211 + m122 * m221 + m123 * m231;
+            rawData[4] = m121 * m212 + m122 * m222 + m123 * m232;
+            rawData[5] = m121 * m213 + m122 * m223 + m123 * m233;
+
+            rawData[6] = m131 * m211 + m132 * m221 + m133 * m231;
+            rawData[7] = m131 * m212 + m132 * m222 + m133 * m232;
+            rawData[8] = m131 * m213 + m132 * m223 + m133 * m233;
+  
+        }
+
+        public invert():boolean{
+            let d: number = this.determinant;
+            let invertable: boolean = Math.abs(d) > 0.00000000001;
+
+            if (invertable) {
+
+           
+                d = 1 / d;
+                const rawData = this.rawData;
+
+                const [
+                    m11, m12, m13,
+                    m21, m22, m23,
+                    m31, m32, m33
+                ] = rawData as any;
+
+                const m22$m33_m32$m23 = m22 * m33 - m32 * m23;
+                const m21$m33_m31$m23 = m21 * m33 - m31 * m23;
+                const m21$m32_m31$m22 = m21 * m32 - m31 * m22;
+
+                const m12$m33_m32$m13 = m12 * m33 - m32 * m13;
+                const m11$m33_m31$m13 = m11 * m33 - m31 * m13;
+                const m11$m32_m31$m12 = m11 * m32 - m31 * m12;
+
+                const m12$m23_m22$m13 = m12 * m23 - m22 * m13;
+                const m11$m23_m21$m13 = m11 * m23 - m21 * m13;
+                const m11$m22_m21$m12 = m11 * m22 - m21 * m12;
+
+                 //逆矩阵 = 1/d * 伴随矩阵
+                rawData[0] = d * m22$m33_m32$m23;
+                rawData[1] = -d * m21$m32_m31$m22;
+                rawData[2] = d * m21$m32_m31$m22;
+
+                rawData[3] = -d * m12$m33_m32$m13;
+                rawData[4] = d * m11$m33_m31$m13;
+                rawData[5] = -d * m11$m32_m31$m12;
+                
+                rawData[6] = d * m12$m23_m22$m13;
+                rawData[7] = -d * m11$m23_m21$m13;
+                rawData[8] = d * m11$m22_m21$m12;
+            }
+            return invertable;
+        }
+
+        public setTo(a:number,b:number,c:number,d:number,tx:number,ty:number):void{
+            const rawData = this.rawData;
+            rawData[0] = a; rawData[1] = b; rawData[2] = tx;
+            rawData[3] = c; rawData[4] = d; rawData[5] = ty;
+        }
+
+        public translate(tx:number,ty:number):void{
+            const rawData = this.rawData;
+            rawData[2] += tx;
+            rawData[5] += ty;
+        }
+
+  
+
+    }
+
 }
 

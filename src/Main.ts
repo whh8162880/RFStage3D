@@ -25,20 +25,24 @@ module rf{
             context3D.setDepthTest(false,gl.ALWAYS);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-            let span = document.getElementById("fps");
 
-            var t = new TextField();
-            t.init();
-            t.format.size = 30;
-            t.format.init();
-            t.y = 40;
-            ROOT.addChild(t);
+            let profile = singleton(GUIProfile);
+            ROOT.addChild(profile);
 
-            Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
-                let str = `pixelRatio:${pixelRatio} fps:${Engine.fps} code:${Engine.code.toFixed(2)}`
-                span.innerHTML = str;
-                t.text = str;
-            });
+            // let span = document.getElementById("fps");
+
+            // var t = new TextField();
+            // t.init();
+            // t.format.size = 30;
+            // t.format.init();
+            // t.y = 40;
+            // ROOT.addChild(t);
+
+            // Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
+            //     let str = `pixelRatio:${pixelRatio} fps:${Engine.fps} code:${Engine.code.toFixed(2)}`
+            //     span.innerHTML = str;
+            //     t.text = str;
+            // });
             
 
 
@@ -77,10 +81,10 @@ module rf{
             //     ROOT.addChild(sp);
             // }
 
-            g = ROOT.graphics;
-            g.clear();
-            g.drawRect(0,0,100,100,0xFF0000);
-            g.end();
+            // g = ROOT.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFF0000);
+            // g.end();
 
             
 
@@ -133,6 +137,14 @@ module rf{
             // Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
             //     t.text =`fps:${Engine.fps}\ncode:${Engine.code.toFixed(2)}`
             // });
+
+
+            let icon = new IconView();
+            icon.x = 100;
+            icon.y = 100;
+            icon.resetSize(100,100);
+            ROOT.addChild(icon);
+            icon.setUrl("assets/ranger.png");
         }
 
         public linktest():void{

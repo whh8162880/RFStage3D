@@ -51,7 +51,7 @@ module rf{
             context3D.setProgram(p);
             context3D.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform)
             v.uploadContext(p);
-            context3D.drawTriangles(i);
+            context3D.drawTriangles(i,2);
 
         }
 
@@ -104,7 +104,7 @@ module rf{
             
             context3D.setProgramConstantsFromVector("color",color,4);
             v.uploadContext(p);
-            context3D.drawTriangles(i);
+            context3D.drawTriangles(i,indexs.length / 3);
         }
 
 
@@ -171,7 +171,7 @@ module rf{
             t.pixels = image;//bitmapdata.canvas;
             t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
-            context3D.drawTriangles(i);
+            context3D.drawTriangles(i,indexs.length / 3);
         }
 
 

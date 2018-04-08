@@ -149,6 +149,12 @@ module rf {
                         }
                         tempvo = tempvo.next;
                     }
+
+                    if(undefined == tempvo){
+                        vo.pre = this.last;
+                        this.last.next = vo;
+                        this.last = vo;
+                    }
                 }
             }
             return vo;
