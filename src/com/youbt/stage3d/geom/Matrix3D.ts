@@ -958,7 +958,62 @@ module rf {
         }
 
         public invert():void{
-            
+            // let d: number = this.determinant;
+            // let invertable: boolean = Math.abs(d) > 0.00000000001;
+
+            // if (invertable) {
+            //     d = 1 / d;
+            //     const rawData = this.rawData;
+
+            //     const [
+            //         m11, m12, m13,
+            //         m21, m22, m23,
+            //         m31, m32, m33
+            //     ] = rawData as any;
+
+            //     const m12$m23_m22$m13 = m12 * m23 - m22 * m13;
+            //     const m12$m24_m22$m14 = m12 * m24 - m22 * m14;
+            //     const m12$m33_m32$m13 = m12 * m33 - m32 * m13;
+            //     const m12$m34_m32$m14 = m12 * m34 - m32 * m14;
+            //     const m12$m43_m42$m13 = m12 * m43 - m42 * m13;
+            //     const m12$m44_m42$m14 = m12 * m44 - m42 * m14;
+
+            //     const m13$m24_m23$m14 = m13 * m24 - m23 * m14;
+            //     const m13$m34_m33$m14 = m13 * m34 - m33 * m14;
+            //     const m13$m44_m43$m14 = m13 * m44 - m43 * m14;
+
+            //     const m22$m33_m32$m23 = m22 * m33 - m32 * m23;
+            //     const m22$m34_m32$m24 = m22 * m34 - m32 * m24;
+            //     const m22$m43_m42$m23 = m22 * m43 - m42 * m23;
+            //     const m22$m44_m42$m24 = m22 * m44 - m42 * m24;
+
+            //     const m23$m34_m33$m24 = m23 * m34 - m33 * m24;
+            //     const m23$m44_m43$m24 = m23 * m44 - m43 * m24;
+
+            //     const m32$m43_m42$m33 = m32 * m43 - m42 * m33;
+            //     const m32$m44_m42$m34 = m32 * m44 - m42 * m34;
+
+            //     const m33$m44_m43$m34 = m33 * m44 - m43 * m34;
+
+
+            //     rawData[0] = d * (m22 * (m33$m44_m43$m34) - m32 * (m23$m44_m43$m24) + m42 * (m23$m34_m33$m24));
+            //     rawData[1] = -d * (m12 * (m33$m44_m43$m34) - m32 * (m13$m44_m43$m14) + m42 * (m13$m34_m33$m14));
+            //     rawData[2] = d * (m12 * (m23$m44_m43$m24) - m22 * (m13$m44_m43$m14) + m42 * (m13$m24_m23$m14));
+            //     rawData[3] = -d * (m12 * (m23$m34_m33$m24) - m22 * (m13$m34_m33$m14) + m32 * (m13$m24_m23$m14));
+            //     rawData[4] = -d * (m21 * (m33$m44_m43$m34) - m31 * (m23$m44_m43$m24) + m41 * (m23$m34_m33$m24));
+            //     rawData[5] = d * (m11 * (m33$m44_m43$m34) - m31 * (m13$m44_m43$m14) + m41 * (m13$m34_m33$m14));
+            //     rawData[6] = -d * (m11 * (m23$m44_m43$m24) - m21 * (m13$m44_m43$m14) + m41 * (m13$m24_m23$m14));
+            //     rawData[7] = d * (m11 * (m23$m34_m33$m24) - m21 * (m13$m34_m33$m14) + m31 * (m13$m24_m23$m14));
+            //     rawData[8] = d * (m21 * (m32$m44_m42$m34) - m31 * (m22$m44_m42$m24) + m41 * (m22$m34_m32$m24));
+            //     rawData[9] = -d * (m11 * (m32$m44_m42$m34) - m31 * (m12$m44_m42$m14) + m41 * (m12$m34_m32$m14));
+            //     rawData[10] = d * (m11 * (m22$m44_m42$m24) - m21 * (m12$m44_m42$m14) + m41 * (m12$m24_m22$m14));
+            //     rawData[11] = -d * (m11 * (m22$m34_m32$m24) - m21 * (m12$m34_m32$m14) + m31 * (m12$m24_m22$m14));
+            //     rawData[12] = -d * (m21 * (m32$m43_m42$m33) - m31 * (m22$m43_m42$m23) + m41 * (m22$m33_m32$m23));
+            //     rawData[13] = d * (m11 * (m32$m43_m42$m33) - m31 * (m12$m43_m42$m13) + m41 * (m12$m33_m32$m13));
+            //     rawData[14] = -d * (m11 * (m22$m43_m42$m23) - m21 * (m12$m43_m42$m13) + m41 * (m12$m23_m22$m13));
+            //     rawData[15] = d * (m11 * (m22$m33_m32$m23) - m21 * (m12$m33_m32$m13) + m31 * (m12$m23_m22$m13));
+            // }
+            // return invertable;
         }
 
         public setTo(a:number,b:number,c:number,d:number,tx:number,ty:number):void{
