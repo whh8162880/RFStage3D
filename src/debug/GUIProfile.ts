@@ -16,6 +16,7 @@ module rf{
             this.timeTex = this.createText();
             this.fpsTxt = this.createText();
             this.bufferTex = this.createText();
+            this.dcTxt = this.createText();
             ROOT.addEventListener(EngineEvent.FPS_CHANGE,this.fpsChangeHandler,this);
         }
 
@@ -29,9 +30,11 @@ module rf{
         }
 
         fpsChangeHandler(event:EventX):void{
+            let con = context3D;
             this.timeTex.text = `time:${getFormatTime(engineNow,"HH:mm:ss",false)}`;
             this.fpsTxt.text = `F:${Engine.fps} C:${Engine.code.toFixed(2)}`;
-            this.bufferTex.text = context3D.toString();
+            this.bufferTex.text = con.toString();
+            this.dcTxt.text = `tri:${con.triangles} dc:${con.dc}`
         }
     }
 }
