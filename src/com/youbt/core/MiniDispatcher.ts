@@ -84,7 +84,7 @@ module rf {
 
 		/** Registers an event listener at a certain object. */
 		
-		on(type: string|number, listener: Function, thisObject?: any, priority: number = 0): void {
+		on(type: string|number, listener: Function, thisObject: any, priority: number = 0): void {
 			if (undefined == this.mEventListeners) {
 				this.mEventListeners = {};
 			}

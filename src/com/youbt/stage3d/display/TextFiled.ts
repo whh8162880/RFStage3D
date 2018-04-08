@@ -6,7 +6,7 @@ module rf {
     export class TextFormat {
         family: string = "微软雅黑";
         oy: number = 0.25;
-        size: number = 12;
+        size: number = 15;
         // "bold " : "normal "
         bold: string = "normal";
         // "italic " : "normal "
@@ -888,7 +888,7 @@ module rf {
     export class TextLine extends Sprite {
         line: Line;
         renderText(line: Line): void {
-            this.cleanAll();
+            this.removeAllChild();
             this.line = line;
             let h = line.h;
             let chars = line.chars;

@@ -247,8 +247,7 @@ module rf {
                 g.vertexAttribPointer(loc, o.size, g.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
                 g.enableVertexAttribArray(loc);
             }
-            //加入资源管理
-            context3D.bufferLink.add(this);
+            this.preusetime = engineNow;
         }
     }
 

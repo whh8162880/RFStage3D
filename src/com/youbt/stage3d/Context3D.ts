@@ -75,6 +75,7 @@ namespace rf {
 		private _depthDisabled: boolean = true;
 		constructor() {
 			this.bufferLink = new Link();
+			ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
 		}
 
 		public configureBackBuffer(width: number,height: number,antiAlias: number,enableDepthAndStencil: boolean = true): void {
@@ -497,6 +498,46 @@ namespace rf {
 		// 	var l: WebGLUniformLocation = gl.getUniformLocation(this._linkedProgram.program, keyInCache);
 		// 	gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		// }
+
+		gc(event:EventX):void{
+			let now = engineNow;
+			let link = this.bufferLink;
+			let vo = link.getFrist();
+			while(vo){
+				if(false == vo.close){
+					let buffer:Recyclable<Buffer3D> = vo.data;
+					if(now - buffer.preusetime > 3000){
+						buffer.recycle();
+						vo.close = true;
+					}
+				}
+				vo = vo.next;
+			}
+			link.clean();
+		}
+
+
+		toString():string{
+			let link = this.bufferLink;
+			let vo = link.getFrist();
+			let v=0,t=0,p=0,i=0;
+			while(vo){
+				if(false == vo.close){
+					let buffer:Recyclable<Buffer3D> = vo.data;
+					if(buffer instanceof VertexBuffer3D){
+						v ++;
+					}else if(buffer instanceof IndexBuffer3D){
+						i ++;
+					}else if(buffer instanceof Texture){
+						t ++;
+					}else if(buffer instanceof Program3D){
+						p ++;
+					}
+				}
+				vo = vo.next;
+			}
+			return `p:${p} i:${i} v:${v} t:${t}`;
+		}
 	}
 
 

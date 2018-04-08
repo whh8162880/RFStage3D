@@ -26,18 +26,29 @@ module rf{
 
         public addChild(child:DisplayObject):void{
             if(undefined == child || child == this) return;
-            if(child.parent) child.remove();
-
-            this.childrens.push(child);
-            child.parent = this;
-            //需要更新Transform
-            child.setChange(DChange.base | DChange.vertex)
-            if(this.stage){
-                if(!child.stage){
-                    child.stage = this.stage;
-                    child.addToStage();
+            let childrens = this.childrens;
+            let i = childrens.indexOf(child);
+            if(i == -1){
+                if(child.parent) child.remove();
+                childrens.push(child);
+                child.parent = this;
+                child.setChange(DChange.base);
+                if(this.stage){
+                    if(!child.stage){
+                        child.stage = this.stage;
+                        child.addToStage();
+                    }
                 }
+            }else{
+                childrens.splice(i,1);
+                childrens.push(child);
             }
+            
+           
+            
+
+            //需要更新Transform
+           
         }
 
 
@@ -55,7 +66,7 @@ module rf{
 
             child.parent = this;
             //需要更新Transform
-            child.setChange(DChange.base | DChange.vertex)
+            child.setChange(DChange.base)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;

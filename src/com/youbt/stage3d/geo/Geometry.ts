@@ -55,9 +55,11 @@ module rf {
      * uv:Float32Array
      * color:Float32Array
      */
-    export function createGeometry(data:{ [key: string]: Float32Array },variables:{ [key: string]: IVariable },numVertices:number):Float32Array{
+    export function createGeometry(data:{ [key: string]: Float32Array },variables:{ [key: string]: IVariable },numVertices:number,result?:Float32Array):Float32Array{
         let data32PerVertex = variables["data32PerVertex"].size;
-        let result = new Float32Array(data32PerVertex * numVertices);
+        if(undefined == result){
+            result = new Float32Array(data32PerVertex * numVertices);
+        }
         let offset = 0;
         let offsetIndex = 0;
         let offsetData = 0;
