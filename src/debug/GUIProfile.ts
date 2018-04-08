@@ -29,8 +29,8 @@ module rf{
         }
 
         fpsChangeHandler(event:EventX):void{
-            // this.timeTex.text = `time:${getFormatTime(engineNow,"HH:mm:ss",false)}`;
-            // this.fpsTxt.text = `F:${Engine.fps} C:${Engine.code.toFixed(2)}`;
+            this.timeTex.text = `time:${getFormatTime(engineNow,"HH:mm:ss",false)}`;
+            this.fpsTxt.text = `F:${Engine.fps} C:${Engine.code.toFixed(2)}`;
             this.bufferTex.text = context3D.toString();
         }
     }

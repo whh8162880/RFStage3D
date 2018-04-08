@@ -356,7 +356,8 @@ module rf {
                 alpha
             ]
 
-            const uv = [originU,originV];
+
+            const uv = [originU,originV,this.target.$vcIndex];
 
             const noraml = [0,0,1]
             
@@ -433,6 +434,8 @@ module rf {
 
             const noraml = [0,0,1]
 
+            const index = this.target.$vcIndex;
+
             let f = m2dTransform;
             let p = [0,0,0];
 
@@ -444,7 +447,7 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.addPoint(p,noraml,[points[i+2],points[i+3]],rgba);
+                this.addPoint(p,noraml,[points[i+2],points[i+3],index],rgba);
             }
 
             // let v = this.target.variables;
