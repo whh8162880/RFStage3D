@@ -327,10 +327,15 @@ module rf {
                     return;
                 }
                 let size = variable.size;
-                let offset = numVertices * size;
-                for(let i = 0;i<size;i++){
-                    array[offset + i] = data[i];
+                let offset = numVertices * size
+                if(data.length == size){
+                    array.set(data,offset)
+                }else{
+                    array.set(data.slice(0,size),offset);
                 }
+                // for(let i = 0;i<size;i++){
+                //     array[offset + i] = data[i];
+                // }
             }
 
             set(variables[VA.pos],empty_float32_pos,pos);
