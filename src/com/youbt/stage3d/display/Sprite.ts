@@ -164,6 +164,103 @@ module rf {
         }
     }
 
+
+    export class IconView extends Image
+    {
+
+        drawW:number;
+        drawH:number;
+        constructor(){
+            super();
+        }
+
+        setUrl(url:string){
+            if(url == null)
+            {
+                let g = this.graphics;
+                g.clear();
+                g.end();
+                return;
+            }
+            this.load(url);
+        }
+
+        resetSize(_width:number,_height:number)
+        {   
+            this.drawW = _width;
+            this.drawH = _height;
+        }
+
+        onImageComplete(e:EventX)
+        {
+            if(e.type !=  EventT.COMPLETE)
+            {
+                this.drawFault();
+                return;
+            }
+
+            let res:ResItem = e.data;
+            let image:HTMLImageElement = res.data;
+
+            this._draw(image);
+            this.simpleDispatch(EventT.COMPLETE);
+        }
+
+
+        
+        _draw(img:HTMLImageElement)
+        {
+            if(!this._url)
+            {
+                return;
+            }
+
+            var matrix = new Matrix();
+            matrix.identity();
+            
+            let dw = this.drawW;
+            let dh = this.drawH;
+
+            let sw;
+            let sh;
+            if(dw && dh)
+            {
+               if(dw != img.width || dh != img.height)
+               {
+                   sw = dw;
+                   sh = dh;
+                   matrix.scale(dw / img.width,dh / img.height);
+
+               }else{
+                    sw = dw;
+                    sh = dh;
+               }
+
+            }else{
+                sw = dw;
+                sh = dh;
+            }
+
+            let source = this.source;
+            let vo = source.setSourceVO(this._url,img.width,img.width,1);
+            source.bmd.context.drawImage(img,vo.x,vo.y);
+
+            let g = this.graphics;
+            g.clear();
+            g.drawBitmap(0,0,vo,0xFFFFFF)//matrix.rawData);
+            g.end();
+
+        }
+
+        drawFault()
+        {
+            let g = this.graphics;
+            g.clear();
+            g.end();
+            this.simpleDispatch(EventT.ERROR);
+        }
+    }
+
     export class Graphics {
         target: Sprite;
         byte: Float32Byte;
