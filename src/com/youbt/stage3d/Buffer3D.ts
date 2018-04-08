@@ -73,7 +73,9 @@ module rf {
                 ThrowError(`create program error:${g.getProgramInfoLog(this.program)}`);
                 return false;
             }
-
+            
+            //加入资源管理
+            context3D.bufferLink.add(this);
             return true;
         }
 
@@ -160,6 +162,8 @@ module rf {
             g.bufferData(g.ARRAY_BUFFER, this.data.vertex.array, g.STATIC_DRAW);
             g.bindBuffer(g.ARRAY_BUFFER, null);
             this.readly = true;
+            //加入资源管理
+            context3D.bufferLink.add(this);
             return true;
         }
 
@@ -243,6 +247,8 @@ module rf {
                 g.vertexAttribPointer(loc, o.size, g.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
                 g.enableVertexAttribArray(loc);
             }
+            //加入资源管理
+            context3D.bufferLink.add(this);
         }
     }
 
@@ -287,7 +293,8 @@ module rf {
             g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, this.buffer);
             g.bufferData(g.ELEMENT_ARRAY_BUFFER, this.data, g.STATIC_DRAW);
             g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, null);
-
+            //加入资源管理
+            context3D.bufferLink.add(this);
         }
         public uploadFromVector(data: number[] | Uint16Array, startOffset: number = 0, count: number = -1): void {
 
@@ -433,6 +440,10 @@ module rf {
             g.bindTexture(g.TEXTURE_2D, null);
 
             this.readly = true;
+
+            //加入资源管理
+            context3D.bufferLink.add(this);
+
             return true;
         }
 
@@ -458,6 +469,9 @@ module rf {
             if(undefined != index_tex){
                 g.uniform1i(index_tex, index);
             }
+
+
+            this.preusetime = engineNow;
             
         }
 

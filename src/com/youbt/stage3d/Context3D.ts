@@ -67,10 +67,14 @@ namespace rf {
 
 	export class Context3D {
 		//todo:enableErrorChecking https://www.khronos.org/webgl/wiki/Debugging
+
+		bufferLink:Link;
+
 		private _clearBit: number;
 		private _bendDisabled: boolean = true;
 		private _depthDisabled: boolean = true;
 		constructor() {
+			this.bufferLink = new Link();
 		}
 
 		public configureBackBuffer(width: number,height: number,antiAlias: number,enableDepthAndStencil: boolean = true): void {
@@ -276,7 +280,10 @@ namespace rf {
 
 		private cProgram: Program3D = undefined;
 		public setProgram(program: Program3D): void {
-			if (program == null || program == this.cProgram) return;
+			if (program == undefined) return 
+
+			program.preusetime = engineNow;
+			if(program == this.cProgram) return;
 
 			if (false == program.readly) {
 				if (false == program.awaken()) {
@@ -378,6 +385,7 @@ namespace rf {
 					throw new Error("create indexBuffer error!");
 				}
 			}
+			indexBuffer.preusetime = engineNow;
 			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
 			gl.drawElements(gl.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, gl.UNSIGNED_SHORT, firstIndex * 2);
 		}

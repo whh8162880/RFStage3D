@@ -214,7 +214,7 @@ module rf {
 
 
             function set(variable:IVariable,array:Float32Array,data:number[]):void{
-                if(undefined == data){
+                if(undefined == data || undefined == variable){
                     return;
                 }
                 let size = variable.size;
