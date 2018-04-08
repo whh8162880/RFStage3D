@@ -1,5 +1,5 @@
 module rf{
-    export class BitmapSourceVO{
+    export class BitmapSourceVO implements IFrame{
         name:string = undefined;
         used:number = 0;
         time:number = 0;
