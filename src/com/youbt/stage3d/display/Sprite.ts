@@ -224,39 +224,38 @@ module rf {
                 return;
             }
 
-            var matrix = new Matrix();
-            matrix.identity();
+            // var matrix = new Matrix();
+            // matrix.identity();
             
             let dw = this.drawW;
             let dh = this.drawH;
 
-            let sw;
-            let sh;
-            if(dw && dh)
+            // if(dw && dh)
+            // {
+            //    if(dw != img.width || dh != img.height)
+            //    {
+            //     //    matrix.scale(dw / img.width,dh / img.height);
+
+            //    }
+            // }else{
+            //     dw = img.width;
+            //     dh = img.height;
+            // }
+            if(!dw || !dh)
             {
-               if(dw != img.width || dh != img.height)
-               {
-                   sw = dw;
-                   sh = dh;
-                   matrix.scale(dw / img.width,dh / img.height);
-
-               }else{
-                    sw = dw;
-                    sh = dh;
-               }
-
-            }else{
-                sw = dw;
-                sh = dh;
+                dw = img.width;
+                dh = img.height;
             }
 
             let source = this.source;
             let vo = source.setSourceVO(this._url,img.width,img.width,1);
-            source.bmd.context.drawImage(img,vo.x,vo.y);
+            // source.bmd.context.drawImage(img,vo.x,vo.y);
+            source.bmd.context.drawImage(img,vo.x,vo.y,dw,dh);
 
             let g = this.graphics;
             g.clear();
-            g.drawBitmap(0,0,vo,0xFFFFFF,matrix.rawData);
+            g.drawBitmap(0,0,vo);
+            // g.drawBitmap(0,0,vo,0xFFFFFF,matrix.rawData);
             g.end();
 
         }
