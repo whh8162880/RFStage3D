@@ -133,6 +133,14 @@ module rf{
             // Engine.dispatcher.addEventListener(EngineEvent.FPS_CHANGE,function (){
             //     t.text =`fps:${Engine.fps}\ncode:${Engine.code.toFixed(2)}`
             // });
+
+
+            let icon = new IconView();
+            icon.x = 100;
+            icon.y = 100;
+            icon.resetSize(100,100);
+            ROOT.addChild(icon);
+            icon.setUrl("assets/ranger.png");
         }
 
         public linktest():void{

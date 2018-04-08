@@ -170,11 +170,15 @@ module rf {
 
         drawW:number;
         drawH:number;
+
+        img:HTMLImageElement;
+
+        isReady:boolean = false;
         constructor(){
             super();
         }
 
-        setUrl(url:string){
+        setUrl(url:string):void{
             if(url == null)
             {
                 let g = this.graphics;
@@ -182,17 +186,20 @@ module rf {
                 g.end();
                 return;
             }
+            this.isReady = false;
             this.load(url);
         }
 
-        resetSize(_width:number,_height:number)
-        {   
+        resetSize(_width:number,_height:number):void{   
             this.drawW = _width;
             this.drawH = _height;
+            if(this.isReady && this.img)
+            {
+                this._draw(this.img);
+            }
         }
 
-        onImageComplete(e:EventX)
-        {
+        onImageComplete(e:EventX):void{
             if(e.type !=  EventT.COMPLETE)
             {
                 this.drawFault();
@@ -200,16 +207,18 @@ module rf {
             }
 
             let res:ResItem = e.data;
-            let image:HTMLImageElement = res.data;
+            this.img = res.data;
 
-            this._draw(image);
+
+            this._draw(this.img);
             this.simpleDispatch(EventT.COMPLETE);
+
+            this.isReady = true;
         }
 
 
         
-        _draw(img:HTMLImageElement)
-        {
+        _draw(img:HTMLImageElement):void{
             if(!this._url)
             {
                 return;
@@ -247,16 +256,16 @@ module rf {
 
             let g = this.graphics;
             g.clear();
-            g.drawBitmap(0,0,vo,0xFFFFFF)//matrix.rawData);
+            g.drawBitmap(0,0,vo,0xFFFFFF,matrix.rawData);
             g.end();
 
         }
 
-        drawFault()
-        {
+        drawFault():void{
             let g = this.graphics;
             g.clear();
             g.end();
+            this.img = null;
             this.simpleDispatch(EventT.ERROR);
         }
     }
