@@ -888,7 +888,7 @@ module rf {
     export class TextLine extends Sprite {
         line: Line;
         renderText(line: Line): void {
-            this.cleanAll();
+            this.removeAllChild();
             this.line = line;
             let h = line.h;
             let chars = line.chars;

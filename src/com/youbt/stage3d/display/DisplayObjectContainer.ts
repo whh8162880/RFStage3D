@@ -27,11 +27,12 @@ module rf{
         public addChild(child:DisplayObject):void{
             if(undefined == child || child == this) return;
             if(child.parent) child.remove();
+            
 
             this.childrens.push(child);
             child.parent = this;
             //需要更新Transform
-            child.setChange(DChange.base | DChange.vertex)
+            child.setChange(DChange.base)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -55,7 +56,7 @@ module rf{
 
             child.parent = this;
             //需要更新Transform
-            child.setChange(DChange.base | DChange.vertex)
+            child.setChange(DChange.base)
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;

@@ -56,6 +56,7 @@ module rf {
             if (this.$graphics && this.$graphics.numVertices) {
                 this.setChange(DChange.vertex);
             }
+            super.addToStage();
         }
 
         cleanAll(){
@@ -203,8 +204,10 @@ module rf {
             }else{
                 change |= (DChange.vertex | DChange.area);
             }
-            
-            target.setChange(change);
+
+            if(change > 0){
+                target.setChange(change);
+            }
         }
         
 
@@ -703,8 +706,8 @@ module rf {
         }
 
         update(position:number,byte:Float32Byte):void{
-            if(undefined != this.vcData){
-                this.vcData.set(position,byte);
+            if(undefined != this.vertex){
+                this.vertex.vertex.set(position,byte);
             }
             if(undefined != this.$vertexBuffer){
                 this.$vertexBuffer.readly = false;
