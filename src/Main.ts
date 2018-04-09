@@ -27,6 +27,15 @@ module rf{
             ROOT.addChild(icon);
             icon.setUrl("assets/ranger.png");
 
+
+            // let line = new Line3D();
+            // line.clear();
+            // line.moveTo(100,100,0);
+            // line.lineTo(200,100,0);
+            // line.end();
+            // ROOT.addChild(line);
+           
+
             // let span = document.getElementById("fps");
 
             // var t = new TextField();
@@ -81,7 +90,7 @@ module rf{
 
             // g = ROOT.graphics;
             // g.clear();
-            // g.drawRect(0,0,100,100,0xFF0000);
+            // g.drawRect(0,0,500,500,0xFF0000);
             // g.end();
 
             

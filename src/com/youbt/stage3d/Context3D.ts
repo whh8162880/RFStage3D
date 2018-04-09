@@ -385,6 +385,7 @@ namespace rf {
 			}
 			indexBuffer.preusetime = engineNow;
 			let g = gl;
+			// g.drawArrays(g.TRIANGLES,0,numTriangles)
 			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
 			g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
 
@@ -393,20 +394,25 @@ namespace rf {
 		}
 
 
-		// /*
-        //  *  [Webgl only]
-        //  *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
-        //  *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
-        //  */
-		// public drawLines(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numLines: number = -1): void {
-		// 	if (false == indexBuffer.readly) {
-		// 		if (false == indexBuffer.awaken()) {
-		// 			throw new Error("create indexBuffer error!");
-		// 		}
-		// 	}
-		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-		// 	gl.drawElements(gl.LINES, numLines < 0 ? indexBuffer.numIndices : numLines * 2, gl.UNSIGNED_SHORT, firstIndex * 2);
-		// }
+		/*
+         *  [Webgl only]
+         *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
+         *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
+         */
+		public drawLines(indexBuffer: IndexBuffer3D, numTriangles:number, firstIndex: number = 0, numLines: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			indexBuffer.preusetime = engineNow;
+			let g = gl;
+			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			g.drawElements(g.LINES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+
+			this.triangles += numTriangles;
+			this.dc ++;
+		}
 
 		// /*
         //  * [Webgl only]

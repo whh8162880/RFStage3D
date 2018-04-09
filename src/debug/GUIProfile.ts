@@ -7,6 +7,8 @@ module rf{
 		repolyTxt:TextField;
 		bufferTex:TextField;
         tweenTex:TextField;
+
+        // span:HTMLElement;
         constructor(){
             super();
             this.bindComponents();
@@ -18,6 +20,7 @@ module rf{
             this.bufferTex = this.createText();
             this.dcTxt = this.createText();
             ROOT.addEventListener(EngineEvent.FPS_CHANGE,this.fpsChangeHandler,this);
+            // this.span = document.getElementById("fps");
         }
 
         private createText():TextField{
@@ -34,7 +37,9 @@ module rf{
             this.timeTex.text = `time:${getFormatTime(engineNow,"HH:mm:ss",false)}`;
             this.fpsTxt.text = `F:${Engine.fps} C:${Engine.code.toFixed(2)}`;
             this.bufferTex.text = con.toString();
-            this.dcTxt.text = `tri:${con.triangles} dc:${con.dc}`
+            this.dcTxt.text = `tri:${con.triangles} dc:${con.dc}`;
+
+            // this.span.innerHTML = `pixelRatio:${pixelRatio} fps:${Engine.fps} code:${Engine.code.toFixed(2)}`
         }
     }
 }
