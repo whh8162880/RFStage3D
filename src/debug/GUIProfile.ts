@@ -1,4 +1,4 @@
-/// <reference path="../com/youbt/rfreference.ts" />
+/// <reference path="../com/youbt/stage3d/Stage3D.ts" />
 module rf{
     export class GUIProfile extends Sprite{
         timeTex:TextField;

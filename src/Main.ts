@@ -16,16 +16,7 @@ module rf{
                 return;
             }
 
-            Capabilities.init();
-
-            
             var g = undefined
-            context3D.configureBackBuffer(stageWidth,stageHeight,0);
-            // context3D.setDepthTest(true,gl.LEQUAL);
-            context3D.setDepthTest(false,gl.ALWAYS);
-            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-
-
             let profile = singleton(GUIProfile);
             ROOT.addChild(profile);
 
