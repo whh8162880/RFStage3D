@@ -16,24 +16,37 @@ module rf{
                 return;
             }
 
-            var g = undefined
-            let profile = singleton(GUIProfile);
-            ROOT.addChild(profile);
+            var g:Graphics;
+            
 
             let icon = new IconView();
-            icon.x = 100;
-            icon.y = 100;
+            icon.x = 0;
+            icon.y = 0;
             icon.resetSize(100,100);
             ROOT.addChild(icon);
             icon.setUrl("assets/ranger.png");
 
+            let profile = singleton(GUIProfile);
+            ROOT.addChild(profile);
 
-            // let line = new Line3D();
-            // line.clear();
-            // line.moveTo(100,100,0);
-            // line.lineTo(200,100,0);
-            // line.end();
-            // ROOT.addChild(line);
+
+            let line = new Line3D();
+            line.clear();
+            line.moveTo(0,0,0,1);
+            line.lineTo(500,0,0,1);
+            line.end();
+            line.setPos(100,100,0)
+            ROOT.addChild(line);
+
+            // let s = new Sprite();
+            // g = s.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,1,0xFF0000)
+            // g.end();
+            // s.setPos(100,100,0)
+            // ROOT.addChild(s);
+
+            
            
 
             // let span = document.getElementById("fps");

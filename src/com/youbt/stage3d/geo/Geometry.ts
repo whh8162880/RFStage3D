@@ -1,12 +1,4 @@
 module rf {
-    export let line_variable:{ [key: string]: IVariable } = {
-        "posX":{size:3,offset:0},
-        "posY":{size:3,offset:3},
-        "len":{size:1,offset:6},
-        "color":{size:4,offset:7},
-        "data32PerVertex":{size:11,offset:0}
-    }
-
     export let vertex_ui_variable:{ [key: string]: IVariable } = {
         //x,y,z,u,v,index,r,g,b,a
         "pos":{size:3,offset:0},

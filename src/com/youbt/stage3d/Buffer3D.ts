@@ -293,6 +293,7 @@ module rf {
             g.bufferData(g.ELEMENT_ARRAY_BUFFER, this.data, g.STATIC_DRAW);
             g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, null);
             //加入资源管理
+            this.readly = true;
             context3D.bufferLink.add(this);
         }
         public uploadFromVector(data: number[] | Uint16Array, startOffset: number = 0, count: number = -1): void {

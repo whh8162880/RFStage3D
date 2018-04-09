@@ -1,4 +1,13 @@
 module rf{
+
+    export let line_variable:{ [key: string]: IVariable } = {
+        "posX":{size:3,offset:0},
+        "posY":{size:3,offset:3},
+        "len":{size:1,offset:6},
+        "color":{size:4,offset:7},
+        "data32PerVertex":{size:11,offset:0}
+    }
+
     export class Line3DPoint{
         x:number = 0;
         y:number = 0;
@@ -27,6 +36,10 @@ module rf{
             return vo;
         }
     }
+
+    /**
+     * 直线 不管放大 缩小 都不变
+     */
     export class Line3D extends Sprite{
         
         constructor(){
@@ -37,15 +50,14 @@ module rf{
         }
         private origin:Recyclable<Line3DPoint>;
         private tempVertex:Recyclable<Temp_Float32Byte>;
-
         points:Line3DPoint[] = [];
         vertexBuffer:VertexBuffer3D;
         program:Program3D;
-
         worldTransform:Matrix3D;
-
         data32PerVertex:number;
-
+        numVertices:number;
+        triangles:number;
+        quad:number;
         clear(){
             let tempVertex = this.tempVertex
             if(undefined == tempVertex){
@@ -65,7 +77,7 @@ module rf{
             this.vertexBuffer = null;
         }
 
-        moveTo(x:number,y:number,z:number,color:number = 0xFFFFFF,alpha:number = 1,thickness:number = 1):void{
+        moveTo(x:number,y:number,z:number,thickness:number = 1,color:number = 0xFFFFFF,alpha:number = 1):void{
             const{origin,points} = this;
             if(points.length){
                 this.build();
@@ -79,10 +91,10 @@ module rf{
             toRGB(color,origin);
             origin.a = alpha;
 
-            points.push(origin);
+            points.push(origin.clone());
         }
 
-        lineTo(x:number,y:number,z:number,color:number = 0xFFFFFF,alpha:number = 1,thickness:number = 1):void{
+        lineTo(x:number,y:number,z:number,thickness:number = 1,color:number = 0xFFFFFF,alpha:number = 1):void{
             const{origin:vo,points} = this;
             vo.x = x;
             vo.y = y;
@@ -119,7 +131,9 @@ module rf{
             }
             let arr = tempVertex.toArray()
             let info = new VertexInfo(arr,data32PerVertex,variables);
-            this.vertexBuffer = context3D.createVertexBuffer(info);
+            let v = this.vertexBuffer = context3D.createVertexBuffer(info);
+            this.triangles = v.numVertices / 2;
+            this.quad = this.triangles / 2;
 
             tempVertex.recycle();
             origin.recycle();
@@ -128,20 +142,40 @@ module rf{
 
         }
 
+        public updateTransform(): void {
+            super.updateTransform();
+        }
+
         render(camera: Camera, now: number, interval: number):void{
-            let v = this.vertexBuffer;
+            let c = context3D;
+            const{vertexBuffer:v,worldTransform:m,quad,triangles}=this;
+
             if(undefined == v){
                 return;
             }
 
             let p = this.program;
 
-            
+            if(undefined == p){
+                this.program = p = this.createProgram();
+            }
 
-            
 
+            c.setProgram(p);
 
+            m.copyFrom(this.sceneTransform);
+            m.append(camera.sceneTransform);
+            c.setProgramConstantsFromMatrix(VC.mv,m);
+            c.setProgramConstantsFromMatrix(VC.p,camera.len);
+            v.uploadContext(p);
+
+            let i = c.getIndexByQuad(quad);
+
+            c.drawTriangles(i,triangles)
         }
+
+
+        
 
 
         protected createProgram():Program3D{
@@ -159,18 +193,20 @@ module rf{
                 void main(void){
                     vec4 pos = mv * vec4(posX,1.0); 
                     vec4 t = pos - mv * vec4(posY,1.0);
-                    vec3 v = normalize(cross(t.xyz,vec3(0,0,1)))
+                    vec3 v = cross(t.xyz,vec3(0,0,1));
+                    v = normalize(v);
                     v.xy *= len;
-                    pos.xy += v.xy;
+                    pos.xyz += ceil(v.xyz);
                     gl_Position = p * pos;
                     vColor = color;
                 }
             `
 
             let fragmentCode = ` 
+                precision mediump float;
                 varying vec4 vColor;
                 void main(void){
-                    gl_FragColor = vColor
+                    gl_FragColor = vColor;
                 }
             `
 
