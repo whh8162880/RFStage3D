@@ -32,11 +32,13 @@ module rf{
 
             let line = new Line3D();
             line.clear();
-            line.moveTo(0,0,0,1);
-            line.lineTo(500,0,0,1);
+            line.moveTo(0,0,0,5);
+            line.lineTo(500,0,0,5);
             line.end();
             line.setPos(100,100,0)
             ROOT.addChild(line);
+
+            // ROOT.camera2D.z = -1.5
 
             // let s = new Sprite();
             // g = s.graphics;
