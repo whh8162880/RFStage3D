@@ -20,6 +20,13 @@ module rf{
             let profile = singleton(GUIProfile);
             ROOT.addChild(profile);
 
+            let icon = new IconView();
+            icon.x = 100;
+            icon.y = 100;
+            icon.resetSize(100,100);
+            ROOT.addChild(icon);
+            icon.setUrl("assets/ranger.png");
+
             // let span = document.getElementById("fps");
 
             // var t = new TextField();
@@ -130,12 +137,7 @@ module rf{
             // });
 
 
-            let icon = new IconView();
-            icon.x = 100;
-            icon.y = 100;
-            icon.resetSize(100,100);
-            ROOT.addChild(icon);
-            icon.setUrl("assets/ranger.png");
+           
         }
 
         public linktest():void{
