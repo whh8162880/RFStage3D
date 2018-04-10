@@ -234,7 +234,7 @@ module rf {
             //     a8, a9, a10, a11,
             //     a41, a42, a43, a44
             // ] = this.rawData as any;
-            let rawData = this.rawData;k
+            let rawData = this.rawData;
             return ((rawData[0] * rawData[5] - rawData[4] * rawData[1]) * (rawData[10] * rawData[15] - rawData[14] * rawData[11])
                 - (rawData[0] * rawData[9] - rawData[8] * rawData[1]) * (rawData[6] * rawData[15] - rawData[14] * rawData[7])
                 + (rawData[0] * rawData[13] - rawData[12] * rawData[1]) * (rawData[6] * rawData[11] - rawData[10] * rawData[7])
@@ -598,60 +598,6 @@ module rf {
 			rawData[15] = 1.0;
 		}
 		
-		public function prepend(rhs : Matrix3D) : void {
-			var m111 : Number = rhs.rawData[0] as Number;
-			var m121 : Number = rhs.rawData[4] as Number;
-			var m131 : Number = rhs.rawData[8] as Number;
-			var m141 : Number = rhs.rawData[12] as Number;
-			var m112 : Number = rhs.rawData[1] as Number;
-			var m122 : Number = rhs.rawData[5] as Number;
-			var m132 : Number = rhs.rawData[9] as Number;
-			var m142 : Number = rhs.rawData[13] as Number;
-			var m113 : Number = rhs.rawData[2] as Number;
-			var m123 : Number = rhs.rawData[6] as Number;
-			var m133 : Number = rhs.rawData[10] as Number;
-			var m143 : Number = rhs.rawData[14] as Number;
-			var m114 : Number = rhs.rawData[3] as Number;
-			var m124 : Number = rhs.rawData[7] as Number;
-			var m134 : Number = rhs.rawData[11] as Number;
-			var m144 : Number = rhs.rawData[15] as Number;
-			var m211 : Number = this.rawData[0] as Number;
-			var m221 : Number = this.rawData[4] as Number;
-			var m231 : Number = this.rawData[8] as Number;
-			var m241 : Number = this.rawData[12] as Number;
-			var m212 : Number = this.rawData[1] as Number;
-			var m222 : Number = this.rawData[5] as Number;
-			var m232 : Number = this.rawData[9] as Number;
-			var m242 : Number = this.rawData[13] as Number;
-			var m213 : Number = this.rawData[2] as Number;
-			var m223 : Number = this.rawData[6] as Number;
-			var m233 : Number = this.rawData[10] as Number;
-			var m243 : Number = this.rawData[14] as Number;
-			var m214 : Number = this.rawData[3] as Number;
-			var m224 : Number = this.rawData[7] as Number;
-			var m234 : Number = this.rawData[11] as Number;
-			var m244 : Number = this.rawData[15] as Number;
-			this.rawData[0] = m111 * m211 + m112 * m221 + m113 * m231 + m114 * m241;
-			this.rawData[1] = m111 * m212 + m112 * m222 + m113 * m232 + m114 * m242;
-			this.rawData[2] = m111 * m213 + m112 * m223 + m113 * m233 + m114 * m243;
-			this.rawData[3] = m111 * m214 + m112 * m224 + m113 * m234 + m114 * m244;
-			this.rawData[4] = m121 * m211 + m122 * m221 + m123 * m231 + m124 * m241;
-			this.rawData[5] = m121 * m212 + m122 * m222 + m123 * m232 + m124 * m242;
-			this.rawData[6] = m121 * m213 + m122 * m223 + m123 * m233 + m124 * m243;
-			this.rawData[7] = m121 * m214 + m122 * m224 + m123 * m234 + m124 * m244;
-			this.rawData[8] = m131 * m211 + m132 * m221 + m133 * m231 + m134 * m241;
-			this.rawData[9] = m131 * m212 + m132 * m222 + m133 * m232 + m134 * m242;
-			this.rawData[10] = m131 * m213 + m132 * m223 + m133 * m233 + m134 * m243;
-			this.rawData[11] = m131 * m214 + m132 * m224 + m133 * m234 + m134 * m244;
-			this.rawData[12] = m141 * m211 + m142 * m221 + m143 * m231 + m144 * m241;
-			this.rawData[13] = m141 * m212 + m142 * m222 + m143 * m232 + m144 * m242;
-			this.rawData[14] = m141 * m213 + m142 * m223 + m143 * m233 + m144 * m243;
-			this.rawData[15] = m141 * m214 + m142 * m224 + m143 * m234 + m144 * m244;
-
-        }
-
-
-
 
         public recompose(components: Vector3D[], orientationStyle = Orientation3D.EULER_ANGLES) {
             if (components.length < 3) {
