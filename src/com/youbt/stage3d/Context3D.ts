@@ -336,23 +336,25 @@ namespace rf {
 		 * @param depthMask 
 		 * @param passCompareMode 
 		 * 
-		 * Context3DCompareMode.LESS			:GL.LESS
-		 * Context3DCompareMode.NEVER			:GL.NEVER
-		 * Context3DCompareMode.EQUAL			:GL.EQUAL
-		 * Context3DCompareMode.GREATER			:GL.GREATER
-		 * Context3DCompareMode.NOT_EQUAL		:GL.NOTEQUAL
-		 * Context3DCompareMode.ALWAYS			:GL.ALWAYS
-		 * Context3DCompareMode.LESS_EQUAL		:GL.LEQUAL
-		 * Context3DCompareMode.GREATER_EQUAL	:GL.GEQUAL
+		 * 
+		 * @constant Context3DCompareMode.LESS=GL.LESS
+		 * @constant Context3DCompareMode.NEVER=GL.NEVER
+		 * @constant Context3DCompareMode.EQUAL=GL.EQUAL
+		 * @constant Context3DCompareMode.GREATER=GL.GREATER
+		 * @constant Context3DCompareMode.NOT_EQUAL=GL.NOTEQUAL
+		 * @constant Context3DCompareMode.ALWAYS=GL.ALWAYS
+		 * @constant Context3DCompareMode.LESS_EQUAL=GL.LEQUAL
+		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
 		 */
 		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
+			let g = gl;
 			if (this._depthDisabled) {
-				gl.enable(gl.DEPTH_TEST);
+				g.enable(g.DEPTH_TEST);
 				this._depthDisabled = false;
 			}
 
-			gl.depthMask(depthMask);
-			gl.depthFunc(passCompareMode);
+			g.depthMask(depthMask);
+			g.depthFunc(passCompareMode);
 		}
 
 

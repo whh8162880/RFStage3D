@@ -9,11 +9,14 @@ module rf{
 
         camera2D:Camera2D;
 
+        camera3D:Camera3D;
+
         mouse:Mouse;
 
         constructor(){
             super();
             this.camera2D = new Camera2D();
+            this.camera3D = new Camera3D();
             this.renderer = new BatchRenderer(this);
             this.mouse = new Mouse();
             this.stage = this;
@@ -63,16 +66,20 @@ module rf{
             }
             context3D.clear(0,0,0,1);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
-            if(this.camera2D.states){
-                this.camera2D.updateSceneTransform();
+
+            let c = this.camera3D;
+
+            if(c.states){
+                c.updateSceneTransform();
             }
-            this.render(this.camera2D,now,interval);
+            this.render(c,now,interval);
         }
         
 
 
         public resize(width:number,height:number):void{
             this.camera2D.resize(width,height);
+            this.camera3D.resize(width,height);
         }
     }
 }

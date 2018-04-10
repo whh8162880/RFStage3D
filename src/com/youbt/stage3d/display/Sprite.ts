@@ -56,6 +56,13 @@ module rf {
             if (this.$graphics && this.$graphics.numVertices) {
                 this.setChange(DChange.vertex);
             }
+
+            if(this.renderer){
+                if(this.parent){
+                    this.parent.setChange(DChange.vertex);
+                }
+            }
+
             super.addToStage();
         }
 

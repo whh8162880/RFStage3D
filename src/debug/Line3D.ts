@@ -142,12 +142,20 @@ module rf{
 
         }
 
-        public updateTransform(): void {
+        updateTransform(): void {
             super.updateTransform();
         }
 
+        addToStage():void{
+            super.addToStage();
+            this.setChange(DChange.vertex);
+        }
+
         render(camera: Camera, now: number, interval: number):void{
+
+
             let c = context3D;
+            c.setDepthTest(true,gl.LEQUAL);
             const{vertexBuffer:v,worldTransform:m,quad,triangles}=this;
 
             if(undefined == v){
@@ -213,4 +221,37 @@ module rf{
             return context3D.createProgram(vertexCode,fragmentCode);
         }
     }
+
+    export class Trident extends Line3D{
+        constructor(len:number = 200,think:number = 2){
+            super();
+            
+            let line= len * 0.9
+            let arrow = len * 0.1
+
+
+            this.clear();
+            let color = 0xFF0000;
+            this.moveTo(think,0,0,think,color);
+            this.lineTo(line,0,0,think,color);
+            this.moveTo(line,0,0,think*5,color);
+            this.lineTo(len,0,0,1,color);
+
+            color = 0x00FF00;
+            this.moveTo(0,think,0,think,color);
+            this.lineTo(0,line,0,think,color);
+            this.moveTo(0,line,0,think*5,color);
+            this.lineTo(0,len,0,1,color);
+
+            color = 0x0000FF;
+            this.moveTo(0,0,think,think,color);
+            this.lineTo(0,0,line,think,color);
+            this.moveTo(0,0,line,think*5,color);
+            this.lineTo(0,0,len,1,color);
+
+            this.end();
+
+        }
+    }
+
 }
