@@ -20,6 +20,14 @@ module rf{
 
             var g:Graphics;
 
+
+            let s = new Sprite();
+            g = s.graphics;
+            g.clear();
+            g.drawCube(0,0,0,100,100,100,0xFFFFFF);
+            g.end();
+            ROOT.addChild(s);
+
             // var m:Matrix3D = new Matrix3D();
             // m.appendRotation(90,Vector3D.X_AXIS);
             // m.appendRotation(90,Vector3D.Y_AXIS);
@@ -44,15 +52,15 @@ module rf{
 
             // ROOT.camera2D.z = -1.5
 
-            let s = new Sprite();
-            s.renderer = new BatchRenderer(s);
-            s.x = 100;
-            g = s.graphics;
-            g.clear();
-            g.drawRect(0,0,100,100,0xFF0000)
-            g.end();
+            // let s = new Sprite();
+            // s.renderer = new BatchRenderer(s);
+            // s.x = 100;
+            // g = s.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFF0000)
+            // g.end();
             // s.setPos(100,100,0)
-            ROOT.addChild(s);
+            // ROOT.addChild(s);
 
             
            

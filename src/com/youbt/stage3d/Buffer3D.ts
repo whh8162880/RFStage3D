@@ -15,9 +15,11 @@ module rf {
 
     export enum VC{
         mv = "mv",
+        invm ="invm",
         p = "p",
         mvp = "mvp",
         ui = "ui"
+
     }
 
     export class Buffer3D implements IRecyclable {

@@ -505,6 +505,76 @@ module rf {
             //     this.numVertices += 1;
             // }
         }
+
+
+        drawCube(x: number, y: number,z: number,
+             width: number, height: number, deep:number,
+            color: number, alpha: number = 1): void {
+
+            const {originU,originV} = this.target.source;
+
+            const rgba = [
+                ((color & 0x00ff0000) >>> 16) / 0xFF,
+                ((color & 0x0000ff00) >>> 8) / 0xFF,
+                (color & 0x000000ff) / 0xFF,
+                alpha
+            ]
+
+
+            const uv = [originU,originV,this.target.$vcIndex];
+
+            const noraml = [0,0,1]
+
+                let x2 = x + width;
+                let y2 = y + height;
+                let z2 = z + deep;
+
+                //前
+                this.addPoint([x,y,z],noraml,uv,rgba);
+                this.addPoint([x2,y,z],noraml,uv,rgba);
+                this.addPoint([x2,y2,z],noraml,uv,rgba);
+                this.addPoint([x,y2,z],noraml,uv,rgba);
+                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                
+                
+    //			beginFill(0x00FF00)
+                //上
+                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                
+                //左
+    //			beginFill(0x0000FF)
+                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                
+                //右
+    //			beginFill(0xFFFF00)
+                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                
+                //后
+    //			beginFill(0x00FFFF);
+                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                
+                //下
+    //			beginFill(0xFF00FF)
+                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+        }
     }
 
 
@@ -627,37 +697,52 @@ module rf {
 
 
         createProgram(): void {
-            let vcode = `
-                attribute vec3 pos;
-                attribute vec3 uv;
-                attribute vec4 color;
-                uniform mat4 mvp;
-                uniform vec4 ui[${max_vc}];
-                varying vec2 vUV;
-                varying vec4 vColor;
-                void main(void){
-                    vec4 p = vec4(pos,1.0);
-                    vec4 t = ui[int(uv.z)];
-                    p.xy = p.xy + t.xy;
-                    p.xy = p.xy * t.zz;
-                    gl_Position = mvp * p;
-                    vUV.xy = uv.xy;
-                    p = color;
-                    p.w = color.w * t.w;
-                    vColor = p;
-                }
-            `
 
-            let fcode = `
-                precision mediump float;
-                uniform sampler2D diff;
-                varying vec4 vColor;
-                varying vec2 vUV;
-                void main(void){
-                    vec4 color = texture2D(diff, vUV);
-                    gl_FragColor = vColor*color;
-                }
-            `
+            let chunk = singleton(Shader);
+
+            let keys = {};
+
+            keys[chunk.att_uv_ui.key] = chunk.att_uv_ui;
+            keys[chunk.uni_v_mvp.key] = chunk.uni_v_mvp;
+            let vcode = chunk.createVertex(undefined,keys)
+
+
+            // let vcode = `
+            //     attribute vec3 pos;
+            //     attribute vec3 uv;
+            //     attribute vec4 color;
+            //     uniform mat4 mvp;
+            //     uniform vec4 ui[${max_vc}];
+            //     varying vec2 vUV;
+            //     varying vec4 vColor;
+            //     void main(void){
+            //         vec4 p = vec4(pos,1.0);
+            //         vec4 t = ui[int(uv.z)];
+            //         p.xy = p.xy + t.xy;
+            //         p.xy = p.xy * t.zz;
+            //         gl_Position = mvp * p;
+            //         vUV.xy = uv.xy;
+            //         p = color;
+            //         p.w = color.w * t.w;
+            //         vColor = p;
+            //     }
+            // `
+
+            keys = {};
+            keys[chunk.uni_f_diff.key] = chunk.uni_f_diff;
+            keys[chunk.att_uv_ui.key] = chunk.att_uv_ui;
+            let fcode = chunk.createFragment(undefined,keys);
+
+            // let fcode = `
+            //     precision mediump float;
+            //     uniform sampler2D diff;
+            //     varying vec4 vColor;
+            //     varying vec2 vUV;
+            //     void main(void){
+            //         vec4 color = texture2D(diff, vUV);
+            //         gl_FragColor = vColor*color;
+            //     }
+            // `
 
             // let vcode = `
             //     attribute vec3 pos;

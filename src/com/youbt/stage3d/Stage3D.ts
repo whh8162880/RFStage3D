@@ -67,7 +67,7 @@ module rf{
             context3D.clear(0,0,0,1);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-            let c = this.camera3D;
+            let c = this.camera2D;
 
             if(c.states){
                 c.updateSceneTransform();
