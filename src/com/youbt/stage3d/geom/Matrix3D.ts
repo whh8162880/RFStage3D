@@ -1,139 +1,151 @@
 module rf {
 
     const DEG_2_RAD = Math.PI / 180;
+    const matrix3d_identity = new Float32Array([1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1]);
+
+    //  1,0,0,tx           
+    //  0,1,0,ty          
+    //  0,0,1,tz           
+    //  0,0,0,1
+
+    //a = a*b
+    export function matrix3d_multiply(a:Float32Array,b:Float32Array,out:Float32Array):void{
+        
+        const [
+            a11, a12, a13, a14,
+            a21, a22, a23, a24,
+            a31, a32, a33, a34,
+            a41, a42, a43, a44
+        ] = a as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
+
+        const [
+            b11, b12, b13, b14,
+            b21, b22, b23, b24,
+            b31, b32, b33, b34,
+            b41, b42, b43, b44
+        ] = b as any;
+
+		// out[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		// out[ 4 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		// out[ 8 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		// out[ 12 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+		// out[ 1 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		// out[ 5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		// out[ 9 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		// out[ 13 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+		// out[ 2 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		// out[ 6 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		// out[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		// out[ 14 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+		// out[ 3 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		// out[ 7 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		// out[ 11 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+        // out[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+
+        out[ 0 ] = a11 * b11 + a12 * b21 + a13 * b31 + a14 * b41;
+		out[ 1 ] = a11 * b12 + a12 * b22 + a13 * b32 + a14 * b42;
+		out[ 2 ] = a11 * b13 + a12 * b23 + a13 * b33 + a14 * b43;
+		out[ 3 ] = a11 * b14 + a12 * b24 + a13 * b34 + a14 * b44;
+
+		out[ 4 ] = a21 * b11 + a22 * b21 + a23 * b31 + a24 * b41;
+		out[ 5 ] = a21 * b12 + a22 * b22 + a23 * b32 + a24 * b42;
+		out[ 6 ] = a21 * b13 + a22 * b23 + a23 * b33 + a24 * b43;
+		out[ 7 ] = a21 * b14 + a22 * b24 + a23 * b34 + a24 * b44;
+
+		out[ 8 ] = a31 * b11 + a32 * b21 + a33 * b31 + a34 * b41;
+		out[ 9 ] = a31 * b12 + a32 * b22 + a33 * b32 + a34 * b42;
+		out[ 10 ] = a31 * b13 + a32 * b23 + a33 * b33 + a34 * b43;
+		out[ 11 ] = a31 * b14 + a32 * b24 + a33 * b34 + a34 * b44;
+
+		out[ 12 ] = a41 * b11 + a42 * b21 + a43 * b31 + a44 * b41;
+		out[ 13 ] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
+		out[ 14 ] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
+        out[ 15 ] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+        
+
+
+    }
+
+    export function matrix3d_RotationAxis(from:Float32Array,axis:Point3D,angle:number,out:Float32Array,prepend:boolean = false):void{
+        let c = Math.cos( angle );
+        let s = Math.sin( angle );
+        let t = 1 - c;
+        const{x,y,z} = axis;
+        let tx = t * x,ty = t * y;
+        let b = RAW_DATA_CONTAINER;
+        b.set([
+            tx * x + c,         tx * y - s * z,         tx * z + s * y,     0,
+			tx * y + s * z,     ty * y + c,             ty * z - s * x,     0,
+			tx * z - s * y,     ty * z + s * x,         t * z * z + c,      0,
+			0, 0, 0, 1
+        ]);
+
+        if(prepend == false){
+            matrix3d_multiply(from,b,out);
+        }else{
+            matrix3d_multiply(b,from,out);
+        }
+        
+    }
+
+
     export class Matrix3D {
-
-
-        /**
-         * [read-only] A Number that determines whether a matrix is invertible.
-         */
-        public get determinant() {
-            const rawData = this.rawData;
-            return ((rawData[0] * rawData[5] - rawData[4] * rawData[1]) * (rawData[10] * rawData[15] - rawData[14] * rawData[11])
-                - (rawData[0] * rawData[9] - rawData[8] * rawData[1]) * (rawData[6] * rawData[15] - rawData[14] * rawData[7])
-                + (rawData[0] * rawData[13] - rawData[12] * rawData[1]) * (rawData[6] * rawData[11] - rawData[10] * rawData[7])
-                + (rawData[4] * rawData[9] - rawData[8] * rawData[5]) * (rawData[2] * rawData[15] - rawData[14] * rawData[3])
-                - (rawData[4] * rawData[13] - rawData[12] * rawData[5]) * (rawData[2] * rawData[11] - rawData[10] * rawData[3])
-                + (rawData[8] * rawData[13] - rawData[12] * rawData[9]) * (rawData[2] * rawData[7] - rawData[6] * rawData[3]));
-        }
-
-        public get position() {
-            const rawData = this.rawData;
-            return new Vector3D(rawData[3], rawData[7], rawData[11]);
-        }
-
-        /**
-             矩阵要保存到这样
-             1, 0, 0, x,
-             0, 1, 0, y,
-             0, 0, 1, z,
-             0  0, 0, 0
-            上传时会自动转置
-         */
         public rawData: Float32Array;
-
-
-        /**
-         * Creates a Matrix3D object.
-         */
         constructor(v?: ArrayLike<number>) {
             if (undefined != v && v.length == 16)
                 this.rawData = new Float32Array(v);
             else
-                this.rawData = new Float32Array([
-                    1, 0, 0, 0,
-                    0, 1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1
-                ]);
+                this.rawData = new Float32Array(matrix3d_identity);
         }
 
-        /**
-         * Appends the matrix by multiplying another Matrix3D object by the current Matrix3D object.
-         * Apply a transform after this transform
-         */
-        public append(lhs: Matrix3D) {
-            //lhs * this
-            const rawData = this.rawData;
-            const [
-                m111, m112, m113, m114,
-                m121, m122, m123, m124,
-                m131, m132, m133, m134,
-                m141, m142, m143, m144
-            ] = rawData as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
-
-            const [
-                m211, m212, m213, m214,
-                m221, m222, m223, m224,
-                m231, m232, m233, m234,
-                m241, m242, m243, m244
-            ] = lhs.rawData as any;
-
-
-            rawData[0] = m111 * m211 + m112 * m221 + m113 * m231 + m114 * m241;
-            rawData[1] = m111 * m212 + m112 * m222 + m113 * m232 + m114 * m242;
-            rawData[2] = m111 * m213 + m112 * m223 + m113 * m233 + m114 * m243;
-            rawData[3] = m111 * m214 + m112 * m224 + m113 * m234 + m114 * m244;
-            rawData[4] = m121 * m211 + m122 * m221 + m123 * m231 + m124 * m241;
-            rawData[5] = m121 * m212 + m122 * m222 + m123 * m232 + m124 * m242;
-            rawData[6] = m121 * m213 + m122 * m223 + m123 * m233 + m124 * m243;
-            rawData[7] = m121 * m214 + m122 * m224 + m123 * m234 + m124 * m244;
-            rawData[8] = m131 * m211 + m132 * m221 + m133 * m231 + m134 * m241;
-            rawData[9] = m131 * m212 + m132 * m222 + m133 * m232 + m134 * m242;
-            rawData[10] = m131 * m213 + m132 * m223 + m133 * m233 + m134 * m243;
-            rawData[11] = m131 * m214 + m132 * m224 + m133 * m234 + m134 * m244;
-            rawData[12] = m141 * m211 + m142 * m221 + m143 * m231 + m144 * m241;
-            rawData[13] = m141 * m212 + m142 * m222 + m143 * m232 + m144 * m242;
-            rawData[14] = m141 * m213 + m142 * m223 + m143 * m233 + m144 * m243;
-            rawData[15] = m141 * m214 + m142 * m224 + m143 * m234 + m144 * m244;
+        identity(){
+            this.rawData.set(matrix3d_identity);
         }
 
-        /**
-        * Prepends a matrix by multiplying the current Matrix3D object by another Matrix3D object.
-        */
-        public prepend(rhs: Matrix3D) {
-            // this * rhs
-            const [
-                a11, a12, a13, a14,
-                a21, a22, a23, a24,
-                a31, a32, a33, a34,
-                a41, a42, a43, a44
-            ] = rhs.rawData as any;
-
-            const rawData = this.rawData;
-
-            const [
-                b11, b12, b13, b14,
-                b21, b22, b23, b24,
-                b31, b32, b33, b34,
-                b41, b42, b43, b44
-            ] = rawData as any;
-
-
-            //b * a
-            rawData[0] = b11 * a11 + b12 * a21 + b13 * a31 + b14 * a41;
-            rawData[1] = b11 * a12 + b12 * a22 + b13 * a32 + b14 * a42;
-            rawData[2] = b11 * a13 + b12 * a23 + b13 * a33 + b14 * a43;
-            rawData[3] = b11 * a14 + b12 * a24 + b13 * a34 + b14 * a44;
-
-            rawData[4] = b21 * a11 + b22 * a21 + b23 * a31 + b24 * a41;
-            rawData[5] = b21 * a12 + b22 * a22 + b23 * a32 + b24 * a42;
-            rawData[6] = b21 * a13 + b22 * a23 + b23 * a33 + b24 * a43;
-            rawData[7] = b21 * a14 + b22 * a24 + b23 * a34 + b24 * a44;
-
-            rawData[8] = b31 * a11 + b32 * a21 + b33 * a31 + b34 * a41;
-            rawData[9] = b31 * a12 + b32 * a22 + b33 * a32 + b34 * a42;
-            rawData[10] = b31 * a13 + b32 * a23 + b33 * a33 + b34 * a43;
-            rawData[11] = b31 * a14 + b32 * a24 + b33 * a34 + b34 * a44;
-
-            rawData[12] = b41 * a11 + b42 * a21 + b43 * a31 + b44 * a41;
-            rawData[13] = b41 * a12 + b42 * a22 + b43 * a32 + b44 * a42;
-            rawData[14] = b41 * a13 + b42 * a23 + b43 * a33 + b44 * a43;
-            rawData[15] = b41 * a14 + b42 * a24 + b43 * a34 + b44 * a44;
+        append(lhs: Matrix3D) {
+            matrix3d_multiply(this.rawData,lhs.rawData,this.rawData);
         }
 
+        prepend(rhs: Matrix3D) {
+            matrix3d_multiply(rhs.rawData,this.rawData,this.rawData);
+        }
 
-        /**
+        public appendRotation(degrees: number, axis: Vector3D) {
+            matrix3d_RotationAxis(this.rawData,axis,degrees * DEG_2_RAD,this.rawData);
+            // var r: Matrix3D = this.getRotateMatrix(axis, degrees * DEG_2_RAD);
+            // if (pivotPoint) {
+            //     //TODO:simplify
+            //     const { x, y, z } = pivotPoint;
+            //     this.appendTranslation(-x, -y, -z);
+            //     this.append(r);
+            //     this.appendTranslation(x, y, z);
+
+            // } else {
+            //     this.append(r);
+            // }
+        }
+
+        public prependRotation(degrees: number, axis: Vector3D, pivotPoint?: Vector3D) {
+            matrix3d_RotationAxis(this.rawData,axis,degrees * DEG_2_RAD,this.rawData,true);
+            // var r: Matrix3D = this.getRotateMatrix(axis, degrees * DEG_2_RAD);
+            // if (pivotPoint) {
+            //     //TODO:simplify
+            //     const { x, y, z } = pivotPoint;
+            //     this.prependTranslation(x, y, z);
+            //     this.prepend(r);
+            //     this.prependTranslation(-x, -y, -z);
+
+            // } else {
+            //     this.prepend(r);
+            // }
+        }
+
+        
+/**
          * Appends an incremental scale change along the x, y, and z axes to a Matrix3D object.
          */
         public appendScale(xScale: number, yScale: number, zScale: number) {
@@ -144,10 +156,10 @@ module rf {
              *              0 0 0 1
              */
             const rawData = this.rawData;
-
-            rawData[0] *= xScale; rawData[1] *= xScale; rawData[2] *= xScale; rawData[3] *= xScale;
-            rawData[4] *= yScale; rawData[5] *= yScale; rawData[6] *= yScale; rawData[7] *= yScale;
-            rawData[8] *= zScale; rawData[9] *= zScale; rawData[10] *= zScale; rawData[11] *= zScale;
+            rawData[0] *= xScale;   rawData[4] *= yScale;   rawData[8] *= zScale;
+            rawData[1] *= xScale;   rawData[5] *= yScale;   rawData[9] *= zScale;
+            rawData[2] *= xScale;   rawData[6] *= yScale;   rawData[10] *= zScale;
+            rawData[3] *= xScale;   rawData[7] *= yScale;   rawData[11] *= zScale;
         }
         /**
          * Prepends an incremental scale change along the x, y, and z axes to a Matrix3D object.
@@ -166,9 +178,8 @@ module rf {
             rawData[12] *= xScale; rawData[13] *= yScale; rawData[14] *= zScale;
 
         }
-
-
-        /**
+        
+/**
          * Appends an incremental translation, a repositioning along the x, y, and z axes, to a Matrix3D object.
          */
         public appendTranslation(x: number, y: number, z: number) {
@@ -196,63 +207,46 @@ module rf {
          * Prepends an incremental translation, a repositioning along the x, y, and z axes, to a Matrix3D object.
          */
         public prependTranslation(x: number, y: number, z: number) {
+            let b = RAW_DATA_CONTAINER;
+            b.set(matrix3d_identity);
+            b[12] = x;
+            b[13] = y;
+            b[14] = z;
+            matrix3d_multiply(b,this.rawData,this.rawData);
+            // const rawData = this.rawData;
+            // rawData[3] += rawData[0] * x + rawData[1] * y + rawData[2] * z;
+            // rawData[7] += rawData[4] * x + rawData[5] * y + rawData[6] * z;
+            // rawData[11] += rawData[8] * x + rawData[9] * y + rawData[10] * z;
+            // rawData[15] += rawData[12] * x + rawData[13] * y + rawData[14] * z;
+        }
 
-            /*
-                         1 0 0 x
-                this *   0 1 0 y
-                         0 0 0 z
-                         0 0 0 1
-             */
+
+
+
+
+        /**
+         * [read-only] A Number that determines whether a matrix is invertible.
+         */
+        public get determinant() {
+            // const [
+            //     a0, a1, a2, a3,
+            //     a4, a5, a6, a7,
+            //     a8, a9, a10, a11,
+            //     a41, a42, a43, a44
+            // ] = this.rawData as any;
+            let rawData = this.rawData;
+            return ((rawData[0] * rawData[5] - rawData[4] * rawData[1]) * (rawData[10] * rawData[15] - rawData[14] * rawData[11])
+                - (rawData[0] * rawData[9] - rawData[8] * rawData[1]) * (rawData[6] * rawData[15] - rawData[14] * rawData[7])
+                + (rawData[0] * rawData[13] - rawData[12] * rawData[1]) * (rawData[6] * rawData[11] - rawData[10] * rawData[7])
+                + (rawData[4] * rawData[9] - rawData[8] * rawData[5]) * (rawData[2] * rawData[15] - rawData[14] * rawData[3])
+                - (rawData[4] * rawData[13] - rawData[12] * rawData[5]) * (rawData[2] * rawData[11] - rawData[10] * rawData[3])
+                + (rawData[8] * rawData[13] - rawData[12] * rawData[9]) * (rawData[2] * rawData[7] - rawData[6] * rawData[3]));
+        }
+
+        public get position() {
             const rawData = this.rawData;
-            rawData[3] += rawData[0] * x + rawData[1] * y + rawData[2] * z;
-            rawData[7] += rawData[4] * x + rawData[5] * y + rawData[6] * z;
-            rawData[11] += rawData[8] * x + rawData[9] * y + rawData[10] * z;
-            rawData[15] += rawData[12] * x + rawData[13] * y + rawData[14] * z;
+            return new Vector3D(rawData[3], rawData[7], rawData[11]);
         }
-
-
-
-        /**
-         * Appends an incremental rotation to a Matrix3D object.
-         */
-        public appendRotation(degrees: number, axis: Vector3D, pivotPoint?: Point3DW) {
-
-            var r: Matrix3D = this.getRotateMatrix(axis, degrees * DEG_2_RAD);
-
-            if (pivotPoint) {
-                //TODO:simplify
-                const { x, y, z } = pivotPoint;
-                this.appendTranslation(-x, -y, -z);
-                this.append(r);
-                this.appendTranslation(x, y, z);
-
-            } else {
-                this.append(r);
-            }
-
-        }
-
-
-        /**
-         * Prepends an incremental rotation to a Matrix3D object.
-         */
-        public prependRotation(degrees: number, axis: Vector3D, pivotPoint?: Vector3D) {
-            var r: Matrix3D = this.getRotateMatrix(axis, degrees * DEG_2_RAD);
-            if (pivotPoint) {
-                //TODO:simplify
-                const { x, y, z } = pivotPoint;
-                this.prependTranslation(x, y, z);
-                this.prepend(r);
-                this.prependTranslation(-x, -y, -z);
-
-            } else {
-                this.prepend(r);
-            }
-        }
-
-
-
-
 
         /**
          * Returns a new Matrix3D object that is an exact copy of the current Matrix3D object.
@@ -268,10 +262,11 @@ module rf {
             if (column < 0 || column > 3)
                 throw new Error("column error");
             const rawData = this.rawData;
+            column *= 4
             rawData[column] = vector3D.x;
-            rawData[column + 4] = vector3D.y;
-            rawData[column + 8] = vector3D.z;
-            rawData[column + 12] = vector3D.w;
+            rawData[column+1] = vector3D.y;
+            rawData[column+2] = vector3D.z;
+            rawData[column+3] = vector3D.w;
 
         }
 
@@ -281,11 +276,13 @@ module rf {
         public copyColumnTo(column: number /*uint*/, vector3D: Point3DW): void {
             if (column < 0 || column > 3)
                 throw new Error("column error");
+
+            column *= 4
             const rawData = this.rawData;
             vector3D.x = rawData[column];
-            vector3D.y = rawData[column + 4];
-            vector3D.z = rawData[column + 8];
-            vector3D.w = rawData[column + 12];
+            vector3D.y = rawData[column + 1];
+            vector3D.z = rawData[column + 2];
+            vector3D.w = rawData[column + 3];
         }
 
         /**
@@ -483,17 +480,6 @@ module rf {
 
 
         /**
-         * Converts the current matrix to an identity or unit matrix.
-         */
-        public identity(): void {
-            this.rawData = new Float32Array([
-                1, 0, 0, 0,
-                0, 1, 0, 0,
-                0, 0, 1, 0,
-                0, 0, 0, 1]);
-        }
-
-        /**
          * [static] Interpolates the translation, rotation, and scale transformation of one matrix toward those of the target matrix.
          */
         //TODO: only support rotation matrix for now
@@ -524,30 +510,30 @@ module rf {
                 const rawData = this.rawData;
 
                 const [
-                    m11, m12, m13, m14,
-                    m21, m22, m23, m24,
+                    a1, a2, a3, a4,
+                    b1, b2, b3, b4,
                     m31, m32, m33, m34,
                     m41, m42, m43, m44
                 ] = rawData as any;
 
-                const m12$m23_m22$m13 = m12 * m23 - m22 * m13;
-                const m12$m24_m22$m14 = m12 * m24 - m22 * m14;
-                const m12$m33_m32$m13 = m12 * m33 - m32 * m13;
-                const m12$m34_m32$m14 = m12 * m34 - m32 * m14;
-                const m12$m43_m42$m13 = m12 * m43 - m42 * m13;
-                const m12$m44_m42$m14 = m12 * m44 - m42 * m14;
+                const a2$b3_b2$a3 = a2 * b3 - b2 * a3;
+                const a2$b4_b2$a4 = a2 * b4 - b2 * a4;
+                const a2$m33_m32$a3 = a2 * m33 - m32 * a3;
+                const a2$m34_m32$a4 = a2 * m34 - m32 * a4;
+                const a2$m43_m42$a3 = a2 * m43 - m42 * a3;
+                const a2$m44_m42$a4 = a2 * m44 - m42 * a4;
 
-                const m13$m24_m23$m14 = m13 * m24 - m23 * m14;
-                const m13$m34_m33$m14 = m13 * m34 - m33 * m14;
-                const m13$m44_m43$m14 = m13 * m44 - m43 * m14;
+                const a3$b4_b3$a4 = a3 * b4 - b3 * a4;
+                const a3$m34_m33$a4 = a3 * m34 - m33 * a4;
+                const a3$m44_m43$a4 = a3 * m44 - m43 * a4;
 
-                const m22$m33_m32$m23 = m22 * m33 - m32 * m23;
-                const m22$m34_m32$m24 = m22 * m34 - m32 * m24;
-                const m22$m43_m42$m23 = m22 * m43 - m42 * m23;
-                const m22$m44_m42$m24 = m22 * m44 - m42 * m24;
+                const b2$m33_m32$b3 = b2 * m33 - m32 * b3;
+                const b2$m34_m32$b4 = b2 * m34 - m32 * b4;
+                const b2$m43_m42$b3 = b2 * m43 - m42 * b3;
+                const b2$m44_m42$b4 = b2 * m44 - m42 * b4;
 
-                const m23$m34_m33$m24 = m23 * m34 - m33 * m24;
-                const m23$m44_m43$m24 = m23 * m44 - m43 * m24;
+                const b3$m34_m33$b4 = b3 * m34 - m33 * b4;
+                const b3$m44_m43$b4 = b3 * m44 - m43 * b4;
 
                 const m32$m43_m42$m33 = m32 * m43 - m42 * m33;
                 const m32$m44_m42$m34 = m32 * m44 - m42 * m34;
@@ -555,22 +541,22 @@ module rf {
                 const m33$m44_m43$m34 = m33 * m44 - m43 * m34;
 
 
-                rawData[0] = d * (m22 * (m33$m44_m43$m34) - m32 * (m23$m44_m43$m24) + m42 * (m23$m34_m33$m24));
-                rawData[1] = -d * (m12 * (m33$m44_m43$m34) - m32 * (m13$m44_m43$m14) + m42 * (m13$m34_m33$m14));
-                rawData[2] = d * (m12 * (m23$m44_m43$m24) - m22 * (m13$m44_m43$m14) + m42 * (m13$m24_m23$m14));
-                rawData[3] = -d * (m12 * (m23$m34_m33$m24) - m22 * (m13$m34_m33$m14) + m32 * (m13$m24_m23$m14));
-                rawData[4] = -d * (m21 * (m33$m44_m43$m34) - m31 * (m23$m44_m43$m24) + m41 * (m23$m34_m33$m24));
-                rawData[5] = d * (m11 * (m33$m44_m43$m34) - m31 * (m13$m44_m43$m14) + m41 * (m13$m34_m33$m14));
-                rawData[6] = -d * (m11 * (m23$m44_m43$m24) - m21 * (m13$m44_m43$m14) + m41 * (m13$m24_m23$m14));
-                rawData[7] = d * (m11 * (m23$m34_m33$m24) - m21 * (m13$m34_m33$m14) + m31 * (m13$m24_m23$m14));
-                rawData[8] = d * (m21 * (m32$m44_m42$m34) - m31 * (m22$m44_m42$m24) + m41 * (m22$m34_m32$m24));
-                rawData[9] = -d * (m11 * (m32$m44_m42$m34) - m31 * (m12$m44_m42$m14) + m41 * (m12$m34_m32$m14));
-                rawData[10] = d * (m11 * (m22$m44_m42$m24) - m21 * (m12$m44_m42$m14) + m41 * (m12$m24_m22$m14));
-                rawData[11] = -d * (m11 * (m22$m34_m32$m24) - m21 * (m12$m34_m32$m14) + m31 * (m12$m24_m22$m14));
-                rawData[12] = -d * (m21 * (m32$m43_m42$m33) - m31 * (m22$m43_m42$m23) + m41 * (m22$m33_m32$m23));
-                rawData[13] = d * (m11 * (m32$m43_m42$m33) - m31 * (m12$m43_m42$m13) + m41 * (m12$m33_m32$m13));
-                rawData[14] = -d * (m11 * (m22$m43_m42$m23) - m21 * (m12$m43_m42$m13) + m41 * (m12$m23_m22$m13));
-                rawData[15] = d * (m11 * (m22$m33_m32$m23) - m21 * (m12$m33_m32$m13) + m31 * (m12$m23_m22$m13));
+                rawData[0] = d * (b2 * (m33$m44_m43$m34) - m32 * (b3$m44_m43$b4) + m42 * (b3$m34_m33$b4));
+                rawData[1] = -d * (a2 * (m33$m44_m43$m34) - m32 * (a3$m44_m43$a4) + m42 * (a3$m34_m33$a4));
+                rawData[2] = d * (a2 * (b3$m44_m43$b4) - b2 * (a3$m44_m43$a4) + m42 * (a3$b4_b3$a4));
+                rawData[3] = -d * (a2 * (b3$m34_m33$b4) - b2 * (a3$m34_m33$a4) + m32 * (a3$b4_b3$a4));
+                rawData[4] = -d * (b1 * (m33$m44_m43$m34) - m31 * (b3$m44_m43$b4) + m41 * (b3$m34_m33$b4));
+                rawData[5] = d * (a1 * (m33$m44_m43$m34) - m31 * (a3$m44_m43$a4) + m41 * (a3$m34_m33$a4));
+                rawData[6] = -d * (a1 * (b3$m44_m43$b4) - b1 * (a3$m44_m43$a4) + m41 * (a3$b4_b3$a4));
+                rawData[7] = d * (a1 * (b3$m34_m33$b4) - b1 * (a3$m34_m33$a4) + m31 * (a3$b4_b3$a4));
+                rawData[8] = d * (b1 * (m32$m44_m42$m34) - m31 * (b2$m44_m42$b4) + m41 * (b2$m34_m32$b4));
+                rawData[9] = -d * (a1 * (m32$m44_m42$m34) - m31 * (a2$m44_m42$a4) + m41 * (a2$m34_m32$a4));
+                rawData[10] = d * (a1 * (b2$m44_m42$b4) - b1 * (a2$m44_m42$a4) + m41 * (a2$b4_b2$a4));
+                rawData[11] = -d * (a1 * (b2$m34_m32$b4) - b1 * (a2$m34_m32$a4) + m31 * (a2$b4_b2$a4));
+                rawData[12] = -d * (b1 * (m32$m43_m42$m33) - m31 * (b2$m43_m42$b3) + m41 * (b2$m33_m32$b3));
+                rawData[13] = d * (a1 * (m32$m43_m42$m33) - m31 * (a2$m43_m42$a3) + m41 * (a2$m33_m32$a3));
+                rawData[14] = -d * (a1 * (b2$m43_m42$b3) - b1 * (a2$m43_m42$a3) + m41 * (a2$b3_b2$a3));
+                rawData[15] = d * (a1 * (b2$m33_m32$b3) - b1 * (a2$m33_m32$a3) + m31 * (a2$b3_b2$a3));
             }
             return invertable;
         }
@@ -579,30 +565,39 @@ module rf {
          * Rotates the display object so that it faces a specified position.
          */
         public pointAt(pos: Vector3D, at?: Vector3D, up?: Vector3D) {
-
-            console.log('pointAt not impletement')
-            //            if (at == null)
-            //                at = new Vector3D(0, -1, 0);
-            //            if (up == null)
-            //                up = new Vector3D(0, 0, -1);
-            //
-            //            var zAxis: Vector3D = at.subtract(pos);
-            //            zAxis.normalize();
-            //
-            //            var xAxis: Vector3D = zAxis.crossProduct(up);
-            //            var yAxis: Vector3D = zAxis.crossProduct(xAxis);
-            //
-            //            this.rawData = new Float32Array([
-            //                xAxis.x, xAxis.y, xAxis.z, 0,
-            //                yAxis.x, yAxis.y, yAxis.z, 0,
-            //                zAxis.x, zAxis.y, zAxis.z, 0,
-            //                pos.x, pos.y, pos.z, 1
-            //            ]);
-
-        }
-
-
-
+            if(undefined == at) at = new Vector3D(0,0,-1);
+			if(undefined == up) up = new Vector3D(0,-1,0);
+			let dir = at.subtract(pos);
+			let vup = up.clone();
+			dir.normalize();
+			vup.normalize();
+			let dir2 = dir.clone();
+			dir2.scaleBy(vup.dotProduct(dir));
+			vup = vup.subtract(dir2);
+			if(vup.length > 0) vup.normalize();
+			else if(dir.x != 0) vup = new Vector3D(-dir.y,dir.x,0);
+			else vup = new Vector3D(1,0,0);
+			let right = vup.crossProduct(dir);
+            right.normalize();
+            let rawData = this.rawData;
+			rawData[0] = right.x;
+			rawData[4] = right.y;
+			rawData[8] = right.z;
+			rawData[12] = 0.0;
+			rawData[1] = vup.x;
+			rawData[5] = vup.y;
+			rawData[9] = vup.z;
+			rawData[13] = 0.0;
+			rawData[2] = dir.x;
+			rawData[6] = dir.y;
+			rawData[10] = dir.z;
+			rawData[14] = 0.0;
+			rawData[3] = pos.x;
+			rawData[7] = pos.y;
+			rawData[11] = pos.z;
+			rawData[15] = 1.0;
+		}
+		
 
         public recompose(components: Vector3D[], orientationStyle = Orientation3D.EULER_ANGLES) {
             if (components.length < 3) {
@@ -944,29 +939,29 @@ module rf {
             //m*m
             const rawData = this.rawData;
             const [
-                m111, m112, m113, 
-                m121, m122, m123, 
-                m131, m132, m133,
+                a11, a12, a13, 
+                a21, a22, a23, 
+                a31, a32, a33,
             ] = rawData as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
 
             const [
-                m211, m212, m213,
-                m221, m222, m223,
-                m231, m232, m233
+                b11, b12, b13,
+                b21, b22, b23,
+                b31, b32, b33
             ] = m.rawData as any;
 
 
-            rawData[0] = m111 * m211 + m112 * m221 + m113 * m231;
-            rawData[1] = m111 * m212 + m112 * m222 + m113 * m232;
-            rawData[2] = m111 * m213 + m112 * m223 + m113 * m233;
+            rawData[0] = a11 * b11 + a12 * b21 + a13 * b31;
+            rawData[1] = a11 * b12 + a12 * b22 + a13 * b32;
+            rawData[2] = a11 * b13 + a12 * b23 + a13 * b33;
 
-            rawData[3] = m121 * m211 + m122 * m221 + m123 * m231;
-            rawData[4] = m121 * m212 + m122 * m222 + m123 * m232;
-            rawData[5] = m121 * m213 + m122 * m223 + m123 * m233;
+            rawData[3] = a21 * b11 + a22 * b21 + a23 * b31;
+            rawData[4] = a21 * b12 + a22 * b22 + a23 * b32;
+            rawData[5] = a21 * b13 + a22 * b23 + a23 * b33;
 
-            rawData[6] = m131 * m211 + m132 * m221 + m133 * m231;
-            rawData[7] = m131 * m212 + m132 * m222 + m133 * m232;
-            rawData[8] = m131 * m213 + m132 * m223 + m133 * m233;
+            rawData[6] = a31 * b11 + a32 * b21 + a33 * b31;
+            rawData[7] = a31 * b12 + a32 * b22 + a33 * b32;
+            rawData[8] = a31 * b13 + a32 * b23 + a33 * b33;
   
         }
 
@@ -981,35 +976,35 @@ module rf {
                 const rawData = this.rawData;
 
                 const [
-                    m11, m12, m13,
-                    m21, m22, m23,
+                    a1, a2, a3,
+                    b1, b2, b3,
                     m31, m32, m33
                 ] = rawData as any;
 
-                const m22$m33_m32$m23 = m22 * m33 - m32 * m23;
-                const m21$m33_m31$m23 = m21 * m33 - m31 * m23;
-                const m21$m32_m31$m22 = m21 * m32 - m31 * m22;
+                const b2$m33_m32$b3 = b2 * m33 - m32 * b3;
+                const b1$m33_m31$b3 = b1 * m33 - m31 * b3;
+                const b1$m32_m31$b2 = b1 * m32 - m31 * b2;
 
-                const m12$m33_m32$m13 = m12 * m33 - m32 * m13;
-                const m11$m33_m31$m13 = m11 * m33 - m31 * m13;
-                const m11$m32_m31$m12 = m11 * m32 - m31 * m12;
+                const a2$m33_m32$a3 = a2 * m33 - m32 * a3;
+                const a1$m33_m31$a3 = a1 * m33 - m31 * a3;
+                const a1$m32_m31$a2 = a1 * m32 - m31 * a2;
 
-                const m12$m23_m22$m13 = m12 * m23 - m22 * m13;
-                const m11$m23_m21$m13 = m11 * m23 - m21 * m13;
-                const m11$m22_m21$m12 = m11 * m22 - m21 * m12;
+                const a2$b3_b2$a3 = a2 * b3 - b2 * a3;
+                const a1$b3_b1$a3 = a1 * b3 - b1 * a3;
+                const a1$b2_b1$a2 = a1 * b2 - b1 * a2;
 
                  //逆矩阵 = 1/d * 伴随矩阵
-                rawData[0] = d * m22$m33_m32$m23;
-                rawData[1] = -d * m21$m32_m31$m22;
-                rawData[2] = d * m21$m32_m31$m22;
+                rawData[0] = d * b2$m33_m32$b3;
+                rawData[1] = -d * b1$m32_m31$b2;
+                rawData[2] = d * b1$m32_m31$b2;
 
-                rawData[3] = -d * m12$m33_m32$m13;
-                rawData[4] = d * m11$m33_m31$m13;
-                rawData[5] = -d * m11$m32_m31$m12;
+                rawData[3] = -d * a2$m33_m32$a3;
+                rawData[4] = d * a1$m33_m31$a3;
+                rawData[5] = -d * a1$m32_m31$a2;
                 
-                rawData[6] = d * m12$m23_m22$m13;
-                rawData[7] = -d * m11$m23_m21$m13;
-                rawData[8] = d * m11$m22_m21$m12;
+                rawData[6] = d * a2$b3_b2$a3;
+                rawData[7] = -d * a1$b3_b1$a3;
+                rawData[8] = d * a1$b2_b1$a2;
             }
             return invertable;
         }

@@ -336,23 +336,25 @@ namespace rf {
 		 * @param depthMask 
 		 * @param passCompareMode 
 		 * 
-		 * Context3DCompareMode.LESS			:GL.LESS
-		 * Context3DCompareMode.NEVER			:GL.NEVER
-		 * Context3DCompareMode.EQUAL			:GL.EQUAL
-		 * Context3DCompareMode.GREATER			:GL.GREATER
-		 * Context3DCompareMode.NOT_EQUAL		:GL.NOTEQUAL
-		 * Context3DCompareMode.ALWAYS			:GL.ALWAYS
-		 * Context3DCompareMode.LESS_EQUAL		:GL.LEQUAL
-		 * Context3DCompareMode.GREATER_EQUAL	:GL.GEQUAL
+		 * 
+		 * @constant Context3DCompareMode.LESS=GL.LESS
+		 * @constant Context3DCompareMode.NEVER=GL.NEVER
+		 * @constant Context3DCompareMode.EQUAL=GL.EQUAL
+		 * @constant Context3DCompareMode.GREATER=GL.GREATER
+		 * @constant Context3DCompareMode.NOT_EQUAL=GL.NOTEQUAL
+		 * @constant Context3DCompareMode.ALWAYS=GL.ALWAYS
+		 * @constant Context3DCompareMode.LESS_EQUAL=GL.LEQUAL
+		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
 		 */
 		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
+			let g = gl;
 			if (this._depthDisabled) {
-				gl.enable(gl.DEPTH_TEST);
+				g.enable(g.DEPTH_TEST);
 				this._depthDisabled = false;
 			}
 
-			gl.depthMask(depthMask);
-			gl.depthFunc(passCompareMode);
+			g.depthMask(depthMask);
+			g.depthFunc(passCompareMode);
 		}
 
 
@@ -385,6 +387,7 @@ namespace rf {
 			}
 			indexBuffer.preusetime = engineNow;
 			let g = gl;
+			// g.drawArrays(g.TRIANGLES,0,numTriangles)
 			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
 			g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
 
@@ -393,20 +396,25 @@ namespace rf {
 		}
 
 
-		// /*
-        //  *  [Webgl only]
-        //  *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
-        //  *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
-        //  */
-		// public drawLines(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numLines: number = -1): void {
-		// 	if (false == indexBuffer.readly) {
-		// 		if (false == indexBuffer.awaken()) {
-		// 			throw new Error("create indexBuffer error!");
-		// 		}
-		// 	}
-		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-		// 	gl.drawElements(gl.LINES, numLines < 0 ? indexBuffer.numIndices : numLines * 2, gl.UNSIGNED_SHORT, firstIndex * 2);
-		// }
+		/*
+         *  [Webgl only]
+         *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
+         *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
+         */
+		public drawLines(indexBuffer: IndexBuffer3D, numTriangles:number, firstIndex: number = 0, numLines: number = -1): void {
+			if (false == indexBuffer.readly) {
+				if (false == indexBuffer.awaken()) {
+					throw new Error("create indexBuffer error!");
+				}
+			}
+			indexBuffer.preusetime = engineNow;
+			let g = gl;
+			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			g.drawElements(g.LINES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+
+			this.triangles += numTriangles;
+			this.dc ++;
+		}
 
 		// /*
         //  * [Webgl only]

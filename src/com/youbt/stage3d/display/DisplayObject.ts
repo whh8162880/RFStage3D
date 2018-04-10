@@ -157,7 +157,7 @@ module rf {
             super();
             this.pos = new Vector3D();
             this.rot = new Vector3D();
-            this.sca = new Vector3D();
+            this.sca = new Vector3D(1,1,1);
             this.transformComponents = [this.pos, this.rot, this.sca];
             this.transform = new Matrix3D();
             this.sceneTransform = new Matrix3D();

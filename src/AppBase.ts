@@ -6,7 +6,7 @@ module rf {
             this.createSource();
             Engine.start();
             ROOT = singleton(Stage3D);
-            Engine.addResize(this);
+            
         }
 
 
@@ -22,8 +22,13 @@ module rf {
                 return;
             }
 
+            Capabilities.init();
             
+            // context3D.setDepthTest(true,gl.LEQUAL);
+            context3D.setDepthTest(false,gl.ALWAYS);
+            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
+            Engine.addResize(this);
             Engine.addTick(this);
         }
 
@@ -57,6 +62,7 @@ module rf {
         }
 
         public resize(width:number,height:number):void{
+            context3D.configureBackBuffer(stageWidth,stageHeight,0);
             ROOT.resize(width,height);
         }
 
