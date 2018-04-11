@@ -11,12 +11,17 @@ module rf{
 
         camera3D:Camera3D;
 
+        camera:Camera;
+
         mouse:Mouse;
 
         constructor(){
             super();
             this.camera2D = new Camera2D();
             this.camera3D = new Camera3D();
+
+            this.camera = this.camera2D;
+
             this.renderer = new BatchRenderer(this);
             this.mouse = new Mouse();
             this.stage = this;
@@ -67,7 +72,7 @@ module rf{
             context3D.clear(0,0,0,1);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-            let c = this.camera2D;
+            let c = this.camera;
 
             if(c.states){
                 c.updateSceneTransform();
