@@ -37,10 +37,9 @@ module rf{
             line.lineTo(500,0,-500,2);
             line.lineTo(-500,0,-500,2);
             line.lineTo(-500,0,500,2);
-            line.end()
-            // line.setPos(1000,600,0)
+            line.end();
             ROOT.addChild(line);
-
+            
             let tr = new Trident(300,2);
             ROOT.addChild(tr);
 

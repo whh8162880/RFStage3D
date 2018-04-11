@@ -586,10 +586,11 @@ module rf {
         passCompareMode: number;
         public render(camera: Camera, now: number, interval: number): void { }
         constructor() {
-            if (undefined != gl) {
-                this.sourceFactor = gl.SRC_ALPHA;
-                this.destinationFactor = gl.ONE_MINUS_CONSTANT_ALPHA;
-                this.passCompareMode = gl.ALWAYS;
+            let g = gl;
+            if (undefined != g) {
+                this.sourceFactor = g.SRC_ALPHA;
+                this.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+                this.passCompareMode = g.ALWAYS;
             }
         }
     }

@@ -208,11 +208,13 @@ module rf{
                     v = normalize(v);
                     float t2 = pos.z * p[2].w;
                     if(t2 <= 0.0){
-                        t2 = 1.0;
+                        v.xyz *= len;
+                    }else{
+                        v.xyz *= len * t2;
                     }
-                    t2 *= len;
-                    v.xyz *= t2;
-                    pos.xy += v.xy;
+                    
+                    
+                    pos.xyz += v.xyz;
                     gl_Position = p * pos;
                     vColor = color;
                 }
