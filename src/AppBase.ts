@@ -24,8 +24,7 @@ module rf {
 
             Capabilities.init();
             
-            // context3D.setDepthTest(true,gl.LEQUAL);
-            // context3D.setDepthTest(true,gl.LEQUAL);
+            context3D.setDepthTest(true,gl.LEQUAL);
             // context3D.setDepthTest(false,gl.ALWAYS);
             // context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
