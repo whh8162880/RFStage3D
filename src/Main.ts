@@ -26,22 +26,27 @@ module rf{
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
             camera.z = -f;
             camera.y = f;
-            camera.rotationX = 45
+            // camera.rotationX = 45
+
+            camera.lookat(new Vector3D(0,0,0));
 
            
             // line.rotationX = 45;
             let line = new Line3D();
+            let t = 2;
             line.clear();
-            line.moveTo(-500,0,500,2);
-            line.lineTo(500,0,500,2);
-            line.lineTo(500,0,-500,2);
-            line.lineTo(-500,0,-500,2);
-            line.lineTo(-500,0,500,2);
+            line.moveTo(-500,0,500,t);
+            line.lineTo(500,0,500,t);
+            line.lineTo(500,0,-500,t);
+            line.lineTo(-500,0,-500,t);
+            line.lineTo(-500,0,500,t);
             line.end();
             ROOT.addChild(line);
             
             let tr = new Trident(300,2);
             ROOT.addChild(tr);
+
+            // new TrackballControls(camera);
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);

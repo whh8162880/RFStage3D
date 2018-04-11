@@ -120,6 +120,9 @@ module rf {
                     }
                 }
                 if(this.mouseEnabled){
+                    if(this.hitArea.allWays){
+                        return this;
+                    }
                     let g = this.$graphics;
                     if(undefined != g){
                         if( g.hitArea.checkIn(dx,dy,scale) == true ){

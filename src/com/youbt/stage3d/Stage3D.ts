@@ -28,6 +28,8 @@ module rf{
             this.renderer = new BatchRenderer(this);
             this.mouse = new Mouse();
             this.stage = this;
+
+            this.hitArea.allWays = true;
         }
 
         public requestContext3D(canvas:HTMLCanvasElement):boolean{
