@@ -15,7 +15,8 @@ module rf{
 
         mouseWheelHandler(event:EventX):void{
             let e =event.data;
-			this.object.forwardPos(-e.deltaY);
+            this.object.forwardPos(-e.deltaY);
+            this.distance = this.object.pos.subtract(this.target).length;
         }
 
         mouseDownHandler(event:EventX):void{
