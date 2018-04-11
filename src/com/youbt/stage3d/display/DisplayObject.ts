@@ -8,6 +8,10 @@ module rf {
         getObjectByPoint?(dx: number, dy: number,scale:number): DisplayObject
     }
 
+    export interface I3DRender extends IRecyclable {
+        render?(camera: Camera, now: number, interval: number,target?:Sprite): void
+    }
+
     export enum DChange {
         trasnform = 0b1,
         alpha = trasnform << 1,
@@ -560,6 +564,10 @@ module rf {
             return nativeMouseY - this.sceneTransform.rawData[13];
         }
 
+
+        render(camera: Camera, now: number, interval: number,target?:Sprite): void{
+
+        }
 
         lookat(target:Vector3D, upAxis:Vector3D=null):void{
 			let xAxis = tempAxeX;
