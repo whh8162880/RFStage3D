@@ -59,8 +59,8 @@ module rf{
         }
     }
 
-
-    export class Camera2D extends Camera{
+    // Orthographic Projection
+    export class CameraOrth extends Camera{
         
         resize(width: number, height: number): void{
             this.w = width;
@@ -94,6 +94,7 @@ module rf{
         
     }
 
+    //  Perspective Projection Matrix
     export class Camera3D extends Camera{
         resize(width: number, height: number): void{
             this.w = width;

@@ -9,7 +9,7 @@ module rf{
 
         cameraUI:CameraUI
 
-        camera2D:Camera2D;
+        camera2D:CameraOrth;
 
         camera3D:Camera3D;
 
@@ -19,7 +19,7 @@ module rf{
 
         constructor(){
             super();
-            this.camera2D = new Camera2D();
+            this.camera2D = new CameraOrth();
             this.camera3D = new Camera3D();
             this.cameraUI = new CameraUI();
 
