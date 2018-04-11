@@ -9,7 +9,7 @@ module rf{
         constructor(far:number = 10000){
             super();
             this.far = far;
-            this.originFar = far / 6.18;
+            this.originFar = far / Math.PI2;
             this.len = new Matrix3D();
             this.worldTranform = new Matrix3D();
         }
