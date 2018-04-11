@@ -98,7 +98,7 @@ module rf {
 
 		/** Removes an event listener from the object. */
 		off(type: string|number, listener: Function): void {
-			if (undefined == this.mEventListeners) {
+			if (undefined != this.mEventListeners) {
 				var signal: Recyclable<Link> = this.mEventListeners[type];
 				if (undefined == signal) return;
 				signal.remove(listener);

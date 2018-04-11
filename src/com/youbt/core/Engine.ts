@@ -46,6 +46,10 @@ namespace rf {
 		ONE_DAY = 86400000
 	}
 
+
+	export let nativeMouseX:number = 0;
+	export let nativeMouseY:number = 0;
+
 	export let nextUpdateTime: number = 0;
 	export let frameInterval: number = 0;
 

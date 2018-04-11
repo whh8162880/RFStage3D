@@ -14,6 +14,10 @@ module rf{
             canvas.ontouchmove = this.touchHandler;
             canvas.ontouchend = this.touchHandler;
             canvas.ontouchcancel = this.touchHandler;
+
+            canvas.oncontextmenu = function (event){
+                event.preventDefault();
+            }
         }
 
         preMouseTime:number;
@@ -22,11 +26,15 @@ module rf{
         clickTarget:DisplayObject;
         preMouseDownTime:number;
         mouseHanlder(e:MouseEvent):void{
+
+            nativeMouseX = e.clientX * pixelRatio;
+            nativeMouseY = e.clientY * pixelRatio;
+
             var d:DisplayObject;
             let now = engineNow;
             if(this.preMouseTime != now){
                 this.preMouseTime = now;
-                d = ROOT.getObjectByPoint(e.clientX,e.clientY,1)
+                d = ROOT.getObjectByPoint(ROOT.mouseX,ROOT.mouseY,1)
             }else{
                 d = this.preTarget;
             }
@@ -36,7 +44,7 @@ module rf{
                     this.clickTarget = d;
                     this.preMouseDownTime = now;
                 }else if(type == MouseEventX.MouseUp){
-                    d.simpleDispatch(e.type,event,true);
+                    d.simpleDispatch(type,event,true);
                     if(this.clickTarget != d){
                         this.clickTarget = null;
                         this.preMouseDownTime = 0;
@@ -45,17 +53,20 @@ module rf{
                     }
                     return;
                 }
-                d.simpleDispatch(e.type,e,true);
+                d.simpleDispatch(type,e,true);
             }
         }
 
         preRolled:DisplayObject;
 		preMouseMoveTime:number;
         mouseMoveHandler(e:MouseEvent):void{
+            let r = ROOT;
+            nativeMouseX = e.clientX * pixelRatio;
+            nativeMouseY = e.clientY * pixelRatio;
             if(this.preMoveTime == engineNow){
                 return;
             }
-            let d = ROOT.getObjectByPoint(e.clientX,e.clientY,1);
+            let d = r.getObjectByPoint(r.mouseX,r.mouseY,1);
             if(undefined != d){
                 d.simpleDispatch(MouseEventX.MouseMove,e,true)
             }

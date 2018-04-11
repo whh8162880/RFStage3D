@@ -120,6 +120,9 @@ module rf {
                     }
                 }
                 if(this.mouseEnabled){
+                    if(this.hitArea.allWays){
+                        return this;
+                    }
                     let g = this.$graphics;
                     if(undefined != g){
                         if( g.hitArea.checkIn(dx,dy,scale) == true ){
@@ -534,14 +537,14 @@ module rf {
                 this.addPoint([x2,y,z],noraml,uv,rgba);
                 this.addPoint([x2,y2,z],noraml,uv,rgba);
                 this.addPoint([x,y2,z],noraml,uv,rgba);
-                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
                 
                 
-    //			beginFill(0x00FF00)
+    			// beginFill(0x00FF00)
                 //上
+                this.addPoint([x,y,z],noraml,uv,rgba);
+                this.addPoint([x,y,z2],noraml,uv,rgba);
+                this.addPoint([x2,y,z2],noraml,uv,rgba);
+                this.addPoint([x2,y,z],noraml,uv,rgba);
                 // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
                 // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
                 // addPoint(x2,	y,		z2,		0,0,	_fr,_fg,_fb,_fa);
@@ -586,10 +589,11 @@ module rf {
         passCompareMode: number;
         public render(camera: Camera, now: number, interval: number): void { }
         constructor() {
-            if (undefined != gl) {
-                this.sourceFactor = gl.SRC_ALPHA;
-                this.destinationFactor = gl.ONE_MINUS_CONSTANT_ALPHA;
-                this.passCompareMode = gl.ALWAYS;
+            let g = gl;
+            if (undefined != g) {
+                this.sourceFactor = g.SRC_ALPHA;
+                this.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+                this.passCompareMode = g.ALWAYS;
             }
         }
     }

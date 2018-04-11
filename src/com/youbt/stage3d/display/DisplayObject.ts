@@ -32,6 +32,8 @@ module rf {
 
 
     export class HitArea {
+
+        allWays:boolean
         left: number = 0;
         right: number = 0;
         top: number = 0;
@@ -105,6 +107,10 @@ module rf {
             return b;
         }
         checkIn(x: number, y: number, scale: number = 1): boolean {
+            if(this.allWays){
+                return true;
+            }
+
             if (x > this.left * scale && x < this.right * scale && y > this.top * scale && y < this.bottom * scale) {
                 return true;
             }
@@ -119,10 +125,11 @@ module rf {
         hitArea: HitArea;
         mouseEnabled:boolean;
         mouseChildren:boolean;
-        public transformComponents: Vector3D[];
-        public pos: Vector3D;
-        public rot: Vector3D;
-        public sca: Vector3D;
+        transformComponents: Vector3D[];
+        pos: Vector3D;
+        rot: Vector3D;
+        sca: Vector3D;
+        up:Vector3D = new Vector3D(0,1,0);
 
         public _x: number = 0;
         public _y: number = 0;
@@ -542,6 +549,15 @@ module rf {
             }
 
             return undefined;
+        }
+
+
+        public get mouseX():number{
+            return nativeMouseX - this.sceneTransform.rawData[12];
+        }
+
+        public get mouseY():number{
+            return nativeMouseY - this.sceneTransform.rawData[13];
         }
     }
 }

@@ -7,19 +7,29 @@ module rf{
 
         canvas:HTMLCanvasElement;
 
-        camera2D:Camera2D;
+        cameraUI:CameraUI
+
+        camera2D:CameraOrth;
 
         camera3D:Camera3D;
+
+        camera:Camera;
 
         mouse:Mouse;
 
         constructor(){
             super();
-            this.camera2D = new Camera2D();
+            this.camera2D = new CameraOrth();
             this.camera3D = new Camera3D();
+            this.cameraUI = new CameraUI();
+
+            this.camera = this.cameraUI;
+
             this.renderer = new BatchRenderer(this);
             this.mouse = new Mouse();
             this.stage = this;
+
+            this.hitArea.allWays = true;
         }
 
         public requestContext3D(canvas:HTMLCanvasElement):boolean{
@@ -67,7 +77,7 @@ module rf{
             context3D.clear(0,0,0,1);
             context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
 
-            let c = this.camera2D;
+            let c = this.camera;
 
             if(c.states){
                 c.updateSceneTransform();
@@ -80,6 +90,7 @@ module rf{
         public resize(width:number,height:number):void{
             this.camera2D.resize(width,height);
             this.camera3D.resize(width,height);
+            this.cameraUI.resize(width,height);
         }
     }
 }
