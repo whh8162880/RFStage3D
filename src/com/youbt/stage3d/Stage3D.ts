@@ -7,6 +7,8 @@ module rf{
 
         canvas:HTMLCanvasElement;
 
+        cameraUI:CameraUI
+
         camera2D:Camera2D;
 
         camera3D:Camera3D;
@@ -19,8 +21,9 @@ module rf{
             super();
             this.camera2D = new Camera2D();
             this.camera3D = new Camera3D();
+            this.cameraUI = new CameraUI();
 
-            this.camera = this.camera2D;
+            this.camera = this.cameraUI;
 
             this.renderer = new BatchRenderer(this);
             this.mouse = new Mouse();
@@ -85,6 +88,7 @@ module rf{
         public resize(width:number,height:number):void{
             this.camera2D.resize(width,height);
             this.camera3D.resize(width,height);
+            this.cameraUI.resize(width,height);
         }
     }
 }

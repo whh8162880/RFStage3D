@@ -534,14 +534,14 @@ module rf {
                 this.addPoint([x2,y,z],noraml,uv,rgba);
                 this.addPoint([x2,y2,z],noraml,uv,rgba);
                 this.addPoint([x,y2,z],noraml,uv,rgba);
-                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
                 
                 
-    //			beginFill(0x00FF00)
+    			// beginFill(0x00FF00)
                 //上
+                this.addPoint([x,y,z],noraml,uv,rgba);
+                this.addPoint([x,y,z2],noraml,uv,rgba);
+                this.addPoint([x2,y,z2],noraml,uv,rgba);
+                this.addPoint([x2,y,z],noraml,uv,rgba);
                 // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
                 // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
                 // addPoint(x2,	y,		z2,		0,0,	_fr,_fg,_fb,_fa);

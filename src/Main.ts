@@ -2,7 +2,7 @@
 module rf{
     export let sp;
 
-    export var line;
+    // export var line;
     export class Main extends AppBase{
         constructor(){      
             super();
@@ -20,14 +20,41 @@ module rf{
 
             var g:Graphics;
 
-            // ROOT.camera = ROOT.camera3D;
+            let camera = ROOT.camera3D;
+            ROOT.camera = camera;
+
+            let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
+            camera.z = -f;
+            camera.y = f;
+            camera.rotationX = 45
+
+           
+            // line.rotationX = 45;
+            let line = new Line3D();
+            line.clear();
+            line.moveTo(-500,0,500,2);
+            line.lineTo(500,0,500,2);
+            line.lineTo(500,0,-500,2);
+            line.lineTo(-500,0,-500,2);
+            line.lineTo(-500,0,500,2);
+            line.end()
+            // line.setPos(1000,600,0)
+            ROOT.addChild(line);
+
+            let tr = new Trident(300,2);
+            ROOT.addChild(tr);
+
             // let s = new Sprite();
+            // s.renderer = new BatchRenderer(s);
             // g = s.graphics;
             // g.clear();
-            // g.drawCube(-100,-100,100,200,200,200,0xFFFFFF);
+            // g.drawCube(-100,-100,-100,200,200,200,0xFFFFFF);
             // g.end();
+            // s.rotationX = 45
             // ROOT.addChild(s);
-            // ROOT.camera.z = 1;
+            
+
+            
 
             // var m:Matrix3D = new Matrix3D();
             // m.appendRotation(90,Vector3D.X_AXIS);
@@ -45,8 +72,8 @@ module rf{
             // ROOT.addChild(icon);
             // icon.setUrl("assets/ranger.png");
 
-            let profile = singleton(GUIProfile);
-            ROOT.addChild(profile);
+            // let profile = singleton(GUIProfile);
+            // ROOT.addChild(profile);
 
             // line = new Trident(200,4);
             // ROOT.addChild(line);

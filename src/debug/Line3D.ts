@@ -117,11 +117,9 @@ module rf{
                 tempVertex.set([p2.x,p2.y,p2.z,p1.x,p1.y,p1.z,p2.t * 0.5,p2.r,p2.g,p2.b,p2.a]);
                 tempVertex.set([p2.x,p2.y,p2.z,p1.x,p1.y,p1.z,-p2.t * 0.5,p2.r,p2.g,p2.b,p2.a]);
                 tempVertex.set([p1.x,p1.y,p1.z,p2.x,p2.y,p2.z,p1.t * 0.5,p1.r,p1.g,p1.b,p1.a]);
+                tempVertex.numVertices += 4;
             }
-
             points.length = 0;
-            tempVertex.numVertices += 4;
-            
         }
 
         end():void{
@@ -168,6 +166,10 @@ module rf{
                 this.program = p = this.createProgram();
             }
 
+            // c.setBlendFactors(gl.ONE,gl.ZERO);
+
+            c.setDepthTest(true,gl.LESS);
+
 
             c.setProgram(p);
 
@@ -194,6 +196,7 @@ module rf{
                 attribute float len;
                 attribute vec4 color;
 
+                // uniform vec2 origin;
                 uniform mat4 mv;
                 uniform mat4 p;
                 varying vec4 vColor;
@@ -203,8 +206,13 @@ module rf{
                     vec4 t = pos - mv * vec4(posY,1.0);
                     vec3 v = cross(t.xyz,vec3(0,0,1));
                     v = normalize(v);
-                    v.xy *= len;
-                    pos.xyz += ceil(v.xyz);
+                    float t2 = pos.z * p[2].w;
+                    if(t2 <= 0.0){
+                        t2 = 1.0;
+                    }
+                    t2 *= len;
+                    v.xyz *= t2;
+                    pos.xy += v.xy;
                     gl_Position = p * pos;
                     vColor = color;
                 }
@@ -226,25 +234,28 @@ module rf{
         constructor(len:number = 200,think:number = 2){
             super();
             
-            let line= len * 0.9
-            let arrow = len * 0.1
-
+            var line;
+            if(len*0.1 > 60){
+                line = len - 60;
+            }else{
+                line = len * 0.9
+            }
 
             this.clear();
             let color = 0xFF0000;
-            this.moveTo(think,0,0,think,color);
+            this.moveTo(0,0,0,think,color);
             this.lineTo(line,0,0,think,color);
             this.moveTo(line,0,0,think*5,color);
             this.lineTo(len,0,0,1,color);
 
             color = 0x00FF00;
-            this.moveTo(0,think,0,think,color);
+            this.moveTo(0,0,0,think,color);
             this.lineTo(0,line,0,think,color);
             this.moveTo(0,line,0,think*5,color);
             this.lineTo(0,len,0,1,color);
 
             color = 0x0000FF;
-            this.moveTo(0,0,think,think,color);
+            this.moveTo(0,0,0,think,color);
             this.lineTo(0,0,line,think,color);
             this.moveTo(0,0,line,think*5,color);
             this.lineTo(0,0,len,1,color);
