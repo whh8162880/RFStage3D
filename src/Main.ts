@@ -46,7 +46,7 @@ module rf{
             let tr = new Trident(300,2);
             ROOT.addChild(tr);
 
-            // new TrackballControls(camera);
+            new TrackballControls(camera);
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);
