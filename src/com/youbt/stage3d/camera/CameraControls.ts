@@ -7,15 +7,14 @@ module rf{
         constructor(object:DisplayObject){
             this.object = object;
             this.target = new Vector3D();
-           
             ROOT.on(MouseEventX.MouseDown,this.mouseDownHandler,this);
             ROOT.on(MouseEventX.MouseWheel,this.mouseWheelHandler,this);
-            
         }
 
         mouseWheelHandler(event:EventX):void{
             let e =event.data;
             this.object.forwardPos(-e.deltaY);
+            // this.object.z += e.deltaY > 0 ? 1: -1
             this.distance = this.object.pos.subtract(this.target).length;
         }
 
@@ -39,17 +38,17 @@ module rf{
             dy *= pixelRatio;
 
             let rx = dy*mouseSitivity + object.rotationX;
-            let ry = dx*mouseSitivity + object.rotationY;
+            let ry = -dx*mouseSitivity + object.rotationY;
             
             if(target){
 				var transform:Matrix3D = CALCULATION_MATRIX;
 				transform.identity();
 				transform.appendTranslation(0, 0, -distance);
 				transform.appendRotation(rx, Vector3D.X_AXIS);
-				transform.appendRotation(-ry, Vector3D.Y_AXIS);
+				transform.appendRotation(ry, Vector3D.Y_AXIS);
 				transform.appendTranslation(target.x, target.y, target.z);
 				let raw = transform.rawData;
-                object.setPos(raw[12],-raw[13],raw[14]);
+                object.setPos(raw[12],raw[13],raw[14]);
             }
             object.rotationX = rx;
 			object.rotationY = ry;

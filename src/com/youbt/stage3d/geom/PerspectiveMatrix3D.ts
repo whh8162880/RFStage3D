@@ -103,8 +103,8 @@ module rf {
             this.copyRawDataFrom([
                 xScale, 0.0, 0.0, 0.0,
                 0.0, yScale, 0.0, 0.0,
-                0.0, 0.0, (zFar + zNear) / (zFar - zNear), 2.0 * zFar * zNear / (zNear - zFar),
-                0.0, 0.0, 1.0, 0.0
+                0.0, 0.0, (zFar + zNear) / (zFar - zNear), 1.0,
+                0.0, 0.0, 2.0 * zFar * zNear / (zNear - zFar), 0.0
             ]);
 
         }

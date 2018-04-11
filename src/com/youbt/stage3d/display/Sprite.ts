@@ -1,9 +1,6 @@
 ///<reference path="./DisplayObjectContainer.ts" />
 ///<reference path="../camera/Camera.ts" />
 module rf {
-    export interface I3DRender extends IRecyclable {
-        render?(camera: Camera, now: number, interval: number,target?:Sprite): void
-    }
     export class Sprite extends DisplayObjectContainer implements I3DRender {
         source:BitmapSource;
         variables:{ [key: string]: IVariable };

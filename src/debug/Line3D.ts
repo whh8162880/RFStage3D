@@ -170,7 +170,6 @@ module rf{
 
             // c.setDepthTest(true,gl.LESS);
 
-
             c.setProgram(p);
 
             m.copyFrom(this.sceneTransform);
@@ -196,7 +195,6 @@ module rf{
                 attribute float len;
                 attribute vec4 color;
 
-                // uniform vec2 origin;
                 uniform mat4 mv;
                 uniform mat4 p;
                 varying vec4 vColor;
@@ -207,16 +205,18 @@ module rf{
                     vec3 v = cross(t.xyz,vec3(0,0,1));
                     v = normalize(v);
                     float t2 = pos.z * p[2].w;
-                    if(t2 <= 0.0){
+                     if(t2 <= 0.0){
                         v.xyz *= len;
-                    }else{
-                        v.xyz *= len * t2;
-                    }
-                    
-                    
-                    pos.xyz += v.xyz;
-                    gl_Position = p * pos;
+                     }else{
+                         v.xyz *= len * t2;
+                     }
+                    pos.xy += v.xy;
+                    pos = p * pos;
+                    gl_Position = pos;
                     vColor = color;
+                    // t2 = pos.z;
+                    // pos = vec4(t2,t2,t2,1.0);
+                    // vColor.xyzw = pos;
                 }
             `
 
@@ -248,13 +248,13 @@ module rf{
             this.moveTo(0,0,0,think,color);
             this.lineTo(line,0,0,think,color);
             this.moveTo(line,0,0,think*5,color);
-            this.lineTo(len,0,0,1,color);
+            this.lineTo(len,0,0,0,color);
 
             color = 0x00FF00;
             this.moveTo(0,0,0,think,color);
             this.lineTo(0,line,0,think,color);
             this.moveTo(0,line,0,think*5,color);
-            this.lineTo(0,len,0,1,color);
+            this.lineTo(0,len,0,0,color);
 
             color = 0x0000FF;
             this.moveTo(0,0,0,think,color);

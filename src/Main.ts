@@ -17,6 +17,12 @@ module rf{
             if(undefined == gl){
                 return;
             }
+            
+            // gl.enable(gl.DEPTH_TEST);  
+            // gl.depthMask(true);
+            // gl.depthFunc(gl.LEQUAL);
+            // context3D.setDepthTest(true,gl.LEQUAL)
+
 
             var g:Graphics;
 
@@ -24,17 +30,23 @@ module rf{
             ROOT.camera = camera;
 
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
-            camera.z = -f;
+            camera.z = f
             camera.y = f;
             // camera.rotationX = 45
-
+            // camera.z = 4
             camera.lookat(new Vector3D(0,0,0));
+
+            let t = 2;
+
+            let tr = new Trident(200,t);
+            ROOT.addChild(tr);
 
            
             // line.rotationX = 45;
             let line = new Line3D();
-            let t = 2;
+           
             line.clear();
+
             line.moveTo(-500,0,500,t);
             line.lineTo(500,0,500,t);
             line.lineTo(500,0,-500,t);
@@ -43,8 +55,7 @@ module rf{
             line.end();
             ROOT.addChild(line);
             
-            let tr = new Trident(300,2);
-            ROOT.addChild(tr);
+            
 
             new TrackballControls(camera);
 
