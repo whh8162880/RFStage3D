@@ -20,11 +20,13 @@ module rf{
 
             var g:Graphics;
 
+            ROOT.camera = ROOT.camera3D;
+
 
             let s = new Sprite();
             g = s.graphics;
             g.clear();
-            g.drawCube(0,0,0,100,100,100,0xFFFFFF);
+            g.drawCube(-100,-100,100,200,200,200,0xFFFFFF);
             g.end();
             ROOT.addChild(s);
 
