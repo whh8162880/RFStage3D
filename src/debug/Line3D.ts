@@ -153,7 +153,7 @@ module rf{
 
 
             let c = context3D;
-            c.setDepthTest(true,gl.LEQUAL);
+            // c.setDepthTest(true,gl.LEQUAL);
             const{vertexBuffer:v,worldTransform:m,quad,triangles}=this;
 
             if(undefined == v){
@@ -168,7 +168,7 @@ module rf{
 
             // c.setBlendFactors(gl.ONE,gl.ZERO);
 
-            c.setDepthTest(true,gl.LESS);
+            // c.setDepthTest(true,gl.LESS);
 
 
             c.setProgram(p);
