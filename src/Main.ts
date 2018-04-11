@@ -20,15 +20,14 @@ module rf{
 
             var g:Graphics;
 
-            ROOT.camera = ROOT.camera3D;
-
-
-            let s = new Sprite();
-            g = s.graphics;
-            g.clear();
-            g.drawCube(-100,-100,100,200,200,200,0xFFFFFF);
-            g.end();
-            ROOT.addChild(s);
+            // ROOT.camera = ROOT.camera3D;
+            // let s = new Sprite();
+            // g = s.graphics;
+            // g.clear();
+            // g.drawCube(-100,-100,100,200,200,200,0xFFFFFF);
+            // g.end();
+            // ROOT.addChild(s);
+            // ROOT.camera.z = 1;
 
             // var m:Matrix3D = new Matrix3D();
             // m.appendRotation(90,Vector3D.X_AXIS);
@@ -46,8 +45,8 @@ module rf{
             // ROOT.addChild(icon);
             // icon.setUrl("assets/ranger.png");
 
-            // let profile = singleton(GUIProfile);
-            // ROOT.addChild(profile);
+            let profile = singleton(GUIProfile);
+            ROOT.addChild(profile);
 
             // line = new Trident(200,4);
             // ROOT.addChild(line);

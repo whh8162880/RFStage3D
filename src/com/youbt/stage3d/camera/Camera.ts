@@ -80,7 +80,7 @@ module rf{
             rawData[8] = 0;
             rawData[9] = 0;
             rawData[10] = 1/this.far;
-            rawData[11] = 1;
+            rawData[11] = 1/100;
 
             rawData[12] = 0;
             rawData[13] = 0;
