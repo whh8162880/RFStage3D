@@ -9,21 +9,32 @@ module rf{
     }
 
     interface ITouchlement{
-        id:number;
-        x:number;
-        y:number;
         target:DisplayObject;
-        timer:number;
+        time:number;
+        data:MouseEventData;
         
     }
     export class Mouse{
         
         init(mobile:boolean):void{
 
-            let mouseElement = this.mouseElement;
+            const{touchElement,mouseElement} = this;
             mouseElement[0] = {target:undefined,time:0,down:MouseEventX.MouseDown,up:MouseEventX.MouseUp,click:MouseEventX.CLICK};
             mouseElement[1] = {target:undefined,time:0,down:MouseEventX.MouseMiddleDown,up:MouseEventX.MouseMiddleUp,click:MouseEventX.middleClick};
             mouseElement[2] = {target:undefined,time:0,down:MouseEventX.MouseRightDown,up:MouseEventX.MouseRightUp,click:MouseEventX.RightClick};
+
+            //10个指头应该够了吧
+            touchElement[0] = {target:undefined,time:0,data:new MouseEventData(0)};
+            touchElement[1] = {target:undefined,time:0,data:new MouseEventData(1)};
+            touchElement[2] = {target:undefined,time:0,data:new MouseEventData(2)};
+            touchElement[3] = {target:undefined,time:0,data:new MouseEventData(3)};
+            touchElement[4] = {target:undefined,time:0,data:new MouseEventData(4)};
+            touchElement[5] = {target:undefined,time:0,data:new MouseEventData(5)};
+            touchElement[6] = {target:undefined,time:0,data:new MouseEventData(6)};
+            touchElement[7] = {target:undefined,time:0,data:new MouseEventData(7)};
+            touchElement[8] = {target:undefined,time:0,data:new MouseEventData(8)};
+            touchElement[9] = {target:undefined,time:0,data:new MouseEventData(9)};
+
 
             let canvas = ROOT.canvas;
             
@@ -41,6 +52,7 @@ module rf{
                 canvas.ontouchstart = this.touchHandler;
                 canvas.ontouchmove = this.touchMoveHandler;
                 canvas.ontouchend = this.touchHandler;
+                canvas.ontouchcancel = this.touchHandler
             }
 
             
@@ -103,7 +115,7 @@ module rf{
                     data.wheel = e.deltaY
                     d.simpleDispatch(MouseEventX.MouseWheel,data,true);
                 }
-                
+
                 data.recycle();
             }
 
@@ -114,17 +126,18 @@ module rf{
 		preMouseMoveTime:number;
         mouseMoveHandler( e ):void{
             let mouse = MouseInstance;
-            if(mouse.preMoveTime == engineNow){
+            let now = engineNow;
+            if(mouse.preMoveTime == now){
                 return;
             }
+            mouse.preMoveTime = now;
            
-            let r = ROOT;
             let mouseX = e.clientX * pixelRatio;
             let mouseY = e.clientY * pixelRatio;
             nativeMouseX = mouseX;
             nativeMouseY = mouseY;
 
-            let d = r.getObjectByPoint(mouseX,mouseY,1);
+            let d = ROOT.getObjectByPoint(mouseX,mouseY,1);
             if(undefined != d){
                 let data = recyclable(MouseEventData);
                 data.id = e.button;
@@ -143,14 +156,97 @@ module rf{
 
         touchHandler(e:TouchEvent):void{
             let mouse = MouseInstance;
+            const{touchElement:elements}=mouse;
             let touch = e.changedTouches[0];
+            let element:ITouchlement;
+            let data:MouseEventData;
 
+            let now = engineNow;
+            let d:DisplayObject;
 
-            console.log(e.type,e.changedTouches.length);
+            let mouseX = touch.clientX * pixelRatio;
+            let mouseY = touch.clientY * pixelRatio;
+            nativeMouseX = mouseX;
+            nativeMouseY = mouseY;
+
+            if(mouse.preMouseTime != now){
+                mouse.preMouseTime = now;
+                d = ROOT.getObjectByPoint(mouseX,mouseY,1)
+            }else{
+                d = mouse.preTarget;
+            }
+
+            if(undefined != d){
+                element = elements[touch.identifier];
+                data = element.data;
+                data.dx = mouseX - data.x;
+                data.dy = mouseY - data.y;
+                data.x = mouseX;
+                data.y = mouseY;
+                if(e.type == "touchstart"){
+                    if(true == d.mousedown){
+                        return;
+                    }
+                    element.target = d;
+                    element.time = now;
+                    d.mousedown = true;
+                    d.simpleDispatch(MouseEventX.MouseDown,data,true);
+                }else{
+                    if(false == d.mousedown){
+                        return;
+                    }
+                    d.mousedown = false;
+                    d.simpleDispatch(MouseEventX.MouseUp,data,true);
+                    if(element.target == d && now - element.time < 500){
+                        d.simpleDispatch(MouseEventX.CLICK,data,true);
+                    }
+
+                }
+            }
         }
 
         touchMoveHandler(e:TouchEvent):void{
             let mouse = MouseInstance;
+            let now = engineNow;
+            if(mouse.preMoveTime == now){
+                return;
+            }
+            mouse.preMoveTime = now;
+
+            const{touchElement:elements}=mouse;
+            const{touches,changedTouches}=e;
+            let element:ITouchlement;
+            let data:MouseEventData;
+            let len = touches.length;
+            if(len == 1){
+                let touch = changedTouches[0];
+                let mouseX = touch.clientX * pixelRatio;
+                let mouseY = touch.clientY * pixelRatio;
+                nativeMouseX = mouseX;
+                nativeMouseY = mouseY;
+                let d = ROOT.getObjectByPoint(mouseX,mouseY,1);
+                if(undefined != d){
+                    element = elements[touch.identifier];
+                    data = element.data;
+                    data.dx = mouseX - data.x;
+                    data.dy = mouseY - data.y;
+                    data.x = mouseX;
+                    data.y = mouseY;
+                    d.simpleDispatch(MouseEventX.MouseMove,data,true);
+                }
+                return;
+            }else{
+                // let x = 0;
+                // let y = 0;
+                // for(let i=0;i<len;i++){
+                //     let touch = touches[i];
+                // }
+            }
+
+
+            
+            
+            
         }
     }
 

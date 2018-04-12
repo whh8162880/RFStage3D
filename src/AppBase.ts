@@ -73,6 +73,8 @@ module rf {
             uiContainer.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
             uiContainer.triangleFaceToCull = Context3DTriangleFace.NONE;
             ROOT.addChild(uiContainer);
+            popContainer.mouseEnabled = false;
+            tipContainer.mouseEnabled = false;
             uiContainer.addChild(popContainer);
             uiContainer.addChild(tipContainer);
         }

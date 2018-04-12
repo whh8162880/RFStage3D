@@ -127,8 +127,9 @@ module rf {
 
     export class DisplayObject extends MiniDispatcher implements IMouse {
         hitArea: HitArea;
-        mouseEnabled:boolean;
-        mouseChildren:boolean;
+        mouseEnabled:boolean = false;
+        mouseChildren:boolean = true;
+        mousedown:boolean = false;
         transformComponents: Vector3D[];
         pos: Vector3D;
         rot: Vector3D;

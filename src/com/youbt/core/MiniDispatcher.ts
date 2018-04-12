@@ -45,6 +45,9 @@ module rf {
 	}
 
 	export class MouseEventData implements IRecyclable{
+		constructor(id?:number){
+			this.id = id;
+		}
 		id:number;
 		x:number;
 		y:number;
