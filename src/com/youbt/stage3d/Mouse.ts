@@ -171,6 +171,9 @@ module rf{
             nativeMouseY = mouseY;
 
             element = elements[touch.identifier];
+            if(undefined == element){
+                elements[touch.identifier] =  element = {target:undefined,time:0,data:new MouseEventData(touch.identifier)}
+            } 
             data = element.data;
             data.dx = mouseX - data.x;
             data.dy = mouseY - data.y;
