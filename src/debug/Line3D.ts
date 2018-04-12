@@ -255,7 +255,7 @@ module rf{
             this.moveTo(0,0,0,think,color);
             this.lineTo(0,0,line,think,color);
             this.moveTo(0,0,line,think*5,color);
-            this.lineTo(0,0,len,1,color);
+            this.lineTo(0,0,len,0,color);
 
             this.end();
 

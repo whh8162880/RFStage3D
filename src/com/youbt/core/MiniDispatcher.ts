@@ -30,11 +30,36 @@ module rf {
 		RECYCLE
 	}
 	export enum MouseEventX {
-		MouseDown = "mousedown",
-		MouseUp = "mouseup",
-		MouseWheel = "mousewheel",
-		MouseMove = 50,
-		CLICK
+		MouseDown = 50,
+		MouseRightDown,
+		MouseMiddleDown,
+		MouseUp,
+		MouseRightUp,
+		MouseMiddleUp,
+		CLICK,
+		RightClick,
+		middleClick,
+		MouseWheel,
+		MouseMove,
+		
+	}
+
+	export class MouseEventData implements IRecyclable{
+		id:number;
+		x:number;
+		y:number;
+		dx:number;
+		dy:number;
+		ctrl:boolean;
+		shift:boolean;
+		alt:boolean;
+		wheel:number;
+
+		onRecycle(){
+			this.ctrl = this.shift = this.alt = false;
+			this.wheel = this.dx = this.dy = this.x = this.y = this.id = 0;
+		}
+
 	}
 
 

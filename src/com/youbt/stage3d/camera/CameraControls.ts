@@ -14,14 +14,14 @@ module rf{
         mouseWheelHandler(event:EventX):void{
            
             const{distance} = this;
-            const{deltaY}=event.data;
+            const{wheel}=event.data;
             let step = 1;
-            if(deltaY < 0 && distance<500){
+            if(wheel < 0 && distance<500){
                 step = distance / 500;
             }
 
            
-            this.object.forwardPos(-deltaY*step);
+            this.object.forwardPos(-wheel*step);
             // this.object.z += e.deltaY > 0 ? 1: -1
             this.distance = this.object.pos.subtract(this.target).length;
         }
@@ -39,11 +39,11 @@ module rf{
 
         mouseMoveHandler(e:EventX):void{
             const{object,target,mouseSitivity,distance}=this;
-            let event = e.data;
-            let dx:number = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            let dy:number = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-            dx *= pixelRatio;
-            dy *= pixelRatio;
+            const{dx,dy}=e.data
+            // let dx:number = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+            // let dy:number = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+            // dx *= pixelRatio;
+            // dy *= pixelRatio;
 
             let speed = (distance > 1000) ? mouseSitivity : mouseSitivity * distance / 1000;
             speed = Math.max(speed,0.015);

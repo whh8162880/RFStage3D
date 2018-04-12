@@ -20,14 +20,12 @@ module rf{
         camera2D:CameraOrth;
         camera3D:Camera3D;
         camera:Camera;
-        mouse:Mouse;
         constructor(){
             super();
             this.camera2D = new CameraOrth();
             this.camera3D = new Camera3D();
             this.cameraUI = new CameraUI();
             this.renderer = new BatchRenderer(this);
-            this.mouse = new Mouse();
             this.camera = this.cameraUI;
             this.stage = this;
         }
@@ -53,9 +51,12 @@ module rf{
 
             context3D = singleton(Context3D);
 
+
+            Capabilities.init();
+            MouseInstance.init(Capabilities.isMobile);
+
             canvas.addEventListener('webglcontextlost',this.webglContextLostHandler);
             canvas.addEventListener("webglcontextrestored",this.webglContextRestoredHandler);
-            this.mouse.init();
             this.simpleDispatch(EventT.CONTEXT3D_CREATE,gl);
             return true;
         }
@@ -82,31 +83,6 @@ module rf{
             this.camera2D.resize(width,height);
             this.camera3D.resize(width,height);
             this.cameraUI.resize(width,height);
-        }
-
-
-
-        initContainer(){
-            let g = gl;
-            let container = new PassContainer(vertex_mesh_variable);
-            container.depthMask = true;
-            container.passCompareMode = g.LEQUAL;
-            container.sourceFactor = g.SRC_ALPHA
-            container.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
-            container.triangleFaceToCull = Context3DTriangleFace.NONE;
-            this.addChild(container);
-            threeContainer = container;
-
-            let uiContainer = new UIContainer(undefined,vertex_ui_variable);
-            uiContainer.renderer = new BatchRenderer(uiContainer);
-            uiContainer.depthMask = false;
-            uiContainer.passCompareMode = g.ALWAYS;
-            uiContainer.sourceFactor = g.SRC_ALPHA;
-            uiContainer.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
-            uiContainer.triangleFaceToCull = Context3DTriangleFace.NONE;
-            this.addChild(uiContainer);
-            uiContainer.addChild(popContainer);
-            uiContainer.addChild(tipContainer);
         }
     }
 
