@@ -228,8 +228,11 @@ module rf{
             // panel.x = 300;
             // panel.y = 300;
             // ROOT.addChild(panel);
+            // let panelutil = new PanelUtils();
 
-            let panelutil = new PanelUtils();
+
+            // 潘华专用  
+            new Pan_Test();
         }
 
         public linktest():void{

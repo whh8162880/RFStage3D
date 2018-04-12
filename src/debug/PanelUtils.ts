@@ -73,7 +73,7 @@ module rf{
             this.ui = new Symbol(source);
             this.ui.setSymbol(cs);
             this.ui.renderer = new BatchRenderer(this.ui);
-            ROOT.addChild(this.ui);
+            popContainer.addChild(this.ui);
             // this.ui.x = 300;
             // this.ui.y = 200;
         }
