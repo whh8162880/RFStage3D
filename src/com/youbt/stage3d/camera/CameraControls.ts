@@ -2,7 +2,7 @@ module rf{
     export class TrackballControls{
         object:DisplayObject;
         target:Vector3D;
-        mouseSitivity:number = 0.5;
+        mouseSitivity:number = 0.3;
         distance:number;
         constructor(object:DisplayObject){
             this.object = object;
@@ -12,8 +12,16 @@ module rf{
         }
 
         mouseWheelHandler(event:EventX):void{
-            let e =event.data;
-            this.object.forwardPos(-e.deltaY);
+           
+            const{distance} = this;
+            const{deltaY}=event.data;
+            let step = 1;
+            if(deltaY < 0 && distance<500){
+                step = distance / 500;
+            }
+
+           
+            this.object.forwardPos(-deltaY*step);
             // this.object.z += e.deltaY > 0 ? 1: -1
             this.distance = this.object.pos.subtract(this.target).length;
         }
@@ -37,8 +45,11 @@ module rf{
             dx *= pixelRatio;
             dy *= pixelRatio;
 
-            let rx = dy*mouseSitivity + object.rotationX;
-            let ry = -dx*mouseSitivity + object.rotationY;
+            let speed = (distance > 1000) ? mouseSitivity : mouseSitivity * distance / 1000;
+            speed = Math.max(speed,0.015);
+
+            let rx = dy*speed + object.rotationX;
+            let ry = -dx*speed + object.rotationY;
             
             if(target){
 				var transform:Matrix3D = CALCULATION_MATRIX;
