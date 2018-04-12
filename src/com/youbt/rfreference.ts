@@ -18,5 +18,5 @@
 ///<reference path="./stage3d/geom/Quaternion.ts" />
 
 ///<reference path="./stage3d/geo/Geometry.ts" />
-
+///<reference path="./stage3d/Shader.ts" />
 

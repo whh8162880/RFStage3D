@@ -223,6 +223,7 @@ module rf {
             this.y = sourceVector3D.y;
             this.z = sourceVector3D.z;
             this.w = sourceVector3D.w;
+            return this;
         }
 
 		/**
@@ -257,6 +258,7 @@ module rf {
             this.x *= s;
             this.y *= s;
             this.z *= s;
+            return this;
         }
 
         /**
@@ -282,7 +284,7 @@ module rf {
             var leng = this.length;
             if (leng != 0)
                 this.scaleBy(1 / leng);
-            return leng;
+            return this;
         }
 
 
@@ -306,6 +308,37 @@ module rf {
             const { x, y, z } = this;
             const { x: ax, y: ay, z: az } = a;
             return new Vector3D(y * az - z * ay, z * ax - x * az, x * ay - y * ax);
+        }
+
+
+        crossVectors( a: Point3D, b: Point3D ) {
+            var ax = a.x, ay = a.y, az = a.z;
+            var bx = b.x, by = b.y, bz = b.z;
+            this.x = ay * bz - az * by;
+            this.y = az * bx - ax * bz;
+            this.z = ax * by - ay * bx;
+            return this;
+        }
+
+
+        setLength(length:number){
+            return this.normalize().scaleBy(length);
+        }
+
+
+        applyQuaternion( q:Quaternion ) {
+            var x = this.x, y = this.y, z = this.z;
+            var qx = q.x, qy = q.y, qz = q.z, qw = q.w;
+            // calculate quat * vector
+            var ix = qw * x + qy * z - qz * y;
+            var iy = qw * y + qz * x - qx * z;
+            var iz = qw * z + qx * y - qy * x;
+            var iw = - qx * x - qy * y - qz * z;
+            // calculate result * inverse quat
+            this.x = ix * qw + iw * - qx + iy * - qz - iz * - qy;
+            this.y = iy * qw + iw * - qy + iz * - qx - ix * - qz;
+            this.z = iz * qw + iw * - qz + ix * - qy - iy * - qx;
+            return this;
         }
 
 		/**

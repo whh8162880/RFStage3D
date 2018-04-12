@@ -6,7 +6,7 @@ module rf {
             this.createSource();
             Engine.start();
             ROOT = singleton(Stage3D);
-            Engine.addResize(this);
+            
         }
 
 
@@ -22,9 +22,12 @@ module rf {
                 return;
             }
 
-            
+            this.initContainer();
 
+            Engine.addResize(this);
             Engine.addTick(this);
+
+            
         }
 
         createSource():void{
@@ -51,12 +54,39 @@ module rf {
         }
 
 
+        initContainer(){
+            let g = gl;
+            let container = new PassContainer(vertex_mesh_variable);
+            container.depthMask = true;
+            container.passCompareMode = g.LEQUAL;
+            container.sourceFactor = g.SRC_ALPHA
+            container.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            container.triangleFaceToCull = Context3DTriangleFace.NONE;
+            ROOT.addChild(container);
+            threeContainer = container;
+
+            let uiContainer = new UIContainer(undefined,vertex_ui_variable);
+            uiContainer.renderer = new BatchRenderer(uiContainer);
+            uiContainer.depthMask = false;
+            uiContainer.passCompareMode = g.ALWAYS;
+            uiContainer.sourceFactor = g.SRC_ALPHA;
+            uiContainer.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            uiContainer.triangleFaceToCull = Context3DTriangleFace.NONE;
+            ROOT.addChild(uiContainer);
+            popContainer.mouseEnabled = false;
+            tipContainer.mouseEnabled = false;
+            uiContainer.addChild(popContainer);
+            uiContainer.addChild(tipContainer);
+        }
+
+
         public update(now: number, interval: number): void {
             //todo
             ROOT.update(now,interval);
         }
 
         public resize(width:number,height:number):void{
+            context3D.configureBackBuffer(stageWidth,stageHeight,0);
             ROOT.resize(width,height);
         }
 

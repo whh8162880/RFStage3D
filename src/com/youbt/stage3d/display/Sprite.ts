@@ -1,25 +1,51 @@
 ///<reference path="./DisplayObjectContainer.ts" />
 ///<reference path="../camera/Camera.ts" />
 module rf {
-    export interface I3DRender extends IRecyclable {
-        render?(camera: Camera, now: number, interval: number,target?:Sprite): void
-    }
-    export class Sprite extends DisplayObjectContainer implements I3DRender {
-        source:BitmapSource;
+
+    export abstract class RenderBase extends DisplayObjectContainer implements I3DRender {
+        nativeRender:boolean = false;
         variables:{ [key: string]: IVariable };
+        triangleFaceToCull: string = Context3DTriangleFace.NONE;
+        sourceFactor: number;
+        destinationFactor: number;
+        depthMask: boolean = false;
+        passCompareMode: number;
+        public render(camera: Camera, now: number, interval: number): void { 
+            let i = 0;
+            let childrens = this.childrens;
+            let len = childrens.length;
+            for(i = 0;i<len;i++){
+                let child = childrens[i];
+                child.render(camera,now,interval);
+            }
+        }
+        constructor(variables?:{ [key: string]: IVariable }) {
+            super();
+            this.variables = variables;
+        }
+
+        addToStage():void{
+            super.addToStage();
+            this.setChange(DChange.vertex);
+        }
+    }
+    
+
+    export class Sprite extends RenderBase {
+        source:BitmapSource;
+       
         /**
          * 1.Sprite本身有render方法可以渲染
          * 2.考虑到可能会有一些需求 渲染器可以写在别的类或者方法中  所以加入renderer概念
          */
         renderer: I3DRender;
-        batcherAvailable: boolean = true;
         $graphics: Graphics = undefined;
         $batchGeometry: BatchGeometry = undefined;
         $vcIndex: number = -1;
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
-        constructor(source:BitmapSource = undefined,variables:{ [key: string]: IVariable } = undefined) {
+        constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }) {
             super();
             this.hitArea = new HitArea();
             this.source = source ? source : componentSource;
@@ -56,6 +82,13 @@ module rf {
             if (this.$graphics && this.$graphics.numVertices) {
                 this.setChange(DChange.vertex);
             }
+
+            if(this.renderer){
+                if(this.parent){
+                    this.parent.setChange(DChange.vertex);
+                }
+            }
+
             super.addToStage();
         }
 
@@ -113,6 +146,9 @@ module rf {
                     }
                 }
                 if(this.mouseEnabled){
+                    if(this.hitArea.allWays){
+                        return this;
+                    }
                     let g = this.$graphics;
                     if(undefined != g){
                         if( g.hitArea.checkIn(dx,dy,scale) == true ){
@@ -225,39 +261,38 @@ module rf {
                 return;
             }
 
-            var matrix = new Matrix();
-            matrix.identity();
+            // var matrix = new Matrix();
+            // matrix.identity();
             
             let dw = this.drawW;
             let dh = this.drawH;
 
-            let sw;
-            let sh;
-            if(dw && dh)
+            // if(dw && dh)
+            // {
+            //    if(dw != img.width || dh != img.height)
+            //    {
+            //     //    matrix.scale(dw / img.width,dh / img.height);
+
+            //    }
+            // }else{
+            //     dw = img.width;
+            //     dh = img.height;
+            // }
+            if(!dw || !dh)
             {
-               if(dw != img.width || dh != img.height)
-               {
-                   sw = dw;
-                   sh = dh;
-                   matrix.scale(dw / img.width,dh / img.height);
-
-               }else{
-                    sw = dw;
-                    sh = dh;
-               }
-
-            }else{
-                sw = dw;
-                sh = dh;
+                dw = img.width;
+                dh = img.height;
             }
 
             let source = this.source;
             let vo = source.setSourceVO(this._url,img.width,img.width,1);
-            source.bmd.context.drawImage(img,vo.x,vo.y);
+            // source.bmd.context.drawImage(img,vo.x,vo.y);
+            source.bmd.context.drawImage(img,vo.x,vo.y,dw,dh);
 
             let g = this.graphics;
             g.clear();
-            g.drawBitmap(0,0,vo,0xFFFFFF,matrix.rawData);
+            g.drawBitmap(0,0,vo);
+            // g.drawBitmap(0,0,vo,0xFFFFFF,matrix.rawData);
             g.end();
 
         }
@@ -327,10 +362,15 @@ module rf {
                     return;
                 }
                 let size = variable.size;
-                let offset = numVertices * size;
-                for(let i = 0;i<size;i++){
-                    array[offset + i] = data[i];
+                let offset = numVertices * size
+                if(data.length == size){
+                    array.set(data,offset)
+                }else{
+                    array.set(data.slice(0,size),offset);
                 }
+                // for(let i = 0;i<size;i++){
+                //     array[offset + i] = data[i];
+                // }
             }
 
             set(variables[VA.pos],empty_float32_pos,pos);
@@ -356,7 +396,8 @@ module rf {
                 alpha
             ]
 
-            const uv = [originU,originV];
+
+            const uv = [originU,originV,this.target.$vcIndex];
 
             const noraml = [0,0,1]
             
@@ -433,6 +474,8 @@ module rf {
 
             const noraml = [0,0,1]
 
+            const index = this.target.$vcIndex;
+
             let f = m2dTransform;
             let p = [0,0,0];
 
@@ -444,7 +487,7 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.addPoint(p,noraml,[points[i+2],points[i+3]],rgba);
+                this.addPoint(p,noraml,[points[i+2],points[i+3],index],rgba);
             }
 
             // let v = this.target.variables;
@@ -491,24 +534,80 @@ module rf {
             //     this.numVertices += 1;
             // }
         }
-    }
 
 
-    export abstract class RenderBase implements I3DRender {
-        triangleFaceToCull: string = Context3DTriangleFace.NONE;
-        sourceFactor: number;
-        destinationFactor: number;
-        depthMask: boolean = false;
-        passCompareMode: number;
-        public render(camera: Camera, now: number, interval: number): void { }
-        constructor() {
-            if (undefined != gl) {
-                this.sourceFactor = gl.SRC_ALPHA;
-                this.destinationFactor = gl.ONE_MINUS_CONSTANT_ALPHA;
-                this.passCompareMode = gl.ALWAYS;
-            }
+        drawCube(x: number, y: number,z: number,
+             width: number, height: number, deep:number,
+            color: number, alpha: number = 1): void {
+
+            const {originU,originV} = this.target.source;
+
+            const rgba = [
+                ((color & 0x00ff0000) >>> 16) / 0xFF,
+                ((color & 0x0000ff00) >>> 8) / 0xFF,
+                (color & 0x000000ff) / 0xFF,
+                alpha
+            ]
+
+
+            const uv = [originU,originV,this.target.$vcIndex];
+
+            const noraml = [0,0,1]
+
+                let x2 = x + width;
+                let y2 = y + height;
+                let z2 = z + deep;
+
+                //前
+                this.addPoint([x,y,z],noraml,uv,rgba);
+                this.addPoint([x2,y,z],noraml,uv,rgba);
+                this.addPoint([x2,y2,z],noraml,uv,rgba);
+                this.addPoint([x,y2,z],noraml,uv,rgba);
+                
+                
+    			// beginFill(0x00FF00)
+                //上
+                this.addPoint([x,y,z],noraml,uv,rgba);
+                this.addPoint([x,y,z2],noraml,uv,rgba);
+                this.addPoint([x2,y,z2],noraml,uv,rgba);
+                this.addPoint([x2,y,z],noraml,uv,rgba);
+                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                
+                //左
+    //			beginFill(0x0000FF)
+                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                
+                //右
+    //			beginFill(0xFFFF00)
+                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                
+                //后
+    //			beginFill(0x00FFFF);
+                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
+                
+                //下
+    //			beginFill(0xFF00FF)
+                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
+                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
         }
     }
+
+
+    
 
     
 
@@ -528,7 +627,7 @@ module rf {
      *      5.考虑到用户电脑 Max Vertex Uniform Vectors 数据不同【http://webglreport.com/】 所以要注意shader对象中ui[${max_vc}]  
      *      6.dc()方法渲染 shader计算详看代码。
      */
-    export class BatchRenderer extends RenderBase implements I3DRender {
+    export class BatchRenderer implements I3DRender {
         target: Sprite;        
         renders: Link;
         geo: BatchGeometry = undefined;
@@ -536,7 +635,6 @@ module rf {
         worldTransform: Matrix3D;
         t:Texture
         constructor(target: Sprite) {
-            super();
             this.target = target;
             this.renders = new Link();
             this.worldTransform = new Matrix3D();
@@ -544,8 +642,7 @@ module rf {
 
         public render(camera: Camera, now: number, interval: number): void {
             let target:Sprite = this.target;
-
-            let source = target.source;
+            const{source,sceneTransform,states,_x,_y,_scaleX} = this.target;
             if(undefined == source){
                 return;
             }
@@ -557,18 +654,18 @@ module rf {
             this.t = t;
 
 
-            if (target.states & DChange.vertex) {
+            if (states & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
-                this.getBatchTargets(target, -target._x, -target._y, 1 / target._scaleX);
+                this.getBatchTargets(target, -_x, -_y, 1 / _scaleX);
                 //step2 合并模型 和 vc信息
                 this.toBatch();
 
                 this.geo = undefined;
                 target.states &= ~DChange.batch;
-            }else if(target.states & DChange.vcdata){
+            }else if(states & DChange.vcdata){
                 //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
-                this.updateVCData(target, -target._x, -target._y, 1 / target._scaleX);
+                this.updateVCData(target, -_x, -_y, 1 / _scaleX);
                 target.states &= ~DChange.vcdata;
             }
 
@@ -576,7 +673,7 @@ module rf {
                 this.createProgram();
             }
 
-            this.worldTransform.copyFrom(target.sceneTransform);
+            this.worldTransform.copyFrom(sceneTransform);
             this.worldTransform.append(camera.worldTranform);
 
 
@@ -613,37 +710,52 @@ module rf {
 
 
         createProgram(): void {
-            let vcode = `
-                attribute vec3 pos;
-                attribute vec3 uv;
-                attribute vec4 color;
-                uniform mat4 mvp;
-                uniform vec4 ui[${max_vc}];
-                varying vec2 vUV;
-                varying vec4 vColor;
-                void main(void){
-                    vec4 p = vec4(pos,1.0);
-                    vec4 t = ui[int(uv.z)];
-                    p.xy = p.xy + t.xy;
-                    p.xy = p.xy * t.zz;
-                    gl_Position = mvp * p;
-                    vUV.xy = uv.xy;
-                    p = color;
-                    p.w = color.w * t.w;
-                    vColor = p;
-                }
-            `
 
-            let fcode = `
-                precision mediump float;
-                uniform sampler2D diff;
-                varying vec4 vColor;
-                varying vec2 vUV;
-                void main(void){
-                    vec4 color = texture2D(diff, vUV);
-                    gl_FragColor = vColor*color;
-                }
-            `
+            let chunk = singleton(Shader);
+
+            let keys = {};
+
+            keys[chunk.att_uv_ui.key] = chunk.att_uv_ui;
+            keys[chunk.uni_v_mvp.key] = chunk.uni_v_mvp;
+            let vcode = chunk.createVertex(undefined,keys)
+
+
+            // let vcode = `
+            //     attribute vec3 pos;
+            //     attribute vec3 uv;
+            //     attribute vec4 color;
+            //     uniform mat4 mvp;
+            //     uniform vec4 ui[${max_vc}];
+            //     varying vec2 vUV;
+            //     varying vec4 vColor;
+            //     void main(void){
+            //         vec4 p = vec4(pos,1.0);
+            //         vec4 t = ui[int(uv.z)];
+            //         p.xy = p.xy + t.xy;
+            //         p.xy = p.xy * t.zz;
+            //         gl_Position = mvp * p;
+            //         vUV.xy = uv.xy;
+            //         p = color;
+            //         p.w = color.w * t.w;
+            //         vColor = p;
+            //     }
+            // `
+
+            keys = {};
+            keys[chunk.uni_f_diff.key] = chunk.uni_f_diff;
+            keys[chunk.att_uv_ui.key] = chunk.att_uv_ui;
+            let fcode = chunk.createFragment(undefined,keys);
+
+            // let fcode = `
+            //     precision mediump float;
+            //     uniform sampler2D diff;
+            //     varying vec4 vColor;
+            //     varying vec2 vUV;
+            //     void main(void){
+            //         vec4 color = texture2D(diff, vUV);
+            //         gl_FragColor = vColor*color;
+            //     }
+            // `
 
             // let vcode = `
             //     attribute vec3 pos;
@@ -679,7 +791,16 @@ module rf {
             this.renders.clean();
         }
 
-        getBatchTargets(target: Sprite, ox: number, oy: number, os: number): void {
+        getBatchTargets(render: RenderBase, ox: number, oy: number, os: number): void {
+            let target:Sprite;
+            if(render instanceof Sprite){
+                target = render;
+            }else{
+                this.renders.add(render);
+                this.geo = undefined;
+                return;
+            }
+
             if (false == target._visible || 0.0 >= target.sceneAlpha) {
                 target.$vcIndex = -1;
                 target.$batchGeometry = null;
@@ -690,7 +811,7 @@ module rf {
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if (target == this.target || (null == target.renderer && true == target.batcherAvailable)) {
+            if (target == this.target || (null == target.renderer && false == target.nativeRender)) {
                 if (undefined == g || 0 >= g.numVertices) {
                     target.$vcIndex = -1;
                     target.$batchGeometry = null;
@@ -712,17 +833,29 @@ module rf {
             } else {
                 this.renders.add(target);
                 this.geo = undefined;
+                return;
             }
 
             for (let child of target.childrens) {
                 if (child instanceof Sprite) {
                     this.getBatchTargets(child, ox, oy, os);
+                }else if(child instanceof RenderBase){
+                    this.renders.add(child);
+                    this.geo = undefined;
                 }
             }
         }
 
         
-        updateVCData(target: Sprite, ox: number, oy: number, os: number):void{
+        updateVCData(render: RenderBase, ox: number, oy: number, os: number):void{
+            let target:Sprite;
+            if(render instanceof Sprite){
+                target = render;
+            }else{
+                return;
+            }
+            
+
             if (false == target._visible || 0.0 >= target.sceneAlpha) {
                 target.$vcIndex = -1;
                 target.$batchGeometry = null;
@@ -733,14 +866,16 @@ module rf {
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if (target == this.target || (null == target.renderer && true == target.batcherAvailable)) {
+            if (target == this.target || (null == target.renderer && false == target.nativeRender)) {
                 if(undefined != target.$batchGeometry){
                     target.$vcox = ox;
                     target.$vcoy = oy;
                     target.$vcos = os;
                     target.$batchGeometry.vcData.wPoint4(sp.$vcIndex * 4 ,sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha);
                 }
-            } 
+            }else{
+                return;
+            }
 
             for (let child of target.childrens) {
                 if (child instanceof Sprite) {

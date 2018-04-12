@@ -83,6 +83,8 @@ namespace rf {
         readonly maxViewportDimensions: Int32Array[];
         // ----- Framebuffer  End  -----
 
+        readonly isMobile:boolean;
+
         init(): void;
     }
 
@@ -125,7 +127,10 @@ namespace rf {
         maxRenderBufferSize: number;
         maxViewportDimensions: Int32Array[];
 
+        isMobile:boolean;
+
         init(): void {
+
             this.platform = navigator.platform;
             this.userAgent = navigator.userAgent;
 
@@ -175,7 +180,26 @@ namespace rf {
             this.stencilBits = g.getParameter(g.STENCIL_BITS);
             this.maxRenderBufferSize = g.getParameter(g.MAX_RENDERBUFFER_SIZE);
             this.maxViewportDimensions = g.getParameter(g.MAX_VIEWPORT_DIMS);
+
+            this.isMobile = this.IsPC() == false;
+        
         }
+
+        IsPC() {
+            var userAgentInfo = navigator.userAgent;
+            var Agents = ["Android", "iPhone",
+               "SymbianOS", "Windows Phone",
+               "iPad", "iPod"];
+            var flag = true;
+            for (var v = 0; v < Agents.length; v++) {
+               if (userAgentInfo.indexOf(Agents[v]) > 0) {
+                  flag = false;
+                  break;
+               }
+            }
+            return flag;
+         }
+        
 
         private isPowerOfTwo(n: number): boolean {
             return (n !== 0) && ((n & (n - 1)) === 0);

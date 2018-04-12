@@ -1,5 +1,4 @@
 module rf {
-
     export let vertex_ui_variable:{ [key: string]: IVariable } = {
         //x,y,z,u,v,index,r,g,b,a
         "pos":{size:3,offset:0},
@@ -94,9 +93,9 @@ module rf {
         vertex: Float32Byte;
         numVertices: number = 0;
         data32PerVertex: number = 0;
-        variables: { [key: string]: { size: number, offset: number } } = undefined;
+        variables: { [key: string]: IVariable };
 
-        constructor(value: number | Float32Array, data32PerVertex: number) {
+        constructor(value: number | Float32Array, data32PerVertex: number,variables?:{ [key: string]: IVariable }) {
             if (value instanceof Float32Array) {
                 this.vertex = new Float32Byte(value)
             } else {
@@ -104,6 +103,7 @@ module rf {
             }
             this.data32PerVertex = data32PerVertex;
             this.numVertices = this.vertex.length / data32PerVertex;
+            this.variables = variables;
         }
 
         public regVariable(variable: string, offset: number, size: number): void {
@@ -118,5 +118,38 @@ module rf {
     export interface IGeometry {
         vertex: VertexInfo;
         index?: Uint16Array;
+    }
+
+
+    export class Temp_Float32Byte implements IRecyclable{
+        constructor(){
+            this.data = new Float32Array(2048); //先无脑申请个8KB内存
+        }
+        data:Float32Array;
+        data32PerVertex:number = 1;
+        numVertices:number = 0;
+        position:number = 0;
+        onSpawn(){
+            this.data32PerVertex = 1;
+            this.numVertices = 0;
+            this.position = 0;
+        }
+
+
+        set(array: ArrayLike<number>, offset?: number): void{
+            if(undefined == offset){
+                offset = this.position;
+            }
+            this.data.set(array,offset);
+            this.position = offset + array.length;
+        }
+
+
+        toArray():Float32Array{
+            let len = this.data32PerVertex * this.numVertices
+            let arr = new Float32Array(len);
+            arr.set(this.data.slice(0,len));
+            return arr;
+        }
     }
 }

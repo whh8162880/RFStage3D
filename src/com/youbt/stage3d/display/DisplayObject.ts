@@ -8,6 +8,10 @@ module rf {
         getObjectByPoint?(dx: number, dy: number,scale:number): DisplayObject
     }
 
+    export interface I3DRender extends IRecyclable {
+        render?(camera: Camera, now: number, interval: number,target?:Sprite): void
+    }
+
     export enum DChange {
         trasnform = 0b1,
         alpha = trasnform << 1,
@@ -32,6 +36,8 @@ module rf {
 
 
     export class HitArea {
+
+        allWays:boolean
         left: number = 0;
         right: number = 0;
         top: number = 0;
@@ -105,6 +111,10 @@ module rf {
             return b;
         }
         checkIn(x: number, y: number, scale: number = 1): boolean {
+            if(this.allWays){
+                return true;
+            }
+
             if (x > this.left * scale && x < this.right * scale && y > this.top * scale && y < this.bottom * scale) {
                 return true;
             }
@@ -117,12 +127,14 @@ module rf {
 
     export class DisplayObject extends MiniDispatcher implements IMouse {
         hitArea: HitArea;
-        mouseEnabled:boolean;
-        mouseChildren:boolean;
-        public transformComponents: Vector3D[];
-        public pos: Vector3D;
-        public rot: Vector3D;
-        public sca: Vector3D;
+        mouseEnabled:boolean = false;
+        mouseChildren:boolean = true;
+        mousedown:boolean = false;
+        transformComponents: Vector3D[];
+        pos: Vector3D;
+        rot: Vector3D;
+        sca: Vector3D;
+        up:Vector3D = new Vector3D(0,1,0);
 
         public _x: number = 0;
         public _y: number = 0;
@@ -157,7 +169,7 @@ module rf {
             super();
             this.pos = new Vector3D();
             this.rot = new Vector3D();
-            this.sca = new Vector3D();
+            this.sca = new Vector3D(1,1,1);
             this.transformComponents = [this.pos, this.rot, this.sca];
             this.transform = new Matrix3D();
             this.sceneTransform = new Matrix3D();
@@ -543,5 +555,89 @@ module rf {
 
             return undefined;
         }
+
+
+        public get mouseX():number{
+            return nativeMouseX - this.sceneTransform.rawData[12];
+        }
+
+        public get mouseY():number{
+            return nativeMouseY - this.sceneTransform.rawData[13];
+        }
+
+
+        render(camera: Camera, now: number, interval: number,target?:Sprite): void{
+
+        }
+
+        lookat(target:Vector3D, upAxis:Vector3D=null):void{
+			let xAxis = tempAxeX;
+			let yAxis = tempAxeY;
+            let zAxis = tempAxeZ;
+            
+            const{transform,_scaleX,_scaleY,_scaleZ,_x,_y,_z,rot}=this;
+			
+            if(undefined == upAxis){
+                upAxis = Vector3D.Y_AXIS;
+            }
+			
+			upAxis = transform.transformVector(upAxis);
+			
+			zAxis.x = target.x - _x;
+			zAxis.y = target.y - _y;
+			zAxis.z = target.z - _z;
+			zAxis.normalize();
+			
+			xAxis.x = upAxis.y*zAxis.z - upAxis.z*zAxis.y;
+			xAxis.y = upAxis.z*zAxis.x - upAxis.x*zAxis.z;
+			xAxis.z = upAxis.x*zAxis.y - upAxis.y*zAxis.x;
+			xAxis.normalize();
+			
+			if (xAxis.length < .05) {
+				xAxis.x = upAxis.y;
+				xAxis.y = upAxis.x;
+				xAxis.z = 0;
+				xAxis.normalize();
+			}
+			
+			yAxis.x = zAxis.y*xAxis.z - zAxis.z*xAxis.y;
+			yAxis.y = zAxis.z*xAxis.x - zAxis.x*xAxis.z;
+			yAxis.z = zAxis.x*xAxis.y - zAxis.y*xAxis.x;
+			
+			let raw = this.transform.rawData;
+			
+			raw[0] = _scaleX*xAxis.x;
+			raw[1] = _scaleX*xAxis.y;
+			raw[2] = _scaleX*xAxis.z;
+			raw[3] = 0;
+			
+			raw[4] = _scaleY*yAxis.x;
+			raw[5] = _scaleY*yAxis.y;
+			raw[6] = _scaleY*yAxis.z;
+			raw[7] = 0;
+			
+			raw[8] = _scaleZ*zAxis.x;
+			raw[9] = _scaleZ*zAxis.y;
+			raw[10] = _scaleZ*zAxis.z;
+			raw[11] = 0;
+			
+			raw[12] = _x;
+			raw[13] = _y;
+			raw[14] = _z;
+			raw[15] = 1;
+			
+			if (zAxis.z < 0) {
+				this.rotationY = (180 - this.rotationY);
+				this.rotationX -= 180;
+				this.rotationZ -= 180;
+			}
+			
+			let v = transform.decompose();
+			xAxis = v[1];
+			rot.x = this._rotationX = xAxis.x;
+			rot.y = this._rotationY = xAxis.y;
+			rot.z = this._rotationZ = xAxis.z;
+			this.setChange(DChange.trasnform);
+		}
     }
 }

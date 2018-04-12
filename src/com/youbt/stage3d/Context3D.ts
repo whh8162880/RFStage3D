@@ -69,6 +69,8 @@ namespace rf {
 		//todo:enableErrorChecking https://www.khronos.org/webgl/wiki/Debugging
 
 		bufferLink:Link;
+		triangles:number;
+		dc:number;
 
 		private _clearBit: number;
 		private _bendDisabled: boolean = true;
@@ -298,20 +300,14 @@ namespace rf {
 			gl.useProgram(program.program);
 		}
 
-		public clear(
-			red: number = 0.0,
-			green: number = 0.0,
-			blue: number = 0.0,
-			alpha: number = 1.0,
-			depth: number = 1.0,
-			stencil: number /*uint*/ = 0,
-			mask: number /* uint */ = 0xffffffff
-		): void {
-			gl.clearColor(red, green, blue, alpha);
-			gl.clearDepth(depth); // TODO:dont need to call this every time
-			gl.clearStencil(stencil); //stencil buffer
-
-			gl.clear(this._clearBit);
+		public clear(red: number = 0.0,green: number = 0.0,blue: number = 0.0,alpha: number = 1.0,depth: number = 1.0,stencil: number /*uint*/ = 0,	mask: number /* uint */ = 0xffffffff): void {
+			let g = gl;
+			g.clearColor(red, green, blue, alpha);
+			g.clearDepth(depth); // TODO:dont need to call this every time
+			g.clearStencil(stencil); //stencil buffer
+			g.clear(this._clearBit);
+			this.triangles = 0;
+			this.dc = 0;
 		}
 
 		public setCulling(triangleFaceToCull: string): void {
@@ -340,23 +336,25 @@ namespace rf {
 		 * @param depthMask 
 		 * @param passCompareMode 
 		 * 
-		 * Context3DCompareMode.LESS			:GL.LESS
-		 * Context3DCompareMode.NEVER			:GL.NEVER
-		 * Context3DCompareMode.EQUAL			:GL.EQUAL
-		 * Context3DCompareMode.GREATER			:GL.GREATER
-		 * Context3DCompareMode.NOT_EQUAL		:GL.NOTEQUAL
-		 * Context3DCompareMode.ALWAYS			:GL.ALWAYS
-		 * Context3DCompareMode.LESS_EQUAL		:GL.LEQUAL
-		 * Context3DCompareMode.GREATER_EQUAL	:GL.GEQUAL
+		 * 
+		 * @constant Context3DCompareMode.LESS=GL.LESS
+		 * @constant Context3DCompareMode.NEVER=GL.NEVER
+		 * @constant Context3DCompareMode.EQUAL=GL.EQUAL
+		 * @constant Context3DCompareMode.GREATER=GL.GREATER
+		 * @constant Context3DCompareMode.NOT_EQUAL=GL.NOTEQUAL
+		 * @constant Context3DCompareMode.ALWAYS=GL.ALWAYS
+		 * @constant Context3DCompareMode.LESS_EQUAL=GL.LEQUAL
+		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
 		 */
 		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
+			let g = gl;
 			if (this._depthDisabled) {
-				gl.enable(gl.DEPTH_TEST);
+				g.enable(g.DEPTH_TEST);
 				this._depthDisabled = false;
 			}
 
-			gl.depthMask(depthMask);
-			gl.depthFunc(passCompareMode);
+			g.depthMask(depthMask);
+			g.depthFunc(passCompareMode);
 		}
 
 
@@ -388,8 +386,13 @@ namespace rf {
 				}
 			}
 			indexBuffer.preusetime = engineNow;
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(gl.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, gl.UNSIGNED_SHORT, firstIndex * 2);
+			let g = gl;
+			// g.drawArrays(g.TRIANGLES,0,numTriangles)
+			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+
+			this.triangles += numTriangles;
+			this.dc ++;
 		}
 
 
@@ -398,97 +401,102 @@ namespace rf {
          *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
          *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
          */
-		public drawLines(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numLines: number = -1): void {
+		public drawLines(indexBuffer: IndexBuffer3D, numTriangles:number, firstIndex: number = 0, numLines: number = -1): void {
 			if (false == indexBuffer.readly) {
 				if (false == indexBuffer.awaken()) {
 					throw new Error("create indexBuffer error!");
 				}
 			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(gl.LINES, numLines < 0 ? indexBuffer.numIndices : numLines * 2, gl.UNSIGNED_SHORT, firstIndex * 2);
+			indexBuffer.preusetime = engineNow;
+			let g = gl;
+			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+			g.drawElements(g.LINES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+
+			this.triangles += numTriangles;
+			this.dc ++;
 		}
 
-		/*
-         * [Webgl only]
-         *  For instance indices = [1,2,3] ; will only render vertices number 1, number 2, and number 3 
-         */
-		public drawPoints(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(gl.POINTS, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
-		}
+		// /*
+        //  * [Webgl only]
+        //  *  For instance indices = [1,2,3] ; will only render vertices number 1, number 2, and number 3 
+        //  */
+		// public drawPoints(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
+		// 	if (false == indexBuffer.readly) {
+		// 		if (false == indexBuffer.awaken()) {
+		// 			throw new Error("create indexBuffer error!");
+		// 		}
+		// 	}
+		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+		// 	gl.drawElements(gl.POINTS, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
+		// }
 
-		/**
-         * [Webgl only]
-         * draws a closed loop connecting the vertices defined in the indexBuffer to the next one
-         */
-		public drawLineLoop(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(gl.LINE_LOOP, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
-		}
+		// /**
+        //  * [Webgl only]
+        //  * draws a closed loop connecting the vertices defined in the indexBuffer to the next one
+        //  */
+		// public drawLineLoop(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
+		// 	if (false == indexBuffer.readly) {
+		// 		if (false == indexBuffer.awaken()) {
+		// 			throw new Error("create indexBuffer error!");
+		// 		}
+		// 	}
+		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+		// 	gl.drawElements(gl.LINE_LOOP, numPoints < 0 ? indexBuffer.numIndices : numPoints, gl.UNSIGNED_SHORT, firstIndex * 2);
+		// }
 
-		/**
-         * [Webgl only]
-         * It is similar to drawLineLoop(). The difference here is that WebGL does not connect the last vertex to the first one (not a closed loop).
-         */
-		public drawLineStrip(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(
-				gl.LINE_STRIP,
-				numPoints < 0 ? indexBuffer.numIndices : numPoints,
-				gl.UNSIGNED_SHORT,
-				firstIndex * 2
-			);
-		}
+		// /**
+        //  * [Webgl only]
+        //  * It is similar to drawLineLoop(). The difference here is that WebGL does not connect the last vertex to the first one (not a closed loop).
+        //  */
+		// public drawLineStrip(indexBuffer: IndexBuffer3D, firstIndex: number = 0, numPoints: number = -1): void {
+		// 	if (false == indexBuffer.readly) {
+		// 		if (false == indexBuffer.awaken()) {
+		// 			throw new Error("create indexBuffer error!");
+		// 		}
+		// 	}
+		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+		// 	gl.drawElements(
+		// 		gl.LINE_STRIP,
+		// 		numPoints < 0 ? indexBuffer.numIndices : numPoints,
+		// 		gl.UNSIGNED_SHORT,
+		// 		firstIndex * 2
+		// 	);
+		// }
 
-		/**
-        * [Webgl only]
-        *  indices = [0, 1, 2, 3, 4];, then we will generate the triangles:(0, 1, 2), (1, 2, 3), and(2, 3, 4).
-        */
-		public drawTriangleStrip(indexBuffer: IndexBuffer3D): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(gl.TRIANGLE_STRIP, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
-		}
+		// /**
+        // * [Webgl only]
+        // *  indices = [0, 1, 2, 3, 4];, then we will generate the triangles:(0, 1, 2), (1, 2, 3), and(2, 3, 4).
+        // */
+		// public drawTriangleStrip(indexBuffer: IndexBuffer3D): void {
+		// 	if (false == indexBuffer.readly) {
+		// 		if (false == indexBuffer.awaken()) {
+		// 			throw new Error("create indexBuffer error!");
+		// 		}
+		// 	}
+		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+		// 	gl.drawElements(gl.TRIANGLE_STRIP, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
+		// }
 
-		/**
-         * [Webgl only]
-         * creates triangles in a similar way to drawTriangleStrip(). 
-         * However, the first vertex defined in the indexBuffer is taken as the origin of the fan(the only shared vertex among consecutive triangles).
-         * In our example, indices = [0, 1, 2, 3, 4]; will create the triangles: (0, 1, 2) and(0, 3, 4).
-         */
-		public drawTriangleFan(indexBuffer: IndexBuffer3D): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			gl.drawElements(gl.TRIANGLE_FAN, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
-		}
+		// /**
+        //  * [Webgl only]
+        //  * creates triangles in a similar way to drawTriangleStrip(). 
+        //  * However, the first vertex defined in the indexBuffer is taken as the origin of the fan(the only shared vertex among consecutive triangles).
+        //  * In our example, indices = [0, 1, 2, 3, 4]; will create the triangles: (0, 1, 2) and(0, 3, 4).
+        //  */
+		// public drawTriangleFan(indexBuffer: IndexBuffer3D): void {
+		// 	if (false == indexBuffer.readly) {
+		// 		if (false == indexBuffer.awaken()) {
+		// 			throw new Error("create indexBuffer error!");
+		// 		}
+		// 	}
+		// 	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+		// 	gl.drawElements(gl.TRIANGLE_FAN, indexBuffer.numIndices, gl.UNSIGNED_SHORT, 0);
+		// }
 
 		/**
         *   In webgl we dont need to call present , browser will do this for us.
         */
-		public present(): void { }
+		// public present(): void { }
 
 		// private enableTex(keyInCache): void {
 		// 	var tex: Texture = this._texCache[keyInCache];

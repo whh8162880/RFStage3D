@@ -1,6 +1,8 @@
 /// <reference path="./com/youbt/rfreference.ts" />
 module rf{
     export let sp;
+
+    // export var line;
     export class Main extends AppBase{
         constructor(){      
             super();
@@ -15,19 +17,93 @@ module rf{
             if(undefined == gl){
                 return;
             }
-
-            Capabilities.init();
-
             
-            var g = undefined
-            context3D.configureBackBuffer(stageWidth,stageHeight,0);
-            // context3D.setDepthTest(true,gl.LEQUAL);
-            context3D.setDepthTest(false,gl.ALWAYS);
-            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+            // gl.enable(gl.DEPTH_TEST);  
+            // gl.depthMask(true);
+            // gl.depthFunc(gl.LEQUAL);
+            // context3D.setDepthTest(true,gl.LEQUAL)
 
+
+            var g:Graphics;
+
+            let camera = ROOT.camera3D;
+            let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
+            camera.z = f
+            camera.y = f;
+            camera.lookat(new Vector3D(0,0,0));
+            new TrackballControls(camera);
+
+
+            let t = 2;
+            let tr = new Trident(200,t);
+            threeContainer.addChild(tr);
+
+            // line.rotationX = 45;
+            let line = new Line3D();
+           
+            line.clear();
+
+            line.moveTo(-500,0,500,t);
+            line.lineTo(500,0,500,t);
+            line.lineTo(500,0,-500,t);
+            line.lineTo(-500,0,-500,t);
+            line.lineTo(-500,0,500,t);
+            line.end();
+            threeContainer.addChild(line);
+            
+            
 
             let profile = singleton(GUIProfile);
-            ROOT.addChild(profile);
+            tipContainer.addChild(profile);
+
+            // let s = new Sprite();
+            // s.renderer = new BatchRenderer(s);
+            // g = s.graphics;
+            // g.clear();
+            // g.drawCube(-100,-100,-100,200,200,200,0xFFFFFF);
+            // g.end();
+            // s.rotationX = 45
+            // ROOT.addChild(s);
+            
+
+            
+
+            // var m:Matrix3D = new Matrix3D();
+            // m.appendRotation(90,Vector3D.X_AXIS);
+            // m.appendRotation(90,Vector3D.Y_AXIS);
+            // m.appendRotation(90,Vector3D.Z_AXIS);
+            // let c = m.toString();
+
+
+
+
+            // let icon = new IconView();
+            // icon.x = 0;
+            // icon.y = 0;
+            // icon.resetSize(100,100);
+            // ROOT.addChild(icon);
+            // icon.setUrl("assets/ranger.png");
+
+            // let profile = singleton(GUIProfile);
+            // ROOT.addChild(profile);
+
+            // line = new Trident(200,4);
+            // ROOT.addChild(line);
+
+            // ROOT.camera2D.z = -1.5
+
+            // let s = new Sprite();
+            // s.renderer = new BatchRenderer(s);
+            // s.x = 100;
+            // g = s.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFF0000)
+            // g.end();
+            // s.setPos(100,100,0)
+            // ROOT.addChild(s);
+
+            
+           
 
             //p3d加载并显示
 
@@ -85,7 +161,7 @@ module rf{
 
             // g = ROOT.graphics;
             // g.clear();
-            // g.drawRect(0,0,100,100,0xFF0000);
+            // g.drawRect(0,0,500,500,0xFF0000);
             // g.end();
 
             
@@ -141,6 +217,7 @@ module rf{
             // });
 
 
+<<<<<<< HEAD
             // let icon = new IconView();
             // icon.x = 100;
             // icon.y = 100;
@@ -154,6 +231,9 @@ module rf{
             // ROOT.addChild(panel);
 
             let panelutil = new PanelUtils();
+=======
+           
+>>>>>>> master
         }
 
         public linktest():void{

@@ -53,18 +53,25 @@ module rf {
     }
 
 
+    export let rgb_color_temp:IColor = {r:1,g:1,b:1,a:1}
+
+
     export function hexToCSS(d: number,a:number = 1): string {
-        var r: number = (d & 0x00ff0000) >>> 16;
-        var g: number = (d & 0x0000ff00) >>> 8;
+        var r: number = ((d & 0x00ff0000) >>> 16) & 0xFF;
+        var g: number = ((d & 0x0000ff00) >>> 8) & 0xFF;
         var b: number = d & 0x000000ff;
         return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; //"rgba(0, 0, 200, 0.5)";
     }
 
 
-    export function toRGB(color:number,out:IColor):void{
+    export function toRGB(color:number,out?:IColor):IColor{
+        if(undefined == out){
+            out = rgb_color_temp
+        }
         out.r = ((color & 0x00ff0000) >>> 16) / 0xFF;
         out.g = ((color & 0x0000ff00) >>> 8) / 0xFF;
         out.b = (color & 0x000000ff) / 0xFF;
+        return out
     }
 
     export function toCSS(color:IColor):string{
