@@ -20,3 +20,6 @@
 ///<reference path="./stage3d/geo/Geometry.ts" />
 ///<reference path="./stage3d/Shader.ts" />
 
+///<reference path="./tween/TweenManager.ts" />
+///<reference path="./tween/Tween.ts" />
+
