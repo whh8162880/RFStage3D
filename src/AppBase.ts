@@ -22,14 +22,12 @@ module rf {
                 return;
             }
 
-            Capabilities.init();
-            
-            context3D.setDepthTest(true,gl.LEQUAL);
-            // context3D.setDepthTest(false,gl.ALWAYS);
-            // context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+            this.initContainer();
 
             Engine.addResize(this);
             Engine.addTick(this);
+
+            
         }
 
         createSource():void{
@@ -53,6 +51,32 @@ module rf {
             pixelRatio = getPixelRatio(bmd.context);
 
             // pixelRatio = 1;
+        }
+
+
+        initContainer(){
+            let g = gl;
+            let container = new PassContainer(vertex_mesh_variable);
+            container.depthMask = true;
+            container.passCompareMode = g.LEQUAL;
+            container.sourceFactor = g.SRC_ALPHA
+            container.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            container.triangleFaceToCull = Context3DTriangleFace.NONE;
+            ROOT.addChild(container);
+            threeContainer = container;
+
+            let uiContainer = new UIContainer(undefined,vertex_ui_variable);
+            uiContainer.renderer = new BatchRenderer(uiContainer);
+            uiContainer.depthMask = false;
+            uiContainer.passCompareMode = g.ALWAYS;
+            uiContainer.sourceFactor = g.SRC_ALPHA;
+            uiContainer.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            uiContainer.triangleFaceToCull = Context3DTriangleFace.NONE;
+            ROOT.addChild(uiContainer);
+            popContainer.mouseEnabled = false;
+            tipContainer.mouseEnabled = false;
+            uiContainer.addChild(popContainer);
+            uiContainer.addChild(tipContainer);
         }
 
 

@@ -2,7 +2,7 @@ module rf{
     export class TrackballControls{
         object:DisplayObject;
         target:Vector3D;
-        mouseSitivity:number = 0.5;
+        mouseSitivity:number = 0.3;
         distance:number;
         constructor(object:DisplayObject){
             this.object = object;
@@ -12,8 +12,16 @@ module rf{
         }
 
         mouseWheelHandler(event:EventX):void{
-            let e =event.data;
-            this.object.forwardPos(-e.deltaY);
+           
+            const{distance} = this;
+            const{wheel}=event.data;
+            let step = 1;
+            if(wheel < 0 && distance<500){
+                step = distance / 500;
+            }
+
+           
+            this.object.forwardPos(-wheel*step);
             // this.object.z += e.deltaY > 0 ? 1: -1
             this.distance = this.object.pos.subtract(this.target).length;
         }
@@ -31,14 +39,17 @@ module rf{
 
         mouseMoveHandler(e:EventX):void{
             const{object,target,mouseSitivity,distance}=this;
-            let event = e.data;
-            let dx:number = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            let dy:number = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-            dx *= pixelRatio;
-            dy *= pixelRatio;
+            const{dx,dy}=e.data
+            // let dx:number = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+            // let dy:number = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+            // dx *= pixelRatio;
+            // dy *= pixelRatio;
 
-            let rx = dy*mouseSitivity + object.rotationX;
-            let ry = -dx*mouseSitivity + object.rotationY;
+            let speed = (distance > 1000) ? mouseSitivity : mouseSitivity * distance / 1000;
+            speed = Math.max(speed,0.015);
+
+            let rx = dy*speed + object.rotationX;
+            let ry = -dx*speed + object.rotationY;
             
             if(target){
 				var transform:Matrix3D = CALCULATION_MATRIX;
