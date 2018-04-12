@@ -29,6 +29,8 @@ module rf{
             let profile = singleton(GUIProfile);
             ROOT.addChild(profile);
 
+            //p3d加载并显示
+
             // let span = document.getElementById("fps");
 
             // var t = new TextField();
@@ -139,12 +141,19 @@ module rf{
             // });
 
 
-            let icon = new IconView();
-            icon.x = 100;
-            icon.y = 100;
-            icon.resetSize(100,100);
-            ROOT.addChild(icon);
-            icon.setUrl("assets/ranger.png");
+            // let icon = new IconView();
+            // icon.x = 100;
+            // icon.y = 100;
+            // icon.resetSize(100,100);
+            // ROOT.addChild(icon);
+            // icon.setUrl("assets/ranger.png");
+
+            // let panel = new Panelui();
+            // panel.x = 300;
+            // panel.y = 300;
+            // ROOT.addChild(panel);
+
+            let panelutil = new PanelUtils();
         }
 
         public linktest():void{

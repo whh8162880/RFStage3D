@@ -160,6 +160,7 @@ module rf{
             area.name = name;
             area.init();
             this.areas[name] = area;
+            return area;
         }
 
         setSourceVO(name:string,w:number,h:number,area:number=1):BitmapSourceVO{
