@@ -2,6 +2,8 @@
 module rf {
     export var ROOT: Stage3D;
 
+    export var tween:TweenManager;
+
     export interface IMouse {
         mouseEnabled?:boolean,
         mouseChildren?:boolean,
@@ -291,6 +293,8 @@ module rf {
             this._rotationZ = value.z * DEGREES_TO_RADIANS;
             this.setChange(DChange.trasnform);
         }
+
+
 
 		/**
 		 * 当前方向Z轴移动

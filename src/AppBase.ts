@@ -6,7 +6,7 @@ module rf {
             this.createSource();
             Engine.start();
             ROOT = singleton(Stage3D);
-            
+            tween = singleton(TweenManager);
         }
 
 
@@ -83,11 +83,13 @@ module rf {
         public update(now: number, interval: number): void {
             //todo
             ROOT.update(now,interval);
+            tween.tick(interval);
         }
 
         public resize(width:number,height:number):void{
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             ROOT.resize(width,height);
+            
         }
 
     }

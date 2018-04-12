@@ -158,7 +158,11 @@ module rf{
             let p = this.program;
 
             if(undefined == p){
-                this.program = p = this.createProgram();
+                p = c.programs["Line3D"];
+                if(undefined == p){
+                    p = this.createProgram();
+                }
+                this.program = p
             }
 
             // c.setBlendFactors(gl.ONE,gl.ZERO);
@@ -223,7 +227,7 @@ module rf{
                 }
             `
 
-            return context3D.createProgram(vertexCode,fragmentCode);
+            return context3D.createProgram(vertexCode,fragmentCode,"Line3D");
         }
     }
 
