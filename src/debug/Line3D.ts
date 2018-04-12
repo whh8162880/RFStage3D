@@ -40,12 +40,12 @@ module rf{
     /**
      * 直线 不管放大 缩小 都不变
      */
-    export class Line3D extends Sprite{
+    export class Line3D extends RenderBase{
         
         constructor(){
-            super(null,line_variable);
+            super(line_variable);
             this.data32PerVertex = line_variable["data32PerVertex"].size;
-            this.batcherAvailable = false;
+            this.nativeRender = true;
             this.worldTransform = new Matrix3D();
         }
         private origin:Recyclable<Line3DPoint>;
@@ -142,11 +142,6 @@ module rf{
 
         updateTransform(): void {
             super.updateTransform();
-        }
-
-        addToStage():void{
-            super.addToStage();
-            this.setChange(DChange.vertex);
         }
 
         render(camera: Camera, now: number, interval: number):void{

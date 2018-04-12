@@ -1,22 +1,51 @@
 ///<reference path="./DisplayObjectContainer.ts" />
 ///<reference path="../camera/Camera.ts" />
 module rf {
-    export class Sprite extends DisplayObjectContainer implements I3DRender {
-        source:BitmapSource;
+
+    export abstract class RenderBase extends DisplayObjectContainer implements I3DRender {
+        nativeRender:boolean = false;
         variables:{ [key: string]: IVariable };
+        triangleFaceToCull: string = Context3DTriangleFace.NONE;
+        sourceFactor: number;
+        destinationFactor: number;
+        depthMask: boolean = false;
+        passCompareMode: number;
+        public render(camera: Camera, now: number, interval: number): void { 
+            let i = 0;
+            let childrens = this.childrens;
+            let len = childrens.length;
+            for(i = 0;i<len;i++){
+                let child = childrens[i];
+                child.render(camera,now,interval);
+            }
+        }
+        constructor(variables?:{ [key: string]: IVariable }) {
+            super();
+            this.variables = variables;
+        }
+
+        addToStage():void{
+            super.addToStage();
+            this.setChange(DChange.vertex);
+        }
+    }
+    
+
+    export class Sprite extends RenderBase {
+        source:BitmapSource;
+       
         /**
          * 1.Sprite本身有render方法可以渲染
          * 2.考虑到可能会有一些需求 渲染器可以写在别的类或者方法中  所以加入renderer概念
          */
         renderer: I3DRender;
-        batcherAvailable: boolean = true;
         $graphics: Graphics = undefined;
         $batchGeometry: BatchGeometry = undefined;
         $vcIndex: number = -1;
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
-        constructor(source:BitmapSource = undefined,variables:{ [key: string]: IVariable } = undefined) {
+        constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }) {
             super();
             this.hitArea = new HitArea();
             this.source = source ? source : componentSource;
@@ -578,22 +607,7 @@ module rf {
     }
 
 
-    export abstract class RenderBase implements I3DRender {
-        triangleFaceToCull: string = Context3DTriangleFace.NONE;
-        sourceFactor: number;
-        destinationFactor: number;
-        depthMask: boolean = false;
-        passCompareMode: number;
-        public render(camera: Camera, now: number, interval: number): void { }
-        constructor() {
-            let g = gl;
-            if (undefined != g) {
-                this.sourceFactor = g.SRC_ALPHA;
-                this.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
-                this.passCompareMode = g.ALWAYS;
-            }
-        }
-    }
+    
 
     
 
@@ -613,7 +627,7 @@ module rf {
      *      5.考虑到用户电脑 Max Vertex Uniform Vectors 数据不同【http://webglreport.com/】 所以要注意shader对象中ui[${max_vc}]  
      *      6.dc()方法渲染 shader计算详看代码。
      */
-    export class BatchRenderer extends RenderBase implements I3DRender {
+    export class BatchRenderer implements I3DRender {
         target: Sprite;        
         renders: Link;
         geo: BatchGeometry = undefined;
@@ -621,7 +635,6 @@ module rf {
         worldTransform: Matrix3D;
         t:Texture
         constructor(target: Sprite) {
-            super();
             this.target = target;
             this.renders = new Link();
             this.worldTransform = new Matrix3D();
@@ -629,8 +642,7 @@ module rf {
 
         public render(camera: Camera, now: number, interval: number): void {
             let target:Sprite = this.target;
-
-            let source = target.source;
+            const{source,sceneTransform,states,_x,_y,_scaleX} = this.target;
             if(undefined == source){
                 return;
             }
@@ -642,18 +654,18 @@ module rf {
             this.t = t;
 
 
-            if (target.states & DChange.vertex) {
+            if (states & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
-                this.getBatchTargets(target, -target._x, -target._y, 1 / target._scaleX);
+                this.getBatchTargets(target, -_x, -_y, 1 / _scaleX);
                 //step2 合并模型 和 vc信息
                 this.toBatch();
 
                 this.geo = undefined;
                 target.states &= ~DChange.batch;
-            }else if(target.states & DChange.vcdata){
+            }else if(states & DChange.vcdata){
                 //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
-                this.updateVCData(target, -target._x, -target._y, 1 / target._scaleX);
+                this.updateVCData(target, -_x, -_y, 1 / _scaleX);
                 target.states &= ~DChange.vcdata;
             }
 
@@ -661,7 +673,7 @@ module rf {
                 this.createProgram();
             }
 
-            this.worldTransform.copyFrom(target.sceneTransform);
+            this.worldTransform.copyFrom(sceneTransform);
             this.worldTransform.append(camera.worldTranform);
 
 
@@ -779,7 +791,16 @@ module rf {
             this.renders.clean();
         }
 
-        getBatchTargets(target: Sprite, ox: number, oy: number, os: number): void {
+        getBatchTargets(render: RenderBase, ox: number, oy: number, os: number): void {
+            let target:Sprite;
+            if(render instanceof Sprite){
+                target = render;
+            }else{
+                this.renders.add(render);
+                this.geo = undefined;
+                return;
+            }
+
             if (false == target._visible || 0.0 >= target.sceneAlpha) {
                 target.$vcIndex = -1;
                 target.$batchGeometry = null;
@@ -790,7 +811,7 @@ module rf {
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if (target == this.target || (null == target.renderer && true == target.batcherAvailable)) {
+            if (target == this.target || (null == target.renderer && false == target.nativeRender)) {
                 if (undefined == g || 0 >= g.numVertices) {
                     target.$vcIndex = -1;
                     target.$batchGeometry = null;
@@ -812,17 +833,29 @@ module rf {
             } else {
                 this.renders.add(target);
                 this.geo = undefined;
+                return;
             }
 
             for (let child of target.childrens) {
                 if (child instanceof Sprite) {
                     this.getBatchTargets(child, ox, oy, os);
+                }else if(child instanceof RenderBase){
+                    this.renders.add(child);
+                    this.geo = undefined;
                 }
             }
         }
 
         
-        updateVCData(target: Sprite, ox: number, oy: number, os: number):void{
+        updateVCData(render: RenderBase, ox: number, oy: number, os: number):void{
+            let target:Sprite;
+            if(render instanceof Sprite){
+                target = render;
+            }else{
+                return;
+            }
+            
+
             if (false == target._visible || 0.0 >= target.sceneAlpha) {
                 target.$vcIndex = -1;
                 target.$batchGeometry = null;
@@ -833,14 +866,16 @@ module rf {
             ox = target._x + ox;
             oy = target._y + oy;
             os = target._scaleX * os;
-            if (target == this.target || (null == target.renderer && true == target.batcherAvailable)) {
+            if (target == this.target || (null == target.renderer && false == target.nativeRender)) {
                 if(undefined != target.$batchGeometry){
                     target.$vcox = ox;
                     target.$vcoy = oy;
                     target.$vcos = os;
                     target.$batchGeometry.vcData.wPoint4(sp.$vcIndex * 4 ,sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha);
                 }
-            } 
+            }else{
+                return;
+            }
 
             for (let child of target.childrens) {
                 if (child instanceof Sprite) {

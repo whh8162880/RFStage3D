@@ -27,21 +27,17 @@ module rf{
             var g:Graphics;
 
             let camera = ROOT.camera3D;
-            ROOT.camera = camera;
-
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
             camera.z = f
             camera.y = f;
-            // camera.rotationX = 45
-            // camera.z = 4
             camera.lookat(new Vector3D(0,0,0));
+            new TrackballControls(camera);
+
 
             let t = 2;
-
             let tr = new Trident(200,t);
-            ROOT.addChild(tr);
+            threeContainer.addChild(tr);
 
-           
             // line.rotationX = 45;
             let line = new Line3D();
            
@@ -53,11 +49,12 @@ module rf{
             line.lineTo(-500,0,-500,t);
             line.lineTo(-500,0,500,t);
             line.end();
-            ROOT.addChild(line);
+            threeContainer.addChild(line);
             
             
 
-            new TrackballControls(camera);
+            let profile = singleton(GUIProfile);
+            tipContainer.addChild(profile);
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);
