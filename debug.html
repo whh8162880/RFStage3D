@@ -19,24 +19,23 @@
 
         <link rel="stylesheet" href="assets/style.css">
 <%script%/>
-        <script src="assets/jQuery.js"></script>
-        <script src="assets/stage3d.js"></script>
+        <!-- <script src="assets/jQuery.js"></script> -->
+        <!-- <script src="assets/stage3d.js"></script> -->
 
         <script>
             function main(){
-                selectd("States");
+                // selectd("States");
                 var m = new rf.Main();
                 m.init(document.getElementById("game"));
-                
-                init();
-                debugModel(false);
+                // init();
+                // debugModel(false);
             }
         </script>
     </head>
     <body onload="main()" style="width:100%;height:100%">
         <canvas id="game" style="width:100%;height:100%"></canvas>
         <!-- <span id="fps" style="position:absolute;color:azure"></span> -->
-        <div id="debugContainer" style="position:absolute;right:0px;height:100%;width:500px;background-color: rgb(243, 243, 243);">
+        <!-- <div id="debugContainer" style="position:absolute;right:0px;height:100%;width:500px;background-color: rgb(243, 243, 243);">
             <span class="bckg"></span>
             <header>
                 <h1>Stage3D</h1>
@@ -70,6 +69,6 @@
                     123132123
                 </article>
             </main>
-        </div>
+        </div> -->
     </body>
 </html>
