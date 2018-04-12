@@ -24,16 +24,16 @@ module rf{
             mouseElement[2] = {target:undefined,time:0,down:MouseEventX.MouseRightDown,up:MouseEventX.MouseRightUp,click:MouseEventX.RightClick};
 
             //10个指头应该够了吧
-            touchElement[0] = {target:undefined,time:0,data:new MouseEventData(0)};
-            touchElement[1] = {target:undefined,time:0,data:new MouseEventData(1)};
-            touchElement[2] = {target:undefined,time:0,data:new MouseEventData(2)};
-            touchElement[3] = {target:undefined,time:0,data:new MouseEventData(3)};
-            touchElement[4] = {target:undefined,time:0,data:new MouseEventData(4)};
-            touchElement[5] = {target:undefined,time:0,data:new MouseEventData(5)};
-            touchElement[6] = {target:undefined,time:0,data:new MouseEventData(6)};
-            touchElement[7] = {target:undefined,time:0,data:new MouseEventData(7)};
-            touchElement[8] = {target:undefined,time:0,data:new MouseEventData(8)};
-            touchElement[9] = {target:undefined,time:0,data:new MouseEventData(9)};
+            // touchElement[0] = {target:undefined,time:0,data:new MouseEventData(0)};
+            // touchElement[1] = {target:undefined,time:0,data:new MouseEventData(1)};
+            // touchElement[2] = {target:undefined,time:0,data:new MouseEventData(2)};
+            // touchElement[3] = {target:undefined,time:0,data:new MouseEventData(3)};
+            // touchElement[4] = {target:undefined,time:0,data:new MouseEventData(4)};
+            // touchElement[5] = {target:undefined,time:0,data:new MouseEventData(5)};
+            // touchElement[6] = {target:undefined,time:0,data:new MouseEventData(6)};
+            // touchElement[7] = {target:undefined,time:0,data:new MouseEventData(7)};
+            // touchElement[8] = {target:undefined,time:0,data:new MouseEventData(8)};
+            // touchElement[9] = {target:undefined,time:0,data:new MouseEventData(9)};
 
 
             let canvas = ROOT.canvas;
