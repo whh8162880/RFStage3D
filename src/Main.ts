@@ -217,7 +217,6 @@ module rf{
             // });
 
 
-<<<<<<< HEAD
             // let icon = new IconView();
             // icon.x = 100;
             // icon.y = 100;
@@ -231,9 +230,6 @@ module rf{
             // ROOT.addChild(panel);
 
             let panelutil = new PanelUtils();
-=======
-           
->>>>>>> master
         }
 
         public linktest():void{
