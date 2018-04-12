@@ -24,16 +24,6 @@ module rf{
             //生成对应的模块 一次只有一个对象    
             //创建bitmapsource
             this.setting = o;
-            // let clsname = "ui.asyncpanel.create";
-            // let sybs = o['symbols'];
-            // let cs = sybs[clsname];
-
-            // let bmd = new BitmapData(o['width'],o['height'],true);
-            // let source = new BitmapSource().create(clsname,bmd,true);
-            // let vo = source.setSourceVO("origin",1,1);
-            // bmd.fillRect(vo.x,vo.y,vo.w,vo.h,"rgba(255,255,255,255)");
-            // source.originU = vo.ul;
-            // source.originV = vo.vt;
 
             //加载对应的图片资源
             let url = "../assets/"+ o['image'] +'.png';
@@ -74,8 +64,6 @@ module rf{
             this.ui.setSymbol(cs);
             this.ui.renderer = new BatchRenderer(this.ui);
             popContainer.addChild(this.ui);
-            // this.ui.x = 300;
-            // this.ui.y = 200;
         }
     }
 }
