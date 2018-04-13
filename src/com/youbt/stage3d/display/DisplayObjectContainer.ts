@@ -98,28 +98,38 @@ module rf{
 
 
         public removeAllChild():void{
-			for(let child of this.childrens){
-				child.stage = undefined;
-				child.parent = undefined;
+			const{childrens} = this;
+            let len = childrens.length;
+            for(let i=0;i<len;i++){
+                let child = childrens[i];
+                child.stage = undefined;
+                child.parent = undefined;
 				child.removeFromStage();
-			}
+            }
 			this.childrens.length = 0;
         }
         
         public removeFromStage():void{
-			for(let child of this.childrens){
-				child.stage = undefined
+            const{childrens} = this;
+            let len = childrens.length;
+            for(let i=0;i<len;i++){
+                let child = childrens[i];
+                child.stage = undefined
 				child.removeFromStage();
-			}
+            }
 			super.removeFromStage();
 		}
 		
 		
 		public addToStage():void{
-			for(let child of this.childrens){
-				child.stage = this.stage;
+            const{childrens,stage} = this;
+            let len = childrens.length;
+            for(let i=0;i<len;i++){
+                let child = childrens[i];
+                child.stage = stage;
 				child.addToStage();
-			}
+            }
+			super.addToStage();
         }
         
 		/**

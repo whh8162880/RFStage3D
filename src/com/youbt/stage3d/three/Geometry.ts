@@ -259,7 +259,7 @@ module rf {
             // this.addAttribute( 'uv', new Float32BufferAttribute( uvs, 2 ) );
 
             
-
+            return this;
         }
     }
 }

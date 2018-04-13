@@ -18,7 +18,9 @@ module rf {
         invm ="invm",
         p = "p",
         mvp = "mvp",
-        ui = "ui"
+        ui = "ui",
+        lightDirection = "lightDirection",
+        color = "vc_color"
 
     }
 

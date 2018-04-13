@@ -39,17 +39,19 @@ module rf{
             scene.addChild(tr);
 
             // line.rotationX = 45;
-            let line = new Line3D();
-           
-            line.clear();
+            // let line = new Line3D();
+            // line.clear();
+            // line.moveTo(-500,0,500,t);
+            // line.lineTo(500,0,500,t);
+            // line.lineTo(500,0,-500,t);
+            // line.lineTo(-500,0,-500,t);
+            // line.lineTo(-500,0,500,t);
+            // line.end();
+            // scene.addChild(line);
 
-            line.moveTo(-500,0,500,t);
-            line.lineTo(500,0,500,t);
-            line.lineTo(500,0,-500,t);
-            line.lineTo(-500,0,-500,t);
-            line.lineTo(-500,0,500,t);
-            line.end();
-            scene.addChild(line);
+            let mesh = new Mesh();
+            mesh.init(new PlanGeometry(mesh.variables).create(500,500),new PhongMaterial());
+            scene.addChild(mesh);
             
             
 

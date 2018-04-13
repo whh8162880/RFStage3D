@@ -5,7 +5,7 @@ module rf {
     export abstract class RenderBase extends DisplayObjectContainer implements I3DRender {
         nativeRender:boolean = false;
         variables:{ [key: string]: IVariable };
-        material:Material;
+        material?:Material;
         // triangleFaceToCull: string = Context3DTriangleFace.NONE;
         // sourceFactor: number;
         // destinationFactor: number;
