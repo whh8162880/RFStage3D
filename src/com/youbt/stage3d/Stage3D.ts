@@ -9,7 +9,7 @@ module rf{
         }
     }
 
-    export let threeContainer;
+    export let scene;
     export let popContainer = new AllActiveSprite();
     export let tipContainer = new AllActiveSprite();
     export class Stage3D extends AllActiveSprite implements IResizeable{
@@ -135,4 +135,5 @@ module rf{
             super.render(cameraUI,now,interval);
         }
     }
+    
 }

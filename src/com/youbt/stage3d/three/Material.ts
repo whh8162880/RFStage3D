@@ -9,9 +9,21 @@ module rf{
 
 
 
-    export class ColorMaterial extends Material{
+    export class PhongMaterial extends Material{
+        //贴图
+        diff:number = 0xFFFFFF;
+        diffTex:string;
 
-        color:number;
+        //自发光
+        emissive:number = 0x000000;
+        emissiveTex:string;
+
+        //高光
+        specular:number = 0x000000;
+        specularTex:string;
+
+        //
+
         
         createProgram(){
 

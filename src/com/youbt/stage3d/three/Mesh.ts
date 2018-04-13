@@ -1,3 +1,4 @@
+///<reference path="../display/Sprite.ts" />
 module rf{
     export class Mesh extends RenderBase{
         geometry:GeometryBase;

@@ -56,7 +56,7 @@ module rf {
 
         initContainer(){
             let g = gl;
-            let container = new PassContainer(vertex_mesh_variable);
+            let container = new Scene(vertex_mesh_variable);
             let material = new Material();
             material.depthMask = true;
             material.passCompareMode = g.LEQUAL;
@@ -66,7 +66,7 @@ module rf {
             container.material = material;
             container.camera = ROOT.camera3D;
             ROOT.addChild(container);
-            threeContainer = container;
+            scene = container;
 
             let uiContainer = new UIContainer(undefined,vertex_ui_variable);
             uiContainer.renderer = new BatchRenderer(uiContainer);

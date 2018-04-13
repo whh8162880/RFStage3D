@@ -36,7 +36,7 @@ module rf{
 
             let t = 2;
             let tr = new Trident(200,t);
-            threeContainer.addChild(tr);
+            scene.addChild(tr);
 
             // line.rotationX = 45;
             let line = new Line3D();
@@ -49,7 +49,7 @@ module rf{
             line.lineTo(-500,0,-500,t);
             line.lineTo(-500,0,500,t);
             line.end();
-            threeContainer.addChild(line);
+            scene.addChild(line);
             
             
 

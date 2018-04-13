@@ -1,5 +1,5 @@
 ///<reference path="../core/Config.ts"/>
-///<reference path="geo/Geometry.ts"/>
+///<reference path="three/Geometry.ts"/>
 module rf {
     export enum VA {
         pos = "pos",
