@@ -183,12 +183,17 @@ module rf{
 
         public updateHitArea():void{
             let hitArea = this.hitArea;
-            hitArea.clean();
-            for(let child of this.childrens){
-                if(child.states & DChange.ac){
-                    child.updateHitArea();
+            if(hitArea){
+                hitArea.clean();
+                for(let child of this.childrens){
+                    const{hitArea:hit}=child
+                    if(undefined == hit) continue;
+
+                    if(child.states & DChange.ac){
+                        child.updateHitArea();
+                    }
+                    hitArea.combine(hit,child._x,child._y);
                 }
-                hitArea.combine(child.hitArea,child._x,child._y);
             }
             this.states &= ~DChange.ac;
         }

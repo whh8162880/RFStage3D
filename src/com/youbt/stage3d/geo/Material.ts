@@ -6,4 +6,21 @@ module rf{
         depthMask: boolean = false;
         passCompareMode: number;
     }
+
+
+
+    export class ColorMaterial extends Material{
+
+        color:number;
+        
+        createProgram(){
+
+        }
+
+        
+
+
+
+
+    }
 }

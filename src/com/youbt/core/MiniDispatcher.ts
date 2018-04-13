@@ -10,7 +10,7 @@ module rf {
 
 
 	export enum EventT {
-		ENTER_FRAME,
+		ENTER_FRAME=1,
 		RESIZE,
 		COMPLETE,
 		FAIL,
