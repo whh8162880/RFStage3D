@@ -38,8 +38,10 @@ module rf{
             let res:ResItem = e.data;
             let image:HTMLImageElement = res.data;
 
+            let bw = this.setting['txtwidth'] + image.width;
+            let bh = this.setting['txtheight'] + image.height;
 
-            let bmd = new BitmapData(image.width + 200,image.height + 200,true);
+            let bmd = new BitmapData(bw, bh, true);
             let source = new BitmapSource().create("ui.asyncpanel.create",bmd,true);
 
             let vo = source.setSourceVO("panelimg",image.width,image.height,1);
