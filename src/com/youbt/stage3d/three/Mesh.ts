@@ -1,4 +1,4 @@
-///<reference path="../display/Sprite.ts" />
+///<reference path="../Stage3D.ts" />
 module rf{
     export class Mesh extends SceneObject{
         scene:Scene;
@@ -29,7 +29,7 @@ module rf{
         }
 
         render(camera: Camera, now: number, interval: number): void {
-            const{geometry,material,worldTranform}=this;
+            const{geometry,material,worldTranform,sceneTransform,invSceneTransform}=this;
             let c = context3D;
             if(undefined != geometry && undefined != material){
                 const{vertex,index}=geometry;
@@ -41,12 +41,13 @@ module rf{
                     c.setProgram(program);
                     vertex.uploadContext(program);
 
-                    worldTranform.copyFrom(this.sceneTransform);
+                    worldTranform.copyFrom(sceneTransform);
                     worldTranform.append(camera.worldTranform);
                     c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+                    c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
 
-                    material.uploadContext();
-                    c.drawTriangles(index,index.numIndices)
+                    material.uploadContext(this);
+                    c.drawTriangles(index,index.numTriangles)
                 }
             }
             super.render(camera,now,interval);

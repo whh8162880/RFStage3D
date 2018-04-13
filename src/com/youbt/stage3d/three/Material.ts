@@ -10,7 +10,7 @@ module rf{
             return this.program;
         }
 
-        uploadContext(){
+        uploadContext(mesh:Mesh){
 
         }
     }
@@ -31,10 +31,12 @@ module rf{
         specularTex:string;
 
 
-        uploadContext(){
+        uploadContext(mesh:Mesh){
+            let scene = mesh.scene;
+            let c = context3D;
 
-            
-
+            c.setProgramConstantsFromVector(VC.lightDirection,[0,500,500],3);
+            c.setProgramConstantsFromVector(VC.color,[1.0,1.0,1.0,1.0],4);
         }
 
         createProgram(){
@@ -84,8 +86,8 @@ module rf{
                 void main() {
                     vec3  invLight = normalize(${VC.invm} * vec4(${VC.lightDirection}, 0.0)).xyz;
                     float diffuse  = clamp(dot(${VA.normal}, invLight), 0.1, 1.0);
-                    vColor         = color * vec4(vec3(diffuse), 1.0);
-                    gl_Position    = ${VC.mvp} * vec4(position, 1.0);
+                    vColor         = ${VC.color} * vec4(vec3(diffuse), 1.0);
+                    gl_Position    = ${VC.mvp} * vec4(${VA.pos}, 1.0);
                 }
             `
 
@@ -93,7 +95,9 @@ module rf{
                 precision mediump float;
                 varying vec4 vColor;
                 void main(void){
-                    gl_FragColor = vColor;
+                    vec4 c = vColor;
+                    gl_FragColor = c;
+                    // gl_FragColor = vec4(1.0,1.0,1.0,1.0);
                 }
             `
             p = c.createProgram(vertexCode,fragmentCode,key);

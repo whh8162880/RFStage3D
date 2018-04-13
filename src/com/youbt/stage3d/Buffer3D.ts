@@ -256,9 +256,10 @@ module rf {
     }
 
     export class IndexBuffer3D extends Buffer3D {
-        public numIndices: number;
-        public data: Uint16Array;
-        public buffer: WebGLBuffer;
+        numIndices: number;
+        data: Uint16Array;
+        buffer: WebGLBuffer;
+        numTriangles:number
 
         public quadid:number = -1;
         constructor() {
@@ -327,6 +328,7 @@ module rf {
             }
 
             this.numIndices = data.length;
+            this.numTriangles = this.numIndices / 3;
             this.data = <Uint16Array>data;
         }
     }

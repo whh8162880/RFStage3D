@@ -51,7 +51,16 @@ module rf{
 
             let mesh = new Mesh();
             mesh.init(new PlanGeometry(mesh.variables).create(500,500),new PhongMaterial());
+            mesh.rotationX = -90;
             scene.addChild(mesh);
+
+
+            // let m  = new Matrix3D();
+            // m.appendRotation(45,Vector3D.Z_AXIS);
+            // m.appendTranslation(100,100,100);
+            // m.invert();
+            // m.invert();
+
             
             
 

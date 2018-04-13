@@ -61,7 +61,7 @@ module rf {
             material.depthMask = true;
             material.passCompareMode = g.LEQUAL;
             material.sourceFactor = g.SRC_ALPHA
-            material.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            material.destinationFactor = g.ONE_MINUS_SRC_ALPHA;
             material.triangleFaceToCull = Context3DTriangleFace.NONE;
             container.material = material;
             container.camera = ROOT.camera3D;
@@ -74,7 +74,7 @@ module rf {
             material.depthMask = false;
             material.passCompareMode = g.ALWAYS;
             material.sourceFactor = g.SRC_ALPHA;
-            material.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            material.destinationFactor = g.ONE_MINUS_SRC_ALPHA;
             material.triangleFaceToCull = Context3DTriangleFace.NONE;
             uiContainer.material = material;
             ROOT.addChild(uiContainer);
