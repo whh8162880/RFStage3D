@@ -143,6 +143,11 @@ module rf {
             this.format = format;
         }
 
+
+        //保存外部设置的宽高 用于layout
+        private _ow:number;
+        private _oh:number;
+
         private lines: Recyclable<Line>[] = [];
 
         private textLines: Recyclable<TextLine>[] = [];
@@ -198,35 +203,51 @@ module rf {
             this.layout();
         }
 
+        setSize(width:number, height:number):void
+        {
+            this._ow = width;
+            this._oh = height;
+            super.setSize(width, height);
+        }
+
         cleanAll():void{
             super.cleanAll();
         }
 
         layout(): void {
+            if(this.format.align == TextFormatAlign.LEFT)
+            {
+                return;
+            }
+
+            this.updateHitArea();
             //根据align属性进行重新布局
             // var line:Text3DLine;
             // var lx:int = 1;
+
+            if(this._ow == undefined || this._ow == 0)
+            {
+                return;
+            }
+            let offsetx:number;
+            if(this.format.align == TextFormatAlign.CENTER){
+                offsetx = this._ow - this.w >> 1;
+            }else if(this.format.align == TextFormatAlign.RIGHT){
+                offsetx = this._ow - this.w;
+            }
+
             let len = this.numChildren;
 
             //fisrt 取出完整的width
             //second 根据align获取偏移offsetx
-
+            let dx = offsetx;
             for(let i = 0; i < len; i++)
             {
                 let display = this.childrens[i];
-
-                // display.x = ;
+                display.x = dx;
+                dx += display.w;
             }
-                if(this.format.align == TextFormatAlign.CENTER){
-            //         for each(line in lines){
-            //             line.x = _width - line.width >> 1
-            //             lx = line.x;
-                    // }
-                }else if(this.format.align == TextFormatAlign.RIGHT){
-            //         for each(line in lines){
-            //             line.x = _width - line.width;
-            //         }
-                }
+               
 
 //             if(u){
 // //				-偏移量

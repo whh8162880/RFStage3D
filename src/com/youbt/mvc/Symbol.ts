@@ -98,6 +98,7 @@ module rf{
 						let e_format:object = textElement.format;
 						let format:TextFormat = recyclable(TextFormat).init();
 						format.size = e_format["size"] == undefined ? 12 : e_format["size"];
+						format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
 
 						(sp as TextField).init(this.source, format);
 						(sp as TextField).color = textElement.color;
