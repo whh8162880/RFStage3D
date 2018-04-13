@@ -161,7 +161,7 @@ module rf {
                 this.buffer = g.createBuffer();
             }
             g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
-            g.bufferData(g.ARRAY_BUFFER, this.data.vertex.array, g.STATIC_DRAW);
+            g.bufferData(g.ARRAY_BUFFER, this.data.vertex, g.STATIC_DRAW);
             g.bindBuffer(g.ARRAY_BUFFER, null);
             this.readly = true;
             //加入资源管理
