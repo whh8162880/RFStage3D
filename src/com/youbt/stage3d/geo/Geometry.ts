@@ -89,17 +89,16 @@ module rf {
 
 
     export class VertexInfo {
-
-        vertex: Float32Byte;
+        vertex: Float32Array;
         numVertices: number = 0;
         data32PerVertex: number = 0;
         variables: { [key: string]: IVariable };
 
         constructor(value: number | Float32Array, data32PerVertex: number,variables?:{ [key: string]: IVariable }) {
             if (value instanceof Float32Array) {
-                this.vertex = new Float32Byte(value)
+                this.vertex = value
             } else {
-                this.vertex = new Float32Byte(new Float32Array(value));
+                this.vertex = new Float32Array(value);
             }
             this.data32PerVertex = data32PerVertex;
             this.numVertices = this.vertex.length / data32PerVertex;

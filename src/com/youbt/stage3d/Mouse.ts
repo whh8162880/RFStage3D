@@ -35,15 +35,17 @@ module rf{
             // touchElement[8] = {target:undefined,time:0,data:new MouseEventData(8)};
             // touchElement[9] = {target:undefined,time:0,data:new MouseEventData(9)};
 
-
+            let _this = this;
+            function m(e){
+                _this.mouseHanlder(e);
+            };
+            
             let canvas = ROOT.canvas;
             
             if(false == mobile){
-                canvas.addEventListener("mousedown",this.mouseHanlder);
-                canvas.addEventListener("mouseup",this.mouseHanlder);
-                // canvas.onmousedown = this.mouseHanlder;
-                // canvas.onmouseup = this.mouseHanlder;
-                canvas.onmousewheel = this.mouseHanlder;
+                canvas.onmousedown = m;
+                canvas.onmouseup = m;
+                canvas.onmousewheel = m;
                 canvas.onmousemove = this.mouseMoveHandler;
                 canvas.oncontextmenu = function (event){
                     event.preventDefault();

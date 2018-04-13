@@ -223,122 +223,114 @@ module rf {
     }
 
 
-    export class Float32Byte {
-        public array: Float32Array;
+    // export class Float32Byte {
+    //     public array: Float32Array;
 
-        constructor(array?: Float32Array) {
-            if(undefined == array){
-                array = new Float32Array(0);
-            }
-            this.array = array;
-        }
+    //     constructor(array?: Float32Array) {
+    //         if(undefined == array){
+    //             array = new Float32Array(0);
+    //         }
+    //         this.array = array;
+    //     }
 
-        get length(): number {
-            return this.array.length;
-        }
+    //     get length(): number {
+    //         return this.array.length;
+    //     }
 
-        set length(value: number) {
-            if (this.array.length == value) {
-                return;
-            }
-            let nd = new Float32Array(value);
-            let len = value < this.array.length ? value : this.array.length;
-            if(len != 0){
-                // nd.set(this.array.slice(0, len), 0);
-                nd.set(this.array);
-            }
-            this.array = nd;
-        }
+    //     set length(value: number) {
+    //         if (this.array.length == value) {
+    //             return;
+    //         }
+    //         let nd = new Float32Array(value);
+    //         let len = value < this.array.length ? value : this.array.length;
+    //         if(len != 0){
+    //             // nd.set(this.array.slice(0, len), 0);
+    //             nd.set(this.array);
+    //         }
+    //         this.array = nd;
+    //     }
 
-        append(byte: Float32Byte, offset: number = 0, len: number = -1): void {
-            var position: number = 0;
-            if (0 > offset) {
-                offset = 0;
-            }
+    //     append(byte: Float32Byte, offset: number = 0, len: number = -1): void {
+    //         var position: number = 0;
+    //         if (0 > offset) {
+    //             offset = 0;
+    //         }
 
-            if (-1 == len) {
-                len = byte.length - offset;
-            } else {
-                if (len > byte.length - offset) {
-                    len = byte.length - offset;
-                }
-            }
+    //         if (-1 == len) {
+    //             len = byte.length - offset;
+    //         } else {
+    //             if (len > byte.length - offset) {
+    //                 len = byte.length - offset;
+    //             }
+    //         }
 
-            position = this.array.length;
-            length = this.array.length + byte.length;
+    //         position = this.array.length;
+    //         length = this.array.length + byte.length;
 
-            if (len == byte.length) {
-                this.array.set(byte.array, position);
-            } else {
-                this.array.set(byte.array.slice(offset, len), position);
-            }
-        }
-
-
-        set(position:number, byte: Float32Byte, offset: number = 0, len: number = -1):void{
-            if (0 > offset) {
-                offset = 0;
-            }
-
-            if (-1 == len) {
-                len = byte.length - offset;
-            } else {
-                if (len > byte.length - offset) {
-                    len = byte.length - offset;
-                }
-            }
-
-            if (len == byte.length) {
-                this.array.set(byte.array, position);
-            } else {
-                this.array.set(byte.array.slice(offset, len), position);
-            }
-        }
+    //         if (len == byte.length) {
+    //             this.array.set(byte.array, position);
+    //         } else {
+    //             this.array.set(byte.array.slice(offset, len), position);
+    //         }
+    //     }
 
 
+    //     set(position:number, byte: Float32Byte, offset: number = 0, len: number = -1):void{
+    //         if (0 > offset) {
+    //             offset = 0;
+    //         }
+
+    //         if (-1 == len) {
+    //             len = byte.length - offset;
+    //         } else {
+    //             if (len > byte.length - offset) {
+    //                 len = byte.length - offset;
+    //             }
+    //         }
+
+    //         if (len == byte.length) {
+    //             this.array.set(byte.array, position);
+    //         } else {
+    //             this.array.set(byte.array.slice(offset, len), position);
+    //         }
+    //     }
 
 
-        wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void {
-            this.array[position] = x;
-        }
-
-        wPoint2(position: number, x: number, y: number, z?: number, w?: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-        }
-
-        wPoint3(position: number, x: number, y: number, z: number, w?: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-            this.array[position + 2] = z;
-        }
-
-        wPoint4(position: number, x: number, y: number, z: number, w: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-            this.array[position + 2] = z;
-            this.array[position + 3] = w;
-        }
-
-        wUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-            this.array[position + 2] = z;
-            this.array[position + 3] = u;
-            this.array[position + 4] = v;
-            this.array[position + 5] = index;
-            this.array[position + 6] = r;
-            this.array[position + 7] = g;
-            this.array[position + 8] = b;
-            this.array[position + 9] = a;
-        }
 
 
-        update(data32PerVertex: number, offset: number, v: number): void {
-            let len = this.array.length;
-            for (let i = 0; i < len; i += data32PerVertex) {
-                this.array[i + offset] = v;
-            }
-        }
-    }
+    //     wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void {
+    //         this.array[position] = x;
+    //     }
+
+    //     wPoint2(position: number, x: number, y: number, z?: number, w?: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //     }
+
+    //     wPoint3(position: number, x: number, y: number, z: number, w?: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //         this.array[position + 2] = z;
+    //     }
+
+    //     wPoint4(position: number, x: number, y: number, z: number, w: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //         this.array[position + 2] = z;
+    //         this.array[position + 3] = w;
+    //     }
+
+    //     wUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //         this.array[position + 2] = z;
+    //         this.array[position + 3] = u;
+    //         this.array[position + 4] = v;
+    //         this.array[position + 5] = index;
+    //         this.array[position + 6] = r;
+    //         this.array[position + 7] = g;
+    //         this.array[position + 8] = b;
+    //         this.array[position + 9] = a;
+    //     }
+    // }
 }
