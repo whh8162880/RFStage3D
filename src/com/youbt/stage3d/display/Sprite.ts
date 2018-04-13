@@ -5,11 +5,12 @@ module rf {
     export abstract class RenderBase extends DisplayObjectContainer implements I3DRender {
         nativeRender:boolean = false;
         variables:{ [key: string]: IVariable };
-        triangleFaceToCull: string = Context3DTriangleFace.NONE;
-        sourceFactor: number;
-        destinationFactor: number;
-        depthMask: boolean = false;
-        passCompareMode: number;
+        material:Material;
+        // triangleFaceToCull: string = Context3DTriangleFace.NONE;
+        // sourceFactor: number;
+        // destinationFactor: number;
+        // depthMask: boolean = false;
+        // passCompareMode: number;
         public render(camera: Camera, now: number, interval: number): void { 
             let i = 0;
             let childrens = this.childrens;
@@ -116,7 +117,14 @@ module rf {
             if(this.$graphics){
                 hitArea.combine(this.$graphics.hitArea,0,0);
             }
-            
+
+            if(hitArea.allWays){
+                this.w = stageWidth;
+                this.h = stageHeight;
+            }else{
+                this.w = hitArea.right - hitArea.left;
+                this.h = hitArea.bottom - hitArea.top;
+            }
             this.states &= ~DChange.ac;
         }
 

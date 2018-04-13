@@ -57,21 +57,26 @@ module rf {
         initContainer(){
             let g = gl;
             let container = new PassContainer(vertex_mesh_variable);
-            container.depthMask = true;
-            container.passCompareMode = g.LEQUAL;
-            container.sourceFactor = g.SRC_ALPHA
-            container.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
-            container.triangleFaceToCull = Context3DTriangleFace.NONE;
+            let material = new Material();
+            material.depthMask = true;
+            material.passCompareMode = g.LEQUAL;
+            material.sourceFactor = g.SRC_ALPHA
+            material.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            material.triangleFaceToCull = Context3DTriangleFace.NONE;
+            container.material = material;
+            container.camera = ROOT.camera3D;
             ROOT.addChild(container);
             threeContainer = container;
 
             let uiContainer = new UIContainer(undefined,vertex_ui_variable);
             uiContainer.renderer = new BatchRenderer(uiContainer);
-            uiContainer.depthMask = false;
-            uiContainer.passCompareMode = g.ALWAYS;
-            uiContainer.sourceFactor = g.SRC_ALPHA;
-            uiContainer.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
-            uiContainer.triangleFaceToCull = Context3DTriangleFace.NONE;
+            material = new Material();
+            material.depthMask = false;
+            material.passCompareMode = g.ALWAYS;
+            material.sourceFactor = g.SRC_ALPHA;
+            material.destinationFactor = g.ONE_MINUS_CONSTANT_ALPHA;
+            material.triangleFaceToCull = Context3DTriangleFace.NONE;
+            uiContainer.material = material;
             ROOT.addChild(uiContainer);
             popContainer.mouseEnabled = false;
             tipContainer.mouseEnabled = false;

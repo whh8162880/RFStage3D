@@ -87,6 +87,8 @@ module rf{
     }
 
     export class PassContainer extends RenderBase{
+
+        camera:Camera
         constructor(variables?:{ [key: string]: IVariable }){
             super(variables);
             this.hitArea = new HitArea();
@@ -94,28 +96,31 @@ module rf{
         }
 
         public render(camera: Camera, now: number, interval: number): void {
-            const{camera3D}=ROOT;
-            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this;
+            let{camera:_camera}=this;
+            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this.material;
             let c = context3D;
             let g = gl;
            
+            if(undefined == _camera){
+                _camera = camera;
+            }
 
-            if(camera3D.states){
-                camera3D.updateSceneTransform();
+            if(_camera.states){
+                _camera.updateSceneTransform();
             }
 
             c.setCulling(triangleFaceToCull)
             c.setDepthTest(depthMask,passCompareMode);
             c.setBlendFactors(sourceFactor,destinationFactor);
 
-            super.render(camera3D,now,interval);
+            super.render(_camera,now,interval);
         }
     }
 
     export class UIContainer extends AllActiveSprite{
         public render(camera: Camera, now: number, interval: number): void {
             const{cameraUI}=ROOT;
-            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this;
+            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this.material;
             let c = context3D;
             let g = gl;
            
