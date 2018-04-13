@@ -118,13 +118,13 @@ module rf {
                 hitArea.combine(this.$graphics.hitArea,0,0);
             }
 
-            if(hitArea.allWays){
-                this.w = stageWidth;
-                this.h = stageHeight;
-            }else{
-                this.w = hitArea.right - hitArea.left;
-                this.h = hitArea.bottom - hitArea.top;
-            }
+            // if(hitArea.allWays){
+            //     this.w = stageWidth;
+            //     this.h = stageHeight;
+            // }else{
+            this.w = hitArea.right - hitArea.left;
+            this.h = hitArea.bottom - hitArea.top;
+            // }
             this.states &= ~DChange.ac;
         }
 
