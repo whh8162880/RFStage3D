@@ -145,8 +145,8 @@ module rf {
 
 
         //保存外部设置的宽高 用于layout
-        private _ow:number;
-        private _oh:number;
+        private _ow:number = 0;
+        private _oh:number = 0;
 
         private lines: Recyclable<Line>[] = [];
 
@@ -215,35 +215,40 @@ module rf {
         }
 
         layout(): void {
-            if(this.format.align == TextFormatAlign.LEFT)
+            const{format,_ow}=this;
+
+            if(format.align == TextFormatAlign.LEFT)
             {
                 return;
             }
 
             this.updateHitArea();
+            
+            const{w,h,childrens}=this;
+
             //根据align属性进行重新布局
             // var line:Text3DLine;
             // var lx:int = 1;
 
-            if(this._ow == undefined || this._ow == 0)
+            if(_ow == 0)
             {
                 return;
             }
             let offsetx:number;
-            if(this.format.align == TextFormatAlign.CENTER){
-                offsetx = this._ow - this.w >> 1;
-            }else if(this.format.align == TextFormatAlign.RIGHT){
-                offsetx = this._ow - this.w;
+            if(format.align == TextFormatAlign.CENTER){
+                offsetx = _ow - w >> 1;
+            }else if(format.align == TextFormatAlign.RIGHT){
+                offsetx = _ow - w;
             }
 
-            let len = this.numChildren;
+            let len = childrens.length;
 
             //fisrt 取出完整的width
             //second 根据align获取偏移offsetx
             let dx = offsetx;
             for(let i = 0; i < len; i++)
             {
-                let display = this.childrens[i];
+                let display = childrens[i];
                 display.x = dx;
                 dx += display.w;
             }
