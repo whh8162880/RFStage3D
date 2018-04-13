@@ -11,19 +11,42 @@ module rf{
             ROOT.on(MouseEventX.MouseWheel,this.mouseWheelHandler,this);
         }
 
+        set tdistance(value:number){
+            // console.log(value);
+            this.distance = value;
+            this.object.forwardPos(value,true);
+        }
+
+        get tdistance():number{
+            return this.distance;
+        }
+
+
         mouseWheelHandler(event:EventX):void{
            
-            const{distance} = this;
-            const{wheel}=event.data;
+            // const{distance} = this;
+
+            let distance = this.object.pos.subtract(this.target).length;
+            this.distance = distance;
+
+            let{wheel}=event.data;
             let step = 1;
             if(wheel < 0 && distance<500){
                 step = distance / 500;
             }
 
-           
-            this.object.forwardPos(-wheel*step);
+            wheel = wheel*step;
+
+
+            
+
+            let tweener = tween.get(this,undefined,undefined,true);
+            tweener.to( { tdistance: distance+wheel*2},Math.abs(wheel)*2);
+            
+
+            
             // this.object.z += e.deltaY > 0 ? 1: -1
-            this.distance = this.object.pos.subtract(this.target).length;
+            // this.distance = this.object.pos.subtract(this.target).length;
         }
 
         mouseDownHandler(event:EventX):void{

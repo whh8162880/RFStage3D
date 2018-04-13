@@ -5,11 +5,12 @@ module rf {
     export abstract class RenderBase extends DisplayObjectContainer implements I3DRender {
         nativeRender:boolean = false;
         variables:{ [key: string]: IVariable };
-        triangleFaceToCull: string = Context3DTriangleFace.NONE;
-        sourceFactor: number;
-        destinationFactor: number;
-        depthMask: boolean = false;
-        passCompareMode: number;
+        material:Material;
+        // triangleFaceToCull: string = Context3DTriangleFace.NONE;
+        // sourceFactor: number;
+        // destinationFactor: number;
+        // depthMask: boolean = false;
+        // passCompareMode: number;
         public render(camera: Camera, now: number, interval: number): void { 
             let i = 0;
             let childrens = this.childrens;
@@ -116,7 +117,14 @@ module rf {
             if(this.$graphics){
                 hitArea.combine(this.$graphics.hitArea,0,0);
             }
-            
+
+            if(hitArea.allWays){
+                this.w = stageWidth;
+                this.h = stageHeight;
+            }else{
+                this.w = hitArea.right - hitArea.left;
+                this.h = hitArea.bottom - hitArea.top;
+            }
             this.states &= ~DChange.ac;
         }
 
@@ -308,7 +316,7 @@ module rf {
 
     export class Graphics {
         target: Sprite;
-        byte: Float32Byte;
+        byte: Float32Array;
         hitArea:HitArea;
         numVertices: number = 0;
         $batchOffset: number = 0;
@@ -333,9 +341,9 @@ module rf {
 
             if(this.numVertices > 0){
                 let float = createGeometry(empty_float32_object,target.variables,this.numVertices);
-                this.byte = new Float32Byte(float);
+                this.byte = float;
                 if(target.$batchGeometry && this.preNumVertices == this.numVertices){
-                    target.$batchGeometry.update(this.$batchOffset,this.byte);
+                    target.$batchGeometry.update(this.$batchOffset,float);
                 }else{
                     change |= DChange.vertex;
                 }
@@ -702,7 +710,7 @@ module rf {
             let p = this.program; 
             c.setProgram(p);
             c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
-            c.setProgramConstantsFromVector(VC.ui, geo.vcData.array, 4);
+            c.setProgramConstantsFromVector(VC.ui, geo.vcData, 4);
             this.t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);
             c.drawTriangles(i,geo.quadcount * 2);
@@ -907,7 +915,7 @@ module rf {
         vertex: VertexInfo;
         $vertexBuffer: VertexBuffer3D;
         quadcount: number;
-        vcData: Float32Byte;
+        vcData: Float32Array;
         vci: number = 0;
         link: Link;
         verlen: number = 0;
@@ -929,7 +937,7 @@ module rf {
             this.vertex = new VertexInfo(this.verlen, variables["data32PerVertex"].size);
             this.vertex.variables = variables;
             this.quadcount = this.vertex.numVertices / 4;
-            this.vcData = new Float32Byte(new Float32Array(this.quadcount * 4))
+            this.vcData = new Float32Array(this.quadcount * 4)
             let byte = this.vertex.vertex;
             let vo = this.link.getFrist();
             while(vo){
@@ -937,18 +945,18 @@ module rf {
                     let sp: Sprite = vo.data;
                     let g = sp.$graphics;
                     if(sp.$vcIndex > 0){
-                        g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex);
+                        g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex)
                     }
-                    byte.set(g.$batchOffset, g.byte);
+                    byte.set(g.byte,g.$batchOffset);
                     this.vcData.wPoint4(sp.$vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
                 }
                 vo = vo.next;
             }
         }
 
-        update(position:number,byte:Float32Byte):void{
+        update(position:number,byte:Float32Array):void{
             if(undefined != this.vertex){
-                this.vertex.vertex.set(position,byte);
+                this.vertex.vertex.set(byte,position);
             }
             if(undefined != this.$vertexBuffer){
                 this.$vertexBuffer.readly = false;

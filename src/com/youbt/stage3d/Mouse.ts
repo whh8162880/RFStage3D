@@ -24,26 +24,28 @@ module rf{
             mouseElement[2] = {target:undefined,time:0,down:MouseEventX.MouseRightDown,up:MouseEventX.MouseRightUp,click:MouseEventX.RightClick};
 
             //10个指头应该够了吧
-            touchElement[0] = {target:undefined,time:0,data:new MouseEventData(0)};
-            touchElement[1] = {target:undefined,time:0,data:new MouseEventData(1)};
-            touchElement[2] = {target:undefined,time:0,data:new MouseEventData(2)};
-            touchElement[3] = {target:undefined,time:0,data:new MouseEventData(3)};
-            touchElement[4] = {target:undefined,time:0,data:new MouseEventData(4)};
-            touchElement[5] = {target:undefined,time:0,data:new MouseEventData(5)};
-            touchElement[6] = {target:undefined,time:0,data:new MouseEventData(6)};
-            touchElement[7] = {target:undefined,time:0,data:new MouseEventData(7)};
-            touchElement[8] = {target:undefined,time:0,data:new MouseEventData(8)};
-            touchElement[9] = {target:undefined,time:0,data:new MouseEventData(9)};
+            // touchElement[0] = {target:undefined,time:0,data:new MouseEventData(0)};
+            // touchElement[1] = {target:undefined,time:0,data:new MouseEventData(1)};
+            // touchElement[2] = {target:undefined,time:0,data:new MouseEventData(2)};
+            // touchElement[3] = {target:undefined,time:0,data:new MouseEventData(3)};
+            // touchElement[4] = {target:undefined,time:0,data:new MouseEventData(4)};
+            // touchElement[5] = {target:undefined,time:0,data:new MouseEventData(5)};
+            // touchElement[6] = {target:undefined,time:0,data:new MouseEventData(6)};
+            // touchElement[7] = {target:undefined,time:0,data:new MouseEventData(7)};
+            // touchElement[8] = {target:undefined,time:0,data:new MouseEventData(8)};
+            // touchElement[9] = {target:undefined,time:0,data:new MouseEventData(9)};
 
-
+            let _this = this;
+            function m(e){
+                _this.mouseHanlder(e);
+            };
+            
             let canvas = ROOT.canvas;
             
             if(false == mobile){
-                canvas.addEventListener("mousedown",this.mouseHanlder);
-                canvas.addEventListener("mouseup",this.mouseHanlder);
-                // canvas.onmousedown = this.mouseHanlder;
-                // canvas.onmouseup = this.mouseHanlder;
-                canvas.onmousewheel = this.mouseHanlder;
+                canvas.onmousedown = m;
+                canvas.onmouseup = m;
+                canvas.onmousewheel = m;
                 canvas.onmousemove = this.mouseMoveHandler;
                 canvas.oncontextmenu = function (event){
                     event.preventDefault();
@@ -156,8 +158,9 @@ module rf{
 
         touchHandler(e:TouchEvent):void{
             let mouse = MouseInstance;
-            const{touchElement:elements}=mouse;
-            let touch = e.changedTouches[0];
+            const{touchElement:elements,touchLen,touchCenterY:centerY}=mouse;
+            var touch = e.changedTouches[0];
+            let touches =  e.touches;
             let element:ITouchlement;
             let data:MouseEventData;
 
@@ -169,6 +172,29 @@ module rf{
             nativeMouseX = mouseX;
             nativeMouseY = mouseY;
 
+            element = elements[touch.identifier];
+            if(undefined == element){
+                elements[touch.identifier] =  element = {target:undefined,time:0,data:new MouseEventData(touch.identifier)}
+            } 
+            data = element.data;
+            data.dx = mouseX - data.x;
+            data.dy = mouseY - data.y;
+            data.x = mouseX;
+            data.y = mouseY;
+
+            if(touches.length == 2){
+                const{clientX:x0,clientY:y0}=touches[0];
+                const{clientX:x1,clientY:y1}=touches[1];
+                let x = (x0 + x1) / 2;
+                let y = (y0 + y1) / 2;
+                let dx = x1 - x0;
+                let dy = y1 - y0;
+                let len = Math.sqrt(dx * dx + dy * dy);
+                mouse.touchCenterY = y;
+                mouse.touchLen = len;
+            }
+
+           
             if(mouse.preMouseTime != now){
                 mouse.preMouseTime = now;
                 d = ROOT.getObjectByPoint(mouseX,mouseY,1)
@@ -177,12 +203,6 @@ module rf{
             }
 
             if(undefined != d){
-                element = elements[touch.identifier];
-                data = element.data;
-                data.dx = mouseX - data.x;
-                data.dy = mouseY - data.y;
-                data.x = mouseX;
-                data.y = mouseY;
                 if(e.type == "touchstart"){
                     if(true == d.mousedown){
                         return;
@@ -205,6 +225,9 @@ module rf{
             }
         }
 
+
+        touchCenterY:number = 0;
+        touchLen:number = 0;
         touchMoveHandler(e:TouchEvent):void{
             let mouse = MouseInstance;
             let now = engineNow;
@@ -213,10 +236,10 @@ module rf{
             }
             mouse.preMoveTime = now;
 
-            const{touchElement:elements}=mouse;
+            let{touchElement:elements,touchCenterY:centerY,touchLen,preTarget}=mouse;
             const{touches,changedTouches}=e;
             let element:ITouchlement;
-            let data:MouseEventData;
+            let data;
             let len = touches.length;
             if(len == 1){
                 let touch = changedTouches[0];
@@ -235,12 +258,46 @@ module rf{
                     d.simpleDispatch(MouseEventX.MouseMove,data,true);
                 }
                 return;
-            }else{
-                // let x = 0;
-                // let y = 0;
-                // for(let i=0;i<len;i++){
-                //     let touch = touches[i];
-                // }
+            }else if(len == 2){
+                if(undefined == preTarget){
+                    preTarget = ROOT;
+                }
+                const{clientX:x0,clientY:y0}=touches[0];
+                const{clientX:x1,clientY:y1}=touches[1];
+                let x = (x0 + x1) / 2;
+                let y = (y0 + y1) / 2;
+
+                let dx = x1 - x0;
+                let dy = y1 - y0;
+                len = Math.sqrt(dx * dx + dy * dy);
+
+                let dlen = (touchLen-len) / pixelRatio;
+                dy = (y - centerY) / pixelRatio;
+
+                if(Math.abs(dlen) > 1.0){
+                    //scale
+                    let data = recyclable(MouseEventData);
+                    data.x = x;
+                    data.y = y;
+                    data.wheel = dlen > 0 ? 120 : -120;
+                    preTarget.simpleDispatch(MouseEventX.MouseWheel,data,true);
+                    // console.log( "scale" , dlen.toFixed(2));
+                    data.recycle();
+                }else if(Math.abs(dy) > 1.0){
+                    let data = recyclable(MouseEventData);
+                    data.x = x;
+                    data.y = y;
+                    data.wheel = dy > 0 ? 120 : -120;
+                    preTarget.simpleDispatch(MouseEventX.MouseWheel,data,true);
+                    // console.log( "scale" , dlen.toFixed(2));
+                    data.recycle();
+                }
+
+                mouse.touchCenterY = y;
+                mouse.touchLen = len;
+
+                
+
             }
 
 
@@ -254,3 +311,4 @@ module rf{
 
     export const MouseInstance = new Mouse();
 }
+
