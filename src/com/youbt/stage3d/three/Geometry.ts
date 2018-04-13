@@ -118,8 +118,8 @@ module rf {
 
 
     export interface IGeometry {
-        vertex: VertexInfo;
-        index?: Uint16Array;
+        vertex: VertexBuffer3D;
+        index?: IndexBuffer3D;
     }
 
 
@@ -158,7 +158,8 @@ module rf {
 
 
     export class GeometryBase implements IGeometry{
-        variables:{ [key: string]: IVariable }
+        variables:{ [key: string]: IVariable };
+        vertex:VertexBuffer3D;
         constructor(variables?:{ [key: string]: IVariable }){
             if(undefined == variables){
                 variables = vertex_mesh_variable;
@@ -168,8 +169,8 @@ module rf {
         }
         data32PerVertex:number = 0;
         numVertices:number = 0;
-        vertex:VertexInfo;
-        index:Uint16Array;
+        index:IndexBuffer3D;
+        
     }
 
 
@@ -248,10 +249,10 @@ module rf {
             
 
             let variables = this.variables;
-
+            let context = context3D;
             let arr = createGeometry(empty_float32_object,variables,numVertices);
-            this.vertex = new VertexInfo(arr,this.data32PerVertex,variables)
-            this.index = new Uint16Array(indices);
+            this.vertex = context.createVertexBuffer(new VertexInfo(arr,this.data32PerVertex,variables));
+            this.index = context.createIndexBuffer(indices);
         
             // this.setIndex( indices );
             // this.addAttribute( 'position', new Float32BufferAttribute( vertices, 3 ) );

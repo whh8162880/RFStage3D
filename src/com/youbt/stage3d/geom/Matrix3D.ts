@@ -502,63 +502,97 @@ module rf {
          * Inverts the current matrix.
          */
         public invert() {
-            let d: number = this.determinant;
-            let invertable: boolean = Math.abs(d) > 0.00000000001;
-
-            if (invertable) {
-                d = 1 / d;
-                const rawData = this.rawData;
-
-                const [
-                    a1, a2, a3, a4,
-                    b1, b2, b3, b4,
-                    m31, m32, m33, m34,
-                    m41, m42, m43, m44
-                ] = rawData as any;
-
-                const a2$b3_b2$a3 = a2 * b3 - b2 * a3;
-                const a2$b4_b2$a4 = a2 * b4 - b2 * a4;
-                const a2$m33_m32$a3 = a2 * m33 - m32 * a3;
-                const a2$m34_m32$a4 = a2 * m34 - m32 * a4;
-                const a2$m43_m42$a3 = a2 * m43 - m42 * a3;
-                const a2$m44_m42$a4 = a2 * m44 - m42 * a4;
-
-                const a3$b4_b3$a4 = a3 * b4 - b3 * a4;
-                const a3$m34_m33$a4 = a3 * m34 - m33 * a4;
-                const a3$m44_m43$a4 = a3 * m44 - m43 * a4;
-
-                const b2$m33_m32$b3 = b2 * m33 - m32 * b3;
-                const b2$m34_m32$b4 = b2 * m34 - m32 * b4;
-                const b2$m43_m42$b3 = b2 * m43 - m42 * b3;
-                const b2$m44_m42$b4 = b2 * m44 - m42 * b4;
-
-                const b3$m34_m33$b4 = b3 * m34 - m33 * b4;
-                const b3$m44_m43$b4 = b3 * m44 - m43 * b4;
-
-                const m32$m43_m42$m33 = m32 * m43 - m42 * m33;
-                const m32$m44_m42$m34 = m32 * m44 - m42 * m34;
-
-                const m33$m44_m43$m34 = m33 * m44 - m43 * m34;
 
 
-                rawData[0] = d * (b2 * (m33$m44_m43$m34) - m32 * (b3$m44_m43$b4) + m42 * (b3$m34_m33$b4));
-                rawData[1] = -d * (a2 * (m33$m44_m43$m34) - m32 * (a3$m44_m43$a4) + m42 * (a3$m34_m33$a4));
-                rawData[2] = d * (a2 * (b3$m44_m43$b4) - b2 * (a3$m44_m43$a4) + m42 * (a3$b4_b3$a4));
-                rawData[3] = -d * (a2 * (b3$m34_m33$b4) - b2 * (a3$m34_m33$a4) + m32 * (a3$b4_b3$a4));
-                rawData[4] = -d * (b1 * (m33$m44_m43$m34) - m31 * (b3$m44_m43$b4) + m41 * (b3$m34_m33$b4));
-                rawData[5] = d * (a1 * (m33$m44_m43$m34) - m31 * (a3$m44_m43$a4) + m41 * (a3$m34_m33$a4));
-                rawData[6] = -d * (a1 * (b3$m44_m43$b4) - b1 * (a3$m44_m43$a4) + m41 * (a3$b4_b3$a4));
-                rawData[7] = d * (a1 * (b3$m34_m33$b4) - b1 * (a3$m34_m33$a4) + m31 * (a3$b4_b3$a4));
-                rawData[8] = d * (b1 * (m32$m44_m42$m34) - m31 * (b2$m44_m42$b4) + m41 * (b2$m34_m32$b4));
-                rawData[9] = -d * (a1 * (m32$m44_m42$m34) - m31 * (a2$m44_m42$a4) + m41 * (a2$m34_m32$a4));
-                rawData[10] = d * (a1 * (b2$m44_m42$b4) - b1 * (a2$m44_m42$a4) + m41 * (a2$b4_b2$a4));
-                rawData[11] = -d * (a1 * (b2$m34_m32$b4) - b1 * (a2$m34_m32$a4) + m31 * (a2$b4_b2$a4));
-                rawData[12] = -d * (b1 * (m32$m43_m42$m33) - m31 * (b2$m43_m42$b3) + m41 * (b2$m33_m32$b3));
-                rawData[13] = d * (a1 * (m32$m43_m42$m33) - m31 * (a2$m43_m42$a3) + m41 * (a2$m33_m32$a3));
-                rawData[14] = -d * (a1 * (b2$m43_m42$b3) - b1 * (a2$m43_m42$a3) + m41 * (a2$b3_b2$a3));
-                rawData[15] = d * (a1 * (b2$m33_m32$b3) - b1 * (a2$m33_m32$a3) + m31 * (a2$b3_b2$a3));
-            }
-            return invertable;
+            const{rawData}=this;
+
+            var a = rawData[0],  b = rawData[1],  c = rawData[2],  d = rawData[3],
+			e = rawData[4],  f = rawData[5],  g = rawData[6],  h = rawData[7],
+			i = rawData[8],  j = rawData[9],  k = rawData[10], l = rawData[11],
+            m = rawData[12], n = rawData[13], o = rawData[14], p = rawData[15],
+            
+			q = a * f - b * e, r = a * g - c * e,
+			s = a * h - d * e, t = b * g - c * f,
+			u = b * h - d * f, v = c * h - d * g,
+			w = i * n - j * m, x = i * o - k * m,
+			y = i * p - l * m, z = j * o - k * n,
+			A = j * p - l * n, B = k * p - l * o,
+			ivd = 1 / (q * B - r * A + s * z + t * y - u * x + v * w);
+            rawData[0]  = ( f * B - g * A + h * z) * ivd;
+            rawData[1]  = (-b * B + c * A - d * z) * ivd;
+            rawData[2]  = ( n * v - o * u + p * t) * ivd;
+            rawData[3]  = (-j * v + k * u - l * t) * ivd;
+            rawData[4]  = (-e * B + g * y - h * x) * ivd;
+            rawData[5]  = ( a * B - c * y + d * x) * ivd;
+            rawData[6]  = (-m * v + o * s - p * r) * ivd;
+            rawData[7]  = ( i * v - k * s + l * r) * ivd;
+            rawData[8]  = ( e * A - f * y + h * w) * ivd;
+            rawData[9]  = (-a * A + b * y - d * w) * ivd;
+            rawData[10] = ( m * u - n * s + p * q) * ivd;
+            rawData[11] = (-i * u + j * s - l * q) * ivd;
+            rawData[12] = (-e * z + f * x - g * w) * ivd;
+            rawData[13] = ( a * z - b * x + c * w) * ivd;
+            rawData[14] = (-m * t + n * r - o * q) * ivd;
+            rawData[15] = ( i * t - j * r + k * q) * ivd;
+
+
+            // let d: number = this.determinant;
+            // let invertable: boolean = Math.abs(d) > 0.00000000001;
+
+            // if (invertable) {
+            //     d = 1 / d;
+            //     const rawData = this.rawData;
+
+            //     const [
+            //         a1, a2, a3, a4,
+            //         b1, b2, b3, b4,
+            //         m31, m32, m33, m34,
+            //         m41, m42, m43, m44
+            //     ] = rawData as any;
+
+            //     const a2$b3_b2$a3 = a2 * b3 - b2 * a3;
+            //     const a2$b4_b2$a4 = a2 * b4 - b2 * a4;
+            //     const a2$m33_m32$a3 = a2 * m33 - m32 * a3;
+            //     const a2$m34_m32$a4 = a2 * m34 - m32 * a4;
+            //     const a2$m43_m42$a3 = a2 * m43 - m42 * a3;
+            //     const a2$m44_m42$a4 = a2 * m44 - m42 * a4;
+
+            //     const a3$b4_b3$a4 = a3 * b4 - b3 * a4;
+            //     const a3$m34_m33$a4 = a3 * m34 - m33 * a4;
+            //     const a3$m44_m43$a4 = a3 * m44 - m43 * a4;
+
+            //     const b2$m33_m32$b3 = b2 * m33 - m32 * b3;
+            //     const b2$m34_m32$b4 = b2 * m34 - m32 * b4;
+            //     const b2$m43_m42$b3 = b2 * m43 - m42 * b3;
+            //     const b2$m44_m42$b4 = b2 * m44 - m42 * b4;
+
+            //     const b3$m34_m33$b4 = b3 * m34 - m33 * b4;
+            //     const b3$m44_m43$b4 = b3 * m44 - m43 * b4;
+
+            //     const m32$m43_m42$m33 = m32 * m43 - m42 * m33;
+            //     const m32$m44_m42$m34 = m32 * m44 - m42 * m34;
+
+            //     const m33$m44_m43$m34 = m33 * m44 - m43 * m34;
+
+
+            //     rawData[0] = d * (b2 * (m33$m44_m43$m34) - m32 * (b3$m44_m43$b4) + m42 * (b3$m34_m33$b4));
+            //     rawData[1] = -d * (a2 * (m33$m44_m43$m34) - m32 * (a3$m44_m43$a4) + m42 * (a3$m34_m33$a4));
+            //     rawData[2] = d * (a2 * (b3$m44_m43$b4) - b2 * (a3$m44_m43$a4) + m42 * (a3$b4_b3$a4));
+            //     rawData[3] = -d * (a2 * (b3$m34_m33$b4) - b2 * (a3$m34_m33$a4) + m32 * (a3$b4_b3$a4));
+            //     rawData[4] = -d * (b1 * (m33$m44_m43$m34) - m31 * (b3$m44_m43$b4) + m41 * (b3$m34_m33$b4));
+            //     rawData[5] = d * (a1 * (m33$m44_m43$m34) - m31 * (a3$m44_m43$a4) + m41 * (a3$m34_m33$a4));
+            //     rawData[6] = -d * (a1 * (b3$m44_m43$b4) - b1 * (a3$m44_m43$a4) + m41 * (a3$b4_b3$a4));
+            //     rawData[7] = d * (a1 * (b3$m34_m33$b4) - b1 * (a3$m34_m33$a4) + m31 * (a3$b4_b3$a4));
+            //     rawData[8] = d * (b1 * (m32$m44_m42$m34) - m31 * (b2$m44_m42$b4) + m41 * (b2$m34_m32$b4));
+            //     rawData[9] = -d * (a1 * (m32$m44_m42$m34) - m31 * (a2$m44_m42$a4) + m41 * (a2$m34_m32$a4));
+            //     rawData[10] = d * (a1 * (b2$m44_m42$b4) - b1 * (a2$m44_m42$a4) + m41 * (a2$b4_b2$a4));
+            //     rawData[11] = -d * (a1 * (b2$m34_m32$b4) - b1 * (a2$m34_m32$a4) + m31 * (a2$b4_b2$a4));
+            //     rawData[12] = -d * (b1 * (m32$m43_m42$m33) - m31 * (b2$m43_m42$b3) + m41 * (b2$m33_m32$b3));
+            //     rawData[13] = d * (a1 * (m32$m43_m42$m33) - m31 * (a2$m43_m42$a3) + m41 * (a2$m33_m32$a3));
+            //     rawData[14] = -d * (a1 * (b2$m43_m42$b3) - b1 * (a2$m43_m42$a3) + m41 * (a2$b3_b2$a3));
+            //     rawData[15] = d * (a1 * (b2$m33_m32$b3) - b1 * (a2$m33_m32$a3) + m31 * (a2$b3_b2$a3));
+            // }
+            // return invertable;
         }
 
         /**

@@ -7,6 +7,10 @@ module rf{
         passCompareMode: number;
         program:Program3D;
         createProgram(){
+            return this.program;
+        }
+
+        uploadContext(){
 
         }
     }
@@ -25,6 +29,13 @@ module rf{
         //高光
         specular:number = 0x000000;
         specularTex:string;
+
+
+        uploadContext(){
+
+            
+
+        }
 
         createProgram(){
 
@@ -86,7 +97,11 @@ module rf{
                 }
             `
             p = c.createProgram(vertexCode,fragmentCode,key);
-            
+
+            this.program = p;
+
+            return p;
+
         }
 
         
