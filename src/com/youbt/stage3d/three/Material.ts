@@ -1,6 +1,6 @@
 module rf{
     export class Material {
-        triangleFaceToCull: string = Context3DTriangleFace.NONE;
+        triangleFaceToCull: string = Context3DTriangleFace.BACK;
         sourceFactor: number;
         destinationFactor: number;
         depthMask: boolean = false;
@@ -10,8 +10,8 @@ module rf{
             return this.program;
         }
 
-        uploadContext(mesh:Mesh){
-
+        uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
+            return false;
         }
     }
 
@@ -31,12 +31,22 @@ module rf{
         specularTex:string;
 
 
-        uploadContext(mesh:Mesh){
+        uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
             let scene = mesh.scene;
             let c = context3D;
 
-            c.setProgramConstantsFromVector(VC.lightDirection,[0,500,500],3);
+            let{program}=this;
+            if(undefined == program){
+                program = this.createProgram();
+            }
+            c.setProgram(program);
+
+            c.setCulling(this.triangleFaceToCull);
+
+            c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
             c.setProgramConstantsFromVector(VC.color,[1.0,1.0,1.0,1.0],4);
+
+            return true;
         }
 
         createProgram(){
@@ -72,6 +82,7 @@ module rf{
 
 
             let vertexCode = `
+                precision highp float;
                 attribute vec3 ${VA.pos};
                 attribute vec3 ${VA.normal};
                 attribute vec3 ${VA.uv};

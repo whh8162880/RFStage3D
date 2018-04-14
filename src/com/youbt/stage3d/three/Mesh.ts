@@ -32,22 +32,16 @@ module rf{
             const{geometry,material,worldTranform,sceneTransform,invSceneTransform}=this;
             let c = context3D;
             if(undefined != geometry && undefined != material){
-                const{vertex,index}=geometry;
-                if(undefined != vertex && undefined != index){
-                    let{program}=material;
-                    if(undefined == program){
-                        program = material.createProgram();
-                    }
-                    c.setProgram(program);
-                    vertex.uploadContext(program);
-
+                let b = material.uploadContext(camera,this,now,interval);
+                if(true == b){
+                    geometry.uploadContext(camera,this,material.program,now,interval);
+                
                     worldTranform.copyFrom(sceneTransform);
                     worldTranform.append(camera.worldTranform);
                     c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
                     c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
-
-                    material.uploadContext(this);
-                    c.drawTriangles(index,geometry.numTriangles)
+                    
+                    c.drawTriangles(geometry.index,geometry.numTriangles)
                 }
             }
             super.render(camera,now,interval);

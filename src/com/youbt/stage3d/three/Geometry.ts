@@ -156,10 +156,12 @@ module rf {
     }
 
 
+    export function geometry_point(position:number,variables:{ [key: string]: IVariable },x:number,y:number,z:number,nx:number,ny:number,nz:number,u:number,v:number):void{
 
+    }
    
 
-    export function geometry_plane(width:number,height:number,position:number,matrix3D?:Matrix3D):void{
+    export function geometry_plane(width:number,height:number,position:number,variables:{ [key: string]: IVariable },matrix3D?:Matrix3D):void{
 
         let width_half = width * 0.5;
         let height_half = height * 0.5;
@@ -172,6 +174,16 @@ module rf {
         ];
         let v:Vector3D = TEMP_VECTOR3D;
 
+        let variable = variables[VA.pos];
+        let pos = variable ? variable.size * 4 : -1;
+
+        variable =variables[VA.normal];
+        let normal = variable ? variable.size * 4 : -1;
+
+        variable =variables[VA.uv];
+        let uv = variable ? variable.size * 4 : -1;
+
+
         for(let i=0;i<12;i+=3){
             v.x = points[i];
             v.y = points[i+1];
@@ -180,9 +192,8 @@ module rf {
             if(undefined != matrix3D){
                 matrix3D.transformVector(v,v);
             }
-            empty_float32_pos.wPoint3(position * 12 + i , v.x,v.y,v.z);
-            empty_float32_uv.wPoint2(position * 8 + i , (v.x+width_half) / width, (v.y+height_half) / height);
-            
+            empty_float32_pos.wPoint3(position * pos + i , v.x,v.y,v.z);
+
             v.x = 0;
             v.y = 0;
             v.z = 1;
@@ -190,7 +201,11 @@ module rf {
             if(undefined != matrix3D){
                 matrix3D.transformRotation(v,v);
             }
-            empty_float32_normal.wPoint3(position * 12 + i , v.x,v.y,v.z);
+            empty_float32_normal.wPoint3(position * normal + i , v.x,v.y,v.z);
+
+            empty_float32_uv.wPoint2(position * uv + i , (v.x+width_half) / width, (v.y+height_half) / height);
+            
+           
         }
     }
 
@@ -208,6 +223,11 @@ module rf {
         numVertices:number = 0;
         numTriangles:number = 0;
         index:IndexBuffer3D;
+
+
+        uploadContext(camera:Camera,mesh:Mesh, program:Program3D, now: number, interval: number){
+            this.vertex.uploadContext(program);
+        }
         
     }
 
@@ -216,20 +236,22 @@ module rf {
         create(width:number = 1, height:number = 1){
             let numVertices = 0;
             let quad = 0;
+
+            let variables = this.variables;
+
             let matrix3D = new Matrix3D();
 
-            geometry_plane(width,height,0);
+            geometry_plane(width,height,0,variables);
             numVertices += 4;
             quad ++;
 
             
             matrix3D.appendRotation(180,Vector3D.Y_AXIS);
-            geometry_plane(width,height,1,matrix3D);
+            geometry_plane(width,height,1,variables,matrix3D);
             numVertices += 4;
             quad ++;
 
            
-            let variables = this.variables;
             let c = context3D;
             let arr = createGeometry(empty_float32_object,variables,numVertices);
             this.vertex = c.createVertexBuffer(new VertexInfo(arr,this.data32PerVertex,variables));
@@ -248,20 +270,53 @@ module rf {
             let matrix3D = new Matrix3D();
             let numVertices = 0;
             let quad = 0;
+            let variables = this.variables;
+
             matrix3D.appendTranslation(0,0,depth * 0.5);
-            geometry_plane(width,height,0,matrix3D);
+            geometry_plane(width,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
             matrix3D.identity();
             matrix3D.appendRotation(180,Vector3D.Y_AXIS);
             matrix3D.appendTranslation(0,0,-depth * 0.5);
-            geometry_plane(width,height,1,matrix3D);
+            geometry_plane(width,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
 
-            let variables = this.variables;
+            matrix3D.identity();
+            matrix3D.appendRotation(-90,Vector3D.Y_AXIS);
+            matrix3D.appendTranslation(width * 0.5,0,0);
+            geometry_plane(width,height,quad,variables,matrix3D);
+            numVertices += 4;
+            quad++;
+
+            matrix3D.identity();
+            matrix3D.appendRotation(90,Vector3D.Y_AXIS);
+            matrix3D.appendTranslation(-width * 0.5,0,0);
+            geometry_plane(width,height,quad,variables,matrix3D);
+            numVertices += 4;
+            quad++;
+
+
+            matrix3D.identity();
+            matrix3D.appendRotation(90,Vector3D.X_AXIS);
+            matrix3D.appendTranslation(0,height * 0.5,0);
+            geometry_plane(width,height,quad,variables,matrix3D);
+            numVertices += 4;
+            quad++;
+
+
+            matrix3D.identity();
+            matrix3D.appendRotation(-90,Vector3D.X_AXIS);
+            matrix3D.appendTranslation(0,-height * 0.5,0);
+            geometry_plane(width,height,quad,variables,matrix3D);
+            numVertices += 4;
+            quad++;
+
+
+            
             let c = context3D;
             let arr = createGeometry(empty_float32_object,variables,numVertices);
             this.vertex = c.createVertexBuffer(new VertexInfo(arr,this.data32PerVertex,variables));
@@ -272,5 +327,10 @@ module rf {
 
             return this;
         }
+    }
+
+
+    export class SphereGeometry extends GeometryBase{
+        class 
     }
 }

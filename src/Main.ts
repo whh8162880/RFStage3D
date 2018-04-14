@@ -50,7 +50,9 @@ module rf{
             // scene.addChild(line);
 
             let mesh = new Mesh();
-            mesh.init(new PlaneGeometry(mesh.variables).create(200,200),new PhongMaterial());
+            let m = new PhongMaterial();
+            m.triangleFaceToCull = Context3DTriangleFace.NONE;
+            mesh.init(new BoxGeometry(mesh.variables).create(200,200,200),m);
             // mesh.rotationX = -90;
             scene.addChild(mesh);
 
