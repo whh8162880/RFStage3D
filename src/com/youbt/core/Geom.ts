@@ -146,6 +146,26 @@ module rf {
     export let TEMP_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
 
 
+    export class Color{
+        r:number;
+        g:number;
+        b:number;
+        a:number = 1.0;
+        private _hex:number;
+        constructor(hex:number = 0xFFFFFF){
+            this.hex = hex;
+        }
+
+        set hex(hex:number){
+            this._hex = hex
+            toRGB(hex,this);
+        }
+        get hex():number{
+            return this._hex;
+        }
+    }
+
+
     /**
     * 经纬度 定位信息
     * 

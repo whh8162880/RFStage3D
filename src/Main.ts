@@ -57,9 +57,12 @@ module rf{
             
             let m = new PhongMaterial();
             m.triangleFaceToCull = Context3DTriangleFace.BACK;
-            let geo = new BoxGeometry(variables).create(w,w,w)
+            // let geo = new BoxGeometry(variables).create(w,w,w)
 
-            let qc = 3;
+            let r = 30;
+            let geo = new SphereGeometry(variables).create(r,r,w * .5);
+
+            let qc = 20;
             let count = qc*qc;
             let tx = -(qc-1)/2 * w_e;
             let ty = -(qc-1)/2 * w_e;
