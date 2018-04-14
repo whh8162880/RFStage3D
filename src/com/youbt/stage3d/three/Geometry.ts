@@ -298,14 +298,14 @@ module rf {
             matrix3D.identity();
             matrix3D.appendRotation(-90,Vector3D.Y_AXIS);
             matrix3D.appendTranslation(width * 0.5,0,0);
-            geometry_plane(width,height,quad,variables,matrix3D);
+            geometry_plane(depth,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
             matrix3D.identity();
             matrix3D.appendRotation(90,Vector3D.Y_AXIS);
             matrix3D.appendTranslation(-width * 0.5,0,0);
-            geometry_plane(width,height,quad,variables,matrix3D);
+            geometry_plane(depth,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
@@ -313,7 +313,7 @@ module rf {
             matrix3D.identity();
             matrix3D.appendRotation(90,Vector3D.X_AXIS);
             matrix3D.appendTranslation(0,height * 0.5,0);
-            geometry_plane(width,height,quad,variables,matrix3D);
+            geometry_plane(width,depth,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
@@ -321,7 +321,7 @@ module rf {
             matrix3D.identity();
             matrix3D.appendRotation(-90,Vector3D.X_AXIS);
             matrix3D.appendTranslation(0,-height * 0.5,0);
-            geometry_plane(width,height,quad,variables,matrix3D);
+            geometry_plane(width,depth,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
