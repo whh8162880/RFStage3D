@@ -35,11 +35,12 @@ module rf {
         "data32PerVertex":{size:12,offset:0}
     }
 
-
-    export let empty_float32_pos = new Float32Array(1000);
-    export let empty_float32_normal = new Float32Array(1000);
-    export let empty_float32_uv = new Float32Array(1000);
-    export let empty_float32_color = new Float32Array(1200);
+    export const EMPTY_MAX_NUMVERTICES = 2048;
+    export let empty_float32_pos = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
+    export let empty_float32_normal = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
+    export let empty_float32_tangent = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
+    export let empty_float32_uv = new Float32Array(2 * EMPTY_MAX_NUMVERTICES);
+    export let empty_float32_color = new Float32Array(4* EMPTY_MAX_NUMVERTICES);
 
     //2000面应该很多了吧
     export let empty_uint16_indexs = new Uint16Array(6000);
@@ -340,8 +341,69 @@ module rf {
         }
     }
 
+    export function hsva(h:number, s:number, v:number, a:number){
+        if(s > 1 || v > 1 || a > 1){return;}
+        var th = h % 360;
+        var i = Math.floor(th / 60);
+        var f = th / 60 - i;
+        var m = v * (1 - s);
+        var n = v * (1 - s * f);
+        var k = v * (1 - s * (1 - f));
+        var color = [];
+        var r = [v, n, m, m, k, v];
+        var g = [k, v, v, n, m, m];
+        var b = [m, m, k, v, v, n];
+        color.push(r[i], g[i], b[i], a);
+        return color;
+    }
+
 
     export class SphereGeometry extends GeometryBase{
-        class 
+        create(row:number, column:number, rad:number,color?:number[]){
+            let numVertices = 0;
+            for(let i = 0; i <= row; i++){
+                let r = Math.PI / row * i;
+                let ry = Math.cos(r);
+                let rr = Math.sin(r);
+                for(let ii = 0; ii <= column; ii++){
+                    let tr = Math.PI * 2 / column * ii;
+                    let tx = rr * rad * Math.cos(tr);
+                    let ty = ry * rad;
+                    let tz = rr * rad * Math.sin(tr);
+                    let rx = rr * Math.cos(tr);
+                    let rz = rr * Math.sin(tr);
+                    let tc = color;
+                    if(undefined == tc){
+                        tc = hsva(360 / row * i, 1, 1, 1);
+                    }
+                    empty_float32_pos.wPoint3(numVertices * 3,tx,ty,tz);
+                    empty_float32_normal.wPoint3(numVertices * 3,rx,ry,rz);
+                    empty_float32_uv.wPoint2(numVertices * 2,1 - 1 / column * ii, 1 / row * i);
+                    empty_float32_color.wPoint4(numVertices * 4 , tc[0], tc[1], tc[2], tc[3]);
+                    numVertices ++;
+                }
+            }
+
+            let position = 0;
+            for(let i = 0; i < row; i++){
+                for(let ii = 0; ii < column; ii++){
+                    let r = (column + 1) * i + ii;
+                    empty_uint16_indexs.set([r, r + 1, r + column + 2,r, r + column + 2, r + column + 1],position);
+                    position += 6;
+                }
+            }
+
+
+            let variables = this.variables;
+            let c = context3D;
+            let arr = createGeometry(empty_float32_object,variables,numVertices);
+            this.vertex = c.createVertexBuffer(new VertexInfo(arr,this.data32PerVertex,variables));
+            this.index = c.createIndexBuffer(empty_uint16_indexs.slice(0,position));
+
+            this.numVertices = numVertices;
+            this.numTriangles =  position / 3;
+
+            return this;
+        }
     }
 }

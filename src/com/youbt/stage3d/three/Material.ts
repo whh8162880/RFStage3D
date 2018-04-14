@@ -19,7 +19,7 @@ module rf{
 
     export class PhongMaterial extends Material{
         //贴图
-        diff:Color;
+        diff:Color = new Color(0xCE6C75);
         diffTex:string;
 
         //自发光
@@ -43,9 +43,12 @@ module rf{
 
             c.setCulling(this.triangleFaceToCull);
 
-            c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
-            // c.setProgramConstantsFromVector(VC.color,[Math.random(),Math.random(),Math.random(),1.0],4);
-            if(undefined !=diff){
+            // c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
+
+            c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
+
+            // c.setProgramConstantsFromVector(VC.vc_diff,[Math.random(),Math.random(),Math.random(),1.0],4);
+            if(undefined != diff){
                 c.setProgramConstantsFromVector(VC.vc_diff,[diff.r,diff.g,diff.b,diff.a],4);
             }
 
@@ -114,6 +117,8 @@ module rf{
 
             let fragmentCode = `
                 precision mediump float;
+
+                #define VC_DIFF
                 
 
                 uniform vec4 ${VC.vc_diff};
@@ -127,7 +132,8 @@ module rf{
                     #ifdef VC_DIFF
                         vec4 c = ${VC.vc_diff} * vDiffuse;
                     #else
-                        vec4 c = vec4(vUV,0.0,1.0) * vDiffuse;
+                        // vec4 c = vec4(vUV,0.0,1.0) * vDiffuse;
+                        vec4 c = vec4(1.0,1.0,1.0,1.0) * vDiffuse;
                     #endif
                     // c += ${VC.vc_emissive};
                     gl_FragColor = c;
