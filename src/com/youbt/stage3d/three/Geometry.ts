@@ -35,7 +35,7 @@ module rf {
         "data32PerVertex":{size:12,offset:0}
     }
 
-    export const EMPTY_MAX_NUMVERTICES = 2048;
+    export const EMPTY_MAX_NUMVERTICES = Math.pow(2,13);
     export let empty_float32_pos = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
     export let empty_float32_normal = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
     export let empty_float32_tangent = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
@@ -43,7 +43,7 @@ module rf {
     export let empty_float32_color = new Float32Array(4* EMPTY_MAX_NUMVERTICES);
 
     //2000面应该很多了吧
-    export let empty_uint16_indexs = new Uint16Array(6000);
+    export let empty_uint16_indexs = new Uint16Array(3*EMPTY_MAX_NUMVERTICES);
 
     export let empty_float32_object:{ [key: string]: Float32Array } = {
         "pos":empty_float32_pos,
