@@ -3,11 +3,9 @@ module rf{
     export class Mesh extends SceneObject{
         scene:Scene;
         geometry:GeometryBase;
-        worldTranform:Matrix3D;
         invSceneTransform:Matrix3D;
         constructor(variables?:{ [key: string]: IVariable }){
             super(variables ? variables : vertex_mesh_variable);
-            this.worldTranform = new Matrix3D();
             this.invSceneTransform = new Matrix3D();
             this.nativeRender = true;
         }
@@ -15,7 +13,7 @@ module rf{
 
         updateSceneTransform():void{
             super.updateSceneTransform();
-            const{invSceneTransform,sceneTransform} = this;
+            let{invSceneTransform,sceneTransform} = this;
             invSceneTransform.copyFrom(sceneTransform);
             invSceneTransform.invert();
 
@@ -29,7 +27,7 @@ module rf{
         }
 
         render(camera: Camera, now: number, interval: number): void {
-            const{geometry,material,worldTranform,sceneTransform,invSceneTransform}=this;
+            const{geometry,material}=this;
             if(undefined != geometry && undefined != material){
                 let b = material.uploadContext(camera,this,now,interval);
                 if(true == b){

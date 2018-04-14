@@ -225,6 +225,7 @@ module rf {
         //     this.varibles[variable] = { size: size, offset: offset * 4 };
         // }
 
+        attribarray:object = {};
 
         public uploadContext(program: Program3D): void {
             if (false == this.readly) {
@@ -236,10 +237,11 @@ module rf {
             let g = gl;
             let attribs = program.attribs;
             let p = program.program;
+            let attribarray = this.attribarray;
             g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
             let variables = this.data.variables
             for (let variable in variables) {
-                if(true == attribs.hasOwnProperty(variable)){
+                if(true == (variable in attribs)){
                     loc = attribs[variable];
                 }else{
                     loc = g.getAttribLocation(p, variable);
@@ -250,7 +252,10 @@ module rf {
                 }
                 let o = variables[variable];
                 g.vertexAttribPointer(loc, o.size, g.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
-                g.enableVertexAttribArray(loc);
+                if(true != attribarray[loc]){
+                    g.enableVertexAttribArray(loc);
+                    attribarray[loc] = true;
+                }
             }
             this.preusetime = engineNow;
         }

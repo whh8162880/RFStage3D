@@ -289,6 +289,11 @@ module rf {
          * Copies all of the matrix data from the source Matrix3D object into the calling Matrix3D object.
          */
         public copyFrom(sourceMatrix3D: Matrix3D): void {
+            // let a = this.rawData;
+            // let b = sourceMatrix3D.rawData;
+            // for(var i=0;i<16;i++){
+            //     a[i] = b[i];
+            // }
             this.rawData.set(sourceMatrix3D.rawData);
         }
 
