@@ -36,7 +36,7 @@ module rf{
 
 
             let t = 2;
-            let tr = new Trident(500,t);
+            let tr = new Trident(100,t);
             scene.addChild(tr);
 
             // line.rotationX = 45;
@@ -52,17 +52,17 @@ module rf{
 
             let variables = vertex_mesh_variable;
 
-            let w = 200;
+            let w = 300;
             let w_e = w * 1.1
             
             let m = new PhongMaterial();
             m.triangleFaceToCull = Context3DTriangleFace.BACK;
             // let geo = new BoxGeometry(variables).create(w,w,w)
 
-            let r = 30;
-            let geo = new SphereGeometry(variables).create(r,r,w * .5);
+            let r = 40;
+            let geo = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
 
-            let qc = 10;
+            let qc = 1;
             let count = qc*qc;
             let tx = -(qc-1)/2 * w_e;
             let ty = -(qc-1)/2 * w_e;
