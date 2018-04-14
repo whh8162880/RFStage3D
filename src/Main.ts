@@ -52,11 +52,11 @@ module rf{
 
             let variables = vertex_mesh_variable;
 
-            let w = 20;
+            let w = 50;
             let w_e = w * 1.1
             
             let m = new PhongMaterial();
-            m.triangleFaceToCull = Context3DTriangleFace.NONE;
+            m.triangleFaceToCull = Context3DTriangleFace.BACK;
             let geo = new BoxGeometry(variables).create(w,w,w)
 
             let count = 30*30;
