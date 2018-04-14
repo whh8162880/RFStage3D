@@ -43,9 +43,9 @@ module rf{
 
             c.setCulling(this.triangleFaceToCull);
 
-            // c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
+            c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
 
-            c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
+            // c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
 
             // c.setProgramConstantsFromVector(VC.vc_diff,[Math.random(),Math.random(),Math.random(),1.0],4);
             if(undefined != diff){

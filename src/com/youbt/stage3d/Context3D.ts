@@ -113,6 +113,7 @@ namespace rf {
 			if(this.triangleFaceToCull == triangleFaceToCull){
 				return;
 			}
+			this.triangleFaceToCull = triangleFaceToCull;
 
 			let g = gl
 			g.frontFace(g.CW);
@@ -157,6 +158,8 @@ namespace rf {
 			if(this.depthMask == depthMask && this.passCompareMode == passCompareMode){
 				return;
 			}
+			this.depthMask = depthMask;
+			this.passCompareMode = passCompareMode;
 
 			let g = gl;
 			g.enable(g.DEPTH_TEST);
@@ -183,6 +186,8 @@ namespace rf {
 			if(this.sourceFactor == sourceFactor && this.destinationFactor == destinationFactor){
 				return;
 			}
+			this.sourceFactor = sourceFactor;
+			this.destinationFactor = destinationFactor;
 			gl.enable(gl.BLEND); //stage3d cant disable blend?
 			gl.blendFunc(sourceFactor, destinationFactor);
 		}
@@ -340,7 +345,7 @@ namespace rf {
 			let uniforms = p.uniforms;
 			let g = gl;
 			var index;
-			if(true == uniforms.hasOwnProperty(variable)){
+			if(true == (variable in uniforms)){
 				index = uniforms[variable];
 			}else{
 				index = g.getUniformLocation(p.program, variable);
@@ -360,7 +365,7 @@ namespace rf {
 			let uniforms = p.uniforms;
 			let g = gl;
 			var index;
-			if(true == uniforms.hasOwnProperty(variable)){
+			if(true == (variable in uniforms)){
 				index = uniforms[variable];
 			}else{
 				index = g.getUniformLocation(p.program, variable);
