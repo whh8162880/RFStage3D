@@ -37,13 +37,14 @@ module rf{
 
             let{program}=this;
             if(undefined == program){
-                program = this.createProgram();
+                this.program = program = this.createProgram();
             }
             c.setProgram(program);
 
             c.setCulling(this.triangleFaceToCull);
 
             c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
+            // c.setProgramConstantsFromVector(VC.color,[Math.random(),Math.random(),Math.random(),1.0],4);
             c.setProgramConstantsFromVector(VC.color,[1.0,1.0,1.0,1.0],4);
 
             return true;
@@ -112,8 +113,6 @@ module rf{
                 }
             `
             p = c.createProgram(vertexCode,fragmentCode,key);
-
-            this.program = p;
 
             return p;
 
