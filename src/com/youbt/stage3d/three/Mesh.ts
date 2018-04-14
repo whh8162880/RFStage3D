@@ -47,7 +47,7 @@ module rf{
                     c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
 
                     material.uploadContext(this);
-                    c.drawTriangles(index,index.numTriangles)
+                    c.drawTriangles(index,geometry.numTriangles)
                 }
             }
             super.render(camera,now,interval);

@@ -140,10 +140,10 @@ module rf {
         0, 0, 1, 0,
         0, 0, 0, 1]);
 
-    export let CALCULATION_MATRIX: Matrix3D = new Matrix3D();
+    export let TEMP_MATRIX: Matrix3D = new Matrix3D();
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
-    export let CALCULATION_VECTOR3D: Vector3D = new Vector3D();
-    export let CALCULATION_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
+    export let TEMP_VECTOR3D: Vector3D = new Vector3D();
+    export let TEMP_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
 
 
     /**

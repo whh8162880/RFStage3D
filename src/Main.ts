@@ -50,8 +50,8 @@ module rf{
             // scene.addChild(line);
 
             let mesh = new Mesh();
-            mesh.init(new PlanGeometry(mesh.variables).create(500,500),new PhongMaterial());
-            mesh.rotationX = -90;
+            mesh.init(new PlaneGeometry(mesh.variables).create(200,200),new PhongMaterial());
+            // mesh.rotationX = -90;
             scene.addChild(mesh);
 
 

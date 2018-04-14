@@ -743,7 +743,7 @@ module rf {
         /**
          * Uses the transformation matrix to transform a Vector3D object from one space coordinate to another.
          */
-        public transformVector(v: Point3DW) {
+        public transformVector(v: Point3DW,result?:Point3DW) {
             /*
                       [ x
             this  *     y
@@ -752,12 +752,31 @@ module rf {
             */
             const { x, y, z } = v;
             const rawData = this.rawData;
-            return new Vector3D(
-                x * rawData[0] + y * rawData[4] + z * rawData[8] + rawData[12],
-                x * rawData[1] + y * rawData[5] + z * rawData[9] + rawData[13],
-                x * rawData[2] + y * rawData[6] + z * rawData[10] + rawData[14],
-                x * rawData[3] + y * rawData[7] + z * rawData[11] + rawData[15]
-            );
+            if(undefined == result){
+                result = new Vector3D();
+            }
+
+            result.x = x * rawData[0] + y * rawData[4] + z * rawData[8] + rawData[12],
+            result.y = x * rawData[1] + y * rawData[5] + z * rawData[9] + rawData[13],
+            result.z = x * rawData[2] + y * rawData[6] + z * rawData[10] + rawData[14],
+            result.w = x * rawData[3] + y * rawData[7] + z * rawData[11] + rawData[15]
+
+            return result;
+        }
+
+        public transformRotation(v: Point3DW,result?:Point3DW) {
+            const { x, y, z } = v;
+            const rawData = this.rawData;
+            if(undefined == result){
+                result = new Vector3D();
+            }
+
+            result.x = x * rawData[0] + y * rawData[4] + z * rawData[8]
+            result.y = x * rawData[1] + y * rawData[5] + z * rawData[9]
+            result.z = x * rawData[2] + y * rawData[6] + z * rawData[10]
+            result.w = x * rawData[3] + y * rawData[7] + z * rawData[11]
+
+            return result;
         }
 
         /**
@@ -791,7 +810,7 @@ module rf {
                 v.x = vin[i];
                 v.y = vin[i + 1];
                 v.z = vin[i + 2];
-                v2 = this.transformVector(v);  //todo: simplify operation
+                this.transformVector(v,v2);  //todo: simplify operation
                 vout[i] = v2.x;
                 vout[i + 1] = v2.y;
                 vout[i + 2] = v2.z;

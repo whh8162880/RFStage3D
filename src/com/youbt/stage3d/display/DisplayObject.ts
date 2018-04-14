@@ -574,7 +574,7 @@ module rf {
 
         }
 
-        lookat(target:Vector3D, upAxis:Vector3D=null):void{
+        lookat(target:Vector3D, upAxis:Point3DW=null):void{
 			let xAxis = tempAxeX;
 			let yAxis = tempAxeY;
             let zAxis = tempAxeZ;
@@ -585,7 +585,8 @@ module rf {
                 upAxis = Vector3D.Y_AXIS;
             }
 			
-			upAxis = transform.transformVector(upAxis);
+            upAxis = transform.transformVector(upAxis,TEMP_VECTOR3D);
+            
 			
 			zAxis.x = target.x - _x;
 			zAxis.y = target.y - _y;

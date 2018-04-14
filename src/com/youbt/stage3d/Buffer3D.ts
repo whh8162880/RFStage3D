@@ -259,8 +259,6 @@ module rf {
         numIndices: number;
         data: Uint16Array;
         buffer: WebGLBuffer;
-        numTriangles:number
-
         public quadid:number = -1;
         constructor() {
             super();
@@ -328,7 +326,6 @@ module rf {
             }
 
             this.numIndices = data.length;
-            this.numTriangles = this.numIndices / 3;
             this.data = <Uint16Array>data;
         }
     }
