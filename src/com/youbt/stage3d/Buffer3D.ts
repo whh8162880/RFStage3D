@@ -1,5 +1,5 @@
 ///<reference path="../core/Config.ts"/>
-///<reference path="geo/Geometry.ts"/>
+///<reference path="three/Geometry.ts"/>
 module rf {
     export enum VA {
         pos = "pos",
@@ -18,7 +18,9 @@ module rf {
         invm ="invm",
         p = "p",
         mvp = "mvp",
-        ui = "ui"
+        ui = "ui",
+        lightDirection = "lightDirection",
+        color = "vc_color"
 
     }
 
@@ -254,10 +256,9 @@ module rf {
     }
 
     export class IndexBuffer3D extends Buffer3D {
-        public numIndices: number;
-        public data: Uint16Array;
-        public buffer: WebGLBuffer;
-
+        numIndices: number;
+        data: Uint16Array;
+        buffer: WebGLBuffer;
         public quadid:number = -1;
         constructor() {
             super();

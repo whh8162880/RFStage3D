@@ -73,8 +73,7 @@ namespace rf {
 		dc:number;
 
 		private _clearBit: number;
-		private _bendDisabled: boolean = true;
-		private _depthDisabled: boolean = true;
+		
 		constructor() {
 			this.bufferLink = new Link();
 			ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
@@ -85,7 +84,6 @@ namespace rf {
 			g.viewport(0, 0, width, height);
 			g.canvas.width = width;
 			g.canvas.height = height;
-			this._depthDisabled = enableDepthAndStencil;
 			//TODO: antiAlias , Stencil
 			if (enableDepthAndStencil) {
 				this._clearBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
@@ -96,6 +94,97 @@ namespace rf {
 				g.disable(g.DEPTH_TEST);
 				g.disable(g.STENCIL_TEST);
 			}
+		}
+
+		
+		public clear(red: number = 0.0,green: number = 0.0,blue: number = 0.0,alpha: number = 1.0,depth: number = 1.0,stencil: number /*uint*/ = 0,	mask: number /* uint */ = 0xffffffff): void {
+			let g = gl;
+			g.clearColor(red, green, blue, alpha);
+			g.clearDepth(depth); // TODO:dont need to call this every time
+			g.clearStencil(stencil); //stencil buffer
+			g.clear(this._clearBit);
+			this.triangles = 0;
+			this.dc = 0;
+		}
+
+		triangleFaceToCull:string;
+
+		public setCulling(triangleFaceToCull: string): void {
+			if(this.triangleFaceToCull == triangleFaceToCull){
+				return;
+			}
+
+			let g = gl
+			g.frontFace(g.CW);
+			switch (triangleFaceToCull) {
+				case Context3DTriangleFace.NONE:
+					g.disable(g.CULL_FACE);
+					break;
+				case Context3DTriangleFace.BACK:
+					g.enable(g.CULL_FACE);
+					g.cullFace(g.BACK);
+					break;
+				case Context3DTriangleFace.FRONT:
+					g.enable(g.CULL_FACE);
+					g.cullFace(g.FRONT);
+					break;
+				case Context3DTriangleFace.FRONT_AND_BACK:
+					g.enable(g.CULL_FACE);
+					g.cullFace(g.FRONT_AND_BACK);
+					break;
+			}
+		}
+
+		/**
+		 * 
+		 * @param depthMask 
+		 * @param passCompareMode 
+		 * 
+		 * 
+		 * @constant Context3DCompareMode.LESS=GL.LESS
+		 * @constant Context3DCompareMode.NEVER=GL.NEVER
+		 * @constant Context3DCompareMode.EQUAL=GL.EQUAL
+		 * @constant Context3DCompareMode.GREATER=GL.GREATER
+		 * @constant Context3DCompareMode.NOT_EQUAL=GL.NOTEQUAL
+		 * @constant Context3DCompareMode.ALWAYS=GL.ALWAYS
+		 * @constant Context3DCompareMode.LESS_EQUAL=GL.LEQUAL
+		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
+		 */
+		depthMask:boolean;
+		passCompareMode:number;
+		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
+
+			if(this.depthMask == depthMask && this.passCompareMode == passCompareMode){
+				return;
+			}
+
+			let g = gl;
+			g.enable(g.DEPTH_TEST);
+			g.depthMask(depthMask);
+			g.depthFunc(passCompareMode);
+		}
+
+
+		/**
+		  	Context3DBlendFactor.ONE = GL.ONE;
+			Context3DBlendFactor.ZERO = GL.ZERO;
+			Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
+			Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
+			Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
+			Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
+			Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
+			Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
+			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
+			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
+		 */
+		sourceFactor:number;
+		destinationFactor:number;
+		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
+			if(this.sourceFactor == sourceFactor && this.destinationFactor == destinationFactor){
+				return;
+			}
+			gl.enable(gl.BLEND); //stage3d cant disable blend?
+			gl.blendFunc(sourceFactor, destinationFactor);
 		}
 
 		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number = -1, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
@@ -300,84 +389,6 @@ namespace rf {
 			gl.useProgram(program.program);
 		}
 
-		public clear(red: number = 0.0,green: number = 0.0,blue: number = 0.0,alpha: number = 1.0,depth: number = 1.0,stencil: number /*uint*/ = 0,	mask: number /* uint */ = 0xffffffff): void {
-			let g = gl;
-			g.clearColor(red, green, blue, alpha);
-			g.clearDepth(depth); // TODO:dont need to call this every time
-			g.clearStencil(stencil); //stencil buffer
-			g.clear(this._clearBit);
-			this.triangles = 0;
-			this.dc = 0;
-		}
-
-		public setCulling(triangleFaceToCull: string): void {
-			gl.frontFace(gl.CW);
-			switch (triangleFaceToCull) {
-				case Context3DTriangleFace.NONE:
-					gl.disable(gl.CULL_FACE);
-					break;
-				case Context3DTriangleFace.BACK:
-					gl.enable(gl.CULL_FACE);
-					gl.cullFace(gl.BACK);
-					break;
-				case Context3DTriangleFace.FRONT:
-					gl.enable(gl.CULL_FACE);
-					gl.cullFace(gl.FRONT);
-					break;
-				case Context3DTriangleFace.FRONT_AND_BACK:
-					gl.enable(gl.CULL_FACE);
-					gl.cullFace(gl.FRONT_AND_BACK);
-					break;
-			}
-		}
-
-		/**
-		 * 
-		 * @param depthMask 
-		 * @param passCompareMode 
-		 * 
-		 * 
-		 * @constant Context3DCompareMode.LESS=GL.LESS
-		 * @constant Context3DCompareMode.NEVER=GL.NEVER
-		 * @constant Context3DCompareMode.EQUAL=GL.EQUAL
-		 * @constant Context3DCompareMode.GREATER=GL.GREATER
-		 * @constant Context3DCompareMode.NOT_EQUAL=GL.NOTEQUAL
-		 * @constant Context3DCompareMode.ALWAYS=GL.ALWAYS
-		 * @constant Context3DCompareMode.LESS_EQUAL=GL.LEQUAL
-		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
-		 */
-		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
-			let g = gl;
-			if (this._depthDisabled) {
-				g.enable(g.DEPTH_TEST);
-				this._depthDisabled = false;
-			}
-
-			g.depthMask(depthMask);
-			g.depthFunc(passCompareMode);
-		}
-
-
-		/**
-		  	Context3DBlendFactor.ONE = GL.ONE;
-			Context3DBlendFactor.ZERO = GL.ZERO;
-			Context3DBlendFactor.SOURCE_COLOR = GL.SRC_COLOR;
-			Context3DBlendFactor.DESTINATION_COLOR = GL.DST_COLOR;
-			Context3DBlendFactor.SOURCE_ALPHA = GL.SRC_ALPHA;
-			Context3DBlendFactor.DESTINATION_ALPHA = GL.DST_ALPHA;
-			Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR = GL.ONE_MINUS_SRC_COLOR;
-			Context3DBlendFactor.ONE_MINUS_DESTINATION_COLOR = GL.ONE_MINUS_DST_COLOR;
-			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
-			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
-		 */
-
-		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
-			if (this._bendDisabled) {
-				gl.enable(gl.BLEND); //stage3d cant disable blend?
-				this._bendDisabled = false;
-			}
-			gl.blendFunc(sourceFactor, destinationFactor);
-		}
 
 		public drawTriangles(indexBuffer: IndexBuffer3D, numTriangles:number,firstIndex: number = 0): void {
 			if (false == indexBuffer.readly) {

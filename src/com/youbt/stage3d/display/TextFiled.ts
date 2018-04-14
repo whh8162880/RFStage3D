@@ -3,10 +3,18 @@ module rf {
 
     export let emote_images: { [key: string]: Image } = {};
 
+    const enum TextFormatAlign{
+        LEFT = "left",
+        RIGHT = "right",
+        CENTER = "center"
+    };
+
     export class TextFormat {
         family: string = "微软雅黑";
         oy: number = 0.25;
         size: number = 15;
+        //"align":"left";
+        align:string = "left";
         // "bold " : "normal "
         bold: string = "normal";
         // "italic " : "normal "
@@ -19,6 +27,7 @@ module rf {
         gradient: {color: number, percent?: number}[];
 
         font: string;
+
         init(): TextFormat {
             this.oy = 0.25 * (this.size + 1);
             this.font = `${this.bold} ${this.italic} ${this.size}px ${this.family}`
@@ -43,7 +52,7 @@ module rf {
         }
         draw(context: CanvasRenderingContext2D, text: string, s: Size): void {
             const { x, y, w, h } = s;
-            const {oy, family, size, bold, italic, stroke, shadow, gradient } = this;
+            const {oy, family, size, bold, italic, stroke, shadow, gradient , align} = this;
             //设置字体
             context.font = this.font;
 
@@ -102,6 +111,7 @@ module rf {
             format.gradient = this.gradient;
             format.font = this.font;
             format.oy = this.oy;
+            format.align = this.align;
             return format;
         }
     }
@@ -133,6 +143,11 @@ module rf {
             this.format = format;
         }
 
+
+        //保存外部设置的宽高 用于layout
+        private _ow:number = 0;
+        private _oh:number = 0;
+
         private lines: Recyclable<Line>[] = [];
 
         private textLines: Recyclable<TextLine>[] = [];
@@ -161,6 +176,8 @@ module rf {
                 element.str = value;
             }
 
+            this.w = 0;
+            this.h = 0;
 
             let lines = this.tranfromHtmlElement2CharDefine(element, this.wordWrap ? this.w : Infinity);
             let len = lines.length;
@@ -186,46 +203,71 @@ module rf {
             this.layout();
         }
 
+        setSize(width:number, height:number):void
+        {
+            this._ow = width;
+            this._oh = height;
+            super.setSize(width, height);
+        }
+
         cleanAll():void{
             super.cleanAll();
         }
 
         layout(): void {
-            // 			if(transfromEnabled){
-            // 				_height = 0;
-            // 				_width = 0;
-            // 			}
-            // 			var line:Text3DLine;
-            // 			var lx:int = 1;
-            // 			if(align){
-            // 				if(align == TextFormatAlign.CENTER){
-            // 					for each(line in lines){
-            // 						line.x = _width - line.width >> 1
-            // 						lx = line.x;
-            // 					}
-            // 				}else if(align == TextFormatAlign.RIGHT){
-            // 					for each(line in lines){
-            // 						line.x = _width - line.width;
-            // 					}
-            // 				}
-            // 			}
+            const{format,_ow}=this;
 
-            // 			transfromflag = true;
+            if(format.align == TextFormatAlign.LEFT)
+            {
+                return;
+            }
 
-            // 			if(u){
-            // //				-偏移量
-            // 				var _offy:int = txtSet ? currentHtml.text2dDefine.offsety : 0;
+            this.updateHitArea();
+            
+            const{w,h,childrens}=this;
 
-            // 				graphics.clear();
-            // 				_graphics.lineStyle(1,_textColor);
-            // 				_graphics.moveTo(lx,height+reduceLineHeight - _offy);
-            // 				_graphics.lineTo(lx + textWidth + reduceLineWidth,height+reduceLineHeight - _offy);
-            // 				_graphics.endFill();
-            // 			}
-            // 			else
-            // 			{
-            // 				graphics.clear();
-            // 			}
+            //根据align属性进行重新布局
+            // var line:Text3DLine;
+            // var lx:int = 1;
+
+            if(_ow == 0)
+            {
+                return;
+            }
+            let offsetx:number;
+            if(format.align == TextFormatAlign.CENTER){
+                offsetx = _ow - w >> 1;
+            }else if(format.align == TextFormatAlign.RIGHT){
+                offsetx = _ow - w;
+            }
+
+            let len = childrens.length;
+
+            //fisrt 取出完整的width
+            //second 根据align获取偏移offsetx
+            let dx = offsetx;
+            for(let i = 0; i < len; i++)
+            {
+                let display = childrens[i];
+                display.x = dx;
+                dx += display.w;
+            }
+               
+
+//             if(u){
+// //				-偏移量
+//                 var _offy:int = txtSet ? currentHtml.text2dDefine.offsety : 0;
+
+//                 graphics.clear();
+//                 _graphics.lineStyle(1,_textColor);
+//                 _graphics.moveTo(lx,height+reduceLineHeight - _offy);
+//                 _graphics.lineTo(lx + textWidth + reduceLineWidth,height+reduceLineHeight - _offy);
+//                 _graphics.endFill();
+//             }
+//             else
+//             {
+//                 graphics.clear();
+//             }
         }
 
 
@@ -895,6 +937,7 @@ module rf {
             let len = chars.length;
             let g = this.graphics;
             g.clear();
+
             for (let i = 0; i < len; i++) {
                 let char = chars[i];
                 let ele = char.element;

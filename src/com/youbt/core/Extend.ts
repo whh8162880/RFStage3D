@@ -162,6 +162,11 @@ Object.defineProperties(Object.prototype, makeDefDescriptors({
     }
 }));
 
+// interface Uint16Array{
+//     addQuadIndex(position:number):void
+//     appendGeo(value:number[]|Uint16Array,)
+// }
+
 
 interface Float32Array{
     update(data32PerVertex: number, offset: number, v: number): void;

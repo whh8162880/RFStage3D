@@ -40,7 +40,7 @@ module rf{
 			
 			this.currentClip = clip;
 			
-			var elements:any[] = this.dsymbol.displayFrames[clip];
+			let elements:any[] = this.dsymbol.displayFrames[clip];
 			if(undefined == elements)
 			{
 				this.graphics.clear();
@@ -49,9 +49,9 @@ module rf{
 			}
 			this.graphics.clear();
 			
-			var sp:Sprite;
+			let sp:Sprite;
 			
-			var tempMatrix:Matrix = new Matrix();
+			let tempMatrix:Matrix = new Matrix();
 
 			for(let ele of elements)
 			{
@@ -90,12 +90,17 @@ module rf{
 					}
 					this.addChild(sp);
 				}else if(ele.type == DisplayFrameElement.TEXT){
-					var textElement:DisplayTextElement;
+					let textElement:DisplayTextElement;
 					textElement = ele as DisplayTextElement;
 					if(!this._skin.hasOwnProperty(ele.name))
 					{
-						sp = new TextField();
-						(sp as TextField).init(this.source);
+						sp = recyclable(TextField);
+						let e_format:object = textElement.format;
+						let format:TextFormat = recyclable(TextFormat).init();
+						format.size = e_format["size"] == undefined ? 12 : e_format["size"];
+						format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
+
+						(sp as TextField).init(this.source, format);
 						(sp as TextField).color = textElement.color;
 						if(textElement.input){
 							// (sp as TextField).type = TextFieldType.INPUT;
@@ -105,7 +110,7 @@ module rf{
 							// (sp as TextField).type = TextFieldType.DYNAMIC;
 						}
 						
-						// sp.setSize(textElement.width+4,textElement.height+4);
+						sp.setSize(textElement.width+4,textElement.height+4);
 						(sp as TextField).text = textElement.text;
 						sp.x = ele.x-2;
 						sp.y = ele.y-2;
@@ -136,7 +141,7 @@ module rf{
 		// public var scaleGeomrtry:ScaleNGeomrtry;
 		
 		renderFrameElement(element:DisplayFrameElement,clean:Boolean = false):void{
-			var vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName);
+			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName);
 			
 			if(vo == undefined)
 			{
@@ -158,7 +163,6 @@ module rf{
 				// scaleGeomrtry.set9Size(_width,_height);
 			}else{
 				this.graphics.drawBitmap(0,0,vo);//,element.matrix2d
-				console.log(vo.name + ",x:" +vo.x+",y:"+vo.y+",ul:"+vo.ul+",ur:"+vo.ur+",vt:"+vo.vt+",vb:"+vo.vb+",w:"+vo.w+",h:"+vo.h);
 			}
 			
 			if(clean){

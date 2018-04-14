@@ -10,7 +10,7 @@ module rf {
 
 
 	export enum EventT {
-		ENTER_FRAME,
+		ENTER_FRAME=1,
 		RESIZE,
 		COMPLETE,
 		FAIL,
@@ -132,6 +132,7 @@ module rf {
 				signal.remove(listener);
 				if (0 >= signal.length) {
 					signal.recycle();
+					this.mEventListeners[type] = undefined;
 				}
 			}
 		}
@@ -144,6 +145,7 @@ module rf {
 				signal = this.mEventListeners[type];
 				if (undefined != signal) {
 					signal.recycle();
+					this.mEventListeners[type] = undefined;
 				}
 				delete this.mEventListeners[type];
 			} else if (this.mEventListeners) {
@@ -151,6 +153,7 @@ module rf {
 					signal = this.mEventListeners[type];
 					if (undefined != signal) {
 						signal.recycle();
+						this.mEventListeners[type] = undefined;
 					}
 				}
 				this.mEventListeners = undefined
@@ -162,7 +165,7 @@ module rf {
 		 *  travel up along the line of parents, until it either hits the root object or someone
 		 *  stops its propagation manually. */
 		public dispatchEvent(event: EventX): boolean {
-			if (undefined == this.mEventListeners || false == (event.type in this.mEventListeners)) {
+			if (undefined == this.mEventListeners || undefined == this.mEventListeners[event.type]) {
 				return false;
 			}
 
@@ -187,7 +190,7 @@ module rf {
 		}
 
 		public simpleDispatch(type: string|number, data: any = undefined, bubbles: boolean = false): boolean {
-			if (!bubbles && (undefined == this.mEventListeners || false == (type in this.mEventListeners))) {
+			if (!bubbles && (undefined == this.mEventListeners || undefined == this.mEventListeners[type])) {
 				return false;
 			}
 

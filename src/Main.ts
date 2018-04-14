@@ -36,20 +36,33 @@ module rf{
 
             let t = 2;
             let tr = new Trident(200,t);
-            threeContainer.addChild(tr);
+            scene.addChild(tr);
 
             // line.rotationX = 45;
-            let line = new Line3D();
-           
-            line.clear();
+            // let line = new Line3D();
+            // line.clear();
+            // line.moveTo(-500,0,500,t);
+            // line.lineTo(500,0,500,t);
+            // line.lineTo(500,0,-500,t);
+            // line.lineTo(-500,0,-500,t);
+            // line.lineTo(-500,0,500,t);
+            // line.end();
+            // scene.addChild(line);
 
-            line.moveTo(-500,0,500,t);
-            line.lineTo(500,0,500,t);
-            line.lineTo(500,0,-500,t);
-            line.lineTo(-500,0,-500,t);
-            line.lineTo(-500,0,500,t);
-            line.end();
-            threeContainer.addChild(line);
+            let mesh = new Mesh();
+            let m = new PhongMaterial();
+            m.triangleFaceToCull = Context3DTriangleFace.NONE;
+            mesh.init(new BoxGeometry(mesh.variables).create(200,200,200),m);
+            // mesh.rotationX = -90;
+            scene.addChild(mesh);
+
+
+            // let m  = new Matrix3D();
+            // m.appendRotation(45,Vector3D.Z_AXIS);
+            // m.appendTranslation(100,100,100);
+            // m.invert();
+            // m.invert();
+
             
             
 

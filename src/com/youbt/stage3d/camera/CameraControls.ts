@@ -75,7 +75,7 @@ module rf{
             let ry = -dx*speed + object.rotationY;
             
             if(target){
-				var transform:Matrix3D = CALCULATION_MATRIX;
+				var transform:Matrix3D = TEMP_MATRIX;
 				transform.identity();
 				transform.appendTranslation(0, 0, -distance);
 				transform.appendRotation(rx, Vector3D.X_AXIS);
