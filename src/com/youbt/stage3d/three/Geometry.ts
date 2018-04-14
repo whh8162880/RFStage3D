@@ -226,7 +226,17 @@ module rf {
 
 
         uploadContext(camera:Camera,mesh:Mesh, program:Program3D, now: number, interval: number){
+
+            let c = context3D;
+
             this.vertex.uploadContext(program);
+
+            const{worldTranform,sceneTransform,invSceneTransform}=mesh;
+
+            worldTranform.copyFrom(sceneTransform);
+            worldTranform.append(camera.worldTranform);
+            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+            c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
         }
         
     }
