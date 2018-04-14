@@ -59,7 +59,7 @@ module rf{
             m.triangleFaceToCull = Context3DTriangleFace.BACK;
             let geo = new BoxGeometry(variables).create(w,w,w)
 
-            let qc = 1;
+            let qc = 3;
             let count = qc*qc;
             let tx = -(qc-1)/2 * w_e;
             let ty = -(qc-1)/2 * w_e;
