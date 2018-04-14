@@ -1,4 +1,5 @@
 /// <reference path="./com/youbt/rfreference.ts" />
+/// <reference path="./AppBase.ts" />
 module rf{
     export let sp;
 
@@ -35,7 +36,7 @@ module rf{
 
 
             let t = 2;
-            let tr = new Trident(200,t);
+            let tr = new Trident(500,t);
             scene.addChild(tr);
 
             // line.rotationX = 45;
@@ -49,12 +50,29 @@ module rf{
             // line.end();
             // scene.addChild(line);
 
-            let mesh = new Mesh();
+            let variables = vertex_mesh_variable;
+            
             let m = new PhongMaterial();
             m.triangleFaceToCull = Context3DTriangleFace.NONE;
-            mesh.init(new BoxGeometry(mesh.variables).create(200,200,200),m);
+            let geo = new BoxGeometry(variables).create(200,200,200)
+
+            let count = 100;
+            let tx = -5 * 220;
+            let ty = -5 * 220;
+
+            for(let i=0;i<100;i++){
+                let c =Math.floor(i / 10);
+                let p = i % 10;
+                let mesh = new Mesh(variables);
+                mesh.init(geo,m);
+                mesh.setPos(tx + p * 220,ty + c * 220,0);
+                scene.addChild(mesh);
+            }
+
+            
+            
             // mesh.rotationX = -90;
-            scene.addChild(mesh);
+            
 
 
             // let m  = new Matrix3D();

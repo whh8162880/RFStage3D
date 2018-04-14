@@ -1,5 +1,6 @@
 ///<reference path="./display/Sprite.ts" />
 ///<reference path="./Context3D.ts" />
+///<reference path="./three/Light.ts" />
 module rf{  
 
     export class SceneObject extends RenderBase{
@@ -7,7 +8,7 @@ module rf{
 
         addChild(child:DisplayObject){
             super.addChild(child);
-            if(child instanceof Mesh){
+            if(child instanceof SceneObject){
                 child.scene = this.scene;
             }
         }
@@ -15,7 +16,7 @@ module rf{
 
         addChildAt(child:DisplayObject,index:number){
             super.addChildAt(child,index);
-            if(child instanceof Mesh){
+            if(child instanceof SceneObject){
                 child.scene = this.scene;
             }
         }
@@ -25,8 +26,8 @@ module rf{
 				return;
             }
             super.removeChild(child);
-            if(child instanceof Mesh){
-                child.scene = null;
+            if(child instanceof SceneObject){
+                child.scene = undefined;
             }
 		}
 
@@ -38,8 +39,8 @@ module rf{
                 let child = childrens[i];
                 child.stage = undefined;
                 child.parent = undefined;
-                if(child instanceof Mesh){
-                    child.scene = null;
+                if(child instanceof SceneObject){
+                    child.scene = undefined;
                 }
 				child.removeFromStage();
             }
@@ -53,8 +54,8 @@ module rf{
             for(let i=0;i<len;i++){
                 let child = childrens[i];
                 child.stage = undefined
-                if(child instanceof Mesh){
-                    child.scene = null;
+                if(child instanceof SceneObject){
+                    child.scene = undefined;
                 }
 				child.removeFromStage();
             }
@@ -67,7 +68,7 @@ module rf{
             for(let i=0;i<len;i++){
                 let child = childrens[i];
                 child.stage = stage;
-                if(child instanceof Mesh){
+                if(child instanceof SceneObject){
                     child.scene = scene;
                 }
 				child.addToStage();
