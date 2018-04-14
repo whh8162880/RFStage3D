@@ -156,21 +156,16 @@ module rf {
     }
 
 
-    export function geometry_point(position:number,variables:{ [key: string]: IVariable },x:number,y:number,z:number,nx:number,ny:number,nz:number,u:number,v:number):void{
-
-    }
-   
-
     export function geometry_plane(width:number,height:number,position:number,variables:{ [key: string]: IVariable },matrix3D?:Matrix3D):void{
 
         let width_half = width * 0.5;
         let height_half = height * 0.5;
 
         let points = [
-            -width_half,-height_half,0,
-            width_half,-height_half,0,
-            width_half,height_half,0,
-            -width_half,height_half,0
+            width_half,height_half,0,0,0,
+            -width_half,height_half,0,1,0,
+            -width_half,-height_half,0,1,1,
+            width_half,-height_half,0,0,1
         ];
         let v:Vector3D = TEMP_VECTOR3D;
 
@@ -184,27 +179,33 @@ module rf {
         let uv = variable ? variable.size * 4 : -1;
 
 
-        for(let i=0;i<12;i+=3){
-            v.x = points[i];
-            v.y = points[i+1];
-            v.z = points[i+2];
+        for(let i=0;i<4;i++){
+            let p = i * 5;
 
-            if(undefined != matrix3D){
-                matrix3D.transformVector(v,v);
+            if(-1 != pos){
+                v.x = points[p];
+                v.y = points[p+1];
+                v.z = points[p+2];
+                if(undefined != matrix3D){
+                    matrix3D.transformVector(v,v);
+                }
+                empty_float32_pos.wPoint3(position * pos + (i * 3) , v.x,v.y,v.z);
             }
-            empty_float32_pos.wPoint3(position * pos + i , v.x,v.y,v.z);
 
-            v.x = 0;
-            v.y = 0;
-            v.z = 1;
-
-            if(undefined != matrix3D){
-                matrix3D.transformRotation(v,v);
+            if(-1 != normal){
+                v.x = 0;
+                v.y = 0;
+                v.z = 1;
+    
+                if(undefined != matrix3D){
+                    matrix3D.transformRotation(v,v);
+                }
+                empty_float32_normal.wPoint3(position * normal +  (i * 3) , v.x,v.y,v.z);
             }
-            empty_float32_normal.wPoint3(position * normal + i , v.x,v.y,v.z);
 
-            empty_float32_uv.wPoint2(position * uv + i , (v.x+width_half) / width, (v.y+height_half) / height);
-            
+            if(-1 != uv){
+                empty_float32_uv.wPoint2(position * uv + (i * 2) , points[p+3], points[p+4]);
+            }
            
         }
     }

@@ -20,7 +20,8 @@ module rf {
         mvp = "mvp",
         ui = "ui",
         lightDirection = "lightDirection",
-        color = "vc_color"
+        vc_diff = "vc_diff",
+        vc_emissive = "vc_emissive"
 
     }
 
