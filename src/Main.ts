@@ -52,21 +52,21 @@ module rf{
 
             let variables = vertex_mesh_variable;
 
-            let w = 50;
+            let w = 200;
             let w_e = w * 1.1
             
             let m = new PhongMaterial();
             m.triangleFaceToCull = Context3DTriangleFace.BACK;
             let geo = new BoxGeometry(variables).create(w,w,w)
 
-            let count = 30*30;
-            let temp = Math.floor(Math.sqrt(count));
-            let tx = -temp/2 * w_e;
-            let ty = -temp/2 * w_e;
+            let qc = 1;
+            let count = qc*qc;
+            let tx = -(qc-1)/2 * w_e;
+            let ty = -(qc-1)/2 * w_e;
 
             for(let i=0;i<count;i++){
-                let c =Math.floor(i / temp);
-                let p = i % temp;
+                let c =Math.floor(i / qc);
+                let p = i % qc;
                 let mesh = new Mesh(variables);
                 mesh.init(geo,m);
                 mesh.setPos(tx + p * w_e,ty + c * w_e,0);
