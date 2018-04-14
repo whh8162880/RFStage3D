@@ -35,7 +35,7 @@ module rf {
         "data32PerVertex":{size:12,offset:0}
     }
 
-    export const EMPTY_MAX_NUMVERTICES = 2048;
+    export const EMPTY_MAX_NUMVERTICES = Math.pow(2,13);
     export let empty_float32_pos = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
     export let empty_float32_normal = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
     export let empty_float32_tangent = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
@@ -43,7 +43,7 @@ module rf {
     export let empty_float32_color = new Float32Array(4* EMPTY_MAX_NUMVERTICES);
 
     //2000面应该很多了吧
-    export let empty_uint16_indexs = new Uint16Array(6000);
+    export let empty_uint16_indexs = new Uint16Array(3*EMPTY_MAX_NUMVERTICES);
 
     export let empty_float32_object:{ [key: string]: Float32Array } = {
         "pos":empty_float32_pos,
@@ -391,6 +391,62 @@ module rf {
             }
 
 
+            let variables = this.variables;
+            let c = context3D;
+            let arr = createGeometry(empty_float32_object,variables,numVertices);
+            this.vertex = c.createVertexBuffer(new VertexInfo(arr,this.data32PerVertex,variables));
+            this.index = c.createIndexBuffer(empty_uint16_indexs.slice(0,position));
+
+            this.numVertices = numVertices;
+            this.numTriangles =  position / 3;
+
+            return this;
+        }
+    }
+
+    export class TorusGeomerty extends GeometryBase{
+        
+        create(row:number, column:number, irad:number, orad:number){
+            let numVertices = 0;
+            for(var i = 0; i <= row; i++){
+                var r = Math.PI * 2 / row * i;
+                var rr = Math.cos(r);
+                var ry = Math.sin(r);
+                for(var ii = 0; ii <= column; ii++){
+                    var tr = Math.PI * 2 / column * ii;
+                    var tx = (rr * irad + orad) * Math.cos(tr);
+                    var ty = ry * irad;
+                    var tz = (rr * irad + orad) * Math.sin(tr);
+                    var rx = rr * Math.cos(tr);
+                    var rz = rr * Math.sin(tr);
+                    // if(color){
+                    //     var tc = color;
+                    // }else{
+                    //     tc = hsva(360 / column * ii, 1, 1, 1);
+                    // }
+                    var rs = 1 / column * ii;
+                    var rt = 1 / row * i + 0.5;
+                    if(rt > 1.0){rt -= 1.0;}
+                    rt = 1.0 - rt;
+
+                    empty_float32_pos.wPoint3(numVertices * 3,tx,ty,tz);
+                    empty_float32_normal.wPoint3(numVertices * 3,rx,ry,rz);
+                    empty_float32_uv.wPoint2(numVertices * 2,rs, rt);
+                    // empty_float32_color.wPoint4(numVertices * 4 , tc[0], tc[1], tc[2], tc[3]);
+                    numVertices ++;
+                }
+            }
+            
+            let position = 0;
+            for(i = 0; i < row; i++){
+                for(ii = 0; ii < column; ii++){
+                    r = (column + 1) * i + ii;
+                    empty_uint16_indexs.set([r, r + column + 1, r + 1,r + column + 1, r + column + 2, r + 1],position);
+                    position += 6;
+                }
+            }
+            
+            
             let variables = this.variables;
             let c = context3D;
             let arr = createGeometry(empty_float32_object,variables,numVertices);

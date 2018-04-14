@@ -34,9 +34,10 @@ module rf{
             camera.lookat(new Vector3D(0,0,0));
             new TrackballControls(camera);
 
+            let w = 100;
 
             let t = 2;
-            let tr = new Trident(500,t);
+            let tr = new Trident(w*2,t);
             scene.addChild(tr);
 
             // line.rotationX = 45;
@@ -52,29 +53,74 @@ module rf{
 
             let variables = vertex_mesh_variable;
 
-            let w = 200;
+           
             let w_e = w * 1.1
             
             let m = new PhongMaterial();
             m.triangleFaceToCull = Context3DTriangleFace.BACK;
             // let geo = new BoxGeometry(variables).create(w,w,w)
 
-            let r = 30;
-            let geo = new SphereGeometry(variables).create(r,r,w * .5);
+            let r = 40;
 
-            let qc = 10;
-            let count = qc*qc;
-            let tx = -(qc-1)/2 * w_e;
-            let ty = -(qc-1)/2 * w_e;
 
-            for(let i=0;i<count;i++){
-                let c =Math.floor(i / qc);
-                let p = i % qc;
-                let mesh = new Mesh(variables);
-                mesh.init(geo,m);
-                mesh.setPos(tx + p * w_e,ty + c * w_e,0);
-                scene.addChild(mesh);
-            }
+            
+            let plane = new PlaneGeometry(variables).create(w*2,w);
+            let mesh = new Mesh(variables);
+            mesh.init(plane,m);
+            mesh.setPos(-w-80,0,0);
+            scene.addChild(mesh);
+
+            plane = new PlaneGeometry(variables).create(w*2,w);
+            mesh = new Mesh(variables);
+            mesh.init(plane,m);
+            mesh.setPos(w+80,0,0);
+            scene.addChild(mesh);
+
+            let box = new BoxGeometry(variables).create(w,w,w);
+            mesh = new Mesh(variables);
+            mesh.init(box,m);
+            mesh.setPos(0,-110,0);
+            scene.addChild(mesh);
+
+            let sphere = new SphereGeometry(variables).create(r,r,w*.5);
+            mesh = new Mesh(variables);
+            mesh.init(sphere,m);
+            mesh.setPos(0,0,0);
+            scene.addChild(mesh);
+
+
+            let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
+            mesh = new Mesh(variables);
+            mesh.init(torus,m);
+            mesh.setPos(0,70,0);
+            scene.addChild(mesh);
+
+
+
+            
+
+            
+
+            
+
+            // let geo = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
+            // let geo = new SphereGeometry(variables).create(r,r,w*.5);
+            // let geo = new BoxGeometry(variables).create(w,w,w);
+            // let geo = new PlaneGeometry(variables).create(w,w);
+
+            // let qc = 10;
+            // let count = qc*qc;
+            // let tx = -(qc-1)/2 * w_e;
+            // let ty = -(qc-1)/2 * w_e;
+
+            // for(let i=0;i<count;i++){
+            //     let c =Math.floor(i / qc);
+            //     let p = i % qc;
+            //     let mesh = new Mesh(variables);
+            //     mesh.init(geo,m);
+            //     mesh.setPos(tx + p * w_e,ty + c * w_e,0);
+            //     scene.addChild(mesh);
+            // }
 
             
             
