@@ -1,7 +1,9 @@
 module rf{
     export class PanelUtils{
-        ui:Symbol;
+        skin:Symbol;
         setting:object;
+        btn_random:Button;
+
         constructor(){
             this.loadp3d("../assets/create.p3d");
         }
@@ -35,11 +37,14 @@ module rf{
             {
                 return;
             }
+
+            const{setting} = this;
+
             let res:ResItem = e.data;
             let image:HTMLImageElement = res.data;
 
-            let bw = this.setting['txtwidth'] + image.width;
-            let bh = this.setting['txtheight'] + image.height;
+            let bw = setting['txtwidth'] + image.width;
+            let bh = setting['txtheight'] + image.height;
 
             let bmd = new BitmapData(bw, bh, true);
             let source = new BitmapSource().create("ui.asyncpanel.create",bmd,true);
@@ -47,25 +52,34 @@ module rf{
             let vo = source.setSourceVO("panelimg",image.width,image.height,1);
             source.bmd.context.drawImage(image,vo.x,vo.y);
 
-            let framekeys:string[] = Object.keys(this.setting['frames']);
+            let framekeys:string[] = Object.keys(setting['frames']);
             let areavo:BitmapSourceArea = source.areas[1];
             let bitvo:BitmapSourceVO;
             let frameObj:object;
             for(let key of framekeys){
-                frameObj = this.setting['frames'][key];
+                frameObj = setting['frames'][key];
                 bitvo = areavo.createFrameArea(key, {x:frameObj['ox'], y:frameObj['oy'], w:frameObj['width'], h:frameObj['height'], ix:frameObj['ix'], iy:frameObj['iy']});
                 bitvo.refreshUV(source.width, source.height);
             }
 
 
             let clsname = "ui.asyncpanel.create";
-            let sybs = this.setting['symbols'];
+            let sybs = setting['symbols'];
             let cs = sybs[clsname];
             
-            this.ui = new Symbol(source);
-            this.ui.setSymbol(cs);
-            this.ui.renderer = new BatchRenderer(this.ui);
-            popContainer.addChild(this.ui);
+            this.skin = new Symbol(source);
+            this.skin.setSymbol(cs);
+            this.skin.renderer = new BatchRenderer(this.skin);
+            popContainer.addChild(this.skin);
+
+            this.bindComponents();
+        }
+
+        protected bindComponents():void
+        {
+            const{skin} = this;
+            this.btn_random = new Button(skin["btn_create"]);
+            this.btn_random.label = "sssss";
         }
     }
 }
