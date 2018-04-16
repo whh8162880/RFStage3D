@@ -1,12 +1,13 @@
 /// <reference path="./com/youbt/rfreference.ts" />
 /// <reference path="./com/youbt/stage3d/Stage3D.ts" />
+///<reference path="./com/youbt/stage3d/three/Mesh.ts" />
 module rf {
     export class AppBase implements ITickable,IResizeable{
         constructor() {
             this.createSource();
             Engine.start();
             ROOT = singleton(Stage3D);
-            Engine.addResize(this);
+            tween = singleton(TweenManager);
         }
 
 
@@ -22,9 +23,12 @@ module rf {
                 return;
             }
 
-            
+            this.initContainer();
 
+            Engine.addResize(this);
             Engine.addTick(this);
+
+            
         }
 
         createSource():void{
@@ -51,13 +55,47 @@ module rf {
         }
 
 
+        initContainer(){
+            let g = gl;
+            let container = new Scene(vertex_mesh_variable);
+            let material = new Material();
+            material.depthMask = true;
+            material.passCompareMode = g.LEQUAL;
+            material.sourceFactor = g.SRC_ALPHA
+            material.destinationFactor = g.ONE_MINUS_SRC_ALPHA;
+            material.triangleFaceToCull = Context3DTriangleFace.NONE;
+            container.material = material;
+            container.camera = ROOT.camera3D;
+            ROOT.addChild(container);
+            scene = container;
+
+            let uiContainer = new UIContainer(undefined,vertex_ui_variable);
+            uiContainer.renderer = new BatchRenderer(uiContainer);
+            material = new Material();
+            material.depthMask = false;
+            material.passCompareMode = g.ALWAYS;
+            material.sourceFactor = g.SRC_ALPHA;
+            material.destinationFactor = g.ONE_MINUS_SRC_ALPHA;
+            material.triangleFaceToCull = Context3DTriangleFace.NONE;
+            uiContainer.material = material;
+            ROOT.addChild(uiContainer);
+            popContainer.mouseEnabled = false;
+            tipContainer.mouseEnabled = false;
+            uiContainer.addChild(popContainer);
+            uiContainer.addChild(tipContainer);
+        }
+
+
         public update(now: number, interval: number): void {
             //todo
             ROOT.update(now,interval);
+            tween.tick(interval);
         }
 
         public resize(width:number,height:number):void{
+            context3D.configureBackBuffer(stageWidth,stageHeight,0);
             ROOT.resize(width,height);
+            
         }
 
     }

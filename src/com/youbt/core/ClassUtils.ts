@@ -1,10 +1,9 @@
 ///<reference path="./CONFIG.ts" />
 module rf {
 
-    export interface IDisposable
-	{
-		dispose():void;
-	}
+    export interface IDisposable {
+        dispose(): void;
+    }
 
     /**
      * 创建器
@@ -30,7 +29,7 @@ module rf {
          */
         public constructor(creator: Creator<T>, props?: Partial<T>) {
             this._creator = creator;
-            if(props != undefined) this._props = props;
+            if (props != undefined) this._props = props;
         }
 
         /**
@@ -59,7 +58,7 @@ module rf {
         /**
          * 回收时触发
          */
-        onRecycle?:  { () };
+        onRecycle?: { () };
         /**
          * 启用时触发
          */
@@ -148,7 +147,10 @@ module rf {
      */
     export function recyclable<T>(clazz: { (): T & { _pool?: RecyclablePool<T> } }, addInstanceRecycle?: boolean): Recyclable<T>
     export function recyclable<T>(clazz: Creator<T> & { _pool?: RecyclablePool<T> }, addInstanceRecycle?: boolean): Recyclable<T> {
-        let pool = clazz._pool;
+        let pool: RecyclablePool<T>;
+        if (clazz.hasOwnProperty("_pool")) {
+            pool = clazz._pool;
+        }
         if (!pool) {
             if (addInstanceRecycle) {
                 pool = new RecyclablePool(function () {
@@ -179,7 +181,10 @@ module rf {
      * @param clazz 要做单例的类型
      */
     export function singleton<T>(clazz: { new(): T; _instance?: T }): T {
-        let instance = clazz._instance;
+        let instance: T;
+        if (clazz.hasOwnProperty("_instance")) {
+            instance = clazz._instance;
+        }
         if (!instance) {
             instance = new clazz;
             Object.defineProperty(clazz, "_instance", {

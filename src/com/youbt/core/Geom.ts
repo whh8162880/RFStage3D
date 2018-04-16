@@ -53,18 +53,25 @@ module rf {
     }
 
 
+    export let rgb_color_temp:IColor = {r:1,g:1,b:1,a:1}
+
+
     export function hexToCSS(d: number,a:number = 1): string {
-        var r: number = (d & 0x00ff0000) >>> 16;
-        var g: number = (d & 0x0000ff00) >>> 8;
+        var r: number = ((d & 0x00ff0000) >>> 16) & 0xFF;
+        var g: number = ((d & 0x0000ff00) >>> 8) & 0xFF;
         var b: number = d & 0x000000ff;
         return 'rgba(' + r + ',' + g + ',' + b + ',' + a + ')'; //"rgba(0, 0, 200, 0.5)";
     }
 
 
-    export function toRGB(color:number,out:IColor):void{
+    export function toRGB(color:number,out?:IColor):IColor{
+        if(undefined == out){
+            out = rgb_color_temp
+        }
         out.r = ((color & 0x00ff0000) >>> 16) / 0xFF;
         out.g = ((color & 0x0000ff00) >>> 8) / 0xFF;
         out.b = (color & 0x000000ff) / 0xFF;
+        return out
     }
 
     export function toCSS(color:IColor):string{
@@ -133,10 +140,30 @@ module rf {
         0, 0, 1, 0,
         0, 0, 0, 1]);
 
-    export let CALCULATION_MATRIX: Matrix3D = new Matrix3D();
+    export let TEMP_MATRIX: Matrix3D = new Matrix3D();
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
-    export let CALCULATION_VECTOR3D: Vector3D = new Vector3D();
-    export let CALCULATION_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
+    export let TEMP_VECTOR3D: Vector3D = new Vector3D();
+    export let TEMP_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
+
+
+    export class Color{
+        r:number;
+        g:number;
+        b:number;
+        a:number = 1.0;
+        private _hex:number;
+        constructor(hex:number = 0xFFFFFF){
+            this.hex = hex;
+        }
+
+        set hex(hex:number){
+            this._hex = hex
+            toRGB(hex,this);
+        }
+        get hex():number{
+            return this._hex;
+        }
+    }
 
 
     /**
@@ -216,122 +243,114 @@ module rf {
     }
 
 
-    export class Float32Byte {
-        public array: Float32Array;
+    // export class Float32Byte {
+    //     public array: Float32Array;
 
-        constructor(array?: Float32Array) {
-            if(undefined == array){
-                array = new Float32Array(0);
-            }
-            this.array = array;
-        }
+    //     constructor(array?: Float32Array) {
+    //         if(undefined == array){
+    //             array = new Float32Array(0);
+    //         }
+    //         this.array = array;
+    //     }
 
-        get length(): number {
-            return this.array.length;
-        }
+    //     get length(): number {
+    //         return this.array.length;
+    //     }
 
-        set length(value: number) {
-            if (this.array.length == value) {
-                return;
-            }
-            let nd = new Float32Array(value);
-            let len = value < this.array.length ? value : this.array.length;
-            if(len != 0){
-                // nd.set(this.array.slice(0, len), 0);
-                nd.set(this.array);
-            }
-            this.array = nd;
-        }
+    //     set length(value: number) {
+    //         if (this.array.length == value) {
+    //             return;
+    //         }
+    //         let nd = new Float32Array(value);
+    //         let len = value < this.array.length ? value : this.array.length;
+    //         if(len != 0){
+    //             // nd.set(this.array.slice(0, len), 0);
+    //             nd.set(this.array);
+    //         }
+    //         this.array = nd;
+    //     }
 
-        append(byte: Float32Byte, offset: number = 0, len: number = -1): void {
-            var position: number = 0;
-            if (0 > offset) {
-                offset = 0;
-            }
+    //     append(byte: Float32Byte, offset: number = 0, len: number = -1): void {
+    //         var position: number = 0;
+    //         if (0 > offset) {
+    //             offset = 0;
+    //         }
 
-            if (-1 == len) {
-                len = byte.length - offset;
-            } else {
-                if (len > byte.length - offset) {
-                    len = byte.length - offset;
-                }
-            }
+    //         if (-1 == len) {
+    //             len = byte.length - offset;
+    //         } else {
+    //             if (len > byte.length - offset) {
+    //                 len = byte.length - offset;
+    //             }
+    //         }
 
-            position = this.array.length;
-            length = this.array.length + byte.length;
+    //         position = this.array.length;
+    //         length = this.array.length + byte.length;
 
-            if (len == byte.length) {
-                this.array.set(byte.array, position);
-            } else {
-                this.array.set(byte.array.slice(offset, len), position);
-            }
-        }
-
-
-        set(position:number, byte: Float32Byte, offset: number = 0, len: number = -1):void{
-            if (0 > offset) {
-                offset = 0;
-            }
-
-            if (-1 == len) {
-                len = byte.length - offset;
-            } else {
-                if (len > byte.length - offset) {
-                    len = byte.length - offset;
-                }
-            }
-
-            if (len == byte.length) {
-                this.array.set(byte.array, position);
-            } else {
-                this.array.set(byte.array.slice(offset, len), position);
-            }
-        }
+    //         if (len == byte.length) {
+    //             this.array.set(byte.array, position);
+    //         } else {
+    //             this.array.set(byte.array.slice(offset, len), position);
+    //         }
+    //     }
 
 
+    //     set(position:number, byte: Float32Byte, offset: number = 0, len: number = -1):void{
+    //         if (0 > offset) {
+    //             offset = 0;
+    //         }
+
+    //         if (-1 == len) {
+    //             len = byte.length - offset;
+    //         } else {
+    //             if (len > byte.length - offset) {
+    //                 len = byte.length - offset;
+    //             }
+    //         }
+
+    //         if (len == byte.length) {
+    //             this.array.set(byte.array, position);
+    //         } else {
+    //             this.array.set(byte.array.slice(offset, len), position);
+    //         }
+    //     }
 
 
-        wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void {
-            this.array[position] = x;
-        }
-
-        wPoint2(position: number, x: number, y: number, z?: number, w?: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-        }
-
-        wPoint3(position: number, x: number, y: number, z: number, w?: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-            this.array[position + 2] = z;
-        }
-
-        wPoint4(position: number, x: number, y: number, z: number, w: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-            this.array[position + 2] = z;
-            this.array[position + 3] = w;
-        }
-
-        wUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
-            this.array[position] = x;
-            this.array[position + 1] = y;
-            this.array[position + 2] = z;
-            this.array[position + 3] = u;
-            this.array[position + 4] = v;
-            this.array[position + 5] = index;
-            this.array[position + 6] = r;
-            this.array[position + 7] = g;
-            this.array[position + 8] = b;
-            this.array[position + 9] = a;
-        }
 
 
-        update(data32PerVertex: number, offset: number, v: number): void {
-            let len = this.array.length;
-            for (let i = 0; i < len; i += data32PerVertex) {
-                this.array[i + offset] = v;
-            }
-        }
-    }
+    //     wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void {
+    //         this.array[position] = x;
+    //     }
+
+    //     wPoint2(position: number, x: number, y: number, z?: number, w?: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //     }
+
+    //     wPoint3(position: number, x: number, y: number, z: number, w?: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //         this.array[position + 2] = z;
+    //     }
+
+    //     wPoint4(position: number, x: number, y: number, z: number, w: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //         this.array[position + 2] = z;
+    //         this.array[position + 3] = w;
+    //     }
+
+    //     wUIPoint(position: number, x: number, y: number, z: number, u: number, v: number, index: number, r: number, g: number, b: number, a: number): void {
+    //         this.array[position] = x;
+    //         this.array[position + 1] = y;
+    //         this.array[position + 2] = z;
+    //         this.array[position + 3] = u;
+    //         this.array[position + 4] = v;
+    //         this.array[position + 5] = index;
+    //         this.array[position + 6] = r;
+    //         this.array[position + 7] = g;
+    //         this.array[position + 8] = b;
+    //         this.array[position + 9] = a;
+    //     }
+    // }
 }

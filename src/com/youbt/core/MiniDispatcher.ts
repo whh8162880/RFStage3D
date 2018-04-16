@@ -10,7 +10,7 @@ module rf {
 
 
 	export enum EventT {
-		ENTER_FRAME,
+		ENTER_FRAME=1,
 		RESIZE,
 		COMPLETE,
 		FAIL,
@@ -30,11 +30,39 @@ module rf {
 		RECYCLE
 	}
 	export enum MouseEventX {
-		MouseDown = "mousedown",
-		MouseUp = "mouseup",
-		MouseWheel = "mousewheel",
-		MouseMove = 50,
-		CLICK
+		MouseDown = 50,
+		MouseRightDown,
+		MouseMiddleDown,
+		MouseUp,
+		MouseRightUp,
+		MouseMiddleUp,
+		CLICK,
+		RightClick,
+		middleClick,
+		MouseWheel,
+		MouseMove,
+		
+	}
+
+	export class MouseEventData implements IRecyclable{
+		constructor(id?:number){
+			this.id = id;
+		}
+		id:number;
+		x:number;
+		y:number;
+		dx:number;
+		dy:number;
+		ctrl:boolean;
+		shift:boolean;
+		alt:boolean;
+		wheel:number;
+
+		onRecycle(){
+			this.ctrl = this.shift = this.alt = false;
+			this.wheel = this.dx = this.dy = this.x = this.y = this.id = 0;
+		}
+
 	}
 
 
@@ -98,12 +126,13 @@ module rf {
 
 		/** Removes an event listener from the object. */
 		off(type: string|number, listener: Function): void {
-			if (undefined == this.mEventListeners) {
+			if (undefined != this.mEventListeners) {
 				var signal: Recyclable<Link> = this.mEventListeners[type];
 				if (undefined == signal) return;
 				signal.remove(listener);
 				if (0 >= signal.length) {
 					signal.recycle();
+					this.mEventListeners[type] = undefined;
 				}
 			}
 		}
@@ -116,6 +145,7 @@ module rf {
 				signal = this.mEventListeners[type];
 				if (undefined != signal) {
 					signal.recycle();
+					this.mEventListeners[type] = undefined;
 				}
 				delete this.mEventListeners[type];
 			} else if (this.mEventListeners) {
@@ -123,6 +153,7 @@ module rf {
 					signal = this.mEventListeners[type];
 					if (undefined != signal) {
 						signal.recycle();
+						this.mEventListeners[type] = undefined;
 					}
 				}
 				this.mEventListeners = undefined
@@ -134,7 +165,7 @@ module rf {
 		 *  travel up along the line of parents, until it either hits the root object or someone
 		 *  stops its propagation manually. */
 		public dispatchEvent(event: EventX): boolean {
-			if (undefined == this.mEventListeners || false == (event.type in this.mEventListeners)) {
+			if (undefined == this.mEventListeners || undefined == this.mEventListeners[event.type]) {
 				return false;
 			}
 
@@ -159,7 +190,7 @@ module rf {
 		}
 
 		public simpleDispatch(type: string|number, data: any = undefined, bubbles: boolean = false): boolean {
-			if (!bubbles && (undefined == this.mEventListeners || false == (type in this.mEventListeners))) {
+			if (!bubbles && (undefined == this.mEventListeners || undefined == this.mEventListeners[type])) {
 				return false;
 			}
 

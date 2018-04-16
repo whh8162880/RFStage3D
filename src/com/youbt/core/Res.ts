@@ -294,7 +294,7 @@ module rf {
         }
 
         protected onComplete(event: EventX): void {
-            this._resItem.data = new ByteArray(this._httpRequest.response);
+            this._resItem.data = this._httpRequest.response;
             event.data = this._resItem;
             
             let compFunc = this._compFunc;

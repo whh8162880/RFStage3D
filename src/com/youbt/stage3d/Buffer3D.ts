@@ -1,5 +1,5 @@
 ///<reference path="../core/Config.ts"/>
-///<reference path="geo/Geometry.ts"/>
+///<reference path="three/Geometry.ts"/>
 module rf {
     export enum VA {
         pos = "pos",
@@ -15,9 +15,14 @@ module rf {
 
     export enum VC{
         mv = "mv",
+        invm ="invm",
         p = "p",
         mvp = "mvp",
-        ui = "ui"
+        ui = "ui",
+        lightDirection = "lightDirection",
+        vc_diff = "vc_diff",
+        vc_emissive = "vc_emissive"
+
     }
 
     export class Buffer3D implements IRecyclable {
@@ -159,7 +164,7 @@ module rf {
                 this.buffer = g.createBuffer();
             }
             g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
-            g.bufferData(g.ARRAY_BUFFER, this.data.vertex.array, g.STATIC_DRAW);
+            g.bufferData(g.ARRAY_BUFFER, this.data.vertex, g.STATIC_DRAW);
             g.bindBuffer(g.ARRAY_BUFFER, null);
             this.readly = true;
             //加入资源管理
@@ -220,6 +225,7 @@ module rf {
         //     this.varibles[variable] = { size: size, offset: offset * 4 };
         // }
 
+        attribarray:object = {};
 
         public uploadContext(program: Program3D): void {
             if (false == this.readly) {
@@ -231,10 +237,11 @@ module rf {
             let g = gl;
             let attribs = program.attribs;
             let p = program.program;
+            let attribarray = this.attribarray;
             g.bindBuffer(g.ARRAY_BUFFER, this.buffer);
             let variables = this.data.variables
             for (let variable in variables) {
-                if(true == attribs.hasOwnProperty(variable)){
+                if(true == (variable in attribs)){
                     loc = attribs[variable];
                 }else{
                     loc = g.getAttribLocation(p, variable);
@@ -245,17 +252,19 @@ module rf {
                 }
                 let o = variables[variable];
                 g.vertexAttribPointer(loc, o.size, g.FLOAT, false, this.data32PerVertex * 4, o.offset * 4);
-                g.enableVertexAttribArray(loc);
+                if(true != attribarray[loc]){
+                    g.enableVertexAttribArray(loc);
+                    attribarray[loc] = true;
+                }
             }
             this.preusetime = engineNow;
         }
     }
 
     export class IndexBuffer3D extends Buffer3D {
-        public numIndices: number;
-        public data: Uint16Array;
-        public buffer: WebGLBuffer;
-
+        numIndices: number;
+        data: Uint16Array;
+        buffer: WebGLBuffer;
         public quadid:number = -1;
         constructor() {
             super();
@@ -293,6 +302,7 @@ module rf {
             g.bufferData(g.ELEMENT_ARRAY_BUFFER, this.data, g.STATIC_DRAW);
             g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, null);
             //加入资源管理
+            this.readly = true;
             context3D.bufferLink.add(this);
         }
         public uploadFromVector(data: number[] | Uint16Array, startOffset: number = 0, count: number = -1): void {

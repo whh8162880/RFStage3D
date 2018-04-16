@@ -1,6 +1,9 @@
 /// <reference path="./com/youbt/rfreference.ts" />
+/// <reference path="./AppBase.ts" />
 module rf{
     export let sp;
+
+    // export var line;
     export class Main extends AppBase{
         constructor(){      
             super();
@@ -15,19 +18,186 @@ module rf{
             if(undefined == gl){
                 return;
             }
+            
+            // gl.enable(gl.DEPTH_TEST);  
+            // gl.depthMask(true);
+            // gl.depthFunc(gl.LEQUAL);
+            // context3D.setDepthTest(true,gl.LEQUAL)
+            let sun = new DirectionalLight();
+            sun.setPos(100,100,100);
+            scene.sun = sun;
+            
 
-            Capabilities.init();
+
+            var g:Graphics;
+
+            let camera = ROOT.camera3D;
+            let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
+            camera.z = f
+            camera.y = f;
+            camera.lookat(new Vector3D(0,0,0));
+            new TrackballControls(camera);
+
+            let w = 100;
+
+            let t = 2;
+            let tr = new Trident(w*2,t);
+            scene.addChild(tr);
+
+            // line.rotationX = 45;
+            // let line = new Line3D();
+            // line.clear();
+            // line.moveTo(-500,0,500,t);
+            // line.lineTo(500,0,500,t);
+            // line.lineTo(500,0,-500,t);
+            // line.lineTo(-500,0,-500,t);
+            // line.lineTo(-500,0,500,t);
+            // line.end();
+            // scene.addChild(line);
+
+            let variables = vertex_mesh_variable;
+
+           
+            let w_e = w * 1.1
+            
+            let m = new PhongMaterial();
+            m.triangleFaceToCull = Context3DTriangleFace.BACK;
+            // let geo = new BoxGeometry(variables).create(w,w,w)
+
+            let r = 40;
+
+
+           
+            
+            
 
             
-            var g = undefined
-            context3D.configureBackBuffer(stageWidth,stageHeight,0);
-            // context3D.setDepthTest(true,gl.LEQUAL);
-            context3D.setDepthTest(false,gl.ALWAYS);
-            context3D.setBlendFactors(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);
+            // let plane = new PlaneGeometry(variables).create(w*2,w);
+            // let mesh = new Mesh(variables);
+            // mesh.init(plane,m);
+            // mesh.setPos(-w-80,0,0);
+            // scene.addChild(mesh);
 
+            // plane = new PlaneGeometry(variables).create(w*2,w);
+            // mesh = new Mesh(variables);
+            // mesh.init(plane,m);
+            // mesh.setPos(w+80,0,0);
+            // scene.addChild(mesh);
+
+            // let box = new BoxGeometry(variables).create(w,w,w);
+            // mesh = new Mesh(variables);
+            // mesh.init(box,m);
+            // mesh.setPos(0,-110,0);
+            // scene.addChild(mesh);
+
+            // let sphere = new SphereGeometry(variables).create(r,r,w*.5);
+            // mesh = new Mesh(variables);
+            // mesh.init(sphere,m);
+            // mesh.setPos(0,0,0);
+            // scene.addChild(mesh);
+
+
+            // let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
+            // mesh = new Mesh(variables);
+            // mesh.init(torus,m);
+            // mesh.setPos(0,70,0);
+            // scene.addChild(mesh);
+
+
+            let kfmMesh = new KFMMesh(m);
+            kfmMesh.setSca(100,100,100);
+            kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a10010m.kfm");
+            scene.addChild(kfmMesh);
+
+            // new AMF3Test().load("assets/test.dat");
+
+            // let geo = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
+            // let geo = new SphereGeometry(variables).create(r,r,w*.5);
+            // let geo = new BoxGeometry(variables).create(w,w,w);
+            // let geo = new PlaneGeometry(variables).create(w,w);
+
+            // let qc = 10;
+            // let count = qc*qc;
+            // let tx = -(qc-1)/2 * w_e;
+            // let ty = -(qc-1)/2 * w_e;
+
+            // for(let i=0;i<count;i++){
+            //     let c =Math.floor(i / qc);
+            //     let p = i % qc;
+            //     let mesh = new Mesh(variables);
+            //     mesh.init(geo,m);
+            //     mesh.setPos(tx + p * w_e,ty + c * w_e,0);
+            //     scene.addChild(mesh);
+            // }
+
+            
+            
+            // mesh.rotationX = -90;
+            
+
+
+            // let m  = new Matrix3D();
+            // m.appendRotation(45,Vector3D.Z_AXIS);
+            // m.appendTranslation(100,100,100);
+            // m.invert();
+            // m.invert();
+
+            
+            
 
             let profile = singleton(GUIProfile);
-            ROOT.addChild(profile);
+            tipContainer.addChild(profile);
+
+            // let s = new Sprite();
+            // s.renderer = new BatchRenderer(s);
+            // g = s.graphics;
+            // g.clear();
+            // g.drawCube(-100,-100,-100,200,200,200,0xFFFFFF);
+            // g.end();
+            // s.rotationX = 45
+            // ROOT.addChild(s);
+            
+
+            
+
+            // var m:Matrix3D = new Matrix3D();
+            // m.appendRotation(90,Vector3D.X_AXIS);
+            // m.appendRotation(90,Vector3D.Y_AXIS);
+            // m.appendRotation(90,Vector3D.Z_AXIS);
+            // let c = m.toString();
+
+
+
+
+            // let icon = new IconView();
+            // icon.x = 0;
+            // icon.y = 0;
+            // icon.resetSize(100,100);
+            // ROOT.addChild(icon);
+            // icon.setUrl("assets/ranger.png");
+
+            // let profile = singleton(GUIProfile);
+            // ROOT.addChild(profile);
+
+            // line = new Trident(200,4);
+            // ROOT.addChild(line);
+
+            // ROOT.camera2D.z = -1.5
+
+            // let s = new Sprite();
+            // s.renderer = new BatchRenderer(s);
+            // s.x = 100;
+            // g = s.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFF0000)
+            // g.end();
+            // s.setPos(100,100,0)
+            // ROOT.addChild(s);
+
+            
+           
+
+            //p3d加载并显示
 
             // let span = document.getElementById("fps");
 
@@ -83,7 +253,7 @@ module rf{
 
             // g = ROOT.graphics;
             // g.clear();
-            // g.drawRect(0,0,100,100,0xFF0000);
+            // g.drawRect(0,0,500,500,0xFF0000);
             // g.end();
 
             
@@ -139,12 +309,22 @@ module rf{
             // });
 
 
-            let icon = new IconView();
-            icon.x = 100;
-            icon.y = 100;
-            icon.resetSize(100,100);
-            ROOT.addChild(icon);
-            icon.setUrl("assets/ranger.png");
+            // let icon = new IconView();
+            // icon.x = 100;
+            // icon.y = 100;
+            // icon.resetSize(100,100);
+            // ROOT.addChild(icon);
+            // icon.setUrl("assets/ranger.png");
+
+            // let panel = new Panelui();
+            // panel.x = 300;
+            // panel.y = 300;
+            // ROOT.addChild(panel);
+            // let panelutil = new PanelUtils();
+
+
+            // 潘华专用  
+            new Pan_Test();
         }
 
         public linktest():void{

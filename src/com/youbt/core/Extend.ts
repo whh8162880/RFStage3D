@@ -161,6 +161,62 @@ Object.defineProperties(Object.prototype, makeDefDescriptors({
         }
     }
 }));
+
+// interface Uint16Array{
+//     addQuadIndex(position:number):void
+//     appendGeo(value:number[]|Uint16Array,)
+// }
+
+
+interface Float32Array{
+    update(data32PerVertex: number, offset: number, v: number): void;
+    wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void
+    wPoint2(position: number, x: number, y: number, z?: number, w?: number): void
+    wPoint3(position: number, x: number, y: number, z: number, w?: number): void
+    wPoint4(position: number, x: number, y: number, z: number, w: number): void
+}
+
+Object.defineProperties(Float32Array.prototype, makeDefDescriptors({
+    update: {
+        value : function(data32PerVertex: number, offset: number, v: number){
+            let len = this.length;
+            for (let i = 0; i < len; i += data32PerVertex) {
+                this[i + offset] = v;
+            }
+        }
+    },
+
+    wPoint1 : {
+        value : function(position: number, x: number, y?: number, z?: number, w?: number): void{
+            this[position] = x;
+        }
+    },
+
+    wPoint2: {
+       value : function(position: number, x: number, y: number, z?: number, w?: number): void{
+            this[position] = x;
+            this[position+1] = y;
+        }
+    },
+
+    wPoint3: {
+        value : function(position: number, x: number, y: number, z: number, w?: number): void{
+            this[position] = x;
+            this[position+1] = y;
+            this[position+2] = z;
+        }
+    },
+
+    wPoint4 :{
+        value:function(position: number, x: number, y: number, z: number, w: number): void{
+            this[position] = x;
+            this[position+1] = y;
+            this[position+2] = z;
+            this[position+3] = w;
+        }
+    }
+}))
+
 interface Function {
 
     /**
