@@ -1,11 +1,27 @@
 //之后移植到Sprite里面
 module rf{
 
+	export enum PanelEvent{
+		SHOW = "PanelEvent_SHOW",
+		HIDE = "PanelEvent_HIDE",
+	}
+
     export enum ChooseState {
 		SELECT = "selected",
 		NORMAL = "normal",
 		SHRTLY = "shortly",
-    }
+	}
+	
+	export enum RES_STATE{
+		LOAD_DISPOSE= -1, //被销毁
+		LOAD_NONE,  // 未加载
+		LOAD_PARSING , //解析状态
+		LOAD_PARSED, //解析状态
+		
+		LOAD_LOADING,// 加载中
+		LOAD_LOADED ,// 已加载
+		LOAD_ERROR	// 加载失败
+	}
 
     export class DataBase{
 
@@ -107,14 +123,14 @@ module rf{
 		}
 		
 		
-		set visible(value:Boolean){
+		set visible(value:boolean){
             let _skin = this._skin;
 			if(_skin){
 				_skin.visible = value;
 				this.doVisible();
 			}
 		}
-		get visible():Boolean{
+		get visible():boolean{
             let _skin = this._skin;
 			if(_skin){
 				return _skin.visible;
@@ -222,29 +238,103 @@ module rf{
      * @param event
      * 
      */		
-		hide(event:any):void;
-    }EventX
-
-    export class TPanel extends SkinBase implements IPanel{
-        
-        public isShow:boolean = false;
-        constructor(skin:Sprite){
-            super(skin);
-        }
-
-        show(container:DisplayObjectContainer = null,isModal:boolean = false):void{
-
-        }
-
-        bringTop():void{
-
-        }
-
-        hide():void{
-
-        }
+	hide(event:Event):void;
 
     }
+
+    export class TPanel extends SkinBase implements IPanel{
+	   
+		uri:string;
+		clsName:string;
+		state:number;
+
+		_resizeable:boolean;
+
+		resource:PanelSource;
+		container:DisplayObjectContainer;
+		_readyShow:boolean = false;
+		isShow:boolean = false;
+		constructor(uri:string,cls:string){
+			super();
+			this.uri = uri;
+			this.clsName = cls;
+			this._resizeable=true;
+		}
+
+		getURL():string
+		{
+			let url:string = "";
+			if(!url){
+				url = "../assets/"+this.uri + ".p3d";
+			}
+			return url;
+		}
+
+
+
+		
+		show(container:any=null, isModal:Boolean=false):void{
+			if((this.state != RES_STATE.LOAD_LOADED) || !this.resource.isReady){
+				this._readyShow=true;
+				this.container = container;
+				// this._isModal = isModal;
+				this.state = RES_STATE.LOAD_NONE;
+				
+				this.load();
+				return;
+			}
+			// super.show(container,isModal);
+			
+			// if(isShow)
+			// {
+			// 	resource.sleeptime = 0;
+			// }
+
+		}
+
+		load():void{
+			// if(this.state != ResourceState.LOAD_NONE && this.state != ResourceState.LOAD_ERROR && p3dCompleted){
+			// 	return;	
+			// }
+			
+			let url= this.getURL();
+			
+			loadRes(url, this.p3dloadComplete, this, ResType.text)
+			// this.resource =  //p3d.load(url, uri, this);
+			// resource.ungc = ungc;
+			// if(resource.isReady){
+			// 	this.resourcevo = resource.vo;
+			// 	state = ResourceState.LOAD_LOADING;
+				// initReady(null);
+				
+			// }else{
+			// 	toggleLoading(true);
+			// 	resource.addEventListener(RFLoaderEvent.COMPLETE,loaderHandler);	
+			// 	resource.addEventListener(RFLoaderEvent.PROGRESS,progressHandler);
+			// 	resource.addEventListener(RFLoaderEvent.FAILED,loaderHandler);
+			// 	state = ResourceState.LOAD_LOADING;
+			// }
+		}
+
+		p3dloadComplete(e:EventX):void{
+			//
+		}
+
+		p3dCompleted():Boolean
+		{
+			return this.resource.isReady;
+		}
+
+		bringTop():void
+		{
+
+		}
+
+		hide(e:Event = undefined):void{
+
+		}
+
+	}
 
     
 }

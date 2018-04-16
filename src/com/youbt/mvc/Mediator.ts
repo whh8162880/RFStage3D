@@ -156,7 +156,7 @@ module rf{
 		 * @param isBind
 		 * 
 		 */		
-		bindSetViewEvent(viewComponent:DisplayObject, isBind:Boolean):void
+		bindSetViewEvent(viewComponent:DisplayObject, isBind:boolean):void
 		{
 			if(isBind){
 				// viewComponent.addEventListener(Event.ADDED_TO_STAGE,stageHandler);
@@ -211,7 +211,7 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		get isCanAwaken():Boolean{
+		get isCanAwaken():boolean{
 			
 			return true;
 		}
@@ -298,7 +298,7 @@ module rf{
             super(mediatorName);
         }
 		
-		startSync():Boolean{
+		startSync():boolean{
 			var panel:IPanel= this.getPanel();
 			// if(panel is IAsyncPanel){
 			// 	var asyncPanel:IAsyncPanel=panel as IAsyncPanel;
@@ -424,7 +424,7 @@ module rf{
 		 * true  有stage
 		 * false 无stage 
 		 */		
-		stage_state:Boolean;
+		stage_state:boolean;
 		
 		awkenCheckIndex:number;
 		
@@ -498,7 +498,7 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		get isReady():Boolean
+		get isReady():boolean
 		{
 			return this._ready;
 		}
