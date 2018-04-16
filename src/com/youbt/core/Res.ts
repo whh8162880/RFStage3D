@@ -381,4 +381,16 @@ module rf {
             imageLoader.load(resItem.url);
         }
     }
+
+
+    export class LoadTask extends MiniDispatcher{
+
+        addBin(url:string):void{
+
+        }
+
+        addImage(url:string):void{
+            
+        }
+    }
 }
