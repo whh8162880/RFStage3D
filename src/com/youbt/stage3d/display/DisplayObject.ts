@@ -301,21 +301,22 @@ module rf {
 		 * @param distance
 		 * 
 		 */
-        public forwardPos(distance: number, or: Boolean = false): void {
+        public forwardPos(distance: number, target?:Vector3D): void {
+            const{pos}=this;
             this.transform.copyColumnTo(2, tempAxeX);
             tempAxeX.normalize();
-            if (or) {
-                this.pos.x = -tempAxeX.x * distance;
-                this.pos.y = -tempAxeX.y * distance;
-                this.pos.z = -tempAxeX.z * distance;
+            if (undefined != target) {
+                pos.x = -tempAxeX.x * distance + target.x;
+                pos.y = -tempAxeX.y * distance + target.y;
+                pos.z = -tempAxeX.z * distance + target.z;
             } else {
-                this.pos.x += tempAxeX.x * distance;
-                this.pos.y += tempAxeX.y * distance;
-                this.pos.z += tempAxeX.z * distance;
+                pos.x += tempAxeX.x * distance;
+                pos.y += tempAxeX.y * distance;
+                pos.z += tempAxeX.z * distance;
             }
-            this._x = this.pos.x;
-            this._y = this.pos.y;
-            this._z = this.pos.z;
+            this._x = pos.x;
+            this._y = pos.y;
+            this._z = pos.z;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
 

@@ -39,11 +39,12 @@ module rf{
             if(undefined == program){
                 this.program = program = this.createProgram();
             }
+
+            let sun = scene.sun;
+
             c.setProgram(program);
-
             c.setCulling(this.triangleFaceToCull);
-
-            c.setProgramConstantsFromVector(VC.lightDirection,[camera._x,camera._y,camera._z],3);
+            c.setProgramConstantsFromVector(VC.lightDirection,[sun._x,sun._y,sun._z],3);
 
             // c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
 

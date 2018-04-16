@@ -23,6 +23,10 @@ module rf{
             // gl.depthMask(true);
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
+            let sun = new DirectionalLight();
+            sun.setPos(100,100,100);
+            scene.sun = sun;
+            
 
 
             var g:Graphics;
@@ -63,38 +67,47 @@ module rf{
             let r = 40;
 
 
+           
             
-            let plane = new PlaneGeometry(variables).create(w*2,w);
-            let mesh = new Mesh(variables);
-            mesh.init(plane,m);
-            mesh.setPos(-w-80,0,0);
-            scene.addChild(mesh);
+            
 
-            plane = new PlaneGeometry(variables).create(w*2,w);
-            mesh = new Mesh(variables);
-            mesh.init(plane,m);
-            mesh.setPos(w+80,0,0);
-            scene.addChild(mesh);
+            
+            // let plane = new PlaneGeometry(variables).create(w*2,w);
+            // let mesh = new Mesh(variables);
+            // mesh.init(plane,m);
+            // mesh.setPos(-w-80,0,0);
+            // scene.addChild(mesh);
 
-            let box = new BoxGeometry(variables).create(w,w,w);
-            mesh = new Mesh(variables);
-            mesh.init(box,m);
-            mesh.setPos(0,-110,0);
-            scene.addChild(mesh);
+            // plane = new PlaneGeometry(variables).create(w*2,w);
+            // mesh = new Mesh(variables);
+            // mesh.init(plane,m);
+            // mesh.setPos(w+80,0,0);
+            // scene.addChild(mesh);
 
-            let sphere = new SphereGeometry(variables).create(r,r,w*.5);
-            mesh = new Mesh(variables);
-            mesh.init(sphere,m);
-            mesh.setPos(0,0,0);
-            scene.addChild(mesh);
+            // let box = new BoxGeometry(variables).create(w,w,w);
+            // mesh = new Mesh(variables);
+            // mesh.init(box,m);
+            // mesh.setPos(0,-110,0);
+            // scene.addChild(mesh);
+
+            // let sphere = new SphereGeometry(variables).create(r,r,w*.5);
+            // mesh = new Mesh(variables);
+            // mesh.init(sphere,m);
+            // mesh.setPos(0,0,0);
+            // scene.addChild(mesh);
 
 
-            let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
-            mesh = new Mesh(variables);
-            mesh.init(torus,m);
-            mesh.setPos(0,70,0);
-            scene.addChild(mesh);
+            // let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
+            // mesh = new Mesh(variables);
+            // mesh.init(torus,m);
+            // mesh.setPos(0,70,0);
+            // scene.addChild(mesh);
 
+
+            let kfmMesh = new KFMMesh(m);
+            kfmMesh.setSca(100,100,100);
+            kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a10010m.kfm");
+            scene.addChild(kfmMesh);
 
             // new AMF3Test().load("assets/test.dat");
 

@@ -5,10 +5,18 @@ module rf{
         length:number;
         buf:DataView;
 
-        constructor(buf:ArrayBuffer){
-            this.buf = new DataView(buf);
-            this.length = buf.byteLength;
-            this.position = 0;
+        constructor(buf?:ArrayBuffer){
+            this.setArrayBuffer(buf);
+        }
+
+        setArrayBuffer(buf:ArrayBuffer){
+            if(undefined == buf){
+                this.length = this.position = 0;
+            }else{
+                this.buf = new DataView(buf);
+                this.length = buf.byteLength;
+                this.position = 0;
+            }
         }
 
         outOfRange(){
@@ -132,7 +140,7 @@ module rf{
 
         MASK = 1 << 28;
 
-        constructor(buf:ArrayBuffer){
+        constructor(buf?:ArrayBuffer){
             super(buf);
         }
 
