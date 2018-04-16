@@ -31,7 +31,7 @@ module.exports = function (grunt) {
         {
             main: {
                 expand: true,
-                src: 'assets/*',
+                src: 'assets/**/*',
                 dest: 'bin-debug/',
             }
         }   
