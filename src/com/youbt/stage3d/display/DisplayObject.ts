@@ -156,7 +156,7 @@ module rf {
         public w: number = 0;
         public h: number = 0;
 
-        public _visible: Boolean = true;
+        public _visible: boolean = true;
         public states: number = 0;
 
         public pivotZero: boolean = false;
@@ -198,8 +198,8 @@ module rf {
             }
         }
 
-        public get visible(): Boolean { return this._visible; }
-        public set visible(value: Boolean) {
+        public get visible(): boolean { return this._visible; }
+        public set visible(value: boolean) {
             if (this._visible != value) {
                 this._visible = value;
                 this.setChange(DChange.vertex)

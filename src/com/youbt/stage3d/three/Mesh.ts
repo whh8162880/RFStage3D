@@ -48,7 +48,6 @@ module rf{
 
         load(url:string){
             loadRes(url,function (e:EventX){
-
                 let item:ResItem = e.data;
                 let amf = singleton(AMF3);
                 amf.setArrayBuffer(item.data);
