@@ -93,7 +93,7 @@ module rf {
 			this.stopImmediatePropagation = false;
 		}
 	}
-
+	
 	/**
 	 * 
 	 * @author crl

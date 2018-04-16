@@ -5,7 +5,7 @@ module rf {
     /**
          * 同一时刻最大可以同时启动的下载线程数
          */
-    export let res_max_loader:number = 5;
+    export let res_max_loader: number = 5;
 
     /**
      * 加载优先级枚举
@@ -15,6 +15,13 @@ module rf {
         middle,
         high,
         max,
+    }
+
+    export enum LoadStates {
+        WAIT,
+        LOADING,
+        COMPLETE,
+        FAILED
     }
 
     /**
@@ -28,9 +35,9 @@ module rf {
      * @param noDispose 不自动释放
      * @param disposeTime 自动释放时间, 超过该时间自动释放资源
      */
-    export function loadRes(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin, 
+    export function loadRes(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin,
         priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): ResItem {
-            return Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
+        return Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
     }
 
     /**
@@ -42,15 +49,15 @@ module rf {
             return this._instance || (this._instance = new Res());
         }
 
-        
+
         // maxLoader: number = 5;
         private nowLoader: number = 0;
-        private _analyzerMap: { [type: string]: { new (): ResLoaderBase } };
+        private _analyzerMap: { [type: string]: { new(): ResLoaderBase } };
 
         // private _loadMap: { [priority: number]: ResItem[] };
         private resMap: { [k: string]: ResItem };
 
-        private link:Link;
+        private link: Link;
         // private _loadingMap: { [k: string]: ResItem };
 
         private constructor() {
@@ -81,41 +88,42 @@ module rf {
          * @param noDispose 不自动释放
          * @param disposeTime 自动释放时间, 超过该时间自动释放资源
          */
-        load(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin, 
-                priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): ResItem {
+        load(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin,
+            priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): ResItem {
 
-            const{resMap}=this;
+            const { resMap } = this;
 
             let item = resMap[url];
-            if(undefined == item){
+            if (undefined == item) {
                 //没创建
                 let item = recyclable(ResItem);
                 item.type = type;
-                item.url = url;
-                item.complete = [{thisObj:thisObj,complete:complete}];
+                item.name = url;
+                item.complete = [{ thisObj: thisObj, complete: complete }];
+                item.states = LoadStates.WAIT;
                 //添加进加载列表
-                this.link.addByWeight(item,priority);
+                this.link.addByWeight(item, priority);
                 //开始加载
                 this.loadNext();
-            }else if(undefined != item.complete){
+            } else if (undefined != item.complete) {
                 //正在加载中
-                item.complete.push({thisObj:thisObj,complete:complete});
-            }else if(undefined != item.data){
+                item.complete.push({ thisObj: thisObj, complete: complete });
+            } else if (undefined != item.data) {
                 //加载完成了
                 setTimeout(() => {
                     let event = recyclable(EventX);
                     event.type = EventT.COMPLETE;
                     event.data = item;
-                    complete.call(thisObj,event);
+                    complete.call(thisObj, event);
                     event.recycle();
                 }, 0);
-            }else{
+            } else {
                 //加载完成 但是404了
                 setTimeout(() => {
                     let event = recyclable(EventX);
                     event.type = EventT.FAILED;
                     event.data = item;
-                    complete.call(thisObj,event);
+                    complete.call(thisObj, event);
                     event.recycle();
                 }, 0);
             }
@@ -124,16 +132,16 @@ module rf {
 
         private loadNext(): void {
 
-            let{nowLoader,link}=this;
+            let { nowLoader, link } = this;
             let maxLoader = res_max_loader
 
             if (nowLoader >= maxLoader) {
                 return;
             }
 
-            while(nowLoader < maxLoader && link.length){
-                let item:ResItem = link.shift();
-                if(undefined == item){
+            while (nowLoader < maxLoader && link.length) {
+                let item: ResItem = link.shift();
+                if (undefined == item) {
                     //全部没有了
                     break;
                 }
@@ -143,6 +151,7 @@ module rf {
 
         private doLoad(item: ResItem): void {
             this.nowLoader++;
+            item.states = LoadStates.LOADING;
             let loader = recyclable(this._analyzerMap[item.type]);
             loader.loadFile(item, this.doLoadComplete, this);
         }
@@ -153,13 +162,13 @@ module rf {
             loader.recycle();
 
             let item: ResItem = event.data;
-            if (item) {
-                item.preUseTime = engineNow;
-            }
+            item.preUseTime = engineNow;
+
+            item.states = event.data ? LoadStates.COMPLETE : LoadStates.FAILED;
 
             item.complete.forEach((v, i) => {
                 if (v) {
-                    v.complete.call(v.thisObj,event);
+                    v.complete.call(v.thisObj, event);
                 }
             });
             item.complete = undefined;
@@ -169,7 +178,7 @@ module rf {
 
         private clearRes(): void {
             let now = engineNow;
-            const{resMap}=this;
+            const { resMap } = this;
             for (let url in resMap) {
                 let item = resMap[url];
                 if (!item.noDispose && undefined == item.complete) {
@@ -204,26 +213,26 @@ module rf {
     }
 
 
-    export interface IResHandler{
-        complete:ResLoadHandler;
-        thisObj:any;
+    export interface IResHandler {
+        complete: ResLoadHandler;
+        thisObj: any;
     }
 
     /**
      * 资源数据
      */
-    export class ResItem implements IRecyclable{
+    export class ResItem implements IRecyclable {
         type: ResType;
-        url: string;
+        name: string;
         complete: IResHandler[];
         data: any;
         preUseTime: number;
         noDispose: boolean;
         disposeTime: number;
-
-        onRecycle(){
-            this.url = this.complete = this.data = undefined;
-            this.preUseTime = this.disposeTime = 0;
+        states: number = 0;
+        onRecycle() {
+            this.name = this.complete = this.data = undefined;
+            this.preUseTime = this.disposeTime = this.states = 0;
             this.noDispose = false;
         }
     }
@@ -242,7 +251,7 @@ module rf {
             this._thisObject = thisObject;
         }
     }
-    
+
     /**
      * 二进制加载
      */
@@ -266,15 +275,15 @@ module rf {
         loadFile(resItem: ResItem, compFunc: Function, thisObject: any): void {
             super.loadFile(resItem, compFunc, thisObject);
 
-            const{_httpRequest:http}=this;
+            const { _httpRequest: http } = this;
 
             http.abort();
-            http.open(resItem.url, HttpMethod.GET);
+            http.open(resItem.name, HttpMethod.GET);
             http.send();
         }
 
         protected onComplete(event: EventX): void {
-            const{_resItem,_compFunc,_thisObject,_httpRequest}=this;
+            const { _resItem, _compFunc, _thisObject, _httpRequest } = this;
             _resItem.data = _httpRequest.response;
             event.data = _resItem;
             this._resItem = this._compFunc = this._thisObject = undefined;
@@ -282,9 +291,9 @@ module rf {
                 _compFunc.call(_thisObject, this, event);
             }
         }
-        
+
         protected onIOError(event: EventX): void {
-            const{_resItem,_compFunc,_thisObject,_httpRequest}=this;
+            const { _resItem, _compFunc, _thisObject, _httpRequest } = this;
             event.data = _resItem;
             this._resItem = this._compFunc = this._thisObject = undefined;
             if (_compFunc) {
@@ -302,7 +311,7 @@ module rf {
         }
 
         protected onComplete(event: EventX): void {
-            const{_resItem,_compFunc,_thisObject,_httpRequest}=this;
+            const { _resItem, _compFunc, _thisObject, _httpRequest } = this;
             _resItem.data = _httpRequest.response;
             event.data = _resItem;
             this._resItem = this._compFunc = this._thisObject = undefined;
@@ -352,33 +361,79 @@ module rf {
                     compFunc.call(thisObject, this, e);
                 }
             }, this);
-            imageLoader.load(resItem.url);
+            imageLoader.load(resItem.name);
         }
     }
 
-    export interface ILoaderTask{
-        data:any;
+    export interface ILoaderTask {
+        name: string;
+        data?: any;
+        states: number;
     }
 
-    export class LoadTask extends MiniDispatcher{
-        queue:{[key:string]:ILoaderTask} = {};
-        addBin(url:string):ResItem{
-            let res = loadRes(url,this.complteHandler,this,ResType.bin);
+    export class LoadTask extends MiniDispatcher implements IRecyclable {
+        queue: { [key: string]: ILoaderTask } = {};
+        total: number = 0;
+        progress: number = 0;
+        addBin(url: string): ResItem {
+            let res = loadRes(url, this.complteHandler, this, ResType.bin);
+            this.queue[url] = res;
+            this.total++;
             return res;
         }
 
-        addTxt(url:string):ResItem{
-            let res = loadRes(url,this.complteHandler,this,ResType.text);
+        addTxt(url: string): ResItem {
+            let res = loadRes(url, this.complteHandler, this, ResType.text);
+            this.queue[url] = res;
+            this.total++;
             return res;
         }
 
-        addImage(url:string):ResItem{
-            let res = loadRes(url,this.complteHandler,this,ResType.image);
+        addImage(url: string): ResItem {
+            let res = loadRes(url, this.complteHandler, this, ResType.image);
+            this.queue[url] = res;
+            this.total++;
             return res;
         }
 
-        complteHandler(event:EventX):void{
+        addTask(item: ILoaderTask & IEventDispatcherX) {
+            this.queue[item.name] = item;
+            this.total++;
+            item.on(EventT.COMPLETE, this.complteHandler, this);
+        }
 
+
+        complteHandler(event: EventX): void {
+
+            let item = event.data as ILoaderTask;
+            if (item instanceof MiniDispatcher) {
+                item.off(EventT.COMPLETE, this.complteHandler);
+            }
+
+            const { queue } = this;
+            let completeCount = 0;
+            let totalCount = 0;
+            for (let key in queue) {
+                let item = queue[key];
+                if (item.states >= LoadStates.COMPLETE) {
+                    completeCount++
+                }
+                totalCount++;
+            }
+
+            this.progress = completeCount;
+            this.total = totalCount;
+
+            this.simpleDispatch(EventT.PROGRESS, this);
+
+            if (completeCount == totalCount) {
+                this.simpleDispatch(EventT.COMPLETE, this);
+            }
+        }
+
+        onRecycle(){
+            this.queue = {};
+            this.progress = this.total = 0;
         }
     }
 }
