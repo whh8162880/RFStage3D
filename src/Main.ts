@@ -96,12 +96,7 @@ module rf{
             scene.addChild(mesh);
 
 
-
-            
-
-            
-
-            
+            // new AMF3Test().load("assets/test.dat");
 
             // let geo = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
             // let geo = new SphereGeometry(variables).create(r,r,w*.5);
