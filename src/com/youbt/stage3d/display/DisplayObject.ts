@@ -132,6 +132,7 @@ module rf {
         mouseEnabled:boolean = false;
         mouseChildren:boolean = true;
         mousedown:boolean = false;
+		mouseRoll:Boolean = false;
         transformComponents: Vector3D[];
         pos: Vector3D;
         rot: Vector3D;

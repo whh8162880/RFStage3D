@@ -41,7 +41,8 @@ module rf {
 		middleClick,
 		MouseWheel,
 		MouseMove,
-		
+		ROLL_OVER,
+		ROLL_OUT
 	}
 
 	export class MouseEventData implements IRecyclable{
