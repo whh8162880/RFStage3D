@@ -76,7 +76,7 @@ namespace rf {
 		
 		constructor() {
 			this.bufferLink = new Link();
-			ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
+			// ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
 		}
 
 		public configureBackBuffer(width: number,height: number,antiAlias: number,enableDepthAndStencil: boolean = true): void {
