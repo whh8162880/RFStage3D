@@ -29,8 +29,8 @@ module rf {
      * @param disposeTime 自动释放时间, 超过该时间自动释放资源
      */
     export function loadRes(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin, 
-        priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): void {
-            Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
+        priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): ResItem {
+            return Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
     }
 
     /**
@@ -356,20 +356,28 @@ module rf {
         }
     }
 
+    export interface ILoaderTask{
+        data:any;
+    }
 
     export class LoadTask extends MiniDispatcher{
-        queue:{[key:string]:ResItem} = {};
-        addBin(url:string):void{
-            let item = new ResItem();
-            item.type = ResType.bin;
-            item.url = url;
+        queue:{[key:string]:ILoaderTask} = {};
+        addBin(url:string):ResItem{
+            let res = loadRes(url,this.complteHandler,this,ResType.bin);
+            return res;
         }
 
-        addTxt(url:string):void{
-
+        addTxt(url:string):ResItem{
+            let res = loadRes(url,this.complteHandler,this,ResType.text);
+            return res;
         }
 
-        addImage(url:string):void{
+        addImage(url:string):ResItem{
+            let res = loadRes(url,this.complteHandler,this,ResType.image);
+            return res;
+        }
+
+        complteHandler(event:EventX):void{
 
         }
     }
