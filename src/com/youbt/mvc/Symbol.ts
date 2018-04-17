@@ -135,7 +135,7 @@ module rf{
 				}
 			}
 			
-			this.graphics.end();
+			graphics.end();
 			
 		}
 		
@@ -149,9 +149,9 @@ module rf{
 			{
 				return;
 			}
-			
+			const {graphics}  = this;
 			if(clean){
-				this.graphics.clear();
+				graphics.clear();
 			}
 			
 			if(element.rect){
@@ -164,11 +164,11 @@ module rf{
 				// }
 				// scaleGeomrtry.set9Size(_width,_height);
 			}else{
-				this.graphics.drawBitmap(0,0,vo);//,element.matrix2d
+				graphics.drawBitmap(0,0,vo);//,element.matrix2d
 			}
 			
 			if(clean){
-				this.graphics.end();
+				graphics.end();
 			}
 		}
 	}

@@ -48,8 +48,6 @@ module rf{
                 canvas.onmousedown = m;
                 canvas.onmouseup = m;
                 canvas.onmousewheel = m;
-                canvas.onmouseover = m;
-                canvas.onmouseout = m;
                 canvas.onmousemove = this.mouseMoveHandler;
                 canvas.oncontextmenu = function (event){
                     event.preventDefault();
