@@ -6,6 +6,8 @@ module rf{
         down:number;
         up:number;
         click:number;
+        over?:number;
+        out?:number;
     }
 
     interface ITouchlement{
@@ -113,7 +115,7 @@ module rf{
                     }
                     element.target = null;
                     element.time = 0;
-                }else{
+                }else if(type == "mousewheel"){
                     data.wheel = e.deltaY
                     d.simpleDispatch(MouseEventX.MouseWheel,data,true);
                 }
@@ -151,6 +153,22 @@ module rf{
                 data.dx = (e.movementX || e.mozMovementX || e.webkitMovementX || 0) * pixelRatio;
                 data.dy = (e.movementY || e.mozMovementY || e.webkitMovementY || 0) * pixelRatio;
                 d.simpleDispatch(MouseEventX.MouseMove,data,true);
+
+                let{preRolled}=mouse;
+
+                if(preRolled != d)
+                {
+                    if(undefined != preRolled){
+                        preRolled.mouseRoll = false;
+                        preRolled.simpleDispatch(MouseEventX.ROLL_OUT,data,true);
+                    }
+                    if(d){
+                        d.mouseRoll = true;
+                        d.simpleDispatch(MouseEventX.ROLL_OVER,data,true);
+                    }
+                    mouse.preRolled = d;
+                }
+
                 data.recycle();
             }
         }

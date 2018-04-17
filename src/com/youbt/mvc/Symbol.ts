@@ -25,11 +25,14 @@ module rf{
 			this.x = dsymbol.x;
 			this.y = dsymbol.y;
 			this.gotoAndStop(dsymbol.displayClip, true);
+
+			this.updateHitArea();
 		}
 		
 		
 		gotoAndStop(clip:any, refresh:Boolean=false):void{
-			if(!this.dsymbol){
+			const{dsymbol, graphics} = this;
+			if(dsymbol == undefined){
 				// this.gotoAndStop(clip,refresh);
 				return;
 			}
@@ -40,14 +43,14 @@ module rf{
 			
 			this.currentClip = clip;
 			
-			let elements:any[] = this.dsymbol.displayFrames[clip];
+			let elements:any[] = dsymbol.displayFrames[clip];
 			if(undefined == elements)
 			{
-				this.graphics.clear();
-				this.graphics.end();
+				graphics.clear();
+				graphics.end();
 				return;
 			}
-			this.graphics.clear();
+			graphics.clear();
 			
 			let sp:Sprite;
 			
@@ -62,12 +65,11 @@ module rf{
 					
 					sp = this[ele.name];
 					if(!sp){
-						if(ele.rect){
+						if(ele.rect){//目前还没写9宫
 							//sp = new ScaleRectSprite3D(source);
 						}else{
 							sp = new Symbol(this.source);
 						}
-						// sp.useTxtSet = this.useTxtSet;
 						sp.mouseEnabled = true;
 						sp.x = ele.x;
 						sp.y = ele.y;
@@ -86,7 +88,7 @@ module rf{
 						this[ele.name] = sp;
 						sp.name = ele.name;
 						
-						// sp.setSize(Math.round(sp.width * ele.scaleX),Math.round(sp.height * ele.scaleY));
+						sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
 					}
 					this.addChild(sp);
 				}else if(ele.type == DisplayFrameElement.TEXT){
@@ -102,7 +104,7 @@ module rf{
 
 						(sp as TextField).init(this.source, format);
 						(sp as TextField).color = textElement.color;
-						if(textElement.input){
+						if(textElement.input){//暂时还没写可输入
 							// (sp as TextField).type = TextFieldType.INPUT;
 							// (sp as TextField).selectable = true;
 							// sp.mouseEnabled = true;
@@ -110,10 +112,10 @@ module rf{
 							// (sp as TextField).type = TextFieldType.DYNAMIC;
 						}
 						
-						sp.setSize(textElement.width+4,textElement.height+4);
+						sp.setSize(textElement.width,textElement.height);
 						(sp as TextField).text = textElement.text;
-						sp.x = ele.x-2;
-						sp.y = ele.y-2;
+						sp.x = ele.x;
+						sp.y = ele.y;
 						this.addChild(sp);
 						if(ele.name){
 							this._skin[ele.name] = sp;
@@ -133,7 +135,7 @@ module rf{
 				}
 			}
 			
-			this.graphics.end();
+			graphics.end();
 			
 		}
 		
@@ -147,9 +149,9 @@ module rf{
 			{
 				return;
 			}
-			
+			const {graphics}  = this;
 			if(clean){
-				this.graphics.clear();
+				graphics.clear();
 			}
 			
 			if(element.rect){
@@ -162,11 +164,11 @@ module rf{
 				// }
 				// scaleGeomrtry.set9Size(_width,_height);
 			}else{
-				this.graphics.drawBitmap(0,0,vo);//,element.matrix2d
+				graphics.drawBitmap(0,0,vo);//,element.matrix2d
 			}
 			
 			if(clean){
-				this.graphics.end();
+				graphics.end();
 			}
 		}
 	}
