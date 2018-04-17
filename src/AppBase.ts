@@ -3,6 +3,9 @@
 ///<reference path="./com/youbt/stage3d/three/Mesh.ts" />
 module rf {
     export class AppBase implements ITickable,IResizeable{
+
+        nextGCTime:number;
+        gcDelay:number = 3000;
         constructor() {
             this.createSource();
             Engine.start();
@@ -27,6 +30,10 @@ module rf {
 
             Engine.addResize(this);
             Engine.addTick(this);
+
+            ROOT.addEventListener(EngineEvent.FPS_CHANGE,this.gcChangeHandler,this);
+
+            this.nextGCTime = engineNow + this.gcDelay;
 
             
         }
@@ -95,6 +102,18 @@ module rf {
         public resize(width:number,height:number):void{
             context3D.configureBackBuffer(stageWidth,stageHeight,0);
             ROOT.resize(width,height);
+            
+        }
+
+
+        gcChangeHandler(event:EventX):void{
+            let{nextGCTime,gcDelay}=this;
+            let now = engineNow;
+            if(now > nextGCTime){
+                context3D.gc(now);
+                Res.instance.gc(now);
+                this.nextGCTime+=gcDelay
+            }
             
         }
 

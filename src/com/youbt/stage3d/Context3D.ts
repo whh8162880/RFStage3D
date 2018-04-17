@@ -523,8 +523,7 @@ namespace rf {
 		// 	gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		// }
 
-		gc(event:EventX):void{
-			let now = engineNow;
+		gc(now:number):void{
 			let link = this.bufferLink;
 			let vo = link.getFrist();
 			while(vo){

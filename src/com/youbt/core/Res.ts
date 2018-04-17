@@ -176,8 +176,7 @@ module rf {
             this.loadNext();
         }
 
-        private clearRes(): void {
-            let now = engineNow;
+        gc(now:number): void {
             const { resMap } = this;
             for (let url in resMap) {
                 let item = resMap[url];
