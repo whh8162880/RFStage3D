@@ -227,6 +227,29 @@ module rf {
         index:IndexBuffer3D;
 
 
+        get pos(){
+            const{numVertices,vertex,data32PerVertex}=this.vertex.data;
+            let pos = [];
+            for(let i=0;i<numVertices;i++){
+                let p = i * data32PerVertex;
+                pos.push([vertex[p],vertex[p+1],vertex[p+2]])
+            }
+            return pos;
+        }
+
+        get triangles(){
+            const{numTriangles}=this;
+            const{data}=this.index;
+            let triangles = [];
+            for(let i=0;i<numTriangles;i++){
+                let p = i * 3;
+                triangles.push( [data[p],data[p+1],data[p+2]] )
+            }
+
+            return triangles;
+        }
+
+
         uploadContext(camera:Camera,mesh:Mesh, program:Program3D, now: number, interval: number){
             let c = context3D;
             this.vertex.uploadContext(program);

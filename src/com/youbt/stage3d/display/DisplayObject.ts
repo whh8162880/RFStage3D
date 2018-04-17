@@ -132,6 +132,7 @@ module rf {
         mouseEnabled:boolean = false;
         mouseChildren:boolean = true;
         mousedown:boolean = false;
+		mouseRoll:Boolean = false;
         transformComponents: Vector3D[];
         pos: Vector3D;
         rot: Vector3D;
@@ -156,7 +157,7 @@ module rf {
         public w: number = 0;
         public h: number = 0;
 
-        public _visible: Boolean = true;
+        public _visible: boolean = true;
         public states: number = 0;
 
         public pivotZero: boolean = false;
@@ -198,8 +199,8 @@ module rf {
             }
         }
 
-        public get visible(): Boolean { return this._visible; }
-        public set visible(value: Boolean) {
+        public get visible(): boolean { return this._visible; }
+        public set visible(value: boolean) {
             if (this._visible != value) {
                 this._visible = value;
                 this.setChange(DChange.vertex)
@@ -301,21 +302,22 @@ module rf {
 		 * @param distance
 		 * 
 		 */
-        public forwardPos(distance: number, or: Boolean = false): void {
+        public forwardPos(distance: number, target?:Vector3D): void {
+            const{pos}=this;
             this.transform.copyColumnTo(2, tempAxeX);
             tempAxeX.normalize();
-            if (or) {
-                this.pos.x = -tempAxeX.x * distance;
-                this.pos.y = -tempAxeX.y * distance;
-                this.pos.z = -tempAxeX.z * distance;
+            if (undefined != target) {
+                pos.x = -tempAxeX.x * distance + target.x;
+                pos.y = -tempAxeX.y * distance + target.y;
+                pos.z = -tempAxeX.z * distance + target.z;
             } else {
-                this.pos.x += tempAxeX.x * distance;
-                this.pos.y += tempAxeX.y * distance;
-                this.pos.z += tempAxeX.z * distance;
+                pos.x += tempAxeX.x * distance;
+                pos.y += tempAxeX.y * distance;
+                pos.z += tempAxeX.z * distance;
             }
-            this._x = this.pos.x;
-            this._y = this.pos.y;
-            this._z = this.pos.z;
+            this._x = pos.x;
+            this._y = pos.y;
+            this._z = pos.z;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
 

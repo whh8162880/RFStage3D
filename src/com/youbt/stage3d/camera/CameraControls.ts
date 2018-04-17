@@ -1,20 +1,32 @@
 module rf{
     export class TrackballControls{
-        object:DisplayObject;
+        object:Camera;
         target:Vector3D;
         mouseSitivity:number = 0.3;
         distance:number;
-        constructor(object:DisplayObject){
+        constructor(object:Camera){
             this.object = object;
             this.target = new Vector3D();
+            this.distance = this.object.pos.subtract(this.target).length;
             ROOT.on(MouseEventX.MouseDown,this.mouseDownHandler,this);
             ROOT.on(MouseEventX.MouseWheel,this.mouseWheelHandler,this);
+            ROOT.on(MouseEventX.MouseRightDown,this.mouseRightDownHandler,this);
+
+            this.updateSun();
+        }
+
+        updateSun(){
+            const{object,target}=this;
+            let sun = scene.sun;
+            sun.x = object._x - target.x;
+            sun.y = object._y - target.y;
+            sun.z = object._z - target.z;
         }
 
         set tdistance(value:number){
             // console.log(value);
             this.distance = value;
-            this.object.forwardPos(value,true);
+            this.object.forwardPos(value,this.target);
         }
 
         get tdistance():number{
@@ -69,7 +81,7 @@ module rf{
             // dy *= pixelRatio;
 
             let speed = (distance > 1000) ? mouseSitivity : mouseSitivity * distance / 1000;
-            speed = Math.max(speed,0.015);
+            speed = Math.max(speed,0.1);
 
             let rx = dy*speed + object.rotationX;
             let ry = -dx*speed + object.rotationY;
@@ -85,7 +97,34 @@ module rf{
                 object.setPos(raw[12],raw[13],raw[14]);
             }
             object.rotationX = rx;
-			object.rotationY = ry;
+            object.rotationY = ry;
+            
+            this.updateSun();
+        }
+
+
+
+        mouseRightDownHandler(event:EventX):void{
+            ROOT.on(MouseEventX.MouseMove,this.mouseRightMoveHandler,this);
+            ROOT.on(MouseEventX.MouseRightUp,this.mouseRightUpHandler,this);
+        }
+
+
+        mouseRightMoveHandler(event:EventX):void{
+            let{dx,dy}=event.data;
+            const{object,target}=this;
+            dy *= (this.distance / object.originFar);
+            target.y += dy;
+            object.setPos(object._x,object._y += dy ,object._z);
+
+            this.updateSun();
+            
+
+        }
+
+        mouseRightUpHandler(event:EventX):void{
+            ROOT.off(MouseEventX.MouseMove,this.mouseRightMoveHandler);
+            ROOT.off(MouseEventX.MouseRightUp,this.mouseRightUpHandler);
         }
     }
 }

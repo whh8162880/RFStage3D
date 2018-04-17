@@ -76,7 +76,7 @@ namespace rf {
 		
 		constructor() {
 			this.bufferLink = new Link();
-			ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
+			// ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
 		}
 
 		public configureBackBuffer(width: number,height: number,antiAlias: number,enableDepthAndStencil: boolean = true): void {
@@ -523,8 +523,7 @@ namespace rf {
 		// 	gl.uniform1i(l, tex.textureUnit); // TODO:multiple textures
 		// }
 
-		gc(event:EventX):void{
-			let now = engineNow;
+		gc(now:number):void{
 			let link = this.bufferLink;
 			let vo = link.getFrist();
 			while(vo){
