@@ -214,32 +214,16 @@ module rf{
 				this._skin.parent.removeChild(this._skin);
 			}
 		}
-    }
-
-        
-    export interface IPanel{
-        show(container:DisplayObjectContainer,isModal:boolean):void;
-		
-	/**
-	 * 是否是展示状态 
-	 * @return 
-	 * 
-	 */		
-	// get isShow():boolean;
-		
-	/**
-	 * 弹到最顶层; 
-	 * 
-	 */		
-	    bringTop():void;
-		
-    /**
-     * 隐藏 
-     * @param event
-     * 
-     */		
-	hide(event:Event):void;
-
+	}
+	
+	
+	export interface IPanel{
+		show(container:DisplayObjectContainer,isModal:boolean):void;
+		bringTop():void;	
+		hide(event:Event):void;
+		// get skin():any;
+		// get isShow():boolean;
+	
     }
 
     export class TPanel extends SkinBase implements IPanel{
@@ -293,7 +277,7 @@ module rf{
 		}
 
 		load():void{
-			// if(this.state != ResourceState.LOAD_NONE && this.state != ResourceState.LOAD_ERROR && p3dCompleted){
+			// if(this.state != .LOAD_NONE && this.state != ResourceState.LOAD_ERROR && p3dCompleted){
 			// 	return;	
 			// }
 			
