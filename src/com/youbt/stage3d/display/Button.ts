@@ -1,6 +1,5 @@
 module rf{
-    export class Button{
-        _skin:Symbol;
+    export class Button extends SkinBase{
         text:TextField;
 
         public mouseDown:Boolean;
@@ -10,13 +9,11 @@ module rf{
         private _label:string;
 
         constructor(skin:Symbol){
-            this._skin = skin;
+            super(skin);
             skin.mouseChildren = false;
-
-            this.bindComponents();
         }
 
-        protected bindComponents():void
+        bindComponents():void
         {
             const{_skin} = this;
             if(_skin["label"] != undefined)
@@ -66,7 +63,7 @@ module rf{
 
         protected clipRefresh():void{
             const{_skin, mouseDown} = this;
-            _skin.gotoAndStop(mouseDown ? 2 : (this._skin.mouseRoll ? 1 : 0));
+            (_skin as Symbol).gotoAndStop(mouseDown ? 2 : (this._skin.mouseRoll ? 1 : 0));
         }
 
         set label(val:string)
