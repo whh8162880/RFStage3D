@@ -111,17 +111,17 @@ module rf{
 		 * @param mediator
 		 * 
 		 */		
-		registerMediatorAlias(mediatorName:string,mediator:IMediator):void{
+		registerMediatorAlias(mediatorName:string,mediator:Mediator):void{
 			this.view.registerMediatorAlias(mediatorName,mediator);
         }
         
 
-        registerMediator( mediator:IMediator ):void {
+        registerMediator( mediator:Mediator ):void {
 			this.view.registerMediator( mediator );
         }
         
 
-        getMediator(clz:IMediator):IMediator{
+        getMediator(clz:Mediator):Mediator{
             let mediatorName = clz.getName();
             let mediator = this.view.getMediator(mediatorName);
             if(mediator == null)
@@ -132,18 +132,18 @@ module rf{
             return mediator;
         }
 
-        removeMediator(clz:IMediator):IMediator{
+        removeMediator(clz:Mediator):Mediator{
             let mediatorName = clz.getName();
             let mediator = this.view.removeMediator(mediatorName);
             return mediator;
         }
 
-        hasMediator(clz:IMediator):boolean{
+        hasMediator(clz:Mediator):boolean{
             let mediatorName = clz.getName();
             return this.view.hasMediator(mediatorName);
         }
 
-        toggleMediator(clz:IMediator,type:number = -1):IMediator{
+        toggleMediator(clz:Mediator,type:number = -1):Mediator{
             let mediatorName = clz.getName();
 			// if(_shieldMediators[mediatorName])
 			// {
@@ -157,7 +157,7 @@ module rf{
                 return null;
             }
 
-            let panel = <TPanel>mediator.getPanel();
+            let panel = mediator.getPanel();
             // let async = <AsyncMediator>mediator ;
             //加载
             // if(!async.isReady && !type)
@@ -207,7 +207,7 @@ module rf{
 		 * @param mediator
 		 * 
 		 */		
-		registerMediator( mediator:IMediator ) : void;
+		registerMediator( mediator:Mediator ) : void;
 		
 		/**
 		 * 注册一个别名; 
@@ -215,7 +215,7 @@ module rf{
 		 * @param mediator
 		 * 
 		 */		
-		registerMediatorAlias( name:string , mediator:IMediator ):void;
+		registerMediatorAlias( name:string , mediator:Mediator ):void;
 		
 		/**
 		 * 取得 一个视图中介; 
@@ -223,7 +223,7 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		getMediator( mediatorName:string ) : IMediator;
+		getMediator( mediatorName:string ) : Mediator;
 		
 		/**
 		 * 删除一个视图中介;  
@@ -231,7 +231,7 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		removeMediator( mediatorName:string ) : IMediator;
+		removeMediator( mediatorName:string ) : Mediator;
 		
 		/**
 		 * 是否存在相应的视图中介;  
@@ -294,7 +294,7 @@ module rf{
 		 * @param mediator
 		 * 
 		 */		
-		registerMediator( mediator:IMediator ) : void
+		registerMediator( mediator:Mediator ) : void
 		{
             let name:string = mediator.getName();
             let mediatorMap = this.mediatorMap;
@@ -306,7 +306,7 @@ module rf{
 			mediator.onRegister();
 		}
 		
-		registerMediatorAlias( name:string , mediator:IMediator ):void{
+		registerMediatorAlias( name:string , mediator:Mediator ):void{
             let mediatorMap = this.mediatorMap;
 
 			if(!mediator){
@@ -349,7 +349,7 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		getMediator( mediatorName:string ) : IMediator
+		getMediator( mediatorName:string ) : Mediator
 		{
 			return this.mediatorMap[ mediatorName ];
 		}
@@ -360,10 +360,10 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		removeMediator( mediatorName:string ) : IMediator
+		removeMediator( mediatorName:string ) : Mediator
 		{
             let mediatorMap = this.mediatorMap;
-			var mediator:IMediator = mediatorMap[ mediatorName ] as IMediator;
+			var mediator:Mediator = mediatorMap[ mediatorName ] as Mediator;
 			
 			if ( mediator ) 
 			{

@@ -21,6 +21,10 @@ module rf{
 			return this.name;
 		}
 
+		getPanel():TPanel{
+			return this._panel;
+		}
+
 		execute(type:string, ...args):void
 		{
 			if(type in this){
@@ -91,6 +95,10 @@ module rf{
 					// sleep();
 					// break;
 			}
+		}
+
+		onRemove():void{
+			
 		}
 
 	}
