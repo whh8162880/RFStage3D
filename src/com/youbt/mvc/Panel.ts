@@ -97,7 +97,7 @@ module rf{
 		awaken():void{}
 		sleep():void{}
 		
-		addEventListener(type:string, listener:Function, priority:number=0):void
+		addEventListener(type:string|number, listener:Function, priority:number=0):void
 		{
 			this._skin.addEventListener(type,listener,priority);
 		}
@@ -107,17 +107,17 @@ module rf{
 			return this._skin.dispatchEvent(event);
 		}
 		
-		hasEventListener(type:string):boolean
+		hasEventListener(type:string|number):boolean
 		{
 			return this._skin.hasEventListener(type);
 		}
 		
-		removeEventListener(type:string, listener:Function):void
+		removeEventListener(type:string|number, listener:Function):void
 		{
 			this._skin.removeEventListener(type,listener);
 		}
 		
-		simpleDispatch(type:string, data:any=null, bubbles:boolean=false):boolean
+		simpleDispatch(type:string|number, data:any=null, bubbles:boolean=false):boolean
 		{
 			return this._skin.simpleDispatch(type,data,bubbles);
 		}
@@ -217,16 +217,77 @@ module rf{
 	}
 	
 	
-	export interface IPanel{
-		show(container:DisplayObjectContainer,isModal:boolean):void;
-		bringTop():void;	
-		hide(event:Event):void;
-		// get skin():any;
-		// get isShow():boolean;
 	
-    }
+	export class PanelBase extends SkinBase{
+		isShow:boolean = false;
+		tweer:Tween;
 
-    export class TPanel extends SkinBase implements IPanel{
+		constructor(){
+			super();
+		}
+
+		show(container:any=null, isModal:Boolean=false):void{
+			if(this.isShow)
+			{
+				this.bringTop();
+				return;
+			}
+			if(!container)
+			{
+				container = popContainer;
+			}
+
+			this.isShow = true;
+			this.awaken();
+			this.effectTween(1);
+
+			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler);
+			if(this.hasEventListener(PanelEvent.SHOW))
+			{
+				this.simpleDispatch(PanelEvent.SHOW);
+			}
+
+
+		}
+
+		effectTween(type:number):void{
+			if(this.tweer)
+			{
+				// this.tweer.off()
+			}
+		}
+
+		hide(e:Event = undefined):void{
+			if(!this.isShow){
+				return;
+			}
+
+			this.isShow = false;
+
+			this.sleep();
+			this.effectTween(0);
+			
+			// this.hideState();
+			this.removeEventListener(MouseEventX.MouseDown,this.panelClickHandler);
+			if(this.hasEventListener(PanelEvent.HIDE)){
+				this.simpleDispatch(PanelEvent.HIDE);
+			}
+		}
+
+		bringTop():void
+		{
+			let skin:Sprite = this._skin;
+			if(skin.parent == null) return;
+			skin.parent.addChild(skin);
+		}
+
+		panelClickHandler(e:MouseEventX):void{
+			this.bringTop();
+		}
+		
+	}
+
+    export class TPanel extends PanelBase{
 	   
 		uri:string;
 		clsName:string;
@@ -237,7 +298,7 @@ module rf{
 		resource:PanelSource;
 		container:DisplayObjectContainer;
 		_readyShow:boolean = false;
-		isShow:boolean = false;
+		
 		constructor(uri:string,cls:string){
 			super();
 			this.uri = uri;
@@ -267,7 +328,7 @@ module rf{
 				this.load();
 				return;
 			}
-			// super.show(container,isModal);
+			super.show(container,isModal);
 			
 			// if(isShow)
 			// {
@@ -281,9 +342,11 @@ module rf{
 			// 	return;	
 			// }
 			
-			let url= this.getURL();
+			// let url= this.getURL();
+			// let manage:PanelSourceManage = new PanelSourceManage;
+			// manage.load(url);
 			
-			loadRes(url, this.p3dloadComplete, this, ResType.text)
+			// loadRes(url, this.p3dloadComplete, this, ResType.text)
 			// this.resource =  //p3d.load(url, uri, this);
 			// resource.ungc = ungc;
 			// if(resource.isReady){
@@ -309,16 +372,15 @@ module rf{
 			return this.resource.isReady;
 		}
 
-		bringTop():void
-		{
-
-		}
 
 		hide(e:Event = undefined):void{
-
+			super.hide(e);
 		}
 
+
 	}
+
+
 
     
 }
