@@ -39,17 +39,10 @@ module rf{
             return mediator;
         }
 
-        registerEvent(event:MiniDispatcher):void{
-            if (undefined == this.mEventListeners) {
-				this.mEventListeners = {};
-            }
-            let signal;
-            for(let type in event.mEventListeners){
-                signal = event.mEventListeners[type];
-                if(signal)
-                {
-                    this.mEventListeners[type] = signal;
-                }
+        registerEvent(events:{[key:string]:EventHandler},thisobj:any):void{
+            for(let key in events){
+                let fun = events[key];
+                this.on(key,fun,thisobj);
             }
         }
 

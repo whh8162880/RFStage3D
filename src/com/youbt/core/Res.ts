@@ -1,6 +1,6 @@
 
 module rf {
-    export type ResLoadHandler = (event: EventX) => void;
+    export type EventHandler = (event: EventX) => void;
 
     /**
          * 同一时刻最大可以同时启动的下载线程数
@@ -35,13 +35,13 @@ module rf {
      * @param noDispose 不自动释放
      * @param disposeTime 自动释放时间, 超过该时间自动释放资源
      */
-    export function loadRes(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin,
+    export function loadRes(url: string, complete?: EventHandler, thisObj?: any, type: ResType = ResType.bin,
         priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): ResItem {
         return Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
     }
 
 
-    export function removeLoad(url:string,complete:ResLoadHandler):void{
+    export function removeLoad(url:string,complete:EventHandler):void{
 
     }
 
@@ -83,7 +83,7 @@ module rf {
         }
 
 
-        removeLoad(url: string, complete?: ResLoadHandler){
+        removeLoad(url: string, complete?: EventHandler){
             const { resMap } = this;
             let item = resMap[url];
             if(undefined == item){
@@ -120,7 +120,7 @@ module rf {
          * @param noDispose 不自动释放
          * @param disposeTime 自动释放时间, 超过该时间自动释放资源
          */
-        load(url: string, complete?: ResLoadHandler, thisObj?: any, type: ResType = ResType.bin,
+        load(url: string, complete?: EventHandler, thisObj?: any, type: ResType = ResType.bin,
             priority: LoadPriority = LoadPriority.low, cache: boolean = true, noDispose: boolean = false, disposeTime: number = 30000): ResItem {
 
             const { resMap } = this;
@@ -245,7 +245,7 @@ module rf {
 
 
     export interface IResHandler {
-        complete: ResLoadHandler;
+        complete: EventHandler;
         thisObj: any;
     }
 
