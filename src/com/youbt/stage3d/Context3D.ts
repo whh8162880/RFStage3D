@@ -257,12 +257,16 @@ namespace rf {
 
 		public textureObj:{[key:string]:Texture} = {};
 
-		public createTexture(key:string,pixels: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
+		public createTexture(key:string,pixels?: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
 			let texture = recyclable(Texture);
 			texture.key = key;
 			texture.pixels = pixels;
-			texture.width = pixels.width;
-			texture.height = pixels.height;
+			
+			if(pixels){
+				texture.width = pixels.width;
+				texture.height = pixels.height;
+			}
+			
 			texture.mipmap = mipmap
 			this.textureObj[key] = texture;
 			return texture;

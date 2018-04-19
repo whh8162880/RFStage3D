@@ -66,16 +66,11 @@ module rf{
 
             let r = 40;
 
+            m.diffTex = "assets/a10010m/diff.png";
 
-           
-            
-            
-
-            
-            // let plane = new PlaneGeometry(variables).create(w*2,w);
+            // let plane = new PlaneGeometry(variables).create(w,w);
             // let mesh = new Mesh(variables);
             // mesh.init(plane,m);
-            // mesh.setPos(-w-80,0,0);
             // scene.addChild(mesh);
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
@@ -104,9 +99,10 @@ module rf{
             // scene.addChild(mesh);
 
 
-            let kfmMesh = new KFMMesh(m);
+            let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            kfmMesh.load("assets/a10010m/mesh.km");
+            // kfmMesh.load("assets/a10010m/");
+            kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a10010m/");
             scene.addChild(kfmMesh);
 
             // new AMF3Test().load("assets/test.dat");

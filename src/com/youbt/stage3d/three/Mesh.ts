@@ -41,19 +41,27 @@ module rf{
 
 
     export class KFMMesh extends Mesh{
+
+        id:string;
+
+
         constructor(material?:Material,variables?:{ [key: string]: IVariable }){
             super(variables);
             this.material = material;
         }
 
         load(url:string){
-            loadRes(url,function (e:EventX){
-                let item:ResItem = e.data;
-                let amf = singleton(AMF3);
-                amf.setArrayBuffer(item.data);
-                let o = amf.readObject();
-                this.setKFM(o);
-            },this,ResType.bin)
+            this.id = url;
+            url += "mesh.km";
+            loadRes(url,this.loadCompelte,this,ResType.bin);
+        }
+
+        loadCompelte(e:EventX){
+            let item:ResItem = e.data;
+            let amf = singleton(AMF3);
+            amf.setArrayBuffer(item.data);
+            let o = amf.readObject();
+            this.setKFM(o);
         }
 
         setKFM(kfm:object){
@@ -68,9 +76,8 @@ module rf{
             geometry.vertex = c.createVertexBuffer(info);
             geometry.index = c.createIndexBuffer(index);
             this.geometry = geometry;
-            if(undefined == this.material){
-                this.material = new PhongMaterial();
-            }
+            this.material.triangleFaceToCull = Context3DTriangleFace.NONE;
+            this.material["diffTex"] = this.id + kfm["diff"];
         }
     }
 }

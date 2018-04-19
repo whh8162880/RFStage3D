@@ -40,6 +40,11 @@ module rf {
         return Res.instance.load(url, complete, thisObj, type, priority, cache, noDispose, disposeTime);
     }
 
+
+    export function removeLoad(url:string,complete:ResLoadHandler):void{
+
+    }
+
     /**
      * 资源加载管理类
      */
@@ -77,9 +82,36 @@ module rf {
             // setInterval(this.clearRes.bind(this), 10 * 1000);
         }
 
+
+        removeLoad(url: string, complete?: ResLoadHandler){
+            const { resMap } = this;
+            let item = resMap[url];
+            if(undefined == item){
+                return;
+            }
+
+            let completes = item.complete;
+            if(undefined == completes){
+                return;
+            }
+
+            let len = completes.length;
+            let i = -1;
+            for(i = 0;i<len;i++){
+                let o = completes[i];
+                if(o.complete == complete){
+                    break;
+                }
+            }
+
+            if(-1 != i){
+                completes.splice(i,1);
+            }
+        }
+
         /**
          * 添加一个加载项
-         * @param url 加载路径, 数组为添加多个
+         * @param url 加载路径
          * @param complete 加载完毕回调
          * @param thisObj 回调作用域
          * @param type 资源类型
