@@ -173,8 +173,8 @@ module rf {
 
     export class Image extends Sprite{
         _url:string;
-        constructor(){
-            super();
+        constructor(source?:BitmapSource){
+            super(source);
         }
         load(url:string):void
         {
@@ -200,7 +200,7 @@ module rf {
             let image:HTMLImageElement = res.data;
             let source = this.source;
             let vo = source.setSourceVO(this._url,image.width,image.height,1);
-            source.bmd.context.drawImage(image,vo.x,vo.y);
+            source.drawimg(image,vo.x,vo.y);
 
             let g = this.graphics;
             g.clear();
@@ -219,8 +219,8 @@ module rf {
         img:HTMLImageElement;
 
         isReady:boolean = false;
-        constructor(){
-            super();
+        constructor(source?:BitmapSource){
+            super(source);
         }
 
         setUrl(url:string):void{
@@ -293,9 +293,9 @@ module rf {
             }
 
             let source = this.source;
-            let vo = source.setSourceVO(this._url,img.width,img.width,1);
+            let vo = source.setSourceVO(this._url,img.width,img.height,1);
             // source.bmd.context.drawImage(img,vo.x,vo.y);
-            source.bmd.context.drawImage(img,vo.x,vo.y,dw,dh);
+            source.drawimg(img,vo.x,vo.y,dw,dh);
 
             let g = this.graphics;
             g.clear();

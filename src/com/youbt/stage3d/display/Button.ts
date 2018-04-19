@@ -80,5 +80,11 @@ module rf{
         {
             return this._label;
         }
+
+        addClick(func:Function):void
+		{
+            const{_skin} = this;
+			_skin.addEventListener(MouseEventX.CLICK, func, this);
+		}
     }
 }
