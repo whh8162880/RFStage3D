@@ -130,7 +130,7 @@ module rf{
             rawData[0] = 2/width;      rawData[1] = 0;             rawData[2] = 0;                  rawData[3] = 0;
             rawData[4] = 0;            rawData[5] = 2/height;      rawData[6] = 0;                  rawData[7] = 0;
             rawData[8] = 0;            rawData[9] = 0;             rawData[10] = 1/this.far;        rawData[11] = 1/this.originFar;
-            rawData[12] = 0;           rawData[13] = 0;            rawData[14] = -1/this.far;       rawData[15] = 0;
+            rawData[12] = 0;           rawData[13] = 0;            rawData[14] = -1/this.far*Math.PI*100;       rawData[15] = 0;
 
             
             this.states |= DChange.trasnform;
