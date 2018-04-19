@@ -1,20 +1,5 @@
 module rf{
-    export interface IProxy extends IName{
-        /**
-		 * 当被注册到应用中时触发; 
-		 * 
-		 */		
-		onRegister( ):void;
-		
-		/**
-		 * 当从应用中删除时触发; 
-		 * 
-		 */		
-        onRemove( ):void;
-        
-    }
-
-    export class BaseMode extends MiniDispatcher implements IProxy{
+    export class BaseMode extends MiniDispatcher{
         /**
 		 * 所有的model列表 
 		 */		
@@ -24,7 +9,7 @@ module rf{
         modelName:string;
         proxyName:string;
         
-        facade:IFacade = Facade.getInstance();
+        facade:Facade = Facade.getInstance();
         constructor(proxyName:string,modelName:string){
             super();
 

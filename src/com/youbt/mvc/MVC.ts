@@ -1,32 +1,22 @@
 module rf{
-    export interface IName{
-        getName():string;
-    }
-
     //var facade
     //facade 注册记录保存所有Model class 等信息
-    export interface IFacade{
-        registerProxy(proxy:IProxy):void;
-        getProxy(clz:IProxy,autoCreate:boolean):IProxy;
-        removeProxy(clz:IProxy):IProxy;
-        toggleMediator(nameOrClass:any,type:number):any;
-        executeMediator(nameOrClass:any,funcType:string,...args):any
-    }
 
-    export class Facade implements IFacade{
+    export class Facade extends MiniDispatcher{
 
         SINGLETON_MSG:string = "Facade Singleton already constructed!";
-        model: IModel;
-		view: IView;
+        model: Model;
+		view: View;
 
         constructor(){
+            super();
             Facade.ins = this;
             
             this.initialize();
         }
 
-        static ins : IFacade; 
-        static getInstance():IFacade{
+        static ins : Facade; 
+        static getInstance():Facade{
             let ins = this.ins;
             if(ins == null){
                 ins = new Facade();
@@ -58,22 +48,12 @@ module rf{
             singleton(clazz);
         }
         
-        /**
-		 * 注册一个proxy别名(不建议直接使用); 
-		 * @param proxyName
-		 * @param proxy
-		 * 
-		 */		
-		registerProxyAlias(proxyName:string,proxy:IProxy):void{
-			this.model.registerProxyAlias(proxyName,proxy);
-		}
-		
-        registerProxy( proxy:IProxy ):void{
+        registerProxy( proxy:BaseMode ):void{
             this.model.registerProxy (proxy);	
 			this.view.registerEvent(proxy);
         }
 
-        getProxy(clz:IProxy,autoCreate:boolean= true):IProxy{
+        getProxy(clz:BaseMode,autoCreate:boolean= true):BaseMode{
 
             let proxyName = clz.getName();
             let proxy = this.model.getProxy(proxyName);
@@ -85,7 +65,7 @@ module rf{
             return proxy;
         }
         
-        removeProxy(clz:IProxy):IProxy{
+        removeProxy(clz:BaseMode):BaseMode{
             
             let proxyName = clz.getName();
 
@@ -98,30 +78,17 @@ module rf{
             return proxy;
         }
 
-        hasProxy(clz:IProxy):IProxy
+        hasProxy(clz:BaseMode):BaseMode
         {  
             let proxyName = clz.getName();
             return this.model.getProxy(proxyName);
         }
 
-
-	    /**
-		 * 注册一个mediator别名(不建议直接使用); 
-		 * @param mediatorName
-		 * @param mediator
-		 * 
-		 */		
-		registerMediatorAlias(mediatorName:string,mediator:IMediator):void{
-			this.view.registerMediatorAlias(mediatorName,mediator);
-        }
-        
-
-        registerMediator( mediator:IMediator ):void {
+        registerMediator( mediator:Mediator ):void {
 			this.view.registerMediator( mediator );
         }
-        
 
-        getMediator(clz:IMediator):IMediator{
+        getMediator(clz:Mediator):Mediator{
             let mediatorName = clz.getName();
             let mediator = this.view.getMediator(mediatorName);
             if(mediator == null)
@@ -132,46 +99,27 @@ module rf{
             return mediator;
         }
 
-        removeMediator(clz:IMediator):IMediator{
+        removeMediator(clz:Mediator):Mediator{
             let mediatorName = clz.getName();
             let mediator = this.view.removeMediator(mediatorName);
             return mediator;
         }
 
-        hasMediator(clz:IMediator):boolean{
+        hasMediator(clz:Mediator):boolean{
             let mediatorName = clz.getName();
             return this.view.hasMediator(mediatorName);
         }
 
-        toggleMediator(clz:IMediator,type:number = -1):IMediator{
-            let mediatorName = clz.getName();
-			// if(_shieldMediators[mediatorName])
-			// {
-			// 	simpleDispatch(NOTICE_WARNING ,_shieldMediators[mediatorName]+"功能暂不提供开放！");
-			// 	return;
-            // }
+        toggleMediator(clz:Mediator,type:number = -1):Mediator{
             let mediator = this.getMediator(clz);
             if(!mediator)
             {
+                let mediatorName = clz.getName();
                 console.log(mediatorName + ":不存在");
                 return null;
             }
 
-            let panel = <TPanel>mediator.getPanel();
-            // let async = <AsyncMediator>mediator ;
-            //加载
-            // if(!async.isReady && !type)
-            // {
-            //     async.removeReadyExecute();
-            //     return;
-            // }
-
-            // if(!async.isReady &&  async.startSync())
-            // {
-            //     async.addReadyExecute(this.toggleMediator,mediator,type);
-            //     return mediator;
-            // }
-            
+            let panel = mediator.getPanel();
             switch(type){
                 case 1:
                     if(panel.isShow == false)
@@ -201,68 +149,7 @@ module rf{
 
     
     //view
-    export interface IView {
-/**
-		 * 注册一个视图中介; 
-		 * @param mediator
-		 * 
-		 */		
-		registerMediator( mediator:IMediator ) : void;
-		
-		/**
-		 * 注册一个别名; 
-		 * @param name
-		 * @param mediator
-		 * 
-		 */		
-		registerMediatorAlias( name:string , mediator:IMediator ):void;
-		
-		/**
-		 * 取得 一个视图中介; 
-		 * @param mediatorName
-		 * @return 
-		 * 
-		 */		
-		getMediator( mediatorName:string ) : IMediator;
-		
-		/**
-		 * 删除一个视图中介;  
-		 * @param mediatorName
-		 * @return 
-		 * 
-		 */		
-		removeMediator( mediatorName:string ) : IMediator;
-		
-		/**
-		 * 是否存在相应的视图中介;  
-		 * @param mediatorName
-		 * @return 
-		 * 
-		 */		
-		hasMediator( mediatorName:string ) : boolean;
-		
-		/**
-		 * 
-		 * @param mediator
-		 * 
-		 */		
-		registerEvent(eventInterester:IProxy):void;
-		
-		/**
-		 * 
-		 * @param mediator
-		 * 
-		 */		
-		removeEvent(eventInterester:IProxy):void;
-		
-		/**
-		 * 清理它管理的所有内容; 
-		 * 
-		 */		
-		clear():void;
-    }
-
-    export class View extends MiniDispatcher implements IView{
+    export class View extends MiniDispatcher{
         SINGLETON_MSG	: string = "View Singleton already constructed!";
         mediatorMap :object;
         constructor(){
@@ -273,8 +160,8 @@ module rf{
 			this.initializeView();	
         }
 
-        static ins:IView;
-        static getInstance():IView{
+        static ins:View;
+        static getInstance():View{
             let ins = this.ins
             if(ins == null){
                 ins = new View();
@@ -294,7 +181,7 @@ module rf{
 		 * @param mediator
 		 * 
 		 */		
-		registerMediator( mediator:IMediator ) : void
+		registerMediator( mediator:Mediator ) : void
 		{
             let name:string = mediator.getName();
             let mediatorMap = this.mediatorMap;
@@ -306,7 +193,7 @@ module rf{
 			mediator.onRegister();
 		}
 		
-		registerMediatorAlias( name:string , mediator:IMediator ):void{
+		registerMediatorAlias( name:string , mediator:Mediator ):void{
             let mediatorMap = this.mediatorMap;
 
 			if(!mediator){
@@ -318,21 +205,21 @@ module rf{
 		}
         
     
-		registerEvent(eventInterester:IProxy):void{
-		// 	var interests:Dictionary = eventInterester.eventInterests;
-		// 	var handle:Function;
-		// 	for(var eventType:String in interests){
-		// 		handle=interests[eventType];
-		// 		if(handle==null){
-		// 			handle=eventInterester.handle;
-		// 		}
-		// 		this.addEventListener(eventType,handle);
-		// 	}
+		registerEvent(eventInterester:MiniDispatcher):void{
+			let interests:object = eventInterester.mEventListeners;
+			let handle:Function;
+			for(let eventType in interests){
+				handle=interests[eventType];
+				if(handle==null){
+					// handle=eventInterester.handle;
+				}
+				// this.addEventListener(eventType,handle);
+			}
 		}
 		
-		removeEvent(eventInterester:IProxy):void{
-		// 	var interests:Dictionary = eventInterester.eventInterests;
-		// 	var handle:Function;
+		removeEvent(eventInterester:MiniDispatcher):void{
+		// 	let interests:Dictionary = eventInterester.eventInterests;
+		// 	let handle:Function;
 		// 	for (var eventType:string in interests){
 		// 		handle=interests[eventType];
 		// 		if(handle==null){
@@ -349,7 +236,7 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		getMediator( mediatorName:string ) : IMediator
+		getMediator( mediatorName:string ) : Mediator
 		{
 			return this.mediatorMap[ mediatorName ];
 		}
@@ -360,10 +247,10 @@ module rf{
 		 * @return 
 		 * 
 		 */		
-		removeMediator( mediatorName:string ) : IMediator
+		removeMediator( mediatorName:string ) : Mediator
 		{
             let mediatorMap = this.mediatorMap;
-			var mediator:IMediator = mediatorMap[ mediatorName ] as IMediator;
+			var mediator:Mediator = mediatorMap[ mediatorName ] as Mediator;
 			
 			if ( mediator ) 
 			{
@@ -398,57 +285,7 @@ module rf{
      * 项目中所有的proxy代理都被此类管理着;
      * 
      */
-    export interface IModel{
-        /**
-		 * 注册数据代理; 
-		 * @param proxy
-		 * 
-		 */		
-		registerProxy( proxy:IProxy ) : void;
-		
-		/**
-		 * 注册一个别名; 
-		 * @param name
-		 * @param proxy
-		 * 
-		 */
-		registerProxyAlias(proxyName:string,proxy:IProxy):void;
-		
-		/**
-		 * 取得数据代理;
-		 * @param proxyName
-		 * @return 
-		 * 
-		 */		
-		getProxy( proxyName:string ) : IProxy;
-		
-		
-		/**
-		 * 删除数据代理; 
-		 * @param proxyName
-		 * @return 
-		 * 
-		 */		
-		removeProxy( proxyName:string ) : IProxy;
-		
-		
-		/**
-		 * 取得所有代理定义 
-		 * @return 
-		 * 
-		 */		
-		getAllPorxy():{ [key: string]: IProxy; };
-		
-		/**
-		 * 是否存在相应的数据代理; 
-		 * @param proxyName
-		 * @return 
-		 * 
-		 */		
-		hasProxy( proxyName:string ) : Boolean;
-    }
-
-    export class Model implements IModel{
+    export class Model{
         SINGLETON_MSG	: string = "Model Singleton already constructed!";
         proxyMap :object;
 
@@ -459,8 +296,8 @@ module rf{
 			this.initializeModel();	
         }
 
-        static ins:IModel;
-        static getInstance():IModel{
+        static ins:Model;
+        static getInstance():Model{
             let ins = this.ins
             if(ins == null){
                 ins = new Model();
@@ -474,7 +311,7 @@ module rf{
 
         }
 
-        registerProxy( proxy:IProxy ) : void{
+        registerProxy( proxy:BaseMode ) : void{
             let proxyName:string=proxy.getName();
             if(this.proxyMap[proxyName] != null){
                 throw new Error("重复定义:"+proxyName);
@@ -484,7 +321,7 @@ module rf{
 			proxy.onRegister();
         }
 
-        registerProxyAlias(proxyName:string,proxy:IProxy):void{
+        registerProxyAlias(proxyName:string,proxy:BaseMode):void{
             let proxyMap = this.proxyMap;
             if(!proxy){
 				proxyMap[ proxyName ]=null;
@@ -494,13 +331,13 @@ module rf{
 			proxyMap[ proxyName ] = proxy;
         }
 
-        getProxy( proxyName:string ) : IProxy{
+        getProxy( proxyName:string ) : BaseMode{
             return this.proxyMap[ proxyName ];
         }
 
-        removeProxy( proxyName:string ) : IProxy{
+        removeProxy( proxyName:string ) : BaseMode{
             let proxyMap = this.proxyMap;
-            var proxy:IProxy = proxyMap [ proxyName ] as IProxy;
+            var proxy:BaseMode = proxyMap [ proxyName ] as BaseMode;
 			if ( proxy ) 
 			{
 				proxyMap[ proxyName ] = null;
