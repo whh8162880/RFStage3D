@@ -5,9 +5,7 @@ module rf{
 			super();
 			this.name = NAME;
 			this.mEventListeners = {};
-		}
-
-		onRegister():void{
+			facade.mediatorMap[this.name] = this;
 
 		}
 
@@ -15,25 +13,6 @@ module rf{
 		}
 		
 		awaken():void{
-		}
-
-		getName():string{
-			return this.name;
-		}
-
-		getPanel():TPanel{
-			return this._panel;
-		}
-
-		execute(type:string, ...args):void
-		{
-			if(type in this){
-				let func:Function=this[type];
-				if(func !=null){
-					func.apply(null,args);
-					return;
-				}
-			}
 		}
 
 		_panel:TPanel
@@ -46,34 +25,19 @@ module rf{
 			this.setView(panel.skin);
 		}
 
-		viewComponent:MiniDispatcher
-		setView(_skin:MiniDispatcher):void{
-			if(this.viewComponent){
-				this.bindSetViewEvent(this.viewComponent,false);
+		_skin:MiniDispatcher
+		setView(_skin:Sprite):void{
+			if(this._skin){
+				// _skin.removeEventListener(Event.,this.stageHandler);
 			}
 			
-			this.viewComponent =_skin;
-			
-			if("$view" in this){
-				this["$view"]=_skin;
-			}
-			
-			if(this.viewComponent){
-				this.bindSetViewEvent(this.viewComponent,true);
+			this._skin =_skin;
+			if(this._skin){
+				// addEventListener(event)
 			}
 		}
 
 
-		bindSetViewEvent(_view:MiniDispatcher , isBind:boolean):void{
-			if(isBind)
-			{
-				//加载舞台
-				//离开舞台
-				// _view.addEventListener()
-			}else{
-
-			}
-		}
 
 
 		stageHandler(event:EventX):void{
@@ -83,17 +47,14 @@ module rf{
 		awkenSleepCheck(type:string|number):void
 		{
 			switch(type){
-				// case Event.ADDED_TO_STAGE:
-					// facade.registerEvent(this);
-					// if(isCanAwaken)
-					// {
-					// 	awaken();
-					// }
-					// break;
-				// case Event.REMOVED_FROM_STAGE:
-					// facade.removeEvent(this);
-					// sleep();
-					// break;
+				case ""://Event.ADDED_TO_STAGE:
+					facade.registerEvent(this);
+					this.awaken();
+					break;
+				case ""://Event.REMOVED_FROM_STAGE:
+					facade.removeEvent(this);
+					this.sleep();
+					break;
 			}
 		}
 

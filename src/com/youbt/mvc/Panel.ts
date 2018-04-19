@@ -6,12 +6,6 @@ module rf{
 		HIDE = "PanelEvent_HIDE",
 	}
 
-    export enum ChooseState {
-		SELECT = "selected",
-		NORMAL = "normal",
-		SHRTLY = "shortly",
-	}
-	
 	export enum RES_STATE{
 		LOAD_DISPOSE= -1, //被销毁
 		LOAD_NONE,  // 未加载
@@ -78,9 +72,6 @@ module rf{
 		bindComponents():void{}
 		
 		refreshData():void{this.doData();}
-		
-		set chooseState(value:string){if(value == ChooseState.SELECT){this.selected = true;}else{this.selected = false;}}
-		get chooseState():string{return this._selected ? ChooseState.SELECT : ChooseState.NORMAL;}
        
         _selected:boolean;
 		set selected(value:boolean){this._selected = value;this.doSelected();}
