@@ -101,8 +101,8 @@ module rf{
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            kfmMesh.load("assets/a10010m/");
-            // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a10010m/");
+            // kfmMesh.load("assets/a10010m/");
+            kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a10010m/");
             scene.addChild(kfmMesh);
 
             // new AMF3Test().load("assets/test.dat");
