@@ -180,6 +180,22 @@ module rf{
             }
             return barea.frames[name];
         }
+
+        drawimg(img:HTMLImageElement,x:number,y:number,w?:number,h?:number):void
+        {//可能需要其他的处理
+            const {bmd, name} = this;
+            if(w == undefined && h == undefined)
+            {
+                bmd.context.drawImage(img,x,y);
+            }else{
+                bmd.context.drawImage(img,x,y, w, h);
+            }
+
+            let texture = context3D.textureObj[name];
+            if(undefined != texture){
+                texture.readly = false;
+            }
+        }
     }
 
 
