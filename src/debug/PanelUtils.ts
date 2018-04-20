@@ -1,3 +1,4 @@
+///<reference path="../com/youbt/mvc/manage/PanelSourceManage.ts" />
 module rf{
     export class PanelUtils{
         skin:Symbol;
