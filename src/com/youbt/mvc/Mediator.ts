@@ -5,7 +5,7 @@ module rf{
 			super();
 			this.name = NAME;
 			this.mEventListeners = {};
-			facade.mediatorMap[this.name] = this;
+			// facade.mediatorMap[this.name] = this;
 
 		}
 
@@ -48,11 +48,11 @@ module rf{
 		{
 			switch(type){
 				case ""://Event.ADDED_TO_STAGE:
-					facade.registerEvent(this);
+					// facade.registerEvent(this);
 					this.awaken();
 					break;
 				case ""://Event.REMOVED_FROM_STAGE:
-					facade.removeEvent(this);
+					// facade.removeEvent(this);
 					this.sleep();
 					break;
 			}
