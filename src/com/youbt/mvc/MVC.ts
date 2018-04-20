@@ -18,6 +18,12 @@ module rf{
             let panel = mediator._panel;
 
             if(panel == null) return null;
+            if(mediator.isReady == false)
+            {
+                mediator.asyncStar();
+                return;
+            }
+
 
             switch(type){
                 case 1:
@@ -63,6 +69,8 @@ module rf{
 		name:string;
 		eventInterests:{[key:string]:EventHandler};
 
+        isReady:boolean = false;
+
 		constructor(NAME:string){
 			super();
 			this.name = NAME;
@@ -73,20 +81,54 @@ module rf{
 		
 		_panel:TPanel
 		setPanel(panel:TPanel):void{
-			if(this._panel)
-			{
-				// this._panel.removeEventListener();
-			}
-
 			this._panel = panel;
 			if("$panel" in this)
 			{
 				this["$panel"] = panel;
 			}
         }
-        
-        mediatorReadyHandle():void{
 
+        
+
+        
+        asyncStar():void
+        {
+            let panel = this._panel;
+            if(panel.isReady == false)
+            {
+                panel.load();
+                panel.addEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
+            }else{
+                this.preViewCompleteHandler(undefined);
+            }
+        }
+
+        preViewCompleteHandler(e:EventT):void{
+            if(e)
+            {
+                this._panel.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler)
+            }
+
+            //add to stage
+
+            
+            //checkModeldata
+            
+
+        }
+
+        model:BaseMode;
+        preModelCompleteHandler(e:EventT):void{
+
+        }
+
+
+        mediatorReadyHandle():void{
+            this.isReady = true;
+            if(this._panel.isShow){
+                facade.registerEvent(this.eventInterests,this);
+                this.awaken();
+            }
 
         }
 

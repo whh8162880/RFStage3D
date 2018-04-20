@@ -288,7 +288,8 @@ module rf{
 
 		resource:PanelSource;
 		container:DisplayObjectContainer;
-		_readyShow:boolean = false;
+
+		isReady:boolean = false;
 		
 		constructor(uri:string,cls:string){
 			super();
@@ -310,15 +311,6 @@ module rf{
 
 		
 		show(container:any=null, isModal:Boolean=false):void{
-			if((this.state != RES_STATE.LOAD_LOADED) || !this.resource.isReady){
-				this._readyShow=true;
-				this.container = container;
-				// this._isModal = isModal;
-				this.state = RES_STATE.LOAD_NONE;
-				
-				this.load();
-				return;
-			}
 			super.show(container,isModal);
 			
 			// if(isShow)
