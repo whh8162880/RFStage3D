@@ -18,6 +18,12 @@ module rf{
             let panel = mediator._panel;
 
             if(panel == null) return null;
+            if(mediator.isReady == false)
+            {
+                mediator.asyncStar();
+                return;
+            }
+
 
             switch(type){
                 case 1:
@@ -46,23 +52,144 @@ module rf{
             }
         }
 
-        removeEvent(event:MiniDispatcher):void{
-            if (undefined == this.mEventListeners) {
-				return;
+        removeEvent(event:{[key:string]:EventHandler}):void{
+            for (let key in event)
+            {
+                let fun = event[key];
+                this.off(key,fun)
             }
-            let signal;
-			for (let type in event.mEventListeners){
-				signal=this.mEventListeners[type];
-				if(signal==null){
-					continue;
-                }
-
-                this.off(type,signal.data);
-			}
         }
 
     }
 
     export let facade = singleton(Facade);
+
+
+    export class Mediator extends MiniDispatcher{
+		name:string;
+		eventInterests:{[key:string]:EventHandler};
+
+        isReady:boolean = false;
+
+		constructor(NAME:string){
+			super();
+			this.name = NAME;
+			this.mEventListeners = {};
+			facade.mediatorMap[this.name] = this;
+			this.eventInterests = {};
+		}
+		
+		_panel:TPanel
+		setPanel(panel:TPanel):void{
+			this._panel = panel;
+			if("$panel" in this)
+			{
+				this["$panel"] = panel;
+			}
+        }
+
+        
+
+        
+        asyncStar():void
+        {
+            let panel = this._panel;
+            if(panel.isReady == false)
+            {
+                panel.load();
+                panel.addEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
+            }else{
+                this.preViewCompleteHandler(undefined);
+            }
+        }
+
+        preViewCompleteHandler(e:EventT):void{
+            if(e)
+            {
+                this._panel.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler)
+            }
+
+            //add to stage
+
+            
+            //checkModeldata
+            
+
+        }
+
+        model:BaseMode;
+        preModelCompleteHandler(e:EventT):void{
+
+        }
+
+
+        mediatorReadyHandle():void{
+            this.isReady = true;
+            if(this._panel.isShow){
+                facade.registerEvent(this.eventInterests,this);
+                this.awaken();
+            }
+
+        }
+
+
+
+		// stageHandler(event:EventX):void{
+		// 	this.awkenSleepCheck(event.type);
+		// }
+
+		// awkenSleepCheck(type:string|number):void
+		// {
+		// 	switch(type){
+		// 		case ""://Event.ADDED_TO_STAGE:
+		// 			facade.registerEvent(this.eventInterests,this);
+		// 			this.awaken();
+		// 			break;
+		// 		case ""://Event.REMOVED_FROM_STAGE:
+		// 			facade.removeEvent(this.eventInterests);
+		// 			this.sleep();
+		// 			break;
+		// 	}
+		// }
+
+		
+		sleep():void{
+		}
+		
+		awaken():void{
+		}
+
+		onRemove():void{
+			
+        }
+    }
+    
+    export class BaseMode extends MiniDispatcher{
+        modelName:string;
+        
+        constructor(modelName:string){
+            super();
+
+            this.modelName = modelName;
+            //注册
+            facade.modelMap[modelName] = this;
+        }
+
+		refreshRuntimeData(type:string,data:any):void{
+			
+		}
+
+        initRuntime():void{
+
+        }
+
+        onRegister( ):void{
+
+        }
+
+        onRemove():void{
+
+        }
+    }
 
 }
