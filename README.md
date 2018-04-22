@@ -156,3 +156,6 @@ https://chrome.google.com/webstore/detail/webgl-inspector/ogkcjmbhnfmlnielkjhedp
 
 http://benvanik.github.io/WebGL-Inspector/
 
+
+#node调试
+node --inspect-brk APP.js
