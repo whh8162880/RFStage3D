@@ -263,6 +263,20 @@ module rf {
         
     }
 
+    export interface ISkeletonJoint{
+        index:number;
+        name:string;
+        inv:Float32Array;
+        chind:ISkeletonJoint[];
+        parent:ISkeletonJoint;
+    }
+
+    export class SkeletonGeometry extends GeometryBase{
+        skVertex:VertexBuffer3D;
+        joints:{[key:string]:ISkeletonJoint};
+        jointroot:ISkeletonJoint;
+    }
+
 
     export class PlaneGeometry extends GeometryBase{
         create(width:number = 1, height:number = 1){
@@ -295,6 +309,7 @@ module rf {
             return this;
         }
     }
+
 
 
     export class BoxGeometry extends GeometryBase{

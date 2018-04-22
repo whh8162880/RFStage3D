@@ -148,3 +148,14 @@
     
     手机内存占用越高，性能就越差。
     
+
+
+
+扩展程序WebGL Inspector
+https://chrome.google.com/webstore/detail/webgl-inspector/ogkcjmbhnfmlnielkjhedpcjomeaghda
+
+http://benvanik.github.io/WebGL-Inspector/
+
+
+#node调试
+node --inspect-brk APP.js

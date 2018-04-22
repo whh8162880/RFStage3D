@@ -1,73 +1,33 @@
+///<reference path="../com/youbt/mvc/manage/PanelSourceManage.ts" />
 module rf{
     export class PanelUtils{
         skin:Symbol;
         setting:object;
         btn_random:Button;
+        btn_create:Button;
+
+        bg:IconView;
+
+        manage:PanelSourceManage;
+
+        source:AsyncResource;
 
         constructor(){
-            this.loadp3d("../assets/create.p3d");
+            let {manage} = this;
+            manage = singleton(PanelSourceManage);
+
+            this.source = manage.load("../assets/create.p3d", "create");
+            this.source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this)
         }
 
-        private loadp3d(url:string):void {
-            loadRes(url, this.p3dloadComplete, this, ResType.text)
-        }
-
-        p3dloadComplete(e:EventX):void{
-           if(e.type !=  EventT.COMPLETE)
-           {
-                return;
-           }
-           let res:ResItem = e.data;
-           let o = JSON.parse(res.data);
-           this.resourceComplete(o);
-        }
-
-        resourceComplete(o:object):void{
-            //生成对应的模块 一次只有一个对象    
-            //创建bitmapsource
-            this.setting = o;
-
-            //加载对应的图片资源
-            let url = "../assets/"+ o['image'] +'.png';
-            loadRes(url,this.onImageComplete,this,ResType.image);
-        }
-
-        onImageComplete(e:EventX):void{
-            if(e.type !=  EventT.COMPLETE)
-            {
-                return;
-            }
-
-            const{setting} = this;
-
-            let res:ResItem = e.data;
-            let image:HTMLImageElement = res.data;
-
-            let bw = setting['txtwidth'] + image.width;
-            let bh = setting['txtheight'] + image.height;
-
-            let bmd = new BitmapData(bw, bh, true);
-            let source = new BitmapSource().create("ui.asyncpanel.create",bmd,true);
-
-            let vo = source.setSourceVO("panelimg",image.width,image.height,1);
-            source.bmd.context.drawImage(image,vo.x,vo.y);
-
-            let framekeys:string[] = Object.keys(setting['frames']);
-            let areavo:BitmapSourceArea = source.areas[1];
-            let bitvo:BitmapSourceVO;
-            let frameObj:object;
-            for(let key of framekeys){
-                frameObj = setting['frames'][key];
-                bitvo = areavo.createFrameArea(key, {x:frameObj['ox'], y:frameObj['oy'], w:frameObj['width'], h:frameObj['height'], ix:frameObj['ix'], iy:frameObj['iy']});
-                bitvo.refreshUV(source.width, source.height);
-            }
-
-
-            let clsname = "ui.asyncpanel.create";
-            let sybs = setting['symbols'];
-            let cs = sybs[clsname];
+        private asyncsourceComplete(e:EventX):void
+        {
+            const{source} = this;
             
-            this.skin = new Symbol(source);
+            let clsname:string = "ui.asyncpanel.create";
+            let cs:DisplaySymbol = source.setting[clsname];
+            
+            this.skin = new Symbol(source.source);
             this.skin.setSymbol(cs);
             this.skin.renderer = new BatchRenderer(this.skin);
             popContainer.addChild(this.skin);
@@ -78,8 +38,19 @@ module rf{
         protected bindComponents():void
         {
             const{skin} = this;
-            this.btn_random = new Button(skin["btn_create"]);
-            this.btn_random.label = "sssss";
+            this.btn_random = new Button(skin["btn_random"]);
+            this.btn_create = new Button(skin['btn_create']);
+
+            this.bg = new IconView(skin.source);
+            skin.addChildAt(this.bg, 0);
+            this.bg.setUrl('assets/createbg.jpg');
+
+            this.btn_random.addClick(this.randomHandler);
+        }
+
+        protected randomHandler(e:EventX):void
+        {
+            alert("随机按钮点击");
         }
     }
 }
