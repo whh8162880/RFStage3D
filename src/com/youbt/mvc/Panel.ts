@@ -282,14 +282,12 @@ module rf{
 	   
 		uri:string;
 		clsName:string;
-		state:number;
-
 		_resizeable:boolean;
 
-		resource:PanelSource;
 		container:DisplayObjectContainer;
 
 		isReady:boolean = false;
+		source:AsyncResource;
 		
 		constructor(uri:string,cls:string){
 			super();
@@ -321,38 +319,19 @@ module rf{
 		}
 
 		load():void{
-			// if(this.state != .LOAD_NONE && this.state != ResourceState.LOAD_ERROR && p3dCompleted){
-			// 	return;	
-			// }
-			
-			// let url= this.getURL();
-			// let manage:PanelSourceManage = new PanelSourceManage;
-			// manage.load(url);
-			
-			// loadRes(url, this.p3dloadComplete, this, ResType.text)
-			// this.resource =  //p3d.load(url, uri, this);
-			// resource.ungc = ungc;
-			// if(resource.isReady){
-			// 	this.resourcevo = resource.vo;
-			// 	state = ResourceState.LOAD_LOADING;
-				// initReady(null);
-				
-			// }else{
-			// 	toggleLoading(true);
-			// 	resource.addEventListener(RFLoaderEvent.COMPLETE,loaderHandler);	
-			// 	resource.addEventListener(RFLoaderEvent.PROGRESS,progressHandler);
-			// 	resource.addEventListener(RFLoaderEvent.FAILED,loaderHandler);
-			// 	state = ResourceState.LOAD_LOADING;
-			// }
+			let source = this.source;
+			if(source == undefined ||source.status == 0 )
+			{
+				source = manage.load("../assets/create.p3d", "create");
+				source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this);
+			}else{
+				this.asyncsourceComplete(undefined);
+			}
 		}
 
-		p3dloadComplete(e:EventX):void{
-			//
-		}
+		asyncsourceComplete(e:EventX):void{
 
-		p3dCompleted():Boolean
-		{
-			return this.resource.isReady;
+			
 		}
 
 
@@ -364,6 +343,6 @@ module rf{
 	}
 
 
-
+	let manage:PanelSourceManage = singleton(PanelSourceManage);
     
 }
