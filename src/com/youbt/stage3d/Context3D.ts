@@ -410,9 +410,9 @@ namespace rf {
 				indexBuffer.preusetime = engineNow;
 				// g.drawArrays(g.TRIANGLES,0,numTriangles)
 				g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-				g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+				g.drawElements(g.TRIANGLES, numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
 			}else{
-				g.drawArrays(g.TRIANGLES,0,numTriangles)
+				g.drawArrays(g.TRIANGLES,0,numTriangles * 3);
 			}
 			
 			this.triangles += numTriangles;

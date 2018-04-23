@@ -35,6 +35,13 @@ module rf {
         "data32PerVertex":{size:12,offset:0}
     }
 
+
+    export let vertex_skeleton_variable:{ [key: string]: IVariable } = {
+        "weight":{size:4,offset:0},
+        "normal":{size:4,offset:4},
+        "data32PerVertex":{size:8,offset:0}
+    }
+
     export const EMPTY_MAX_NUMVERTICES = Math.pow(2,13);
     export let empty_float32_pos = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);
     export let empty_float32_normal = new Float32Array(3 * EMPTY_MAX_NUMVERTICES);

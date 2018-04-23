@@ -19,6 +19,9 @@ module rf{
                 return;
             }
 
+            // var matrix = new Matrix3D([-1.0938435201278621e-8,-0.968181073665619,-0.2502503693103784,0,-1.4972529544683223e-8,-0.2502503567352837,0.9681810250144678,0,-0.9999999403953552,1.4337268631142944e-8,-1.1758774204986801e-8,0,6.187005396895984e-8,1.6862283945083618,-0.09339626878499985,1]);
+            // var vs = matrix.decompose();
+            // matrix.invert();
 
             // let amfEncode = new AMF3Encode();
             // let amfDecode = new AMF3();
@@ -109,8 +112,8 @@ module rf{
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            kfmMesh.load("assets/a10010m/");
-            // kfmMesh.load("assets/hero001/");
+            // kfmMesh.load("assets/a10010m/");
+            kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
 
             // new AMF3Test().load("assets/test.dat");

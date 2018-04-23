@@ -59,7 +59,10 @@ module rf{
         loadCompelte(e:EventX){
             let item:ResItem = e.data;
             let amf = singleton(AMF3);
-            amf.setArrayBuffer(item.data);
+            let byte = item.data;
+            var inflate = new Zlib.Inflate( new Uint8Array(byte) );
+            var plain = inflate.decompress();
+            amf.setArrayBuffer(plain.buffer);
             let o = amf.readObject();
             this.setKFM(o);
         }
@@ -85,8 +88,6 @@ module rf{
             let index=mesh["index"];
             if(index){
                 geometry.index = c.createIndexBuffer(new Uint16Array(index));
-            }else{
-                geometry.numTriangles *= 3;
             }
             
             this.geometry = geometry;
