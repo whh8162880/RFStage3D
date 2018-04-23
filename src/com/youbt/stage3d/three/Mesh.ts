@@ -70,7 +70,7 @@ module rf{
             let vertex = new Float32Array(mesh["vertex"]);
             let geometry = new GeometryBase(this.variables);
             geometry.numVertices = mesh["numVertices"];
-            geometry.numTriangles = mesh["numTriangles"];
+            geometry.numTriangles = mesh["numTriangles"] * 3;
             geometry.data32PerVertex = mesh["data32PerVertex"];
             let info:VertexInfo = new VertexInfo(vertex,geometry.data32PerVertex,this.variables);
             geometry.vertex = c.createVertexBuffer(info);

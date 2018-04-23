@@ -374,6 +374,8 @@ module rf {
 
             g.bindTexture(g.TEXTURE_2D, tex);
 
+            // g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,true);
+
 
 
             if(this.mipmap){
