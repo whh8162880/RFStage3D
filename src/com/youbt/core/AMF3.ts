@@ -186,13 +186,15 @@ module rf{
 				v = -(v & 0x10000000) | v;
 			}
 
-			if(unsign){
-				return v;
-			}
-			if (v & 1)
-				return -1 - (v>>1);
-			else
-				return v>>1;
+			// if(unsign){
+			// 	return v;
+			// }
+			// if (v & 1)
+			// 	return -1 - (v>>1);
+			// else
+			// 	return v>>1;
+
+			return v;
 
 
 			// v = this.readByte() & 0xff;
@@ -305,6 +307,9 @@ module rf{
 			{
 				case AMF3Define.INT:
 					value = this.read29(false);
+					if(value >= 0x10000000){
+						value = value - 0xFFFFFFFF-1;
+					}
 					break;
 				
 				case AMF3Define.DOUBLE:
@@ -539,19 +544,20 @@ module rf{
 
 		write29 (v:number,unsign:boolean):void
 		{
-			if(unsign == false){
-				if (v < 0)
-					v = (-v - 1)*2 + 1;
-				else
-					v *= 2;
-			}
+			// if(unsign == false){
+			// 	if (v < 0)
+			// 		v = (-v - 1)*2 + 1;
+			// 	else
+			// 		v *= 2;
+			// }
 
 			let len = 0;
 			if (v < 0x80) len = 1;
 			else if (v < 0x4000) len = 2;
 			else if (v < 0x200000) len = 3;
-			else if (v < 0x40000000) len = 4;
-			else throw new Error("U29 Range Error");// 0x40000000 - 0xFFFFFFFF : throw range exception
+			else len = 4;
+			// else if (v < 0x40000000) len = 4;
+			// else throw new Error("U29 Range Error");// 0x40000000 - 0xFFFFFFFF : throw range exception
 
 			switch (len) {
 				case 1:// 0x00000000 - 0x0000007F : 0xxxxxxx
@@ -612,14 +618,17 @@ module rf{
 		}  
 
 		writeObject(o){
-			if(typeof(o) == "string"){
+			let type = typeof o;
+			if(type === "string"){
 				this.writeByte(AMF3Define.STRING);
 				this.writeString(String(o));
-			}else if(typeof(o) == "boolean"){
+			}else if(type === "boolean"){
 				this.writeByte(o == true ? AMF3Define.TRUE:AMF3Define.FALSE);
-			}else if(this.isRealNum(o)){
-
-				if(Math.floor(o) == o && o <= 0x0FFFFFFF && o >= -0x10000000){
+			}else if('number' === type){
+				if((o >> 0) === o && o >= -0x10000000 && o < 0x10000000){
+					if(o<0){
+						o = 0xFFFFFFFF - (o+1);
+					}
 					this.writeByte(AMF3Define.INT);
 					this.write29(o,false);
 				}else{

@@ -70,7 +70,7 @@ module rf{
             let vertex = new Float32Array(mesh["vertex"]);
             let geometry = new GeometryBase(this.variables);
             geometry.numVertices = mesh["numVertices"];
-            geometry.numTriangles = mesh["numTriangles"] * 3;
+            geometry.numTriangles = mesh["numTriangles"];
             geometry.data32PerVertex = mesh["data32PerVertex"];
             let info:VertexInfo = new VertexInfo(vertex,geometry.data32PerVertex,this.variables);
             geometry.vertex = c.createVertexBuffer(info);
@@ -85,6 +85,8 @@ module rf{
             let index=mesh["index"];
             if(index){
                 geometry.index = c.createIndexBuffer(new Uint16Array(index));
+            }else{
+                geometry.numTriangles *= 3;
             }
             
             this.geometry = geometry;

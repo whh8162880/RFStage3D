@@ -18,6 +18,14 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+
+            // let amfEncode = new AMF3Encode();
+            // let amfDecode = new AMF3();
+            // amfEncode.writeObject(1000);
+            // let b = amfEncode.toUint8Array().buffer;
+            // amfDecode.setArrayBuffer(b);
+            // let re = amfDecode.readObject();
             
             // gl.enable(gl.DEPTH_TEST);  
             // gl.depthMask(true);
@@ -101,8 +109,8 @@ module rf{
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            // kfmMesh.load("assets/a10010m/");
-            kfmMesh.load("assets/hero001/");
+            kfmMesh.load("assets/a10010m/");
+            // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
 
             // new AMF3Test().load("assets/test.dat");
