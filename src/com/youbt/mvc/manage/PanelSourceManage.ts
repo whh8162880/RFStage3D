@@ -1,3 +1,4 @@
+///<reference path="../PanelSource.ts" />
 module rf{
     export class PanelSourceManage{
         protected all_res:object;

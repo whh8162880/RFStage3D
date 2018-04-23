@@ -237,6 +237,17 @@ module rf {
             return pos;
         }
 
+        get uv(){
+            const{numVertices,vertex,data32PerVertex,variables}=this.vertex.data;
+            let uv = variables["uv"];
+            let uvs = [];
+            for(let i=0;i<numVertices;i++){
+                let p = i * data32PerVertex + uv.offset;
+                uvs.push([vertex[p],vertex[p+1]])
+            }
+            return uvs;
+        }
+
         get triangles(){
             const{numTriangles}=this;
             const{data}=this.index;
@@ -261,6 +272,20 @@ module rf {
             c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
         }
         
+    }
+
+    export interface ISkeletonJoint{
+        index:number;
+        name:string;
+        inv:Float32Array;
+        chind:ISkeletonJoint[];
+        parent:ISkeletonJoint;
+    }
+
+    export class SkeletonGeometry extends GeometryBase{
+        skVertex:VertexBuffer3D;
+        joints:{[key:string]:ISkeletonJoint};
+        jointroot:ISkeletonJoint;
     }
 
 
@@ -295,6 +320,7 @@ module rf {
             return this;
         }
     }
+
 
 
     export class BoxGeometry extends GeometryBase{
