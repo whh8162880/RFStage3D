@@ -64,20 +64,38 @@ module rf{
             this.setKFM(o);
         }
 
-        setKFM(kfm:object){
+        setKFM(kfm){
+            let mesh = kfm.mesh ? kfm.mesh : kfm;
             let c = context3D;
-            let vertex = new Float32Array(kfm["vertex"]);
-            let index = new Uint16Array(kfm["index"]);
+            let vertex = new Float32Array(mesh["vertex"]);
             let geometry = new GeometryBase(this.variables);
-            geometry.numVertices = kfm["numVertices"];
-            geometry.numTriangles = kfm["numTriangles"];
-            geometry.data32PerVertex = kfm["data32PerVertex"];
+            geometry.numVertices = mesh["numVertices"];
+            geometry.numTriangles = mesh["numTriangles"];
+            geometry.data32PerVertex = mesh["data32PerVertex"];
             let info:VertexInfo = new VertexInfo(vertex,geometry.data32PerVertex,this.variables);
             geometry.vertex = c.createVertexBuffer(info);
-            geometry.index = c.createIndexBuffer(index);
+
+
+            if(mesh.matrix){
+                let m = new Matrix3D(new Float32Array(mesh.matrix));
+                m.appendScale(100,100,100);
+                this.setTransform(m);
+            }
+
+            let index=mesh["index"];
+            if(index){
+                geometry.index = c.createIndexBuffer(new Uint16Array(index));
+            }else{
+                geometry.numTriangles *= 3;
+            }
+            
             this.geometry = geometry;
+
+
             this.material.triangleFaceToCull = Context3DTriangleFace.NONE;
-            this.material["diffTex"] = this.id + kfm["diff"];
+            // this.material["diffTex"] = this.id + kfm["diff"];
+            this.material["diffTex"] = this.id + "diff.png";
+            
         }
     }
 }

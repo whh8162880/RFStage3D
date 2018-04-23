@@ -25,7 +25,7 @@ module rf{
 
         readByte(){
             const{position}=this;
-            if(position > this.length) this.outOfRange();
+            if(position > this.length){ this.outOfRange();return};
             let b = this.buf.getUint8(position); 
             this.position ++;
             return b;
@@ -147,58 +147,86 @@ module rf{
             super(buf);
         }
 
-        private read29():number{
+        private read29(unsign:boolean):number{
 			var v = 0,a = 0;
-			v = this.readByte() & 0xff
-			if (v >= 0x80)
-			{
-				a = this.readByte();
-				v += (a<<7) - 0x80;
-				if (a >= 0x80)
-				{
-					a = this.readByte();
-					v += (a<<14) - 0x4000;
-					if (a >= 0x80)
-					{
-						a = this.readByte();
-						v += (a << 21) - 0x200000;
-					}
-				}
-			}
-			if (v & 1)
-				return -1 - (v>>1);
-			else
-				return v>>1;
-			// let value = this.readByte() & 0xff;
-			// if (value < 128){
-			// 	return value;
-			// }
-			// let tmp;
-			// value = (value & 0x7f) << 7;
-			// tmp = this.readByte()&0xff;
-			// if (tmp < 128){
-			// 	value = value | tmp;
-			// }else{
-			// 	value = (value | tmp & 0x7f) << 7;
-			// 	tmp = this.readByte()&0xff;
-			// 	if (tmp < 128){
-			// 		value = value | tmp;
-			// 	}else{
-			// 		value = (value | tmp & 0x7f) << 8;
-			// 		tmp = this.readByte()&0xff;
-			// 		value = value | tmp;
+			// v = this.readByte() & 0xff
+			// if (v >= 0x80)
+			// {
+			// 	a = this.readByte();
+			// 	v += (a<<7) - 0x80;
+			// 	if (a >= 0x80)
+			// 	{
+			// 		a = this.readByte();
+			// 		v += (a<<14) - 0x4000;
+			// 		if (a >= 0x80)
+			// 		{
+			// 			a = this.readByte();
+			// 			v += (a << 21) - 0x200000;
+			// 		}
 			// 	}
 			// }
-			// return -(value & this.MASK) | value;
+			v = this.readByte();
+			if (v >= 0x80) {//U29 1bytes 0x00-0x7f
+				a = this.readByte();
+				v = (v & 0x7f) << 7;
+				if (a < 0x80) {//U29 2bytes 0x80-0xFF 0x00-0x7f
+					v = v | a;
+				}else {
+					v = (v | a & 0x7f) << 7;
+					a = this.readByte();
+					if (a < 0x80) { //U29 3bytes 0x80-0xFF 0x80-0xFF 0x00-0x7f
+						v = v | a;
+					}
+					else {//u29 4bytes 0x80-0xFF 0x80-0xFF 0x80-0xFF 0x00-0xFF
+						v = (v | a & 0x7f) << 8;
+						a = this.readByte();
+						v = v | a;
+					}
+				}
+				v = -(v & 0x10000000) | v;
+			}
+
+			// if(unsign){
+			// 	return v;
+			// }
+			// if (v & 1)
+			// 	return -1 - (v>>1);
+			// else
+			// 	return v>>1;
+
+			return v;
+
+
+			// v = this.readByte() & 0xff;
+			// if (v < 128){
+			// 	return v;
+			// }
+			// let tmp;
+			// v = (v & 0x7f) << 7;
+			// tmp = this.readByte()&0xff;
+			// if (tmp < 128){
+			// 	v = v | tmp;
+			// }else{
+			// 	v = (v | tmp & 0x7f) << 7;
+			// 	tmp = this.readByte()&0xff;
+			// 	if (tmp < 128){
+			// 		v = v | tmp;
+			// 	}else{
+			// 		v = (v | tmp & 0x7f) << 8;
+			// 		tmp = this.readByte()&0xff;
+			// 		v = v | tmp;
+			// 	}
+			// }
+			// return -(v & this.MASK) | v;
 		}
 
         readInt(){
-            return this.read29();
+            return this.read29(false);
         }
 
 
         readString():string{
-            let handle = this.read29();
+            let handle = this.read29(true);
             let inline = (handle & 1) != 0;
             handle = handle >> 1;
             if(inline)
@@ -221,7 +249,7 @@ module rf{
 
 
         readObjectVector(length:number){
-            let fixed = this.read29();
+            let fixed = this.read29(true);
             let list = [];
             
 			this.objectsTable.push(list);
@@ -278,7 +306,10 @@ module rf{
 			switch(marker)
 			{
 				case AMF3Define.INT:
-					value = this.read29();
+					value = this.read29(false);
+					if(value >= 0x10000000){
+						value = value - 0xFFFFFFFF-1;
+					}
 					break;
 				
 				case AMF3Define.DOUBLE:
@@ -398,7 +429,7 @@ module rf{
 		{
             const{objectsTable}=this;
 			let object;
-			let handle = this.read29();
+			let handle = this.read29(true);
 			let isIn = (handle&1) == 0;
 			handle=handle>>1;
 			
@@ -462,7 +493,7 @@ module rf{
 		unit8:Uint8Array
 
 		constructor(buf?:ArrayBuffer){
-			super(buf || new ArrayBuffer(10240));
+			super(buf || new ArrayBuffer(10240*1024));
 			this.unit8 = new Uint8Array(this.buf.buffer);
 		}
 
@@ -493,7 +524,7 @@ module rf{
 				let length = str.length;
 				handle = length << 1;
 				handle |= 1;
-				this.write29(handle);
+				this.write29(handle,true);
 
 				let{position,buf}=this;
 				for (var i:number = 0; i < length;i++ ){
@@ -505,41 +536,73 @@ module rf{
 			}else{
 				handle = index << 1;
 				handle |= 0;
-				this.write29(handle);
+				this.write29(handle,true);
 			}
         }
 
 		
 
-		write29 (v:number):void
+		write29 (v:number,unsign:boolean):void
 		{
-			if (v < 0)
-				v = (-v - 1)*2 + 1;
-			else
-				v *= 2;
+			// if(unsign == false){
+			// 	if (v < 0)
+			// 		v = (-v - 1)*2 + 1;
+			// 	else
+			// 		v *= 2;
+			// }
 
-			// 写入 7 位
-			if (v < 0x80)
-				return this.writeByte (v);
-			this.writeByte (v|0x80);
-			v = v >> 7;
+			let len = 0;
+			if (v < 0x80) len = 1;
+			else if (v < 0x4000) len = 2;
+			else if (v < 0x200000) len = 3;
+			else len = 4;
+			// else if (v < 0x40000000) len = 4;
+			// else throw new Error("U29 Range Error");// 0x40000000 - 0xFFFFFFFF : throw range exception
 
-			// 写入 7 位
-			if (v < 0x80)
-				return this.writeByte (v);
-				this.writeByte (v|0x80);
-			v = v >> 7;
+			switch (len) {
+				case 1:// 0x00000000 - 0x0000007F : 0xxxxxxx
+					this.writeByte(v);
+					break;
+				case 2:// 0x00000080 - 0x00003FFF : 1xxxxxxx 0xxxxxxx
+					this.writeByte(((v >> 7) & 0x7F) | 0x80);
+					this.writeByte(v & 0x7F);
+					break;
+				case 3:// 0x00004000 - 0x001FFFFF : 1xxxxxxx 1xxxxxxx 0xxxxxxx
+					this.writeByte(((v >> 14) & 0x7F) | 0x80);
+					this.writeByte(((v >> 7) & 0x7F) | 0x80);
+					this.writeByte(v & 0x7F);
+					break;
+				case 4:// 0x00200000 - 0x3FFFFFFF : 1xxxxxxx 1xxxxxxx 1xxxxxxx xxxxxxxx
+					this.writeByte(((v >> 22) & 0x7F) | 0x80);
+					this.writeByte(((v >> 15) & 0x7F) | 0x80);
+					this.writeByte(((v >> 8) & 0x7F) | 0x80);
+					this.writeByte(v & 0xFF);
+					break;
+			}
+		
 
-			// 写入 7 位
-			if (v < 0x80)
-				return this.writeByte (v);
-				this.writeByte (v|0x80);
-			v = v >> 7;
+			// // 写入 7 位
+			// if (v < 0x80)
+			// 	return this.writeByte (v);
+			// this.writeByte (v|0x80);
+			// v = v >> 7;
 
-			// 写入 8 位
-			if (v >= 0x100)
-				throw new Error ('bad integer value');
-			this.writeByte (v);
+			// // 写入 7 位
+			// if (v < 0x80)
+			// 	return this.writeByte (v);
+			// 	this.writeByte (v|0x80);
+			// v = v >> 7;
+
+			// // 写入 7 位
+			// if (v < 0x80)
+			// 	return this.writeByte (v);
+			// 	this.writeByte (v|0x80);
+			// v = v >> 7;
+
+			// // 写入 8 位
+			// if (v >= 0x100)
+			// 	throw new Error ('bad integer value');
+			// this.writeByte (v);
 		}
 
 		isRealNum(val){
@@ -555,16 +618,19 @@ module rf{
 		}  
 
 		writeObject(o){
-			if(typeof(o) == "string"){
+			let type = typeof o;
+			if(type === "string"){
 				this.writeByte(AMF3Define.STRING);
 				this.writeString(String(o));
-			}else if(typeof(o) == "boolean"){
+			}else if(type === "boolean"){
 				this.writeByte(o == true ? AMF3Define.TRUE:AMF3Define.FALSE);
-			}else if(this.isRealNum(o)){
-
-				if(Math.floor(o) == o && o <= 0x0FFFFFFF && o >= -0x10000000){
+			}else if('number' === type){
+				if((o >> 0) === o && o >= -0x10000000 && o < 0x10000000){
+					if(o<0){
+						o = 0xFFFFFFFF - (o+1);
+					}
 					this.writeByte(AMF3Define.INT);
-					this.write29(o);
+					this.write29(o,false);
 				}else{
 					this.writeByte(AMF3Define.DOUBLE);
 					this.writeDouble(o);
@@ -584,14 +650,14 @@ module rf{
 				let index = objectsTable.indexOf(o);
 				let ins = 0;
 				if(index != -1){
-					this.write29(index << 1);
+					this.write29(index << 1,true);
 					return;
 				}
 
 				objectsTable.push(o);
 
-				this.write29(0b1011); //isDynamic && isIExternalizable && inlineClassDef && 新对象
-				this.write29(0b1);	//class name
+				this.write29(0b1011,true); //isDynamic && isIExternalizable && inlineClassDef && 新对象
+				this.write29(0b1,true);	//class name
 
 				for(let key in o){
 					this.writeString(key);
@@ -613,13 +679,13 @@ module rf{
 			let index = objectsTable.indexOf(arr);
 			let ins = 0;
 			if(index != -1){
-				this.write29(index << 1);
+				this.write29(index << 1,true);
 				return;
 			}
 
 			objectsTable.push(arr);
 			let len = arr.length;
-			this.write29( (len << 1) | 1);
+			this.write29( (len << 1) | 1,true);
 			this.writeByte(1);
 			for(let i = 0;i<len;i++){
 				this.writeObject(arr[i]);
@@ -633,14 +699,14 @@ module rf{
 			let index = objectsTable.indexOf(buffer);
 			let ins = 0;
 			if(index != -1){
-				this.write29(index << 1);
+				this.write29(index << 1,true);
 				return;
 			}
 
 			objectsTable.push(buffer);
 
 			let length = buffer.byteLength;
-			this.write29((length << 1) | 1 );
+			this.write29((length << 1) | 1,true);
 
 			this.unit8.set(new Uint8Array(buffer),this.position);
 			this.position += buffer.byteLength;

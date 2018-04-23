@@ -237,6 +237,17 @@ module rf {
             return pos;
         }
 
+        get uv(){
+            const{numVertices,vertex,data32PerVertex,variables}=this.vertex.data;
+            let uv = variables["uv"];
+            let uvs = [];
+            for(let i=0;i<numVertices;i++){
+                let p = i * data32PerVertex + uv.offset;
+                uvs.push([vertex[p],vertex[p+1]])
+            }
+            return uvs;
+        }
+
         get triangles(){
             const{numTriangles}=this;
             const{data}=this.index;

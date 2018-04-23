@@ -400,17 +400,21 @@ namespace rf {
 
 
 		public drawTriangles(indexBuffer: IndexBuffer3D, numTriangles:number,firstIndex: number = 0): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			indexBuffer.preusetime = engineNow;
 			let g = gl;
-			// g.drawArrays(g.TRIANGLES,0,numTriangles)
-			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
-
+			if(undefined != indexBuffer){
+				if (false == indexBuffer.readly) {
+					if (false == indexBuffer.awaken()) {
+						throw new Error("create indexBuffer error!");
+					}
+				}
+				indexBuffer.preusetime = engineNow;
+				// g.drawArrays(g.TRIANGLES,0,numTriangles)
+				g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+				g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+			}else{
+				g.drawArrays(g.TRIANGLES,0,numTriangles)
+			}
+			
 			this.triangles += numTriangles;
 			this.dc ++;
 		}
@@ -435,6 +439,8 @@ namespace rf {
 			this.triangles += numTriangles;
 			this.dc ++;
 		}
+
+
 
 		// /*
         //  * [Webgl only]
