@@ -364,7 +364,7 @@ namespace rf {
 		/**
         *  @variable must predefined in glsl
         */
-		public setProgramConstantsFromMatrix(variable: string, matrix: Matrix3D): void {
+		public setProgramConstantsFromMatrix(variable: string, rawData: Float32Array): void {
 			let p = this.cProgram;
 			let uniforms = p.uniforms;
 			let g = gl;
@@ -376,7 +376,7 @@ namespace rf {
 				uniforms[variable] = index;
 			}
 			if (undefined != index) {
-				g.uniformMatrix4fv(index, false, matrix.rawData);
+				g.uniformMatrix4fv(index, false, rawData);
 			}
 		}
 

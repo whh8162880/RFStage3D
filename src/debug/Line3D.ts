@@ -177,8 +177,8 @@ module rf{
 
             m.copyFrom(this.sceneTransform);
             m.append(camera.sceneTransform);
-            c.setProgramConstantsFromMatrix(VC.mv,m);
-            c.setProgramConstantsFromMatrix(VC.p,camera.len);
+            c.setProgramConstantsFromMatrix(VC.mv,m.rawData);
+            c.setProgramConstantsFromMatrix(VC.p,camera.len.rawData);
             v.uploadContext(p);
 
             let i = c.getIndexByQuad(quad);

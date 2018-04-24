@@ -37,8 +37,8 @@ module rf {
 
 
     export let vertex_skeleton_variable:{ [key: string]: IVariable } = {
-        "weight":{size:4,offset:0},
-        "normal":{size:4,offset:4},
+        "index":{size:4,offset:0},
+        "weight":{size:4,offset:4},
         "data32PerVertex":{size:8,offset:0}
     }
 
@@ -275,8 +275,8 @@ module rf {
             let worldTranform = TEMP_MATRIX;
             worldTranform.copyFrom(sceneTransform);
             worldTranform.append(camera.worldTranform);
-            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
-            c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
+            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform.rawData);
+            c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform.rawData);
         }
         
     }

@@ -208,7 +208,7 @@
 
             let matrix = new Matrix3D();
             matrix.append(ROOT.camera2D.worldTranform);
-            context3D.setProgramConstantsFromMatrix(VC.mvp,matrix);
+            context3D.setProgramConstantsFromMatrix(VC.mvp,matrix.rawData);
 
             //draw
             context3D.drawTriangles(indexBuffer,this.indexData.length / 3);
@@ -227,7 +227,7 @@
             c.setProgram(p);        //激活shader
             t.uploadContext(p,0,FS.diff);   //上传贴图纹理
             v.uploadContext(p);             //上传顶点数据
-            c.setProgramConstantsFromMatrix(VC.mvp,camera.worldTranform);   //上传mvp信息
+            c.setProgramConstantsFromMatrix(VC.mvp,camera.worldTranform.rawData);   //上传mvp信息
             c.drawTriangles(i,2);             //绘制
          }
 
