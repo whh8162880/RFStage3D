@@ -6,7 +6,9 @@ module rf {
         normal = "normal",
         tangent = "tangent",
         color = "color",
-        uv = "uv"
+        uv = "uv",
+        index = "index",
+        weight = "weight"
     }
 
     export enum FS {
@@ -21,8 +23,8 @@ module rf {
         ui = "ui",
         lightDirection = "lightDirection",
         vc_diff = "vc_diff",
-        vc_emissive = "vc_emissive"
-
+        vc_emissive = "vc_emissive",
+        vc_bones="bones"
     }
 
     export class Buffer3D implements IRecyclable {

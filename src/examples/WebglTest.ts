@@ -49,7 +49,7 @@ module rf{
 
 
             context3D.setProgram(p);
-            context3D.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform)
+            context3D.setProgramConstantsFromMatrix(VC.mvp,ROOT.camera2D.worldTranform.rawData)
             v.uploadContext(p);
             context3D.drawTriangles(i,2);
 
@@ -166,7 +166,7 @@ module rf{
             let matrix = new Matrix3D();
             matrix.appendTranslation(200,100,0);
             matrix.append(ROOT.camera2D.worldTranform);
-            context3D.setProgramConstantsFromMatrix(VC.mvp,matrix)
+            context3D.setProgramConstantsFromMatrix(VC.mvp,matrix.rawData)
             let t = context3D.createTexture("test",image);
             t.pixels = image;//bitmapdata.canvas;
             t.uploadContext(p,0,FS.diff);
