@@ -139,6 +139,15 @@ module rf{
 			
 		}
 		
+		addToStage():void{
+			super.addToStage();
+			this.simpleDispatch(EventT.ADD_TO_STAGE);
+		}
+
+		removeFromStage():void{
+			super.removeFromStage();
+			this.simpleDispatch(EventT.REMOVE_FROM_STAGE);
+		}
 		
 		// public var scaleGeomrtry:ScaleNGeomrtry;
 		

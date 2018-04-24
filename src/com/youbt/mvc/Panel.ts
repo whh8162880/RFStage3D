@@ -284,11 +284,13 @@ module rf{
 		clsName:string;
 		_resizeable:boolean;
 
-		container:DisplayObjectContainer;
-
-		isReady:boolean = false;
 		source:AsyncResource;
-		
+		container:DisplayObjectContainer;
+		isModel:boolean;
+
+		isReadyShow:boolean = false;
+		loaded:boolean = false;
+
 		constructor(uri:string,cls:string){
 			super();
 			this.uri = uri;
@@ -308,35 +310,58 @@ module rf{
 
 
 		
-		show(container:any=null, isModal:Boolean=false):void{
-			super.show(container,isModal);
-			
-			// if(isShow)
-			// {
-			// 	resource.sleeptime = 0;
-			// }
+		show(container:any=null, isModal:boolean=false):void{
 
+			if(this.loaded == false)
+			{
+				this.isReadyShow=true;
+				this.container = container;
+				this.isModel = isModal;
+				this.load();
+				return;
+			}
+			super.show(container,isModal);
 		}
 
 		load():void{
 			let source = this.source;
 			if(source == undefined ||source.status == 0 )
 			{
-				source = manage.load("../assets/create.p3d", "create");
+				source = manage.load(this.getURL(), "create");
 				source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this);
+
+				// this.showload();
 			}else{
 				this.asyncsourceComplete(undefined);
 			}
+
+			
+
 		}
 
 		asyncsourceComplete(e:EventX):void{
+			let source = this.source;
+			let cs:DisplaySymbol = source.setting[this.clsName];
+			if(cs){
+				let _skin:Symbol = <Symbol>this.skin;
+				_skin = new Symbol(source.source);
+				_skin.setSymbol(cs);
+				_skin.renderer = new BatchRenderer(_skin);
+				this.skin =<Sprite>_skin;
+			}
 
-			
+			this.loaded = true;
+			this.simpleDispatch(EventT.COMPLETE);
+
+			if(this.isReadyShow){
+				this.show(this.container,this.isModel);
+			}
 		}
 
 
 		hide(e:Event = undefined):void{
 			super.hide(e);
+			this.isReadyShow=false;
 		}
 
 

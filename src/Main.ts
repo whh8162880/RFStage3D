@@ -332,6 +332,13 @@ module rf{
 
             // 潘华专用  
             new Pan_Test();
+
+            console.log("function Name:"+this.onTest.toString());
+        }
+
+
+        onTest():void{
+
         }
 
         // public linktest():void{

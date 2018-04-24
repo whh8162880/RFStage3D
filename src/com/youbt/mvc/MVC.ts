@@ -18,9 +18,9 @@ module rf{
             let panel = mediator._panel;
 
             if(panel == null) return null;
-            if(mediator.isReady == false)
+            if(mediator.isReady == false && mediator.startSync())
             {
-                mediator.asyncStar();
+                mediator.addReadyExecute(this.toggleMediator,mediator,type);
                 return;
             }
 
@@ -66,10 +66,13 @@ module rf{
 
 
     export class Mediator extends MiniDispatcher{
-		name:string;
-		eventInterests:{[key:string]:EventHandler};
+
+        eventInterests:{[key:string]:EventHandler};
 
         isReady:boolean = false;
+
+        name:string;
+        data:BaseMode;
 
 		constructor(NAME:string){
 			super();
@@ -81,6 +84,10 @@ module rf{
 		
 		_panel:TPanel
 		setPanel(panel:TPanel):void{
+           if(this._panel){
+               this.setBindView(false);
+            }
+
 			this._panel = panel;
 			if("$panel" in this)
 			{
@@ -88,69 +95,105 @@ module rf{
 			}
         }
 
-        
-
-        
-        asyncStar():void
+        startSync():boolean
         {
             let panel = this._panel;
-            if(panel.isReady == false)
+            if(panel.loaded == false)
             {
                 panel.load();
                 panel.addEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
             }else{
                 this.preViewCompleteHandler(undefined);
             }
+            return true;
         }
 
-        preViewCompleteHandler(e:EventT):void{
+        preViewCompleteHandler(e:EventX):void{
             if(e)
             {
                 this._panel.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler)
+                this.setBindView(true);
             }
 
-            //add to stage
-
-            
             //checkModeldata
+            TimerUtil.caller(this.mediatorReadyHandle)
+
+        }
+
+        _readyExecutes:Function[];
+        _readyExecutesArgs:{[key:string]:any} = {}
+        addReadyExecute(fun:Function,...args):void{
+            const {_panel} = this;
+            let _readyExecutes = this._readyExecutes;
+            let _readyExecutesArgs = this._readyExecutesArgs
+
+            if(this.isReady){
+				if(_panel && !_panel.loaded)
+				{
+
+                    let length:number = _readyExecutes.length;
+                    _readyExecutes.push(fun);
+                    _readyExecutesArgs[length] =args;
+					return;
+                }
+                fun.apply(null,args);
+				return;
+			}else{
+				this.startSync();
+            }
             
-
+            let length:number = _readyExecutes.length;
+            _readyExecutes.push(fun);
+            _readyExecutesArgs[length] =args;
+			
         }
 
-        model:BaseMode;
-        preModelCompleteHandler(e:EventT):void{
-
+        awakenAndSleepHandle(e:EventX):void{
+            let type = e.type;
+            switch(type){
+                case EventT.ADD_TO_STAGE:
+                    facade.registerEvent(this.eventInterests,this);
+                    this.awaken();
+					break;
+				case EventT.REMOVE_FROM_STAGE:
+                    facade.removeEvent(this.eventInterests)
+					this.sleep();
+					break;
+			}
         }
 
+        setBindView(isBind:boolean):void{
+            if(isBind){
+                this._panel.addEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle);
+                this._panel.addEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle);
+            }else{
+                this._panel.removeEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle);
+                this._panel.removeEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle);
+            }
+        }
 
         mediatorReadyHandle():void{
             this.isReady = true;
+
+           let _readyExecutes = this._readyExecutes;
+           let _readyExecutesArgs = this._readyExecutesArgs;
+            if(_readyExecutes.length){
+                let i = 0;
+                while(_readyExecutes.length){
+                    let fun = _readyExecutes.shift();
+                    let args = _readyExecutesArgs[i];
+                    fun.apply(null,args);
+
+                    i++;
+                }
+			}
+
             if(this._panel.isShow){
                 facade.registerEvent(this.eventInterests,this);
                 this.awaken();
             }
 
         }
-
-
-
-		// stageHandler(event:EventX):void{
-		// 	this.awkenSleepCheck(event.type);
-		// }
-
-		// awkenSleepCheck(type:string|number):void
-		// {
-		// 	switch(type){
-		// 		case ""://Event.ADDED_TO_STAGE:
-		// 			facade.registerEvent(this.eventInterests,this);
-		// 			this.awaken();
-		// 			break;
-		// 		case ""://Event.REMOVED_FROM_STAGE:
-		// 			facade.removeEvent(this.eventInterests);
-		// 			this.sleep();
-		// 			break;
-		// 	}
-		// }
 
 		
 		sleep():void{
@@ -167,6 +210,7 @@ module rf{
     export class BaseMode extends MiniDispatcher{
         modelName:string;
         
+        isReady:boolean;
         constructor(modelName:string){
             super();
 
@@ -191,5 +235,6 @@ module rf{
 
         }
     }
+
 
 }
