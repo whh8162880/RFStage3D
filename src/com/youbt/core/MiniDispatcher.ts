@@ -27,7 +27,9 @@ module rf {
 		PROGRESS,
 		IO_ERROR,
 		MESSAGE,
-		RECYCLE
+		RECYCLE,
+		ADD_TO_STAGE,
+		REMOVE_FROM_STAGE
 	}
 	export enum MouseEventX {
 		MouseDown = 50,
