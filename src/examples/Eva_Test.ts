@@ -1,13 +1,20 @@
 module rf{
     export class Eva_Text{
         constructor(){
-            let m = singleton(TestMediator);
-            facade.toggleMediator(m);
-        }
-
-        
+            window.onkeyup = this.onKeyDownHandle;
     }
 
+    onKeyDownHandle(e:KeyboardEvent):void{
+        // console.log(e.type);
+        switch(e.code){
+            case "KeyA":
+               let m = singleton(TestMediator);
+                facade.toggleMediator(m);
+            break;
+
+        }
+    }
+}
 
     export class TestMediator extends Mediator{
         $panel:TestPanel

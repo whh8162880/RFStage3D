@@ -6,17 +6,6 @@ module rf{
 		HIDE = "PanelEvent_HIDE",
 	}
 
-	export enum RES_STATE{
-		LOAD_DISPOSE= -1, //被销毁
-		LOAD_NONE,  // 未加载
-		LOAD_PARSING , //解析状态
-		LOAD_PARSED, //解析状态
-		
-		LOAD_LOADING,// 加载中
-		LOAD_LOADED ,// 已加载
-		LOAD_ERROR	// 加载失败
-	}
-
     export class DataBase{
 
         DataBase3D()
@@ -229,12 +218,13 @@ module rf{
 			{
 				container = popContainer;
 			}
+			container.addChild(this._skin);
 
 			this.isShow = true;
 			this.awaken();
-			// this.effectTween(1);
+			this.effectTween(1);
 
-			container.addChild(this._skin);
+			
 
 			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler,this);
 			if(this.hasEventListener(PanelEvent.SHOW))
@@ -246,11 +236,36 @@ module rf{
 		}
 
 		effectTween(type:number):void{
-			// if(this.tweer)
+			
+			let _tween = this.tweer;
+
+			
+			// if(this._skin.alpha == 1)
 			// {
-			// 	// this.tweer.off()
+			// 	this._skin.alpha = 0;
 			// }
 
+			// if(type){
+			
+			// 	_tween = tween.get(this._skin);
+			// 	_tween.to({alpha:1},200);
+			// }else{
+			// 	_tween = tween.get(this._skin);
+			// 	_tween.to({alpha:1},200);
+			// }
+
+			// _tween.call(this.effectEndByBitmapCache,this,type);
+
+			this.effectEndByBitmapCache(type);
+		}
+
+
+		effectEndByBitmapCache(type:number):void{
+			if(type == 0){
+				this._skin.remove();
+			}else{
+				// this._skin.alpha = 1;
+			}
 		}
 
 		hide(e:Event = undefined):void{
