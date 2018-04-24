@@ -48,9 +48,11 @@ module rf{
       
        
         constructor(skin:Sprite = null){
-            super();
-            this.skin = skin;
-			skin.mouseEnabled = true
+			super();
+			if(skin){
+				this.skin = skin;
+				skin.mouseEnabled = true
+			}
         }
         
         _skin:Sprite;
@@ -88,9 +90,9 @@ module rf{
 		awaken():void{}
 		sleep():void{}
 		
-		addEventListener(type:string|number, listener:Function, priority:number=0):void
+		addEventListener(type:string|number, listener:Function, thisobj:any,priority:number=0):void
 		{
-			this._skin.addEventListener(type,listener,priority);
+			this._skin.addEventListener(type,listener,thisobj,priority);
 		}
 		
 		dispatchEvent(event:EventX):boolean
@@ -214,7 +216,7 @@ module rf{
 		tweer:Tween;
 
 		constructor(){
-			super();
+			super(new Symbol());
 		}
 
 		show(container:any=null, isModal:Boolean=false):void{
@@ -230,9 +232,11 @@ module rf{
 
 			this.isShow = true;
 			this.awaken();
-			this.effectTween(1);
+			// this.effectTween(1);
 
-			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler);
+			container.addChild(this._skin);
+
+			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler,this);
 			if(this.hasEventListener(PanelEvent.SHOW))
 			{
 				this.simpleDispatch(PanelEvent.SHOW);
@@ -242,10 +246,11 @@ module rf{
 		}
 
 		effectTween(type:number):void{
-			if(this.tweer)
-			{
-				// this.tweer.off()
-			}
+			// if(this.tweer)
+			// {
+			// 	// this.tweer.off()
+			// }
+
 		}
 
 		hide(e:Event = undefined):void{
@@ -324,18 +329,17 @@ module rf{
 		}
 
 		load():void{
-			let source = this.source;
-			if(source == undefined ||source.status == 0 )
+			if(this.source == undefined ||this.source.status == 0 )
 			{
-				source = manage.load(this.getURL(), "create");
+				let url = this.getURL();
+				let source = manage.load(url, this.uri);
 				source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this);
-
+				this.source = source;
 				// this.showload();
 			}else{
 				this.asyncsourceComplete(undefined);
 			}
 
-			
 
 		}
 
@@ -343,11 +347,10 @@ module rf{
 			let source = this.source;
 			let cs:DisplaySymbol = source.setting[this.clsName];
 			if(cs){
-				let _skin:Symbol = <Symbol>this.skin;
-				_skin = new Symbol(source.source);
-				_skin.setSymbol(cs);
-				_skin.renderer = new BatchRenderer(_skin);
-				this.skin =<Sprite>_skin;
+				let skin = this.skin as Symbol;
+				skin.source = source.source;
+				skin.setSymbol(cs);
+				skin.renderer = new BatchRenderer(skin);
 			}
 
 			this.loaded = true;

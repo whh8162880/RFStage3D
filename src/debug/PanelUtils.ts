@@ -14,7 +14,6 @@ module rf{
         constructor(){
             let {manage} = this;
             manage = singleton(PanelSourceManage);
-
             this.source = manage.load("../assets/create.p3d", "create");
             this.source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this)
         }

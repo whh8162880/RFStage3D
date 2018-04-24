@@ -14,17 +14,21 @@ module rf{
         }
 
 
+        mediator:Mediator = null;
+        type:number;
         toggleMediator(mediator:Mediator,type:number = -1):Mediator{
             let panel = mediator._panel;
 
             if(panel == null) return null;
             if(mediator.isReady == false && mediator.startSync())
             {
-                mediator.addReadyExecute(this.toggleMediator,mediator,type);
+                this.mediator = mediator;
+                this.type = type;
+                mediator.addEventListener(EventT.COMPLETE_LOADED,this.onCompleteHandle,this);
                 return;
             }
 
-
+            this.mediator = null;
             switch(type){
                 case 1:
                     if(panel.isShow == false)
@@ -43,6 +47,18 @@ module rf{
             }
 
             return mediator;
+        }
+
+        onCompleteHandle(e:EventX):void{
+            let mediator = this.mediator;
+            if(mediator && mediator.hasEventListener(EventT.COMPLETE_LOADED)){
+                mediator.off(EventT.COMPLETE_LOADED, this.onCompleteHandle);
+            }
+
+            if(mediator){
+                this.toggleMediator(this.mediator,this.type);
+            }   
+
         }
 
         registerEvent(events:{[key:string]:EventHandler},thisobj:any):void{
@@ -101,7 +117,7 @@ module rf{
             if(panel.loaded == false)
             {
                 panel.load();
-                panel.addEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
+                panel.addEventListener(EventT.COMPLETE,this.preViewCompleteHandler,this);
             }else{
                 this.preViewCompleteHandler(undefined);
             }
@@ -111,42 +127,44 @@ module rf{
         preViewCompleteHandler(e:EventX):void{
             if(e)
             {
-                this._panel.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler)
+                let skin = e.currentTarget  as Symbol;
+                skin.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
                 this.setBindView(true);
             }
-
             //checkModeldata
-            TimerUtil.caller(this.mediatorReadyHandle)
+            // TimerUtil.add(this.mediatorReadyHandle,100);
+            this.mediatorReadyHandle();
+            this.simpleDispatch(EventT.COMPLETE_LOADED,this);
 
         }
 
-        _readyExecutes:Function[];
-        _readyExecutesArgs:{[key:string]:any} = {}
-        addReadyExecute(fun:Function,...args):void{
-            const {_panel} = this;
-            let _readyExecutes = this._readyExecutes;
-            let _readyExecutesArgs = this._readyExecutesArgs
+        // _readyExecutes:Function[];
+        // _readyExecutesArgs:{[key:string]:any} = {}
+        // addReadyExecute(fun:Function,...args):void{
+            // const {_panel} = this;
+            // let _readyExecutes = this._readyExecutes;
+            // let _readyExecutesArgs = this._readyExecutesArgs
 
-            if(this.isReady){
-				if(_panel && !_panel.loaded)
-				{
+            // if(this.isReady){
+			// 	if(_panel && !_panel.loaded)
+			// 	{
 
-                    let length:number = _readyExecutes.length;
-                    _readyExecutes.push(fun);
-                    _readyExecutesArgs[length] =args;
-					return;
-                }
-                fun.apply(null,args);
-				return;
-			}else{
-				this.startSync();
-            }
+            //         let length:number = _readyExecutes.length;
+            //         _readyExecutes.push(fun);
+            //         _readyExecutesArgs[length] =args;
+			// 		return;
+            //     }
+            //     fun.apply(null,args);
+			// 	return;
+			// }else{
+			// 	this.startSync();
+            // }
             
-            let length:number = _readyExecutes.length;
-            _readyExecutes.push(fun);
-            _readyExecutesArgs[length] =args;
+            // let length:number = _readyExecutes.length;
+            // _readyExecutes.push(fun);
+            // _readyExecutesArgs[length] =args;
 			
-        }
+        // }
 
         awakenAndSleepHandle(e:EventX):void{
             let type = e.type;
@@ -164,8 +182,8 @@ module rf{
 
         setBindView(isBind:boolean):void{
             if(isBind){
-                this._panel.addEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle);
-                this._panel.addEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle);
+                this._panel.addEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle,this);
+                this._panel.addEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle,this);
             }else{
                 this._panel.removeEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle);
                 this._panel.removeEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle);
@@ -175,18 +193,18 @@ module rf{
         mediatorReadyHandle():void{
             this.isReady = true;
 
-           let _readyExecutes = this._readyExecutes;
-           let _readyExecutesArgs = this._readyExecutesArgs;
-            if(_readyExecutes.length){
-                let i = 0;
-                while(_readyExecutes.length){
-                    let fun = _readyExecutes.shift();
-                    let args = _readyExecutesArgs[i];
-                    fun.apply(null,args);
+        //    let _readyExecutes = this._readyExecutes;
+        //    let _readyExecutesArgs = this._readyExecutesArgs;
+        //     if(_readyExecutes.length){
+        //         let i = 0;
+        //         while(_readyExecutes.length){
+        //             let fun = _readyExecutes.shift();
+        //             let args = _readyExecutesArgs[i];
+        //             fun.apply(null,args);
 
-                    i++;
-                }
-			}
+        //             i++;
+        //         }
+		// 	}
 
             if(this._panel.isShow){
                 facade.registerEvent(this.eventInterests,this);
