@@ -1,4 +1,3 @@
-///<reference path="../com/youbt/mvc/manage/PanelSourceManage.ts" />
 module rf{
     export class PanelUtils{
         skin:Symbol;
@@ -53,4 +52,6 @@ module rf{
             alert("随机按钮点击");
         }
     }
+
+    let sourceManger:PanelSourceManage = singleton(PanelSourceManage)
 }
