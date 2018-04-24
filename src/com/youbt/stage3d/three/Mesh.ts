@@ -80,9 +80,9 @@ module rf{
 
 
             if(mesh.matrix){
-                let m = new Matrix3D(new Float32Array(mesh.matrix));
+                let m = new Matrix3D(mesh.matrix);
                 m.appendScale(100,100,100);
-                this.setTransform(m);
+                this.setTransform(m.rawData);
             }
 
             let index=mesh["index"];
@@ -91,12 +91,32 @@ module rf{
             }
             
             this.geometry = geometry;
-
-
             this.material.triangleFaceToCull = Context3DTriangleFace.NONE;
             // this.material["diffTex"] = this.id + kfm["diff"];
             this.material["diffTex"] = this.id + "diff.png";
             
         }
+    }
+
+
+
+    export interface IBone{
+        inv:Float32Array;
+        matrix:Float32Array;
+        name:string;
+        index:number;
+        parent:IBone;
+        children:IBone[];
+    }
+
+    export class Bone extends DisplayObject{
+        bind(bone:IBone){
+            this.setTransform
+        }
+    }
+
+    export class Skeleton{
+        rootBone:Bone;
+
     }
 }
