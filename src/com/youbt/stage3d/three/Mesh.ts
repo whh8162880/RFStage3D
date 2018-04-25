@@ -4,7 +4,7 @@ module rf {
         scene: Scene;
         geometry: GeometryBase;
         invSceneTransform: Matrix3D;
-        skAnim:ISkeletonAnimation;
+        skAnim:SkeletonAnimation;
         constructor(variables?: { [key: string]: IVariable }) {
             super(variables ? variables : vertex_mesh_variable);
             this.invSceneTransform = new Matrix3D();
@@ -34,7 +34,7 @@ module rf {
                 if (true == b) {
                     const{program}=material;
                     if (undefined != skAnim) {
-                        skAnim.skeleton.uploadContext(skAnim,camera,this,program,now,interval);
+                        skAnim.uploadContext(camera,this,program,now,interval);
                     }
                     geometry.uploadContext(camera, this, program, now, interval);
                     context3D.drawTriangles(geometry.index, geometry.numTriangles)
@@ -106,9 +106,17 @@ module rf {
             //=========================
             let skeleton = new Skeleton(kfm.skeleton);
 
-            let animation = skeleton.createSkeletionAnimation();
+            
+            //===========================
+            //  Animation
+            //===========================
+            let animationData = kfm.anims["Take 001"];
 
-            this.skAnim = animation;
+            skeleton.initAnimationData(animationData);
+
+            // let animation = skeleton.createSkeletionAnimation();
+            this.skAnim = skeleton.createAnimation();
+            this.skAnim.play(animationData,engineNow);
 
         }
     }
@@ -125,23 +133,31 @@ module rf {
         children: IBone[];
     }
 
-    export interface ISkeletonAnimation {
+    export interface ISkeletonAnimationData {
         skeleton: Skeleton;
-        boneMatrices: Float32Array;
-        rootBone: IBoneAnimation;
+        matrices:Float32Array[];
+        duration:number;
+        eDuration:number;
+        totalFrame:number;
+        name:string;
+        frames:{[key:string]:Float32Array};
     }
 
-    export interface IBoneAnimation {
-        bone: IBone;
-        index: number;
-        status: number;
-        inv: Float32Array;
-        transform: Float32Array;
-        sceneTransform: Float32Array;
-        matriceTransfrom: Float32Array;
-        parent: IBoneAnimation;
-        children: IBoneAnimation[];
-    }
+    // export interface ISkeletonAnimation {
+        
+    // }
+
+    // export interface IBonePose {
+    //     bone: IBone;
+    //     index: number;
+    //     status: number;
+    //     inv: Float32Array;
+    //     transform: Float32Array;
+    //     sceneTransform: Float32Array;
+    //     matriceTransfrom: Float32Array;
+    //     parent: IBonePose;
+    //     children: IBonePose[];
+    // }
 
 
     export interface ISkeletonConfig {
@@ -149,6 +165,7 @@ module rf {
         numVertices: number;
         vertex: ArrayBuffer;
         root: IBone;
+        boneCount:number;
     }
 
     export function multiplyMatrices(a, b, te) {
@@ -190,21 +207,22 @@ module rf {
 
     export class Skeleton {
         rootBone: IBone;
+        // bonePose: IBonePose;
+        defaultMatrices: Float32Array;
         vertex: VertexBuffer3D;
         boneCount: number;
-        map: { [key: string]: IBone } = {};
+        animations: { [key: string]:ISkeletonAnimationData } = {};
+        
         constructor(config: ISkeletonConfig) {
 
-            let { map, boneCount } = this;
+            let { boneCount ,defaultMatrices } = this;
 
-            boneCount = 0;
+            this.boneCount = boneCount = config.boneCount;
+            let buffer = new ArrayBuffer(16 * 4 * boneCount);
+            this.defaultMatrices = defaultMatrices = new Float32Array(buffer);
 
             function init(bone: IBone) {
-                let { inv, matrix, parent, children, name } = bone;
-                map[name] = bone;
-                if (bone.index > -1) {
-                    boneCount++;
-                }
+                let { inv, matrix, parent, children, name ,index} = bone;
                 if (undefined != inv) {
                     bone.inv = inv = new Float32Array(inv);
                 }
@@ -212,6 +230,10 @@ module rf {
                 let sceneTransform = new Float32Array(matrix);
                 if (parent) {
                     matrix3d_multiply(sceneTransform, parent.sceneTransform, sceneTransform);
+                    if(index > -1){
+                        let matrice = new Float32Array(buffer, index * 16 * 4, 16);
+                        multiplyMatrices(sceneTransform,inv,matrice);
+                    }
                 }
                 bone.sceneTransform = sceneTransform;
 
@@ -222,100 +244,193 @@ module rf {
 
             init(config.root);
 
-
-            this.boneCount = boneCount;
-
             this.rootBone = config.root;
 
             this.vertex = context3D.createVertexBuffer(new VertexInfo(new Float32Array(config.vertex), config.data32PerVertex, vertex_skeleton_variable));
-
-
         }
 
-        createSkeletionAnimation() {
+        initAnimationData(anim:ISkeletonAnimationData){
+            anim.skeleton = this;
+            anim.matrices = [];
+            let frames = anim.frames;
+            for(let key in frames){
+                frames[key] = new Float32Array(frames[key]);
+            }
+            this.animations[anim.name] = anim;
+        }
 
-            let { rootBone, boneCount } = this;
 
-            let skeletonAni = {} as ISkeletonAnimation;
-            let buffer = new ArrayBuffer(16 * 4 * boneCount)
-            skeletonAni.boneMatrices = new Float32Array(buffer);
+        createAnimation(){
+            let anim = recyclable(SkeletonAnimation);
+            anim.skeleton = this;
+            return anim;
+        }
 
-            function createBoneAnimation(bone: IBone, parent?: IBoneAnimation) {
-                let { matrix, sceneTransform, index, inv } = bone;
-                let m = skeletonAni.boneMatrices;
-                let ani: IBoneAnimation = {} as IBoneAnimation;
-                ani.bone = bone;
-                ani.transform = new Float32Array(matrix);
-                ani.sceneTransform = new Float32Array(sceneTransform);
-                ani.index = index;
-                ani.inv = inv;
-                if (index > -1) {
-                    if (index == 0) {
-                        index = 0;
-                    }
-                    ani.matriceTransfrom = new Float32Array(buffer, index * 16 * 4, 16);
-                    multiplyMatrices(sceneTransform,inv,ani.matriceTransfrom);
-                    // matrix3d_multiply(sceneTransform, inv, ani.matriceTransfrom);
-                }
-                ani.parent = parent;
-                ani.status = 0;
 
-                ani.children = [];
-                bone.children.forEach(b => {
-                    ani.children.push(createBoneAnimation(b, ani));
-                });
-                return ani;
+        getMatricesData(anim:ISkeletonAnimationData,frame:number){
+            let result = anim.matrices[frame];
+            if(undefined != result){
+                return result;
             }
 
+            let{boneCount,rootBone}=this;
+            let{frames}=anim;
 
 
-            skeletonAni.rootBone = createBoneAnimation(rootBone);
-            skeletonAni.skeleton = this;
+            let map:{[key:string]:IBone} = {};
 
-            return skeletonAni;
-        }
-
-
-        updateSkeletonAnimation(anim: ISkeletonAnimation) {
-
-            let { rootBone, boneMatrices } = anim;
+            let buffer = new ArrayBuffer(16 * 4 * boneCount);
+            result = new Float32Array(buffer);
+            anim.matrices[frame] = result;
 
 
-            function updateBoneMatrices(bone: IBoneAnimation) {
+            function update(bone:IBone){
+                let { inv, matrix,sceneTransform, parent, children, name ,index} = bone;
+                let frameData = frames[bone.name];
 
-                const { index, sceneTransform, status, children, matriceTransfrom } = bone;
-
-                let change = false;
-                if (status & DChange.trasnform) {
-                    const { transform, parent } = bone;
-                    if (parent) {
-                        matrix3d_multiply(transform, parent.sceneTransform, sceneTransform);
-                    } else {
-                        sceneTransform.set(transform);
-                    }
-                    change = true;
-                    bone.status &= ~DChange.trasnform;
-                    if (index > -1) {
-                        // multiplyMatrices(sceneTransform,bone.inv,matriceTransfrom);
-                        matrix3d_multiply(sceneTransform, bone.inv, matriceTransfrom);
-                    }
+                if(frameData){
+                    matrix.set(frameData.slice(frame*16,(frame+1)*16));
                 }
-                children.forEach(b => {
-                    if (change) b.status |= DChange.trasnform;
-                    updateBoneMatrices(b);
+
+                if (parent) {
+                    matrix3d_multiply(matrix, parent.sceneTransform, sceneTransform);
+                    // multiplyMatrices(parent.sceneTransform,matrix,sceneTransform);
+                    if(index > -1){
+                        let matrice = new Float32Array(buffer, index * 16 * 4, 16);
+                        matrix3d_multiply(inv, sceneTransform, matrice);
+                        // multiplyMatrices(sceneTransform,inv,matrice);
+                    }
+                }else{
+                    sceneTransform.set(matrix);
+                }
+
+                map[bone.name] = bone;
+
+                children.forEach(element => {
+                    update(element);
                 });
             }
 
-            updateBoneMatrices(rootBone);
+            update(rootBone);
+
+            
+            return result;
         }
 
-        uploadContext(anim: ISkeletonAnimation,camera: Camera, mesh: Mesh, program: Program3D, now: number, interval: number) {
-            this.vertex.uploadContext(program);
-            context3D.setProgramConstantsFromMatrix(VC.vc_bones,anim.boneMatrices);
+        // createSkeletionAnimation() {
+
+        //     let { rootBone, boneCount } = this;
+
+        //     let skeletonAni = {} as ISkeletonAnimation;
+        //     let buffer = new ArrayBuffer(16 * 4 * boneCount)
+        //     skeletonAni.boneMatrices = new Float32Array(buffer);
+
+        //     function createBoneAnimation(bone: IBone, parent?: IBonePose) {
+        //         let { matrix, sceneTransform, index, inv } = bone;
+        //         let m = skeletonAni.boneMatrices;
+        //         let ani: IBonePose = {} as IBonePose;
+        //         ani.bone = bone;
+        //         ani.transform = new Float32Array(matrix);
+        //         ani.sceneTransform = new Float32Array(sceneTransform);
+        //         ani.index = index;
+        //         ani.inv = inv;
+        //         if (index > -1) {
+        //             if (index == 0) {
+        //                 index = 0;
+        //             }
+        //             ani.matriceTransfrom = new Float32Array(buffer, index * 16 * 4, 16);
+        //             multiplyMatrices(sceneTransform,inv,ani.matriceTransfrom);
+        //             // matrix3d_multiply(sceneTransform, inv, ani.matriceTransfrom);
+        //         }
+        //         ani.parent = parent;
+        //         ani.status = 0;
+
+        //         ani.children = [];
+        //         bone.children.forEach(b => {
+        //             ani.children.push(createBoneAnimation(b, ani));
+        //         });
+        //         return ani;
+        //     }
+
+        //     this.bonePose = createBoneAnimation(rootBone);
+
+        //     skeletonAni.skeleton = this;
+
+        //     return skeletonAni;
+        // }
+
+        // updateSkeletonAnimation(anim: ISkeletonAnimation) {
+
+        //     let { rootBone, boneMatrices } = anim;
+
+
+        //     function updateBoneMatrices(bone: IBonePose) {
+
+        //         const { index, sceneTransform, status, children, matriceTransfrom } = bone;
+
+        //         let change = false;
+        //         if (status & DChange.trasnform) {
+        //             const { transform, parent } = bone;
+        //             if (parent) {
+        //                 matrix3d_multiply(transform, parent.sceneTransform, sceneTransform);
+        //             } else {
+        //                 sceneTransform.set(transform);
+        //             }
+        //             change = true;
+        //             bone.status &= ~DChange.trasnform;
+        //             if (index > -1) {
+        //                 // multiplyMatrices(sceneTransform,bone.inv,matriceTransfrom);
+        //                 matrix3d_multiply(sceneTransform, bone.inv, matriceTransfrom);
+        //             }
+        //         }
+        //         children.forEach(b => {
+        //             if (change) b.status |= DChange.trasnform;
+        //             updateBoneMatrices(b);
+        //         });
+        //     }
+
+        //     updateBoneMatrices(rootBone);
+        // }
+    }
+
+    export class SkeletonAnimation{
+        skeleton: Skeleton;
+        pose:{[key:string]:Float32Array} = {};
+        starttime:number;
+        nextTime:number;
+        animationData:ISkeletonAnimationData;
+
+        currentFrame:number = 0;
+
+        play(animationData:ISkeletonAnimationData,now:number){
+            this.animationData = animationData;
+            this.nextTime = now + animationData.eDuration * 1000;
         }
 
+        uploadContext(camera: Camera, mesh: Mesh, program: Program3D, now: number, interval: number) {
+            let{animationData,skeleton,starttime,currentFrame,nextTime}=this;
+            skeleton.vertex.uploadContext(program);
 
+            if(currentFrame >= animationData.totalFrame){
+                currentFrame = 0;
+            }
 
+            if(now > nextTime){
+                this.nextTime = nextTime  + animationData.eDuration * 1000;
+                // if(currentFrame>=30){
+                //     currentFrame = 30;
+                // }
+                this.currentFrame = currentFrame+1;
+            }
+
+            let matrixes:Float32Array;
+            if(undefined == animationData){
+                matrixes = skeleton.defaultMatrices;
+            }else{
+                matrixes = skeleton.getMatricesData(animationData,currentFrame);
+            }
+            context3D.setProgramConstantsFromMatrix(VC.vc_bones,matrixes);
+        }
 
     }
 }
