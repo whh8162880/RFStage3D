@@ -68,6 +68,7 @@ module rf {
             var inflate = new Zlib.Inflate(new Uint8Array(byte));
             var plain = inflate.decompress();
             amf.setArrayBuffer(plain.buffer);
+            // amf.setArrayBuffer(byte);
             let o = amf.readObject();
             this.setKFM(o);
         }
@@ -100,24 +101,18 @@ module rf {
             this.material.triangleFaceToCull = Context3DTriangleFace.NONE;
             // this.material["diffTex"] = this.id + kfm["diff"];
             this.material["diffTex"] = this.id + "diff.png";
-
             //=========================
             //skeleton
             //=========================
             let skeleton = new Skeleton(kfm.skeleton);
-
-            
             //===========================
             //  Animation
             //===========================
             let animationData = kfm.anims["Take 001"];
-
             skeleton.initAnimationData(animationData);
-
             // let animation = skeleton.createSkeletionAnimation();
             this.skAnim = skeleton.createAnimation();
             this.skAnim.play(animationData,engineNow);
-
         }
     }
 
@@ -410,23 +405,18 @@ module rf {
         uploadContext(camera: Camera, mesh: Mesh, program: Program3D, now: number, interval: number) {
             let{animationData,skeleton,starttime,currentFrame,nextTime}=this;
             skeleton.vertex.uploadContext(program);
-
-            if(currentFrame >= animationData.totalFrame){
-                currentFrame = 0;
-            }
-
-            if(now > nextTime){
-                this.nextTime = nextTime  + animationData.eDuration * 1000;
-                // if(currentFrame>=30){
-                //     currentFrame = 30;
-                // }
-                this.currentFrame = currentFrame+1;
-            }
-
             let matrixes:Float32Array;
             if(undefined == animationData){
                 matrixes = skeleton.defaultMatrices;
             }else{
+                if(currentFrame >= animationData.totalFrame){
+                    currentFrame = 0;
+                }
+    
+                if(now > nextTime){
+                    this.nextTime = nextTime  + animationData.eDuration * 1000;
+                    this.currentFrame = currentFrame+1;
+                }
                 matrixes = skeleton.getMatricesData(animationData,currentFrame);
             }
             context3D.setProgramConstantsFromMatrix(VC.vc_bones,matrixes);
