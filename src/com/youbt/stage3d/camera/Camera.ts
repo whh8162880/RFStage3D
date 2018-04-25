@@ -105,6 +105,7 @@ module rf{
 
             // let len = new PerspectiveMatrix3D();
             // len.perspectiveFieldOfViewLH(45,width/height,0.1,10000);
+            // len.perspectiveFieldOfViewRH(45,width/height,0.1,10000);
             // this.len = len;
             // len.transpose();
 

@@ -208,11 +208,11 @@ module rf{
                     vec3 v = cross(t.xyz,vec3(0,0,1));
                     v = normalize(v);
                     float t2 = pos.z * p[2].w;
-                     if(t2 <= 0.0){
-                        v.xyz *= len;
-                     }else{
-                         v.xyz *= len * t2;
-                     }
+                    if(t2 <= 0.0){
+                       v.xyz *= len;
+                    }else{
+                        v.xyz *= len * t2;
+                    }
                     pos.xy += v.xy;
                     pos = p * pos;
                     gl_Position = pos;

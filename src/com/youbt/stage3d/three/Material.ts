@@ -203,7 +203,8 @@ module rf{
 
 
             let fragmentCode = `
-                precision mediump float;
+                precision highp float;
+                precision highp int;
 
                 ${f_def}
 
