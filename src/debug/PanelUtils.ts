@@ -1,4 +1,3 @@
-///<reference path="../com/youbt/mvc/manage/PanelSourceManage.ts" />
 module rf{
     export class PanelUtils{
         skin:Symbol;
@@ -15,7 +14,6 @@ module rf{
         constructor(){
             let {manage} = this;
             manage = singleton(PanelSourceManage);
-
             this.source = manage.load("../assets/create.p3d", "create");
             this.source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this)
         }
@@ -53,4 +51,6 @@ module rf{
             alert("随机按钮点击");
         }
     }
+
+    let sourceManger:PanelSourceManage = singleton(PanelSourceManage)
 }

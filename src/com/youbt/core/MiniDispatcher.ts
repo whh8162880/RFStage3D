@@ -12,8 +12,8 @@ module rf {
 	export enum EventT {
 		ENTER_FRAME=1,
 		RESIZE,
-		COMPLETE,
 		FAILED,
+		COMPLETE,
 		CONTEXT3D_CREATE,
 		CHANGE,
 		CANCEL,
@@ -27,7 +27,10 @@ module rf {
 		PROGRESS,
 		IO_ERROR,
 		MESSAGE,
-		RECYCLE
+		RECYCLE,
+		ADD_TO_STAGE,
+		REMOVE_FROM_STAGE,
+		COMPLETE_LOADED
 	}
 	export enum MouseEventX {
 		MouseDown = 50,

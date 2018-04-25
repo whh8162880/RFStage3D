@@ -3,6 +3,10 @@
 
 declare function parseInt(s: number, radix?: number): number;
 
+declare class Zlib{
+    static Inflate:any;
+}
+
 
 /**
  * 对数字进行补0操作

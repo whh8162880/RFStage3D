@@ -133,7 +133,6 @@ module rf {
         mouseChildren:boolean = true;
         mousedown:boolean = false;
 		mouseRoll:Boolean = false;
-        transformComponents: Vector3D[];
         pos: Vector3D;
         rot: Vector3D;
         sca: Vector3D;
@@ -173,7 +172,6 @@ module rf {
             this.pos = new Vector3D();
             this.rot = new Vector3D();
             this.sca = new Vector3D(1,1,1);
-            this.transformComponents = [this.pos, this.rot, this.sca];
             this.transform = new Matrix3D();
             this.sceneTransform = new Matrix3D();
         }
@@ -421,23 +419,21 @@ module rf {
         }
 
 
-        public setTransform(matrix: Matrix3D): void {
-            //			transform.copyFrom(matrix);
-            var vs: Vector3D[] = matrix.decompose();
-            this.pos.copyFrom(vs[0]);
-            this._x = this.pos.x;
-            this._y = this.pos.y;
-            this._z = this.pos.z;
+        public setTransform(matrix:ArrayLike<number>): void {
+            const{pos,rot,sca}=this;
+            matrix3d_decompose(matrix,pos,rot,sca);
+            this._x = pos.x;
+            this._y = pos.y;
+            this._z = pos.z;
 
-            this.rot.copyFrom(vs[1]);
-            this._rotationX = this.rot.x;
-            this._rotationY = this.rot.y;
-            this._rotationZ = this.rot.z;
+            this._rotationX = rot.x;
+            this._rotationY = rot.y;
+            this._rotationZ = rot.z;
 
-            this.sca.copyFrom(vs[2]);
-            this._scaleX = this.sca.x;
-            this._scaleY = this.sca.y;
-            this._scaleZ = this.sca.z;
+            this._scaleX = sca.x;
+            this._scaleY = sca.y;
+            this._scaleZ = sca.z;
+
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
 
@@ -448,14 +444,15 @@ module rf {
 		 * 
 		 */
         public updateTransform(): void {
+            const{transform}=this;
             if (this.pivotZero) {
-                this.transform.identity();
-                this.transform.appendTranslation(-this.pivotPonumber.x, -this.pivotPonumber.y, -this.pivotPonumber.z);
-                this.transform.appendScale(this._scaleX, this._scaleY, this._scaleZ);
-                this.transform.appendTranslation(this._x, this._y, this._z);
-                this.transform.appendTranslation(this.pivotPonumber.x, this.pivotPonumber.y, this.pivotPonumber.z);
+                transform.identity();
+                transform.appendTranslation(-this.pivotPonumber.x, -this.pivotPonumber.y, -this.pivotPonumber.z);
+                transform.appendScale(this._scaleX, this._scaleY, this._scaleZ);
+                transform.appendTranslation(this._x, this._y, this._z);
+                transform.appendTranslation(this.pivotPonumber.x, this.pivotPonumber.y, this.pivotPonumber.z);
             } else {
-                this.transform.recompose(this.transformComponents);
+                matrix_recompose(this.pos,this.rot,this.sca,transform.rawData);
             }
 
             this.states &= ~DChange.trasnform;
@@ -633,17 +630,20 @@ module rf {
 			raw[14] = _z;
 			raw[15] = 1;
 			
-			if (zAxis.z < 0) {
-				this.rotationY = (180 - this.rotationY);
-				this.rotationX -= 180;
-				this.rotationZ -= 180;
-			}
+			// if (zAxis.z < 0) {
+			// 	this.rotationY = (180 - this.rotationY);
+			// 	this.rotationX -= 180;
+			// 	this.rotationZ -= 180;
+            // }
+            
+            matrix3d_decompose(transform.rawData,undefined,rot,undefined);
 			
-			let v = transform.decompose();
-			xAxis = v[1];
-			rot.x = this._rotationX = xAxis.x;
-			rot.y = this._rotationY = xAxis.y;
-			rot.z = this._rotationZ = xAxis.z;
+			// let v = transform.decompose();
+			// xAxis = v[1];
+			this._rotationX = rot.x;
+			this._rotationY = rot.y;
+            this._rotationZ = rot.z;
+            
 			this.setChange(DChange.trasnform);
 		}
     }
