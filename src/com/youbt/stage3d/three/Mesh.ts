@@ -113,6 +113,8 @@ module rf {
             // let animation = skeleton.createSkeletionAnimation();
             this.skAnim = skeleton.createAnimation();
             this.skAnim.play(animationData,engineNow);
+
+            
         }
     }
 
