@@ -202,7 +202,7 @@ module rf{
 	
 	export class PanelBase extends SkinBase{
 		isShow:boolean = false;
-		tweer:Tween;
+		effectTweener:Tween;
 
 		constructor(){
 			super(new Symbol());
@@ -237,13 +237,8 @@ module rf{
 
 		effectTween(type:number):void{
 			
-			let _tween = this.tweer;
-
-			
-			// if(this._skin.alpha == 1)
-			// {
-			// 	this._skin.alpha = 0;
-			// }
+			this.getTweener(type);
+		
 
 			// if(type){
 			
@@ -257,6 +252,13 @@ module rf{
 			// _tween.call(this.effectEndByBitmapCache,this,type);
 
 			this.effectEndByBitmapCache(type);
+		}
+
+		getTweener(type:number):void{
+			if(this._skin.alpha == 1)
+			{
+				this._skin.alpha = 0;
+			}
 		}
 
 
