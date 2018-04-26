@@ -90,12 +90,11 @@ module rf {
             let info: VertexInfo = new VertexInfo(vertex, geometry.data32PerVertex, this.variables);
             geometry.vertex = c.createVertexBuffer(info);
 
-
-            if (mesh.matrix) {
-                let m = new Matrix3D(mesh.matrix);
-                m.appendScale(100, 100, 100);
-                this.setTransform(m.rawData);
-            }
+            // if (mesh.matrix) {
+            //     let m = new Matrix3D(mesh.matrix);
+            //     m.appendScale(100, 100, 100);
+            //     this.setTransform(m.rawData);
+            // }
 
             let index = mesh["index"];
             if (index) {

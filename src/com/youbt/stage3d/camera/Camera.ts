@@ -85,7 +85,7 @@ module rf{
 
             rawData[12] = 0;
             rawData[13] = 0;
-            rawData[14] = 0;
+            rawData[14] = -1/this.far*Math.PI*100;
             rawData[15] = 1;
 
             this.states |= DChange.trasnform;

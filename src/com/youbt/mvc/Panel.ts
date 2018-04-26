@@ -251,14 +251,18 @@ module rf{
 
 			// _tween.call(this.effectEndByBitmapCache,this,type);
 
-			this.effectEndByBitmapCache(type);
+			// this.effectEndByBitmapCache(type);
+			if(type == 0){
+				this._skin.remove();
+			}
+
 		}
 
 		getTweener(type:number):void{
-			if(this._skin.alpha == 1)
-			{
-				this._skin.alpha = 0;
-			}
+			// if(this._skin.alpha == 1)
+			// {
+			// 	this._skin.alpha = 0;
+			// }
 		}
 
 
@@ -285,6 +289,8 @@ module rf{
 			if(this.hasEventListener(PanelEvent.HIDE)){
 				this.simpleDispatch(PanelEvent.HIDE);
 			}
+
+			console.log("Mediatro sleep");
 		}
 
 		bringTop():void

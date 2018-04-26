@@ -161,6 +161,9 @@ module rf{
             Capabilities.init();
             MouseInstance.init(Capabilities.isMobile);
 
+            mainKey.init();
+            KeyManagerV2.resetDefaultMainKey();
+
             canvas.addEventListener('webglcontextlost',this.webglContextLostHandler);
             canvas.addEventListener("webglcontextrestored",this.webglContextRestoredHandler);
             this.simpleDispatch(EventT.CONTEXT3D_CREATE,gl);
