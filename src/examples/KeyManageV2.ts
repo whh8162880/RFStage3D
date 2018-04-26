@@ -452,10 +452,5 @@ module rf{
 
     }
 
-    export let mainKey = singleton(KeyManagerV2);
-    mainKey.init();
-    KeyManagerV2.resetDefaultMainKey();
-
-   
-    
+    export let mainKey = new KeyManagerV2();
 }
