@@ -385,13 +385,14 @@ namespace rf {
 			if (program == undefined) return 
 
 			program.preusetime = engineNow;
-			if(program == this.cProgram) return;
 
 			if (false == program.readly) {
 				if (false == program.awaken()) {
 					ThrowError("program create error!");
 					return;
 				}
+			}else{
+				if(program == this.cProgram) return;
 			}
 
 			this.cProgram = program;
@@ -536,17 +537,19 @@ namespace rf {
 		gc(now:number):void{
 			let link = this.bufferLink;
 			let vo = link.getFrist();
+			var hasChange = false
 			while(vo){
 				if(false == vo.close){
 					let buffer:Recyclable<Buffer3D> = vo.data;
 					if(now - buffer.preusetime > 3000){
 						buffer.recycle();
 						vo.close = true;
+						hasChange = true;
 					}
 				}
 				vo = vo.next;
 			}
-			link.clean();
+			if(hasChange) link.clean();
 		}
 
 

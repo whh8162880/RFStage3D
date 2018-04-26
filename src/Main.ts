@@ -42,7 +42,7 @@ module rf{
 
             var g:Graphics;
             
-            let camera = ROOT.camera2D;
+            let camera = ROOT.camera3D;
             scene.camera = camera
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
             f = camera.originFar;
@@ -56,6 +56,8 @@ module rf{
             let t = 2;
             let tr = new Trident(w*2,t);
             scene.addChild(tr);
+
+            sp = tr;
 
             // line.rotationX = 45;
             // let line = new Line3D();
