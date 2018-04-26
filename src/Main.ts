@@ -41,11 +41,13 @@ module rf{
 
 
             var g:Graphics;
-
-            let camera = ROOT.camera3D;
+            
+            let camera = ROOT.camera2D;
+            scene.camera = camera
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
+            f = camera.originFar;
             camera.z = f
-            camera.y = f;
+            // camera.y = f;
             camera.lookat(new Vector3D(0,0,0));
             new TrackballControls(camera);
 
