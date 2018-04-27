@@ -107,12 +107,16 @@ module rf {
             }
         }
 
-        onRecycle(): void {
+        recycle(): void {
             this.dispose();
-            this.vertexCode = undefined;
-            this.fragmentCode = undefined;
+            // this.vertexCode = undefined;
+            // this.fragmentCode = undefined;
             this.preusetime = 0;
             this.readly = false;
+
+            this.uniforms = {};
+            this.attribs = {};
+            // context3D.bufferLink.remove(this);
         }
         /*
          * load shader from html file by document.getElementById
@@ -144,16 +148,18 @@ module rf {
         constructor() {
             super();
         }
-        onRecycle(): void {
+        recycle(): void {
             if (this.buffer) {
                 gl.deleteBuffer(this.buffer);
                 this.buffer = undefined;
             }
             this.readly = false;
             this.preusetime = 0;
-            this.numVertices = 0;
-            this.data32PerVertex = 0;
-            this.data = null;
+            this.attribarray = {};
+            // this.numVertices = 0;
+            // this.data32PerVertex = 0;
+            // this.data = null;
+            // context3D.bufferLink.remove(this);
         }
         awaken(): boolean {
             if (!this.data || !this.data32PerVertex || !this.numVertices) {
@@ -271,15 +277,17 @@ module rf {
         constructor() {
             super();
         }
-        onRecycle(): void {
+        recycle(): void {
             if (this.buffer) {
                 gl.deleteBuffer(this.buffer);
                 this.buffer = undefined;
             }
             this.readly = false;
             this.preusetime = 0;
-            this.numIndices = 0;
-            this.data = null;
+
+            // this.numIndices = 0;
+            // this.data = null;
+            // context3D.bufferLink.remove(this);
         }
         awaken(): boolean {
             if (true == this.readly) {
@@ -538,17 +546,18 @@ module rf {
         }
 
 
-        onRecycle(): void {
+        recycle(): void {
             if (this.texture) {
                 gl.deleteTexture(this.texture);
                 this.texture = undefined;
                 this.mipmap = false;
             }
-            if (this.pixels) {
-                this.pixels = undefined;
-            }
-            this.width = 0;
-            this.height = 0;
+            this.readly = false;
+            // if (this.pixels) {
+            //     this.pixels = undefined;
+            // }
+            // this.width = 0;
+            // this.height = 0;
         }
     }
 

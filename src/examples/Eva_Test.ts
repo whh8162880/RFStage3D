@@ -1,18 +1,13 @@
 module rf{
     export class Eva_Text{
         constructor(){
-            window.onkeyup = this.onKeyDownHandle;
+            // window.onkeyup = this.onKeyDownHandle;
+            mainKey.regKeyDown(Keybord.A,this.onKeyDownHandle,this)
     }
 
     onKeyDownHandle(e:KeyboardEvent):void{
-        // console.log(e.type);
-        switch(e.code){
-            case "KeyA":
-               let m = singleton(TestMediator);
-                facade.toggleMediator(m);
-            break;
-
-        }
+        let m = singleton(TestMediator);
+        facade.toggleMediator(m);
     }
 }
 
@@ -37,6 +32,25 @@ module rf{
         constructor(){
             super("create","ui.asyncpanel.create");
         }
+
+        
+        key:KeyManagerV2
+        awaken():void{
+            this.key = new KeyManagerV2(this.skin);
+            this.key.regKeyDown(Keybord.B,this.onKeyHandle,this);
+            this.key.awaken();
+        }
+
+        onKeyHandle(e:KeyboardEvent):void{
+            console.log("key_down_"+e.keyCode);
+        }
+
+        sleep():void{
+            this.key.sleep();
+
+            console.log("key_sleep");
+        }
+
     }
 
     export class TestModel extends BaseMode{

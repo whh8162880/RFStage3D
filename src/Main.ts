@@ -57,6 +57,8 @@ module rf{
             let tr = new Trident(w*2,t);
             scene.addChild(tr);
 
+            sp = tr;
+
             // line.rotationX = 45;
             // let line = new Line3D();
             // line.clear();

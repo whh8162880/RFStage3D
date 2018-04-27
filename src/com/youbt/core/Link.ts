@@ -81,7 +81,7 @@ module rf {
             var vo: Recyclable<LinkVO>
             if (this.checkSameData) {
                 vo = this.getValueLink(value);
-                if (vo) return vo;
+                if (vo && vo.close == false) return vo;
             }
 
 
@@ -109,7 +109,7 @@ module rf {
 
             if (this.checkSameData) {
                 vo = this.getValueLink(value);
-                if (vo) {
+                if (vo && vo.close == false) {
                     if (weight == vo.weight) {
                         return vo;
                     }
@@ -191,7 +191,7 @@ module rf {
                     }
 
                     if (vo == this.last) {
-                        this.last = vo;
+                        this.last = vo.pre;
                         if(undefined != this.last){
                             this.last.next = undefined;
                         }
