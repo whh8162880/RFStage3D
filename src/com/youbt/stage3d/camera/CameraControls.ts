@@ -16,11 +16,11 @@ module rf{
         }
 
         updateSun(){
-            const{object,target}=this;
-            let sun = scene.sun;
-            sun.x = object._x - target.x;
-            sun.y = object._y - target.y;
-            sun.z = object._z - target.z;
+            // const{object,target}=this;
+            // let sun = scene.sun;
+            // sun.x = object._x - target.x;
+            // sun.y = object._y - target.y;
+            // sun.z = object._z - target.z;
         }
 
         set tdistance(value:number){

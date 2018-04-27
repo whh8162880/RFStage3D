@@ -42,7 +42,7 @@ module rf{
 
             var g:Graphics;
             
-            let camera = ROOT.camera2D;
+            let camera = ROOT.camera3D;
             scene.camera = camera
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
             f = camera.originFar;
@@ -51,7 +51,7 @@ module rf{
             camera.lookat(new Vector3D(0,0,0));
             new TrackballControls(camera);
 
-            let w = 100;
+            let w = 500;
 
             let t = 2;
             let tr = new Trident(w*2,t);
@@ -81,10 +81,11 @@ module rf{
 
             m.diffTex = "assets/a10010m/diff.png";
 
-            // let plane = new PlaneGeometry(variables).create(w,w);
-            // let mesh = new Mesh(variables);
-            // mesh.init(plane,m);
-            // scene.addChild(mesh);
+            let plane = new PlaneGeometry(variables).create(w,w);
+            let mesh = new Mesh(variables);
+            mesh.rotationX = -90;
+            mesh.init(plane,m);
+            scene.addChild(mesh);
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
             // mesh = new Mesh(variables);
