@@ -709,7 +709,7 @@ module rf {
             let i: IndexBuffer3D = c.getIndexByQuad(geo.quadcount);
             let p = this.program; 
             c.setProgram(p);
-            c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
+            c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform.rawData);
             c.setProgramConstantsFromVector(VC.ui, geo.vcData, 4);
             this.t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);

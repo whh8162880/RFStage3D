@@ -6,17 +6,6 @@ module rf{
 		HIDE = "PanelEvent_HIDE",
 	}
 
-	export enum RES_STATE{
-		LOAD_DISPOSE= -1, //被销毁
-		LOAD_NONE,  // 未加载
-		LOAD_PARSING , //解析状态
-		LOAD_PARSED, //解析状态
-		
-		LOAD_LOADING,// 加载中
-		LOAD_LOADED ,// 已加载
-		LOAD_ERROR	// 加载失败
-	}
-
     export class DataBase{
 
         DataBase3D()
@@ -48,9 +37,11 @@ module rf{
       
        
         constructor(skin:Sprite = null){
-            super();
-            this.skin = skin;
-			skin.mouseEnabled = true
+			super();
+			if(skin){
+				this.skin = skin;
+				skin.mouseEnabled = true
+			}
         }
         
         _skin:Sprite;
@@ -88,9 +79,9 @@ module rf{
 		awaken():void{}
 		sleep():void{}
 		
-		addEventListener(type:string|number, listener:Function, priority:number=0):void
+		addEventListener(type:string|number, listener:Function, thisobj:any,priority:number=0):void
 		{
-			this._skin.addEventListener(type,listener,priority);
+			this._skin.addEventListener(type,listener,thisobj,priority);
 		}
 		
 		dispatchEvent(event:EventX):boolean
@@ -211,10 +202,10 @@ module rf{
 	
 	export class PanelBase extends SkinBase{
 		isShow:boolean = false;
-		tweer:Tween;
+		effectTweener:Tween;
 
 		constructor(){
-			super();
+			super(new Symbol());
 		}
 
 		show(container:any=null, isModal:Boolean=false):void{
@@ -227,12 +218,15 @@ module rf{
 			{
 				container = popContainer;
 			}
+			container.addChild(this._skin);
 
 			this.isShow = true;
 			this.awaken();
 			this.effectTween(1);
 
-			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler);
+			
+
+			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler,this);
 			if(this.hasEventListener(PanelEvent.SHOW))
 			{
 				this.simpleDispatch(PanelEvent.SHOW);
@@ -242,9 +236,41 @@ module rf{
 		}
 
 		effectTween(type:number):void{
-			if(this.tweer)
-			{
-				// this.tweer.off()
+			
+			this.getTweener(type);
+		
+
+			// if(type){
+			
+			// 	_tween = tween.get(this._skin);
+			// 	_tween.to({alpha:1},200);
+			// }else{
+			// 	_tween = tween.get(this._skin);
+			// 	_tween.to({alpha:1},200);
+			// }
+
+			// _tween.call(this.effectEndByBitmapCache,this,type);
+
+			// this.effectEndByBitmapCache(type);
+			if(type == 0){
+				this._skin.remove();
+			}
+
+		}
+
+		getTweener(type:number):void{
+			// if(this._skin.alpha == 1)
+			// {
+			// 	this._skin.alpha = 0;
+			// }
+		}
+
+
+		effectEndByBitmapCache(type:number):void{
+			if(type == 0){
+				this._skin.remove();
+			}else{
+				// this._skin.alpha = 1;
 			}
 		}
 
@@ -263,6 +289,8 @@ module rf{
 			if(this.hasEventListener(PanelEvent.HIDE)){
 				this.simpleDispatch(PanelEvent.HIDE);
 			}
+
+			console.log("Mediatro sleep");
 		}
 
 		bringTop():void
@@ -282,15 +310,15 @@ module rf{
 	   
 		uri:string;
 		clsName:string;
-		state:number;
-
 		_resizeable:boolean;
 
-		resource:PanelSource;
+		source:AsyncResource;
 		container:DisplayObjectContainer;
+		isModel:boolean;
 
-		isReady:boolean = false;
-		
+		isReadyShow:boolean = false;
+		loaded:boolean = false;
+
 		constructor(uri:string,cls:string){
 			super();
 			this.uri = uri;
@@ -310,60 +338,62 @@ module rf{
 
 
 		
-		show(container:any=null, isModal:Boolean=false):void{
-			super.show(container,isModal);
-			
-			// if(isShow)
-			// {
-			// 	resource.sleeptime = 0;
-			// }
+		show(container:any=null, isModal:boolean=false):void{
 
+			if(this.loaded == false)
+			{
+				this.isReadyShow=true;
+				this.container = container;
+				this.isModel = isModal;
+				this.load();
+				return;
+			}
+			super.show(container,isModal);
 		}
 
 		load():void{
-			// if(this.state != .LOAD_NONE && this.state != ResourceState.LOAD_ERROR && p3dCompleted){
-			// 	return;	
-			// }
-			
-			// let url= this.getURL();
-			// let manage:PanelSourceManage = new PanelSourceManage;
-			// manage.load(url);
-			
-			// loadRes(url, this.p3dloadComplete, this, ResType.text)
-			// this.resource =  //p3d.load(url, uri, this);
-			// resource.ungc = ungc;
-			// if(resource.isReady){
-			// 	this.resourcevo = resource.vo;
-			// 	state = ResourceState.LOAD_LOADING;
-				// initReady(null);
-				
-			// }else{
-			// 	toggleLoading(true);
-			// 	resource.addEventListener(RFLoaderEvent.COMPLETE,loaderHandler);	
-			// 	resource.addEventListener(RFLoaderEvent.PROGRESS,progressHandler);
-			// 	resource.addEventListener(RFLoaderEvent.FAILED,loaderHandler);
-			// 	state = ResourceState.LOAD_LOADING;
-			// }
+			if(this.source == undefined ||this.source.status == 0 )
+			{
+				let url = this.getURL();
+				let source = manage.load(url, this.uri);
+				source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this);
+				this.source = source;
+				// this.showload();
+			}else{
+				this.asyncsourceComplete(undefined);
+			}
+
+
 		}
 
-		p3dloadComplete(e:EventX):void{
-			//
-		}
+		asyncsourceComplete(e:EventX):void{
+			let source = this.source;
+			let cs:DisplaySymbol = source.setting[this.clsName];
+			if(cs){
+				let skin = this.skin as Symbol;
+				skin.source = source.source;
+				skin.setSymbol(cs);
+				skin.renderer = new BatchRenderer(skin);
+			}
 
-		p3dCompleted():Boolean
-		{
-			return this.resource.isReady;
+			this.loaded = true;
+			this.simpleDispatch(EventT.COMPLETE);
+
+			if(this.isReadyShow){
+				this.show(this.container,this.isModel);
+			}
 		}
 
 
 		hide(e:Event = undefined):void{
 			super.hide(e);
+			this.isReadyShow=false;
 		}
 
 
 	}
 
 
-
+	let manage:PanelSourceManage = singleton(PanelSourceManage);
     
 }

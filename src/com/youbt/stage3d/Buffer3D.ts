@@ -6,7 +6,9 @@ module rf {
         normal = "normal",
         tangent = "tangent",
         color = "color",
-        uv = "uv"
+        uv = "uv",
+        index = "index",
+        weight = "weight"
     }
 
     export enum FS {
@@ -21,8 +23,8 @@ module rf {
         ui = "ui",
         lightDirection = "lightDirection",
         vc_diff = "vc_diff",
-        vc_emissive = "vc_emissive"
-
+        vc_emissive = "vc_emissive",
+        vc_bones="bones"
     }
 
     export class Buffer3D implements IRecyclable {
@@ -105,12 +107,16 @@ module rf {
             }
         }
 
-        onRecycle(): void {
+        recycle(): void {
             this.dispose();
-            this.vertexCode = undefined;
-            this.fragmentCode = undefined;
+            // this.vertexCode = undefined;
+            // this.fragmentCode = undefined;
             this.preusetime = 0;
             this.readly = false;
+
+            this.uniforms = {};
+            this.attribs = {};
+            // context3D.bufferLink.remove(this);
         }
         /*
          * load shader from html file by document.getElementById
@@ -142,16 +148,18 @@ module rf {
         constructor() {
             super();
         }
-        onRecycle(): void {
+        recycle(): void {
             if (this.buffer) {
                 gl.deleteBuffer(this.buffer);
                 this.buffer = undefined;
             }
             this.readly = false;
             this.preusetime = 0;
-            this.numVertices = 0;
-            this.data32PerVertex = 0;
-            this.data = null;
+            this.attribarray = {};
+            // this.numVertices = 0;
+            // this.data32PerVertex = 0;
+            // this.data = null;
+            // context3D.bufferLink.remove(this);
         }
         awaken(): boolean {
             if (!this.data || !this.data32PerVertex || !this.numVertices) {
@@ -269,15 +277,17 @@ module rf {
         constructor() {
             super();
         }
-        onRecycle(): void {
+        recycle(): void {
             if (this.buffer) {
                 gl.deleteBuffer(this.buffer);
                 this.buffer = undefined;
             }
             this.readly = false;
             this.preusetime = 0;
-            this.numIndices = 0;
-            this.data = null;
+
+            // this.numIndices = 0;
+            // this.data = null;
+            // context3D.bufferLink.remove(this);
         }
         awaken(): boolean {
             if (true == this.readly) {
@@ -380,9 +390,12 @@ module rf {
 
             if(this.mipmap){
 
-                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
+                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
 
-                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST_MIPMAP_NEAREST);
+                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR_MIPMAP_LINEAR);
+
+                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.REPEAT);   //U方向上设置
+                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.REPEAT);   //v方向上设置
 
             }else{
                 //设置纹理参数 https://blog.csdn.net/a23366192007/article/details/51264454
@@ -417,7 +430,8 @@ module rf {
             //如果我们的贴图长宽不满足2的幂条件。那么MIN_FILTER 和 MAG_FILTER, 只能是 NEAREST或者LINEAR
             g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
 
-
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);   //U方向上设置
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);   //v方向上设置
 
             
             }
@@ -426,8 +440,7 @@ module rf {
             //g.REPEAT                  limit:power of two   
             //g.MIRRORED_REPEAT         limit:power of two   
             //g.CLAMP_TO_EDGE
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);   //U方向上设置
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);   //v方向上设置
+           
 
             /**
                 ====format=====
@@ -533,17 +546,18 @@ module rf {
         }
 
 
-        onRecycle(): void {
+        recycle(): void {
             if (this.texture) {
                 gl.deleteTexture(this.texture);
                 this.texture = undefined;
                 this.mipmap = false;
             }
-            if (this.pixels) {
-                this.pixels = undefined;
-            }
-            this.width = 0;
-            this.height = 0;
+            this.readly = false;
+            // if (this.pixels) {
+            //     this.pixels = undefined;
+            // }
+            // this.width = 0;
+            // this.height = 0;
         }
     }
 

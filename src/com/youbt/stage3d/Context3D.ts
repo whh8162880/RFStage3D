@@ -364,7 +364,7 @@ namespace rf {
 		/**
         *  @variable must predefined in glsl
         */
-		public setProgramConstantsFromMatrix(variable: string, matrix: Matrix3D): void {
+		public setProgramConstantsFromMatrix(variable: string, rawData: Float32Array): void {
 			let p = this.cProgram;
 			let uniforms = p.uniforms;
 			let g = gl;
@@ -376,7 +376,7 @@ namespace rf {
 				uniforms[variable] = index;
 			}
 			if (undefined != index) {
-				g.uniformMatrix4fv(index, false, matrix.rawData);
+				g.uniformMatrix4fv(index, false, rawData);
 			}
 		}
 
@@ -385,13 +385,14 @@ namespace rf {
 			if (program == undefined) return 
 
 			program.preusetime = engineNow;
-			if(program == this.cProgram) return;
 
 			if (false == program.readly) {
 				if (false == program.awaken()) {
 					ThrowError("program create error!");
 					return;
 				}
+			}else{
+				if(program == this.cProgram) return;
 			}
 
 			this.cProgram = program;
@@ -410,9 +411,9 @@ namespace rf {
 				indexBuffer.preusetime = engineNow;
 				// g.drawArrays(g.TRIANGLES,0,numTriangles)
 				g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-				g.drawElements(g.TRIANGLES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+				g.drawElements(g.TRIANGLES, numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
 			}else{
-				g.drawArrays(g.TRIANGLES,0,numTriangles)
+				g.drawArrays(g.TRIANGLES,0,numTriangles * 3);
 			}
 			
 			this.triangles += numTriangles;
@@ -536,17 +537,19 @@ namespace rf {
 		gc(now:number):void{
 			let link = this.bufferLink;
 			let vo = link.getFrist();
+			var hasChange = false
 			while(vo){
 				if(false == vo.close){
 					let buffer:Recyclable<Buffer3D> = vo.data;
 					if(now - buffer.preusetime > 3000){
 						buffer.recycle();
 						vo.close = true;
+						hasChange = true;
 					}
 				}
 				vo = vo.next;
 			}
-			link.clean();
+			if(hasChange) link.clean();
 		}
 
 

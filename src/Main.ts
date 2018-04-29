@@ -18,6 +18,17 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+            // var matrix = new Matrix3D([-1.0938435201278621e-8,-0.968181073665619,-0.2502503693103784,0,-1.4972529544683223e-8,-0.2502503567352837,0.9681810250144678,0,-0.9999999403953552,1.4337268631142944e-8,-1.1758774204986801e-8,0,6.187005396895984e-8,1.6862283945083618,-0.09339626878499985,1]);
+            // var vs = matrix.decompose();
+            // matrix.invert();
+
+            // let amfEncode = new AMF3Encode();
+            // let amfDecode = new AMF3();
+            // amfEncode.writeObject(1000);
+            // let b = amfEncode.toUint8Array().buffer;
+            // amfDecode.setArrayBuffer(b);
+            // let re = amfDecode.readObject();
             
             // gl.enable(gl.DEPTH_TEST);  
             // gl.depthMask(true);
@@ -30,11 +41,13 @@ module rf{
 
 
             var g:Graphics;
-
+            
             let camera = ROOT.camera3D;
+            scene.camera = camera
             let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
+            f = camera.originFar;
             camera.z = f
-            camera.y = f;
+            // camera.y = f;
             camera.lookat(new Vector3D(0,0,0));
             new TrackballControls(camera);
 
@@ -43,6 +56,8 @@ module rf{
             let t = 2;
             let tr = new Trident(w*2,t);
             scene.addChild(tr);
+
+            sp = tr;
 
             // line.rotationX = 45;
             // let line = new Line3D();
@@ -101,8 +116,8 @@ module rf{
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            // kfmMesh.load("assets/a10010m/");
-            kfmMesh.load("assets/hero001/");
+            kfmMesh.load("assets/a10010m/");
+            // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
 
             // new AMF3Test().load("assets/test.dat");
@@ -321,6 +336,12 @@ module rf{
 
             // 潘华专用  
             new Pan_Test();
+            new Eva_Text();
+        }
+
+
+        onTest():void{
+
         }
 
         // public linktest():void{

@@ -6,7 +6,7 @@ module rf{
         depthMask: boolean = false;
         passCompareMode: number;
         program:Program3D;
-        createProgram(){
+        createProgram(mesh:Mesh){
             return this.program;
         }
 
@@ -63,6 +63,8 @@ module rf{
 
             let{program,diff,emissive,specular,diffTex,emissiveTex,specularTex}=this;
 
+            let{skAnim}=mesh;
+
             if(!diff && !diffTex){
                 return false;
             }
@@ -73,7 +75,7 @@ module rf{
             }
 
             if(undefined == program){
-                this.program = program = this.createProgram();
+                this.program = program = this.createProgram(mesh);
             }
 
             let sun = scene.sun;
@@ -81,7 +83,7 @@ module rf{
             c.setProgram(program);
             c.setCulling(this.triangleFaceToCull);
             c.setProgramConstantsFromVector(VC.lightDirection,[sun._x,sun._y,sun._z],3);
-            
+
             let t:Texture
 
             if(undefined != diffTex){
@@ -101,20 +103,20 @@ module rf{
             if(undefined != emissive){
                 c.setProgramConstantsFromVector(VC.vc_emissive,[emissive.r,emissive.g,emissive.b,0.0],4);
             }
-            
-            
 
             return true;
         }
 
-        createProgram(){
+        createProgram(mesh:Mesh){
 
 
             const{diffTex,emissiveTex,specularTex} = this;
+            const{skAnim}=mesh;
 
             let c = context3D;
             
             let f_def = "";
+            let v_def = "";
 
             let key = "PhongMaterial";
 
@@ -131,7 +133,11 @@ module rf{
                 key += "-specular"
             }
 
-           
+            if(undefined != skAnim){
+                key += "-skeleton";
+                v_def += "#define USE_SKINNING\n           #define MAX_BONES 50\n";
+            }
+
             let p = c.programs[key];
 
             if(undefined != p){
@@ -143,23 +149,52 @@ module rf{
 
             let vertexCode = `
                 precision mediump float;
+                ${v_def}
                 attribute vec3 ${VA.pos};
                 attribute vec3 ${VA.normal};
                 attribute vec2 ${VA.uv};
-
+                #ifdef USE_SKINNING
+                    attribute vec4 ${VA.index};
+                    attribute vec4 ${VA.weight};
+                #endif
                 uniform mat4 ${VC.mvp};
                 uniform mat4 ${VC.invm};
-
                 uniform vec3 ${VC.lightDirection};
-                
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
+#ifdef USE_SKINNING
+                uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
+                mat4 getBoneMatrix( const in float i ) {
+                    mat4 bone = ${VC.vc_bones}[ int(i) ];
+                    return bone;
+                }
+#endif
                 void main() {
+                    vec4 t_pos = vec4(${VA.pos}, 1.0);
+                    vec3 t_normal = ${VA.normal};
+
+                    #ifdef USE_SKINNING
+                        mat4 boneMatX = getBoneMatrix( ${VA.index}.x );
+                        mat4 boneMatY = getBoneMatrix( ${VA.index}.y );
+                        mat4 boneMatZ = getBoneMatrix( ${VA.index}.z );
+                        mat4 boneMatW = getBoneMatrix( ${VA.index}.w );
+                    #endif
+
+                    #ifdef USE_SKINNING
+                        mat4 skinMatrix = mat4( 0.0 );
+                        skinMatrix += ${VA.weight}.x * boneMatX;
+                        skinMatrix += ${VA.weight}.y * boneMatY;
+                        skinMatrix += ${VA.weight}.z * boneMatZ;
+                        skinMatrix += ${VA.weight}.w * boneMatW;
+                        t_normal = vec4( skinMatrix * vec4( t_normal, 0.0 ) ).xyz;
+                        t_pos = skinMatrix * t_pos;
+                    #endif
+
                     vec3  invLight = normalize(${VC.invm} * vec4(${VC.lightDirection}, 0.0)).xyz;
-                    float diffuse  = clamp(dot(${VA.normal}, invLight), 0.1, 1.0);
+                    float diffuse  = clamp(dot(t_normal.xyz, invLight), 0.1, 1.0);
                     vDiffuse = vec4(vec3(diffuse), 1.0);
                     vUV = ${VA.uv};
-                    gl_Position = ${VC.mvp} * vec4(${VA.pos}, 1.0);
+                    gl_Position = ${VC.mvp} * t_pos;
                 }
             `
             
@@ -168,7 +203,8 @@ module rf{
 
 
             let fragmentCode = `
-                precision mediump float;
+                precision highp float;
+                precision highp int;
 
                 ${f_def}
 

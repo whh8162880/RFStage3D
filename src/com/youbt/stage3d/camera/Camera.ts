@@ -85,7 +85,7 @@ module rf{
 
             rawData[12] = 0;
             rawData[13] = 0;
-            rawData[14] = 0;
+            rawData[14] = -1/this.far*Math.PI*100;
             rawData[15] = 1;
 
             this.states |= DChange.trasnform;
@@ -105,6 +105,7 @@ module rf{
 
             // let len = new PerspectiveMatrix3D();
             // len.perspectiveFieldOfViewLH(45,width/height,0.1,10000);
+            // len.perspectiveFieldOfViewRH(45,width/height,0.1,10000);
             // this.len = len;
             // len.transpose();
 
