@@ -640,12 +640,12 @@ module rf {
         renders: Link;
         geo: BatchGeometry = undefined;
         program: Program3D;
-        worldTransform: Matrix3D;
+        worldTransform: IMatrix3D;
         t:Texture
         constructor(target: Sprite) {
             this.target = target;
             this.renders = new Link();
-            this.worldTransform = new Matrix3D();
+            this.worldTransform = newMatrix3D();
         }
 
         public render(camera: Camera, now: number, interval: number): void {
@@ -681,8 +681,8 @@ module rf {
                 this.createProgram();
             }
 
-            this.worldTransform.copyFrom(sceneTransform);
-            this.worldTransform.append(camera.worldTranform);
+            this.worldTransform.set(sceneTransform);
+            this.worldTransform.m3_append(camera.worldTranform);
 
 
             let vo = this.renders.getFrist();
@@ -709,7 +709,7 @@ module rf {
             let i: IndexBuffer3D = c.getIndexByQuad(geo.quadcount);
             let p = this.program; 
             c.setProgram(p);
-            c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform.rawData);
+            c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
             c.setProgramConstantsFromVector(VC.ui, geo.vcData, 4);
             this.t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);

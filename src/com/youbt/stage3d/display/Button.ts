@@ -8,7 +8,7 @@ module rf{
 
         private _label:string;
 
-        constructor(skin:Symbol){
+        constructor(skin:Component){
             super(skin);
             skin.mouseChildren = false;
         }
@@ -63,7 +63,7 @@ module rf{
 
         protected clipRefresh():void{
             const{_skin, mouseDown} = this;
-            (_skin as Symbol).gotoAndStop(mouseDown ? 2 : (this._skin.mouseRoll ? 1 : 0));
+            (_skin as Component).gotoAndStop(mouseDown ? 2 : (this._skin.mouseRoll ? 1 : 0));
         }
 
         set label(val:string)

@@ -128,9 +128,16 @@ module rf {
 
     export let RADIANS_TO_DEGREES: number = 180 / Math.PI;
     export let DEGREES_TO_RADIANS: number = Math.PI / 180;
-    export let tempAxeX: Vector3D = new Vector3D();
-    export let tempAxeY: Vector3D = new Vector3D();
-    export let tempAxeZ: Vector3D = new Vector3D();
+
+    export let tempAxeX: IVector3D = newVector3D();
+    export let tempAxeY: IVector3D = newVector3D();
+    export let tempAxeZ: IVector3D = newVector3D();
+
+    export let X_AXIS: IVector3D = newVector3D(1, 0, 0);
+    export let Y_AXIS: IVector3D = newVector3D(0, 1, 0);
+    export let Z_AXIS: IVector3D = newVector3D(0, 0, 1);
+
+
 
     export let PI2: number = Math.PI * 2;
 
@@ -140,10 +147,10 @@ module rf {
         0, 0, 1, 0,
         0, 0, 0, 1]);
 
-    export let TEMP_MATRIX: Matrix3D = new Matrix3D();
+    export let TEMP_MATRIX: IMatrix3D = newMatrix3D();
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
-    export let TEMP_VECTOR3D: Vector3D = new Vector3D();
-    export let TEMP_DECOMPOSE: Vector3D[] = [new Vector3D(), new Vector3D(), new Vector3D()];
+    export let TEMP_VECTOR3D: IVector3D = newVector3D();
+    export let TEMP_DECOMPOSE: IVector3D[] = [newVector3D(), newVector3D(), newVector3D()];
 
 
     export class Color{

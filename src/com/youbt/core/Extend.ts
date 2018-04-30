@@ -173,14 +173,57 @@ Object.defineProperties(Object.prototype, makeDefDescriptors({
 
 
 interface Float32Array{
+    x:number;
+    y:number;
+    z:number;
+    w:number;
     update(data32PerVertex: number, offset: number, v: number): void;
     wPoint1(position: number, x: number, y?: number, z?: number, w?: number): void
     wPoint2(position: number, x: number, y: number, z?: number, w?: number): void
     wPoint3(position: number, x: number, y: number, z: number, w?: number): void
     wPoint4(position: number, x: number, y: number, z: number, w: number): void
+    clone():Float32Array;
 }
 
+
 Object.defineProperties(Float32Array.prototype, makeDefDescriptors({
+    x:{
+        get(){
+            return this[0];
+        },
+        set(value){
+            this[0]=value;
+        }
+    },
+
+    y:{
+        get(){
+            return this[1];
+        },
+        set(value){
+            this[1]=value;
+        }
+    },
+
+
+    z:{
+        get(){
+            return this[2];
+        },
+        set(value){
+            this[2]=value;
+        }
+    },
+
+    w:{
+        get(){
+            return this[3];
+        },
+        set(value){
+            this[3]=value;
+        }
+    },
+
     update: {
         value : function(data32PerVertex: number, offset: number, v: number){
             let len = this.length;
@@ -217,6 +260,11 @@ Object.defineProperties(Float32Array.prototype, makeDefDescriptors({
             this[position+1] = y;
             this[position+2] = z;
             this[position+3] = w;
+        }
+    },
+    clone :{
+        value:function(){
+            return new Float32Array(this);
         }
     }
 }))

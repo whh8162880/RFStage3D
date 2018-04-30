@@ -205,7 +205,7 @@ module rf{
 		effectTweener:Tween;
 
 		constructor(){
-			super(new Symbol());
+			super(new Component());
 		}
 
 		show(container:any=null, isModal:Boolean=false):void{
@@ -370,7 +370,7 @@ module rf{
 			let source = this.source;
 			let cs:DisplaySymbol = source.setting[this.clsName];
 			if(cs){
-				let skin = this.skin as Symbol;
+				let skin = this.skin as Component;
 				skin.source = source.source;
 				skin.setSymbol(cs);
 				skin.renderer = new BatchRenderer(skin);
