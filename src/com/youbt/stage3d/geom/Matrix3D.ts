@@ -1,6 +1,7 @@
 //Matrix3D算法相关
 const rf_v3_identity = [0,0,0,0];
 const rf_m3_identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
+const rf_m2_identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 const rf_m3_temp = new Float32Array(16);
 
 interface IArrayBase{
@@ -476,6 +477,167 @@ Object.defineProperties(Float32Array.prototype, {
 })
 
 
+interface IMatrix extends IArrayBase{
+    m2_identity();
+}
+
+Object.defineProperties(Float32Array.prototype, {
+    m2_identitye:{
+        value:function(){
+            this.set(rf_m2_identity);
+        }
+    }
+});
+
+
+// export class Matrix {
+//     public rawData: Float32Array;
+
+//     constructor(a: number = 1, b: number = 0, c: number = 0, d: number = 1, tx: number = 0, ty: number = 0) {
+//         this.rawData = new Float32Array(
+//             [
+//                 a, b, tx,
+//                 c, d, ty,
+//                 0, 0, 1
+//             ]
+//         )
+//     }
+
+
+//     public get determinant() {
+//         const rawData = this.rawData;
+//         //3 * 3 对角线法
+//         return (rawData[0] * rawData[4] * rawData[8]
+//             + rawData[1] * rawData[5] * rawData[6]
+//             + rawData[2] * rawData[3] * rawData[7]
+//             - rawData[2] * rawData[4] * rawData[6]
+//             - rawData[7] * rawData[5] * rawData[0]
+//             - rawData[8] * rawData[3] * rawData[1]
+//         );
+//     }
+
+
+//     public clone(): Matrix {
+//         const rawData = this.rawData;
+//         return new Matrix(
+//             rawData[0], rawData[1], rawData[2],
+//             rawData[3], rawData[4], rawData[5]
+//         )
+//     }
+
+
+//     public copyFrom(m: Matrix): void {
+//         this.rawData = m.rawData;
+//     }
+
+//     public identity(): void {
+//         this.rawData = new Float32Array([
+//             1, 0, 0,
+//             0, 1, 0,
+//             0, 0, 1]);
+//     }
+
+//     public rotate(degrees: number): void {
+//         let radians: number = degrees * DEG_2_RAD;
+//         const rawData = this.rawData;
+//         //X’ = cos(50)*X + sin(50)*Y + tx;
+//         //Y’ = -sin(50)*X + cos(50)*Y + ty;
+//         let rm = new Matrix(Math.cos(radians), -Math.sin(radians), 0, Math.sin(radians), Math.cos(radians), 0);
+//         this.concat(rm);
+//     }
+
+//     public scale(a: number, b: number): void {
+//         const rawData = this.rawData;
+//         rawData[0] *= a;
+//         rawData[4] *= b;
+//     }
+
+//     public concat(m: Matrix): void {
+//         //m*m
+//         const rawData = this.rawData;
+//         const [
+//             a11, a12, a13,
+//             a21, a22, a23,
+//             a31, a32, a33,
+//         ] = rawData as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
+
+//         const [
+//             b11, b12, b13,
+//             b21, b22, b23,
+//             b31, b32, b33
+//         ] = m.rawData as any;
+
+
+//         rawData[0] = a11 * b11 + a12 * b21 + a13 * b31;
+//         rawData[1] = a11 * b12 + a12 * b22 + a13 * b32;
+//         rawData[2] = a11 * b13 + a12 * b23 + a13 * b33;
+
+//         rawData[3] = a21 * b11 + a22 * b21 + a23 * b31;
+//         rawData[4] = a21 * b12 + a22 * b22 + a23 * b32;
+//         rawData[5] = a21 * b13 + a22 * b23 + a23 * b33;
+
+//         rawData[6] = a31 * b11 + a32 * b21 + a33 * b31;
+//         rawData[7] = a31 * b12 + a32 * b22 + a33 * b32;
+//         rawData[8] = a31 * b13 + a32 * b23 + a33 * b33;
+
+//     }
+
+//     public invert(): boolean {
+//         let d: number = this.determinant;
+//         let invertable: boolean = Math.abs(d) > 0.00000000001;
+
+//         if (invertable) {
+
+
+//             d = 1 / d;
+//             const rawData = this.rawData;
+
+//             const [
+//                 a1, a2, a3,
+//                 b1, b2, b3,
+//                 m31, m32, m33
+//             ] = rawData as any;
+
+//             const b2$m33_m32$b3 = b2 * m33 - m32 * b3;
+//             const b1$m33_m31$b3 = b1 * m33 - m31 * b3;
+//             const b1$m32_m31$b2 = b1 * m32 - m31 * b2;
+
+//             const a2$m33_m32$a3 = a2 * m33 - m32 * a3;
+//             const a1$m33_m31$a3 = a1 * m33 - m31 * a3;
+//             const a1$m32_m31$a2 = a1 * m32 - m31 * a2;
+
+//             const a2$b3_b2$a3 = a2 * b3 - b2 * a3;
+//             const a1$b3_b1$a3 = a1 * b3 - b1 * a3;
+//             const a1$b2_b1$a2 = a1 * b2 - b1 * a2;
+
+//             //逆矩阵 = 1/d * 伴随矩阵
+//             rawData[0] = d * b2$m33_m32$b3;
+//             rawData[1] = -d * b1$m32_m31$b2;
+//             rawData[2] = d * b1$m32_m31$b2;
+
+//             rawData[3] = -d * a2$m33_m32$a3;
+//             rawData[4] = d * a1$m33_m31$a3;
+//             rawData[5] = -d * a1$m32_m31$a2;
+
+//             rawData[6] = d * a2$b3_b2$a3;
+//             rawData[7] = -d * a1$b3_b1$a3;
+//             rawData[8] = d * a1$b2_b1$a2;
+//         }
+//         return invertable;
+//     }
+
+//     public setTo(a: number, b: number, c: number, d: number, tx: number, ty: number): void {
+//         const rawData = this.rawData;
+//         rawData[0] = a; rawData[1] = b; rawData[2] = tx;
+//         rawData[3] = c; rawData[4] = d; rawData[5] = ty;
+//     }
+
+//     public translate(tx: number, ty: number): void {
+//         const rawData = this.rawData;
+//         rawData[2] += tx;
+//         rawData[5] += ty;
+//     }
+// }
 
 
 
@@ -489,10 +651,7 @@ Object.defineProperties(Float32Array.prototype, {
 
 
 
-
-
-
-interface Float32Array extends IMatrix3D,IVector3D{
+interface Float32Array extends IMatrix3D,IMatrix,IVector3D{
    
 }
 
@@ -509,6 +668,20 @@ module rf {
                 out = new Float32Array(v);
             } else {
                 out = new Float32Array(rf_m3_identity);
+            }
+        }
+        return out;
+    }
+
+    export function newMatrix(v?: ArrayLike<number> | ArrayBuffer) {
+        let out:Float32Array;
+        if (v instanceof ArrayBuffer) {
+            out = new Float32Array(v);
+        } else {
+            if (undefined != v) {
+                out = new Float32Array(v);
+            } else {
+                out = new Float32Array(rf_m2_identity);
             }
         }
         return out;
@@ -1755,160 +1928,6 @@ module rf {
 
 
     // }
-
-
-
-    export class Matrix {
-        public rawData: Float32Array;
-
-        constructor(a: number = 1, b: number = 0, c: number = 0, d: number = 1, tx: number = 0, ty: number = 0) {
-            this.rawData = new Float32Array(
-                [
-                    a, b, tx,
-                    c, d, ty,
-                    0, 0, 1
-                ]
-            )
-        }
-
-
-        public get determinant() {
-            const rawData = this.rawData;
-            //3 * 3 对角线法
-            return (rawData[0] * rawData[4] * rawData[8]
-                + rawData[1] * rawData[5] * rawData[6]
-                + rawData[2] * rawData[3] * rawData[7]
-                - rawData[2] * rawData[4] * rawData[6]
-                - rawData[7] * rawData[5] * rawData[0]
-                - rawData[8] * rawData[3] * rawData[1]
-            );
-        }
-
-
-        public clone(): Matrix {
-            const rawData = this.rawData;
-            return new Matrix(
-                rawData[0], rawData[1], rawData[2],
-                rawData[3], rawData[4], rawData[5]
-            )
-        }
-
-
-        public copyFrom(m: Matrix): void {
-            this.rawData = m.rawData;
-        }
-
-        public identity(): void {
-            this.rawData = new Float32Array([
-                1, 0, 0,
-                0, 1, 0,
-                0, 0, 1]);
-        }
-
-        public rotate(degrees: number): void {
-            let radians: number = degrees * DEG_2_RAD;
-            const rawData = this.rawData;
-            //X’ = cos(50)*X + sin(50)*Y + tx;
-            //Y’ = -sin(50)*X + cos(50)*Y + ty;
-            let rm = new Matrix(Math.cos(radians), -Math.sin(radians), 0, Math.sin(radians), Math.cos(radians), 0);
-            this.concat(rm);
-        }
-
-        public scale(a: number, b: number): void {
-            const rawData = this.rawData;
-            rawData[0] *= a;
-            rawData[4] *= b;
-        }
-
-        public concat(m: Matrix): void {
-            //m*m
-            const rawData = this.rawData;
-            const [
-                a11, a12, a13,
-                a21, a22, a23,
-                a31, a32, a33,
-            ] = rawData as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
-
-            const [
-                b11, b12, b13,
-                b21, b22, b23,
-                b31, b32, b33
-            ] = m.rawData as any;
-
-
-            rawData[0] = a11 * b11 + a12 * b21 + a13 * b31;
-            rawData[1] = a11 * b12 + a12 * b22 + a13 * b32;
-            rawData[2] = a11 * b13 + a12 * b23 + a13 * b33;
-
-            rawData[3] = a21 * b11 + a22 * b21 + a23 * b31;
-            rawData[4] = a21 * b12 + a22 * b22 + a23 * b32;
-            rawData[5] = a21 * b13 + a22 * b23 + a23 * b33;
-
-            rawData[6] = a31 * b11 + a32 * b21 + a33 * b31;
-            rawData[7] = a31 * b12 + a32 * b22 + a33 * b32;
-            rawData[8] = a31 * b13 + a32 * b23 + a33 * b33;
-
-        }
-
-        public invert(): boolean {
-            let d: number = this.determinant;
-            let invertable: boolean = Math.abs(d) > 0.00000000001;
-
-            if (invertable) {
-
-
-                d = 1 / d;
-                const rawData = this.rawData;
-
-                const [
-                    a1, a2, a3,
-                    b1, b2, b3,
-                    m31, m32, m33
-                ] = rawData as any;
-
-                const b2$m33_m32$b3 = b2 * m33 - m32 * b3;
-                const b1$m33_m31$b3 = b1 * m33 - m31 * b3;
-                const b1$m32_m31$b2 = b1 * m32 - m31 * b2;
-
-                const a2$m33_m32$a3 = a2 * m33 - m32 * a3;
-                const a1$m33_m31$a3 = a1 * m33 - m31 * a3;
-                const a1$m32_m31$a2 = a1 * m32 - m31 * a2;
-
-                const a2$b3_b2$a3 = a2 * b3 - b2 * a3;
-                const a1$b3_b1$a3 = a1 * b3 - b1 * a3;
-                const a1$b2_b1$a2 = a1 * b2 - b1 * a2;
-
-                //逆矩阵 = 1/d * 伴随矩阵
-                rawData[0] = d * b2$m33_m32$b3;
-                rawData[1] = -d * b1$m32_m31$b2;
-                rawData[2] = d * b1$m32_m31$b2;
-
-                rawData[3] = -d * a2$m33_m32$a3;
-                rawData[4] = d * a1$m33_m31$a3;
-                rawData[5] = -d * a1$m32_m31$a2;
-
-                rawData[6] = d * a2$b3_b2$a3;
-                rawData[7] = -d * a1$b3_b1$a3;
-                rawData[8] = d * a1$b2_b1$a2;
-            }
-            return invertable;
-        }
-
-        public setTo(a: number, b: number, c: number, d: number, tx: number, ty: number): void {
-            const rawData = this.rawData;
-            rawData[0] = a; rawData[1] = b; rawData[2] = tx;
-            rawData[3] = c; rawData[4] = d; rawData[5] = ty;
-        }
-
-        public translate(tx: number, ty: number): void {
-            const rawData = this.rawData;
-            rawData[2] += tx;
-            rawData[5] += ty;
-        }
-
-
-
-    }
 
 }
 

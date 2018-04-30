@@ -11,7 +11,7 @@ module rf{
 		scaleX:number;
 		scaleY:number;
 		rotaion:number;
-		matrix2d:Matrix;
+		matrix2d:IMatrix;
 		libraryItemName:string;
 	}
 
@@ -43,11 +43,11 @@ module rf{
 
         public symbol:IDisplaySymbol;
 		
-		public sceneMatrix:Matrix;
+		public sceneMatrix:IMatrix;
 
 		public _skin:object;
 
-		setSymbol(symbol:IDisplaySymbol,matrix?:Matrix):void{
+		setSymbol(symbol:IDisplaySymbol,matrix?:IMatrix):void{
 			this.symbol = symbol;
 			const{graphics}=this;
 			if(!symbol){
@@ -87,7 +87,7 @@ module rf{
 			
 			let sp:Sprite;
 			
-			let tempMatrix:Matrix = new Matrix();
+			let tempMatrix:IMatrix = newMatrix();
 
 			for(let ele of elements)
 			{
@@ -107,9 +107,9 @@ module rf{
 						sp.x = ele.x;
 						sp.y = ele.y;
 						if(ele.matrix2d){
-							tempMatrix.copyFrom(ele.matrix2d);
+							tempMatrix.set(ele.matrix2d);
 						}else{
-							tempMatrix.identity();
+							tempMatrix.m2_identity();
 						}
 						// if(sceneMatrix){
 						// 	tempMatrix.concat(sceneMatrix);
@@ -244,7 +244,7 @@ module rf{
 		
 		public rotaion:number = 0;
 		
-		public matrix2d:Matrix;
+		public matrix2d:IMatrix;
 		
 		public libraryItemName:string;
 
