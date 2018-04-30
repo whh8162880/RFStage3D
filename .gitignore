@@ -1,6 +1,7 @@
 .tscache
 /build
 .vs
+.vscode
 /bin-debug
 /node_modules
 async2github.cmd

@@ -46,14 +46,14 @@ module rf{
             super(line_variable);
             this.data32PerVertex = line_variable["data32PerVertex"].size;
             this.nativeRender = true;
-            this.worldTransform = new Matrix3D();
+            this.worldTransform = newMatrix3D();
         }
         private origin:Recyclable<Line3DPoint>;
         private tempVertex:Recyclable<Temp_Float32Byte>;
         points:Line3DPoint[] = [];
         vertexBuffer:VertexBuffer3D;
         program:Program3D;
-        worldTransform:Matrix3D;
+        worldTransform:IMatrix3D;
         data32PerVertex:number;
         numVertices:number;
         triangles:number;
@@ -175,10 +175,10 @@ module rf{
 
             c.setProgram(p);
 
-            m.copyFrom(this.sceneTransform);
-            m.append(camera.sceneTransform);
-            c.setProgramConstantsFromMatrix(VC.mv,m.rawData);
-            c.setProgramConstantsFromMatrix(VC.p,camera.len.rawData);
+            m.set(this.sceneTransform);
+            m.m3_append(camera.sceneTransform);
+            c.setProgramConstantsFromMatrix(VC.mv,m);
+            c.setProgramConstantsFromMatrix(VC.p,camera.len);
             v.uploadContext(p);
 
             let i = c.getIndexByQuad(quad);

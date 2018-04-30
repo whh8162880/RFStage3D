@@ -3,11 +3,11 @@ module rf {
     export class Mesh extends SceneObject {
         scene: Scene;
         geometry: GeometryBase;
-        invSceneTransform: Matrix3D;
+        invSceneTransform: IMatrix3D;
         skAnim:SkeletonAnimation;
         constructor(variables?: { [key: string]: IVariable }) {
             super(variables ? variables : vertex_mesh_variable);
-            this.invSceneTransform = new Matrix3D();
+            this.invSceneTransform = newMatrix3D();
             this.nativeRender = true;
         }
 
@@ -15,8 +15,8 @@ module rf {
         updateSceneTransform(): void {
             super.updateSceneTransform();
             let { invSceneTransform, sceneTransform } = this;
-            invSceneTransform.copyFrom(sceneTransform);
-            invSceneTransform.invert();
+            invSceneTransform.set(sceneTransform);
+            invSceneTransform.m3_invert();
 
 
         }
@@ -99,6 +99,8 @@ module rf {
             let index = mesh["index"];
             if (index) {
                 geometry.index = c.createIndexBuffer(new Uint16Array(index));
+            }else{
+                geometry.numTriangles *= 3;
             }
 
 
@@ -196,12 +198,14 @@ module rf {
                 bone.matrix = matrix = new Float32Array(matrix);
                 let sceneTransform = new Float32Array(matrix);
                 if (parent) {
-                    matrix3d_multiply(sceneTransform, parent.sceneTransform, sceneTransform);
+                    sceneTransform.m3_append(parent.sceneTransform);
+                    // matrix3d_multiply(sceneTransform, parent.sceneTransform, sceneTransform);
                 }
 
                 if(index > -1){
                     let matrice = new Float32Array(buffer, index * 16 * 4, 16);
-                    matrix3d_multiply(inv,sceneTransform,matrice);
+                    matrice.m3_append(sceneTransform,false,inv);
+                    // matrix3d_multiply(inv,sceneTransform,matrice);
                 }
 
                 bone.sceneTransform = sceneTransform;
@@ -262,7 +266,8 @@ module rf {
                 }
 
                 if (parent) {
-                    matrix3d_multiply(matrix, parent.sceneTransform, sceneTransform);
+                    sceneTransform.m3_append(parent.sceneTransform,false,matrix)
+                    // matrix3d_multiply(matrix, parent.sceneTransform, sceneTransform);
                     // multiplyMatrices(parent.sceneTransform,matrix,sceneTransform);
                     
                 }else{
@@ -271,7 +276,8 @@ module rf {
 
                 if(index > -1){
                     let matrice = new Float32Array(buffer, index * 16 * 4, 16);
-                    matrix3d_multiply(inv, sceneTransform, matrice);
+                    // matrix3d_multiply(inv, sceneTransform, matrice);
+                    matrice.m3_append(sceneTransform,false,inv);
                     // multiplyMatrices(sceneTransform,inv,matrice);
                 }
 

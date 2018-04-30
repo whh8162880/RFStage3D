@@ -1,13 +1,13 @@
 module rf{
     export class TrackballControls{
         object:Camera;
-        target:Vector3D;
+        target:IVector3D;
         mouseSitivity:number = 0.3;
         distance:number;
         constructor(object:Camera){
             this.object = object;
-            this.target = new Vector3D();
-            this.distance = this.object.pos.subtract(this.target).length;
+            this.target = newVector3D();
+            this.distance = this.object.pos.v3_sub(this.target).v3_length;
             ROOT.on(MouseEventX.MouseDown,this.mouseDownHandler,this);
             ROOT.on(MouseEventX.MouseWheel,this.mouseWheelHandler,this);
             ROOT.on(MouseEventX.MouseRightDown,this.mouseRightDownHandler,this);
@@ -38,7 +38,7 @@ module rf{
            
             // const{distance} = this;
 
-            let distance = this.object.pos.subtract(this.target).length;
+            let distance = this.object.pos.v3_sub(this.target).v3_length;
             this.distance = distance;
 
             let{wheel}=event.data;
@@ -64,7 +64,7 @@ module rf{
         mouseDownHandler(event:EventX):void{
             ROOT.on(MouseEventX.MouseMove,this.mouseMoveHandler,this);
             ROOT.on(MouseEventX.MouseUp,this.mouseUpHandler,this);
-            this.distance = this.object.pos.subtract(this.target).length;
+            this.distance = this.object.pos.v3_sub(this.target).v3_length;
         }
 
         mouseUpHandler(e:EventX){
@@ -87,14 +87,13 @@ module rf{
             let ry = -dx*speed + object.rotationY;
             
             if(target){
-				var transform:Matrix3D = TEMP_MATRIX;
-				transform.identity();
-				transform.appendTranslation(0, 0, -distance);
-				transform.appendRotation(rx, Vector3D.X_AXIS);
-				transform.appendRotation(ry, Vector3D.Y_AXIS);
-				transform.appendTranslation(target.x, target.y, target.z);
-				let raw = transform.rawData;
-                object.setPos(raw[12],raw[13],raw[14]);
+                var transform:IMatrix3D = TEMP_MATRIX;
+				transform.m3_identity();
+				transform.m3_translation(0, 0, -distance);
+				transform.m3_rotation(rx * DEGREES_TO_RADIANS,X_AXIS);
+				transform.m3_rotation(ry * DEGREES_TO_RADIANS, Y_AXIS);
+				transform.m3_translation(target.x, target.y, target.z);
+                object.setPos(transform[12],transform[13],transform[14]);
             }
             object.rotationX = rx;
             object.rotationY = ry;

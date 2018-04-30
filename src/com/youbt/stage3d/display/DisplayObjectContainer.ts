@@ -66,7 +66,7 @@ module rf{
 
             child.parent = this;
             //需要更新Transform
-            child.setChange(DChange.base)
+            child.setChange(DChange.base);
             if(this.stage){
                 if(!child.stage){
                     child.stage = this.stage;
@@ -92,7 +92,8 @@ module rf{
 			}
             this.childrens.splice(i,1);
 			child.stage = undefined;
-			child.parent = undefined;
+            child.parent = undefined;
+            this.setChange(DChange.batch);
 			child.removeFromStage();
 		}
 
@@ -106,6 +107,7 @@ module rf{
                 child.parent = undefined;
 				child.removeFromStage();
             }
+            this.setChange(DChange.batch);
 			this.childrens.length = 0;
         }
         
@@ -172,8 +174,8 @@ module rf{
         
 
         public updateSceneTransform(): void {
-            this.sceneTransform.copyFrom(this.transform);
-            if (this.parent) this.sceneTransform.append(this.parent.sceneTransform);
+            this.sceneTransform.set(this.transform);
+            if (this.parent) this.sceneTransform.m3_append(this.parent.sceneTransform);
             for(let child of this.childrens){
                 if( (child.states & DChange.trasnform) != 0){
                     //这里不更新其transform 是因为后续有人来让其更新

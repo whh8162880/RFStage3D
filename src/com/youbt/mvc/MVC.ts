@@ -127,7 +127,7 @@ module rf{
         preViewCompleteHandler(e:EventX):void{
             if(e)
             {
-                let skin = e.currentTarget  as Symbol;
+                let skin = e.currentTarget  as Component;
                 skin.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
                 this.setBindView(true);
             }

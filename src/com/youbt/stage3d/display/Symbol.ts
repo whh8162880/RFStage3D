@@ -1,5 +1,38 @@
+///<reference path="./Sprite.ts" />
+
 module rf{
-    export class Symbol extends Sprite{
+
+	export interface IDisplayFrameElement{
+		type:number;
+		name:string;
+		rect:any;
+		x:number;
+		y:number;
+		scaleX:number;
+		scaleY:number;
+		rotaion:number;
+		matrix2d:Matrix;
+		libraryItemName:string;
+	}
+
+	export interface IDisplaySymbol extends IDisplayFrameElement{
+		className:String;
+		displayClip:number;
+		displayFrames:object;
+	}
+
+
+	export enum SymbolConst{
+		SYMBOL = 0,
+		BITMAP = 1,
+		TEXT = 2,
+		RECTANGLE = 3
+	}
+
+
+
+
+    export class Component extends Sprite{
         constructor(source?:BitmapSource){
 			super(source);
 			
@@ -8,31 +41,31 @@ module rf{
 
         public currentClip:number;
 
-        public dsymbol:DisplaySymbol;
+        public symbol:IDisplaySymbol;
 		
 		public sceneMatrix:Matrix;
 
 		public _skin:object;
 
-		setSymbol(dsymbol:DisplaySymbol,matrix?:Matrix):void{
-			this.dsymbol = dsymbol;
-			// this.sceneMatrix = matrix ||= new Matrix();
-			if(!dsymbol){
-				this.graphics.clear();
-				this.graphics.end();
+		setSymbol(symbol:IDisplaySymbol,matrix?:Matrix):void{
+			this.symbol = symbol;
+			const{graphics}=this;
+			if(!symbol){
+				graphics.clear();
+				graphics.end();
 				return;
 			}
-			this.x = dsymbol.x;
-			this.y = dsymbol.y;
-			this.gotoAndStop(dsymbol.displayClip, true);
+			this.x = symbol.x;
+			this.y = symbol.y;
+			this.gotoAndStop(symbol.displayClip, true);
 
 			this.updateHitArea();
 		}
 		
 		
 		gotoAndStop(clip:any, refresh:Boolean=false):void{
-			const{dsymbol, graphics} = this;
-			if(dsymbol == undefined){
+			const{symbol, graphics} = this;
+			if(symbol == undefined){
 				// this.gotoAndStop(clip,refresh);
 				return;
 			}
@@ -43,7 +76,7 @@ module rf{
 			
 			this.currentClip = clip;
 			
-			let elements:any[] = dsymbol.displayFrames[clip];
+			let elements:any[] = symbol.displayFrames[clip];
 			if(undefined == elements)
 			{
 				graphics.clear();
@@ -68,7 +101,7 @@ module rf{
 						if(ele.rect){//目前还没写9宫
 							//sp = new ScaleRectSprite3D(source);
 						}else{
-							sp = new Symbol(this.source);
+							sp = new Component(this.source);
 						}
 						sp.mouseEnabled = true;
 						sp.x = ele.x;
@@ -82,7 +115,7 @@ module rf{
 						// 	tempMatrix.concat(sceneMatrix);
 						// }
 						
-						(sp as Symbol).setSymbol(ele as DisplaySymbol,tempMatrix);
+						(sp as Component).setSymbol(ele as DisplaySymbol,tempMatrix);
 						
 						this._skin[ele.name] = sp;
 						this[ele.name] = sp;
@@ -181,6 +214,10 @@ module rf{
 			}
 		}
 	}
+
+	
+
+
 
 	export class DisplayFrameElement{
 		static SYMBOL:number = 0;
