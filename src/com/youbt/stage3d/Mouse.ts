@@ -159,11 +159,11 @@ module rf{
                 if(preRolled != d)
                 {
                     if(undefined != preRolled){
-                        preRolled.mouseRoll = false;
+                        preRolled.mouseroll = false;
                         preRolled.simpleDispatch(MouseEventX.ROLL_OUT,data,true);
                     }
                     if(d){
-                        d.mouseRoll = true;
+                        d.mouseroll = true;
                         d.simpleDispatch(MouseEventX.ROLL_OVER,data,true);
                     }
                     mouse.preRolled = d;

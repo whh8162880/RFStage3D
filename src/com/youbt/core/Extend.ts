@@ -854,4 +854,13 @@ module rf {
         }
         return (types.indexOf(getQualifiedClassName(ref)) !== -1);
     }
+
+
+    export function toString(instance:any,defaultValue:string = ""){
+        if(!instance){
+            return defaultValue;
+        } 
+
+        
+    }
 }

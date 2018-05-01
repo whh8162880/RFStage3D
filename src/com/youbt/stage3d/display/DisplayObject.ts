@@ -132,7 +132,7 @@ module rf {
         mouseEnabled:boolean = false;
         mouseChildren:boolean = true;
         mousedown:boolean = false;
-		mouseRoll:Boolean = false;
+		mouseroll:boolean = false;
         pos: IVector3D;
         rot: IVector3D;
         sca: IVector3D;
