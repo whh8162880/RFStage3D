@@ -117,6 +117,7 @@ module rf{
             super();
         }
         name:string = undefined;
+        textureData:ITextureData;
         width:number = 0;
         height:number = 0;
         originU:number = 0;

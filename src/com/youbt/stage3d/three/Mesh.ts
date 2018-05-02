@@ -79,35 +79,29 @@ module rf {
             this.setKFM(o);
         }
 
-        setKFM(kfm) {
-            let mesh = kfm.mesh ? kfm.mesh : kfm;
+        setKFM(kfm:ISkeletonMeshData) {
+            let{mesh,skeleton:skeletonData,material:materialData}=kfm;
+            let{material,geometry}=this;
             let c = context3D;
-            let vertex = new Float32Array(mesh["vertex"]);
-            let geometry = new GeometryBase(this.variables);
-            geometry.numVertices = mesh["numVertices"];
-            geometry.numTriangles = mesh["numTriangles"];
-            geometry.data32PerVertex = mesh["data32PerVertex"];
-            let info: VertexInfo = new VertexInfo(vertex, geometry.data32PerVertex, this.variables);
-            geometry.vertex = c.createVertexBuffer(info);
 
-            // if (mesh.matrix) {
-            //     let m = new Matrix3D(mesh.matrix);
-            //     m.appendScale(100, 100, 100);
-            //     this.setTransform(m.rawData);
-            // }
-
-            let index = mesh["index"];
-            if (index) {
-                geometry.index = c.createIndexBuffer(new Uint16Array(index));
-            }else{
-                geometry.numTriangles *= 3;
+            if(!geometry){
+                this.geometry = geometry = new GeometryBase(this.variables);
             }
+            geometry.setData(mesh);
+
+            if(!material){
+                this.material = material = new PhongMaterial();
+            }
+            material.setData(kfm.material);
+
+            material.diffTex.url = this.id + material.diffTex.url;
 
 
-            this.geometry = geometry;
-            this.material.triangleFaceToCull = Context3DTriangleFace.NONE;
+            
+
+
             // this.material["diffTex"] = this.id + kfm["diff"];
-            this.material["diffTex"] = this.id + "diff.png";
+            // this.material["diffTex"] = this.id + "diff.png";
             //=========================
             //skeleton
             //=========================
@@ -126,54 +120,6 @@ module rf {
         }
     }
 
-
-
-    export interface IBone {
-        inv: Float32Array;
-        matrix: Float32Array;
-        sceneTransform: Float32Array;
-        name: string;
-        index: number;
-        parent: IBone;
-        children: IBone[];
-    }
-
-    export interface ISkeletonAnimationData {
-        skeleton: Skeleton;
-        matrices:Float32Array[];
-        duration:number;
-        eDuration:number;
-        totalFrame:number;
-        name:string;
-        frames:{[key:string]:Float32Array};
-    }
-
-    // export interface ISkeletonAnimation {
-        
-    // }
-
-    // export interface IBonePose {
-    //     bone: IBone;
-    //     index: number;
-    //     status: number;
-    //     inv: Float32Array;
-    //     transform: Float32Array;
-    //     sceneTransform: Float32Array;
-    //     matriceTransfrom: Float32Array;
-    //     parent: IBonePose;
-    //     children: IBonePose[];
-    // }
-
-
-    export interface ISkeletonConfig {
-        data32PerVertex: number;
-        numVertices: number;
-        vertex: ArrayBuffer;
-        root: IBone;
-        boneCount:number;
-    }
-
-
     export class Skeleton {
         rootBone: IBone;
         // bonePose: IBonePose;
@@ -182,7 +128,7 @@ module rf {
         boneCount: number;
         animations: { [key: string]:ISkeletonAnimationData } = {};
         
-        constructor(config: ISkeletonConfig) {
+        constructor(config: ISkeletonData) {
 
             let { boneCount ,defaultMatrices } = this;
 

@@ -650,14 +650,19 @@ module rf {
 
         public render(camera: Camera, now: number, interval: number): void {
             let target:Sprite = this.target;
+            let c = context3D;
             const{source,sceneTransform,states,_x,_y,_scaleX} = this.target;
             if(undefined == source){
                 return;
             }
+            let{textureData}=source;
+            if(!textureData) {
+                source.textureData = textureData = c.getTextureData(source.name);
+            }
             
-            let t = context3D.textureObj[source.name];
+            let t = context3D.textureObj[textureData.key];
             if(undefined == t){
-                t = context3D.createTexture(source.name,source.bmd);
+                t = context3D.createTexture(textureData,source.bmd);
             }
             this.t = t;
 

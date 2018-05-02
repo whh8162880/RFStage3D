@@ -1,13 +1,47 @@
 module rf{
     export class Material {
-        triangleFaceToCull: string = Context3DTriangleFace.BACK;
-        sourceFactor: number;
-        destinationFactor: number;
+        cull: string;
+        srcFactor: string;
+        dstFactor: string;
         depthMask: boolean = false;
-        passCompareMode: number;
+        passCompareMode: string;
+        alphaTest:number;
+
         program:Program3D;
+
+        //贴图
+        diff:Color;
+        diffTex:ITextureData;
+
         createProgram(mesh:Mesh){
             return this.program;
+        }
+
+        setData(data:IMaterialData){
+            if(!data){
+                this.cull = "BACK";
+                this.depthMask = true;
+                this.passCompareMode = "LEQUAL";
+                this.srcFactor = "SRC_ALPHA";
+                this.dstFactor = "ONE_MINUS_SRC_ALPHA";
+                this.alphaTest = -1;
+            }else{
+                let{cull,depthMask,passCompareMode,srcFactor,dstFactor,alphaTest,diffTex}=data;
+
+                this.cull = cull ? cull : "BACK";
+                this.depthMask = undefined != depthMask ? depthMask : true;
+                this.passCompareMode = passCompareMode ? passCompareMode : "LEQUAL";
+                this.srcFactor = srcFactor ? srcFactor : "SRC_ALPHA";
+                this.dstFactor = dstFactor ? dstFactor : "ONE_MINUS_SRC_ALPHA";
+                this.alphaTest = Number(alphaTest);
+                
+                if(diffTex){
+                    this.diffTex = diffTex;
+                }else{
+                    this.diff = new Color(0xFFFFFF);
+                }
+            }
+            
         }
 
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
@@ -18,11 +52,14 @@ module rf{
         checkTexs(...args){
             let c = context3D;
             let b = true;
-            args.forEach(name => {
-                if(undefined != name){
-                    let tex = c.textureObj[name];
+            args.forEach(data => {
+                if(undefined != data){
+                    let tex:Texture
+                    if(data.key){
+                        tex = c.textureObj[data.key];
+                    }
                     if(undefined == tex){
-                        tex = c.createTexture(name,undefined);
+                        tex = c.createTexture(data,undefined);
                         b = false;
                     }
                     let{readly,status}=tex;
@@ -44,18 +81,13 @@ module rf{
 
 
     export class PhongMaterial extends Material{
-        //贴图
-        diff:Color;
-        diffTex:string;
-
         //自发光
         emissive:Color;
-        emissiveTex:string;
+        emissiveTex:ITextureData;
 
         //高光
         specular:Color;
-        specularTex:string;
-
+        specularTex:ITextureData;
 
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
             let scene = mesh.scene;
@@ -81,14 +113,13 @@ module rf{
             let sun = scene.sun;
 
             c.setProgram(program);
-            c.setCulling(this.triangleFaceToCull);
+            c.setCulling(this.cull);
             c.setProgramConstantsFromVector(VC.lightDirection,[sun._x,sun._y,sun._z],3);
 
             let t:Texture
 
             if(undefined != diffTex){
-                t = c.textureObj[diffTex];
-                t.mipmap = true;
+                t = c.textureObj[diffTex.key];
                 t.uploadContext(program,0,FS.diff);
             }
 
