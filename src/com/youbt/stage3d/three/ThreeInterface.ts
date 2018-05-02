@@ -4,7 +4,36 @@ module rf{
         [key:string]:any;
         [key:number]:any;
     }
+    /**
+     * 贴图数据
+     * 如果只有url 可以通过context3D.getTextureData(url)获得
+     */
+    export interface ITextureData extends IData{
+        key:string;
+        url:string;
+        mipmap:boolean;
+        mag:string;
+        mix:string;
+        repeat:boolean;
+    }
 
+
+    /**
+     * 材质球数据
+     */
+    export interface IMaterialData extends IData{
+        depthMask:boolean;
+        passCompareMode:string;
+        srcFactor:string;
+        dstFactor:string;
+        cull:string;
+        alphaTest:number; //0表示不剔除
+        diffTex?:ITextureData;
+    }
+
+    /**
+     * 模型数据
+     */
     export interface IMeshData extends IData{
         vertex:Float32Array;
         index:Uint16Array;
@@ -17,6 +46,9 @@ module rf{
         indexBuffer:IndexBuffer3D;
     }
 
+    /**
+     * 单骨骼数据
+     */
     export interface IBone extends IData{
         inv: IMatrix3D;
         matrix: IMatrix3D;
@@ -27,6 +59,9 @@ module rf{
         children: IBone[];
     }
 
+    /**
+     * 全骨骼数据
+     */
     export interface ISkeletonData extends IData{
         vertex:Float32Array;
         root:IBone;
@@ -36,26 +71,7 @@ module rf{
     }
 
 
-    export interface ITextureData extends IData{
-        key:string;
-        url:string;
-        mipmap:boolean;
-        mag:string;
-        mix:string;
-        repeat:boolean;
-    }
 
-
-
-    export interface IMaterialData extends IData{
-        depthMask:boolean;
-        passCompareMode:string;
-        srcFactor:string;
-        dstFactor:string;
-        cull:string;
-        alphaTest:number; //0表示不剔除
-        diffTex?:ITextureData;
-    }
 
 
     export interface ISkeletonMeshData extends IData{

@@ -184,7 +184,7 @@ module rf{
 
         drawimg(img:HTMLImageElement,x:number,y:number,w?:number,h?:number):void
         {//可能需要其他的处理
-            const {bmd, name} = this;
+            const {bmd, name,textureData} = this;
             if(w == undefined && h == undefined)
             {
                 bmd.context.drawImage(img,x,y);
@@ -192,7 +192,7 @@ module rf{
                 bmd.context.drawImage(img,x,y, w, h);
             }
 
-            let texture = context3D.textureObj[name];
+            let texture = context3D.textureObj[textureData.key];
             if(undefined != texture){
                 texture.readly = false;
             }
