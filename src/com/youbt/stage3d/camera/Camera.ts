@@ -1,28 +1,28 @@
 ///<reference path="../display/DisplayObject.ts" />
 module rf{
     export class Camera extends DisplayObject implements IResizeable{
-        len:Matrix3D;
+        len:IMatrix3D;
         far :number;
 
         originFar:number;
-        worldTranform:Matrix3D;
+        worldTranform:IMatrix3D;
         constructor(far:number = 10000){
             super();
             this.far = far;
             this.originFar = far / Math.PI2;
-            this.len = new Matrix3D();
-            this.worldTranform = new Matrix3D();
+            this.len = newMatrix3D();
+            this.worldTranform = newMatrix3D();
         }
 
         resize(width: number, height: number): void{}
 
-        public updateSceneTransform(sceneTransform?:Matrix3D):void{
+        public updateSceneTransform(sceneTransform?:IMatrix3D):void{
             if( this.states | DChange.trasnform){
                 this.updateTransform();
-                this.sceneTransform.copyFrom(this.transform);
-                this.sceneTransform.invert();
-                this.worldTranform.copyFrom(this.sceneTransform);
-                this.worldTranform.append(this.len);
+                this.sceneTransform.set(this.transform);
+                this.sceneTransform.m3_invert();
+                this.worldTranform.set(this.sceneTransform);
+                this.worldTranform.m3_append(this.len);
                 this.states &= ~DChange.trasnform;
             }
         }
@@ -33,7 +33,7 @@ module rf{
             this.w = width;
             this.h = height;
 
-            let rawData = this.len.rawData;
+            let rawData = this.len;
 
             rawData[0] = 2/width;
             rawData[1] = 0;
@@ -66,7 +66,7 @@ module rf{
             this.w = width;
             this.h = height;
 
-            let rawData = this.len.rawData;
+            let rawData = this.len;
 
             rawData[0] = 2/width;
             rawData[1] = 0;
@@ -118,7 +118,7 @@ module rf{
             // 2.0 * zFar * zNear / (zNear - zFar)
 
             // this.len = len;
-            let rawData = this.len.rawData;
+            let rawData = this.len;
 
             // let yScale: number = 1.0 / Math.tan(45 / 2.0);
             // let xScale: number = yScale / width * height;

@@ -174,8 +174,8 @@ module rf{
         
 
         public updateSceneTransform(): void {
-            this.sceneTransform.copyFrom(this.transform);
-            if (this.parent) this.sceneTransform.append(this.parent.sceneTransform);
+            this.sceneTransform.set(this.transform);
+            if (this.parent) this.sceneTransform.m3_append(this.parent.sceneTransform);
             for(let child of this.childrens){
                 if( (child.states & DChange.trasnform) != 0){
                     //这里不更新其transform 是因为后续有人来让其更新

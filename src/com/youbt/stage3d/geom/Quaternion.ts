@@ -36,12 +36,12 @@ module rf {
 
         }
 
-        public fromMatrix3D(m: Matrix3D) {
+        public fromMatrix3D(m: IMatrix3D) {
             const [
                 m11, m12, m13, ,
                 m21, m22, m23, ,
                 m31, m32, m33,
-            ] = m.rawData as any;
+            ] = m as any;
 
 
             const tr = m11 + m22 + m33;
@@ -84,7 +84,7 @@ module rf {
             return this;
         }
 
-        public toMatrix3D(target?: Matrix3D) {
+        public toMatrix3D(target?: IMatrix3D) {
             const { x, y, z, w } = this;
             const x2 = x + x,
                 y2 = y + y,
@@ -102,9 +102,9 @@ module rf {
 
 
             if (!target) {
-                target = new Matrix3D();
+                target = newMatrix3D();
             }
-            const rawData = target.rawData;
+            const rawData = target;
             rawData[0] = 1 - (yy + zz);
             rawData[1] = xy + wz;
             rawData[2] = xz - wy;

@@ -48,7 +48,7 @@ module rf{
             f = camera.originFar;
             camera.z = f
             // camera.y = f;
-            camera.lookat(new Vector3D(0,0,0));
+            camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
 
             let w = 500;

@@ -1,6 +1,6 @@
 module rf{
     export class PanelUtils{
-        skin:Symbol;
+        skin:Component;
         setting:object;
         btn_random:Button;
         btn_create:Button;
@@ -23,9 +23,9 @@ module rf{
             const{source} = this;
             
             let clsname:string = "ui.asyncpanel.create";
-            let cs:DisplaySymbol = source.setting[clsname];
+            let cs:IDisplaySymbol = source.setting[clsname];
             
-            this.skin = new Symbol(source.source);
+            this.skin = new Component(source.source);
             this.skin.setSymbol(cs);
             this.skin.renderer = new BatchRenderer(this.skin);
             popContainer.addChild(this.skin);

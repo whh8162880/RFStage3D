@@ -122,7 +122,7 @@ module rf {
             }
             return false;
         }
-        public toString(): string {
+        toString(): string {
             return `HitArea left:${this.left} right:${this.right} top:${this.top} bottom:${this.bottom} front:${this.front} back:${this.back}`
         }
     }
@@ -132,48 +132,48 @@ module rf {
         mouseEnabled:boolean = false;
         mouseChildren:boolean = true;
         mousedown:boolean = false;
-		mouseRoll:Boolean = false;
-        pos: Vector3D;
-        rot: Vector3D;
-        sca: Vector3D;
-        up:Vector3D = new Vector3D(0,1,0);
+		mouseroll:boolean = false;
+        pos: IVector3D;
+        rot: IVector3D;
+        sca: IVector3D;
+        up:IVector3D = newVector3D(0,1,0);
 
-        public _x: number = 0;
-        public _y: number = 0;
-        public _z: number = 0;
+        _x: number = 0;
+        _y: number = 0;
+        _z: number = 0;
 
-        public _rotationX: number = 0;
-        public _rotationY: number = 0;
-        public _rotationZ: number = 0;
+        _rotationX: number = 0;
+        _rotationY: number = 0;
+        _rotationZ: number = 0;
 
-        public _scaleX: number = 1;
-        public _scaleY: number = 1;
-        public _scaleZ: number = 1;
-        public _alpha: number = 1;
+        _scaleX: number = 1;
+        _scaleY: number = 1;
+        _scaleZ: number = 1;
+        _alpha: number = 1;
 
-        public sceneAlpha: number = 1;
+        sceneAlpha: number = 1;
 
-        public w: number = 0;
-        public h: number = 0;
+        w: number = 0;
+        h: number = 0;
 
-        public _visible: boolean = true;
-        public states: number = 0;
+        _visible: boolean = true;
+        states: number = 0;
 
-        public pivotZero: boolean = false;
-        public pivotPonumber: Vector3D = undefined;
-        public transform: Matrix3D;
-        public sceneTransform: Matrix3D;
-        public parent: DisplayObjectContainer = undefined;
-        public stage: Stage3D = undefined;
-        public name: string = undefined;
+        pivotZero: boolean = false;
+        pivotPonumber: IVector3D;
+        transform: IMatrix3D;
+        sceneTransform: IMatrix3D;
+        parent: DisplayObjectContainer;
+        stage: Stage3D;
+        name: string;
 
         constructor() {
             super();
-            this.pos = new Vector3D();
-            this.rot = new Vector3D();
-            this.sca = new Vector3D(1,1,1);
-            this.transform = new Matrix3D();
-            this.sceneTransform = new Matrix3D();
+            this.pos = newVector3D();
+            this.rot = newVector3D();
+            this.sca = newVector3D(1,1,1);
+            this.transform = newMatrix3D();
+            this.sceneTransform = newMatrix3D();
         }
 
         /**
@@ -197,15 +197,15 @@ module rf {
             }
         }
 
-        public get visible(): boolean { return this._visible; }
-        public set visible(value: boolean) {
+        get visible(): boolean { return this._visible; }
+        set visible(value: boolean) {
             if (this._visible != value) {
                 this._visible = value;
                 this.setChange(DChange.vertex)
             }
         }
 
-        public set alpha(value: number) {
+        set alpha(value: number) {
             if (this._alpha == value) {
                 return;
             }
@@ -220,64 +220,64 @@ module rf {
             this.setChange(vertex | DChange.alpha | DChange.vcdata);
         }
 
-        public get alpha(): number {
+        get alpha(): number {
             return this._alpha;
         }
 
-        public get scaleX(): number { return this._scaleX; }
-        public set scaleX(value: number) {
+        get scaleX(): number { return this._scaleX; }
+        set scaleX(value: number) {
             if (this._scaleX == value) return;
             this._scaleX = value;
             this.sca.x = value;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
-        public get scaleY(): number { return this._scaleY; }
-        public set scaleY(value: number) { this._scaleY = value; this.sca.y = value; this.setChange(DChange.trasnform); }
-        public get scaleZ(): number { return this._scaleZ; }
-        public set scaleZ(value: number) { this._scaleZ = value; this.sca.z = value; this.setChange(DChange.trasnform); }
-        public get rotationX(): number { return this._rotationX * RADIANS_TO_DEGREES; }
-        public get rotationY(): number { return this._rotationY * RADIANS_TO_DEGREES; }
-        public get rotationZ(): number { return this._rotationZ * RADIANS_TO_DEGREES; }
+        get scaleY(): number { return this._scaleY; }
+        set scaleY(value: number) { this._scaleY = value; this.sca.y = value; this.setChange(DChange.trasnform); }
+        get scaleZ(): number { return this._scaleZ; }
+        set scaleZ(value: number) { this._scaleZ = value; this.sca.z = value; this.setChange(DChange.trasnform); }
+        get rotationX(): number { return this._rotationX * RADIANS_TO_DEGREES; }
+        get rotationY(): number { return this._rotationY * RADIANS_TO_DEGREES; }
+        get rotationZ(): number { return this._rotationZ * RADIANS_TO_DEGREES; }
 
 
-        public set rotationX(value: number) {
+        set rotationX(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationX) return;
             this._rotationX = value; this.rot.x = value; this.setChange(DChange.trasnform);
         }
-        public set rotationY(value: number) {
+        set rotationY(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationY) return;
             this._rotationY = value; this.rot.y = value; this.setChange(DChange.trasnform);
         }
-        public set rotationZ(value: number) {
+        set rotationZ(value: number) {
             value %= 360; value *= DEGREES_TO_RADIANS;
             if (value == this._rotationZ) return;
             this._rotationZ = value; this.rot.z = value; this.setChange(DChange.trasnform);
         }
 
-        public get x(): number { return this._x; }
-        public get y(): number { return this._y; }
-        public get z(): number { return this._z; }
+        get x(): number { return this._x; }
+        get y(): number { return this._y; }
+        get z(): number { return this._z; }
 
-        public set x(value: number) {
+        set x(value: number) {
             if (value == this._x) return;
             this._x = value; this.pos.x = value;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
-        public set y(value: number) {
+        set y(value: number) {
             if (value == this._y) return;
             this._y = value; this.pos.y = value;
             this.setChange(DChange.trasnform | DChange.vcdata);
         }
-        public set z(value: number) {
+        set z(value: number) {
             if (value == this._z) return;
             this._z = value; this.pos.z = value;
             this.setChange(DChange.trasnform);
         }
 
 
-        public setPos(x: number, y: number, z: number = 0, update: Boolean = true): void {
+        setPos(x: number, y: number, z: number = 0, update: Boolean = true): void {
             this.pos.x = this._x = x;
             this.pos.y = this._y = y;
             this.pos.z = this._z = z;
@@ -286,7 +286,7 @@ module rf {
             }
         }
 
-        public set eulers(value: Vector3D) {
+        set eulers(value:IVector3D) {
             this._rotationX = value.x * DEGREES_TO_RADIANS;
             this._rotationY = value.y * DEGREES_TO_RADIANS;
             this._rotationZ = value.z * DEGREES_TO_RADIANS;
@@ -300,10 +300,10 @@ module rf {
 		 * @param distance
 		 * 
 		 */
-        public forwardPos(distance: number, target?:Vector3D): void {
+        forwardPos(distance: number, target?:IVector3D): void {
             const{pos}=this;
-            this.transform.copyColumnTo(2, tempAxeX);
-            tempAxeX.normalize();
+            this.transform.m3_copyColumnTo(2, tempAxeX);
+            tempAxeX.v3_normalize();
             if (undefined != target) {
                 pos.x = -tempAxeX.x * distance + target.x;
                 pos.y = -tempAxeX.y * distance + target.y;
@@ -325,9 +325,9 @@ module rf {
 		 * @param distance
 		 * 
 		 */
-        public upPos(distance: number): void {
-            this.transform.copyColumnTo(1, tempAxeX);
-            tempAxeX.normalize();
+        upPos(distance: number): void {
+            this.transform.m3_copyColumnTo(1, tempAxeX);
+            tempAxeX.v3_normalize();
             this.pos.x += tempAxeX.x * distance;
             this.pos.y += tempAxeX.y * distance;
             this.pos.z += tempAxeX.z * distance;
@@ -343,9 +343,9 @@ module rf {
 		 * @param distance
 		 * 
 		 */
-        public rightPos(distance: number): void {
-            this.transform.copyColumnTo(0, tempAxeX);
-            tempAxeX.normalize();
+        rightPos(distance: number): void {
+            this.transform.m3_copyColumnTo(0, tempAxeX);
+            tempAxeX.v3_normalize();
             this.pos.x += tempAxeX.x * distance;
             this.pos.y += tempAxeX.y * distance;
             this.pos.z += tempAxeX.z * distance;
@@ -362,7 +362,7 @@ module rf {
 		 * @param rz
 		 * 
 		 */
-        public setRot(rx: number, ry: number, rz: number, update: Boolean = true): void {
+        setRot(rx: number, ry: number, rz: number, update: Boolean = true): void {
             this.rot.x = this._rotationX = rx * DEGREES_TO_RADIANS;
             this.rot.y = this._rotationY = ry * DEGREES_TO_RADIANS;
             this.rot.z = this._rotationZ = rz * DEGREES_TO_RADIANS;
@@ -379,7 +379,7 @@ module rf {
 		 * @param rz
 		 * 
 		 */
-        public setRotRadians(rx: number, ry: number, rz: number, update: Boolean = true): void {
+        setRotRadians(rx: number, ry: number, rz: number, update: Boolean = true): void {
             this.rot.x = this._rotationX = rx;
             this.rot.y = this._rotationY = ry;
             this.rot.z = this._rotationZ = rz;
@@ -388,18 +388,18 @@ module rf {
             }
         }
 
-        public set scale(value: number) {
+        set scale(value: number) {
             this.setSca(value, value, value);
         }
 
-        public get scale(): number {
+        get scale(): number {
             if (this._scaleX == this._scaleY && this._scaleX == this._scaleZ) {
                 return this._scaleX;
             }
             return 1;
         }
 
-        public setSca(sx: number, sy: number, sz: number, update: Boolean = true): void {
+        setSca(sx: number, sy: number, sz: number, update: Boolean = true): void {
             this.sca.x = this._scaleX = sx;
             this.sca.y = this._scaleY = sy;
             this.sca.z = this._scaleZ = sz;
@@ -410,8 +410,8 @@ module rf {
 
 
 
-        public setPivotPonumber(x: number, y: number, z: number): void {
-            if (undefined == this.pivotPonumber) { this.pivotPonumber = new Vector3D() };
+        setPivotPonumber(x: number, y: number, z: number): void {
+            if (undefined == this.pivotPonumber) { this.pivotPonumber = newVector3D() };
             this.pivotPonumber.x = x;
             this.pivotPonumber.y = y;
             this.pivotPonumber.z = z;
@@ -419,9 +419,10 @@ module rf {
         }
 
 
-        public setTransform(matrix:ArrayLike<number>): void {
-            const{pos,rot,sca}=this;
-            matrix3d_decompose(matrix,pos,rot,sca);
+        setTransform(matrix:ArrayLike<number>): void {
+            const{transform,pos,rot,sca}=this;
+            transform.set(matrix);
+            transform.m3_decompose(pos,rot,sca);
             this._x = pos.x;
             this._y = pos.y;
             this._z = pos.z;
@@ -443,16 +444,17 @@ module rf {
 		/**
 		 * 
 		 */
-        public updateTransform(): void {
+        updateTransform(): void {
             const{transform}=this;
             if (this.pivotZero) {
-                transform.identity();
-                transform.appendTranslation(-this.pivotPonumber.x, -this.pivotPonumber.y, -this.pivotPonumber.z);
-                transform.appendScale(this._scaleX, this._scaleY, this._scaleZ);
-                transform.appendTranslation(this._x, this._y, this._z);
-                transform.appendTranslation(this.pivotPonumber.x, this.pivotPonumber.y, this.pivotPonumber.z);
+                const{pivotPonumber}=this;
+                transform.m3_identity();
+                transform.m3_translation(-pivotPonumber.x, -pivotPonumber.y, -pivotPonumber.z);
+                transform.m3_scale(this._scaleX, this._scaleY, this._scaleZ);
+                transform.m3_translation(this._x, this._y, this._z);
+                transform.m3_translation(pivotPonumber.x, pivotPonumber.y, pivotPonumber.z);
             } else {
-                matrix_recompose(this.pos,this.rot,this.sca,transform.rawData);
+                transform.m3_recompose(this.pos,this.rot,this.sca)
             }
 
             this.states &= ~DChange.trasnform;
@@ -463,27 +465,27 @@ module rf {
 		 * 
 		 * 
 		 */
-        public updateSceneTransform(sceneTransform: Matrix3D): void {
-            this.sceneTransform.copyFrom(this.transform);
-            this.sceneTransform.append(sceneTransform);
+        updateSceneTransform(sceneTransform: IMatrix3D): void {
+            this.sceneTransform.set(this.transform);
+            this.sceneTransform.m3_append(sceneTransform);
         }
 
 
-        public updateAlpha(sceneAlpha: number): void {
+        updateAlpha(sceneAlpha: number): void {
             this.sceneAlpha = this.sceneAlpha * this._alpha;
             this.states &= ~DChange.alpha;
         }
 
-        public remove(): void {
+        remove(): void {
             if (this.parent) {
                 this.parent.removeChild(this);
             }
         }
 
-        public addToStage(): void { };
-        public removeFromStage(): void { };
+        addToStage(): void { };
+        removeFromStage(): void { };
 
-        public setSize(width: number, height: number): void {
+        setSize(width: number, height: number): void {
             this.w = width;
             this.h = height;
             this.invalidate();
@@ -543,7 +545,7 @@ module rf {
             return bool;
         }
 
-        public updateHitArea():void{
+        updateHitArea():void{
             this.states &= ~DChange.ac;
         }
 
@@ -560,12 +562,12 @@ module rf {
         }
 
 
-        public get mouseX():number{
-            return nativeMouseX - this.sceneTransform.rawData[12];
+        get mouseX():number{
+            return nativeMouseX - this.sceneTransform[12];
         }
 
-        public get mouseY():number{
-            return nativeMouseY - this.sceneTransform.rawData[13];
+        get mouseY():number{
+            return nativeMouseY - this.sceneTransform[13];
         }
 
 
@@ -573,7 +575,7 @@ module rf {
 
         }
 
-        lookat(target:Vector3D, upAxis:Point3DW=null):void{
+        lookat(target: IVector3D, upAxis:IVector3D=null):void{
 			let xAxis = tempAxeX;
 			let yAxis = tempAxeY;
             let zAxis = tempAxeZ;
@@ -581,34 +583,34 @@ module rf {
             const{transform,_scaleX,_scaleY,_scaleZ,_x,_y,_z,rot}=this;
 			
             if(undefined == upAxis){
-                upAxis = Vector3D.Y_AXIS;
+                upAxis = Y_AXIS;
             }
 			
-            upAxis = transform.transformVector(upAxis,TEMP_VECTOR3D);
+            upAxis = transform.m3_transformVector(upAxis,TEMP_VECTOR3D);
             
 			
 			zAxis.x = target.x - _x;
 			zAxis.y = target.y - _y;
 			zAxis.z = target.z - _z;
-			zAxis.normalize();
+			zAxis.v3_normalize();
 			
 			xAxis.x = upAxis.y*zAxis.z - upAxis.z*zAxis.y;
 			xAxis.y = upAxis.z*zAxis.x - upAxis.x*zAxis.z;
 			xAxis.z = upAxis.x*zAxis.y - upAxis.y*zAxis.x;
-			xAxis.normalize();
+			xAxis.v3_normalize();
 			
-			if (xAxis.length < .05) {
+			if (xAxis.v3_length < .05) {
 				xAxis.x = upAxis.y;
 				xAxis.y = upAxis.x;
 				xAxis.z = 0;
-				xAxis.normalize();
+				xAxis.v3_normalize();
 			}
 			
 			yAxis.x = zAxis.y*xAxis.z - zAxis.z*xAxis.y;
 			yAxis.y = zAxis.z*xAxis.x - zAxis.x*xAxis.z;
 			yAxis.z = zAxis.x*xAxis.y - zAxis.y*xAxis.x;
 			
-			let raw = this.transform.rawData;
+			let raw = transform;
 			
 			raw[0] = _scaleX*xAxis.x;
 			raw[1] = _scaleX*xAxis.y;
@@ -635,8 +637,7 @@ module rf {
 			// 	this.rotationX -= 180;
 			// 	this.rotationZ -= 180;
             // }
-            
-            matrix3d_decompose(transform.rawData,undefined,rot,undefined);
+            transform.m3_decompose(undefined,rot,undefined);
 			
 			// let v = transform.decompose();
 			// xAxis = v[1];

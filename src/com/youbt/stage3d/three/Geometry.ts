@@ -164,7 +164,7 @@ module rf {
     }
 
 
-    export function geometry_plane(width:number,height:number,position:number,variables:{ [key: string]: IVariable },matrix3D?:Matrix3D):void{
+    export function geometry_plane(width:number,height:number,position:number,variables:{ [key: string]: IVariable },matrix3D?:IMatrix3D):void{
 
         let width_half = width * 0.5;
         let height_half = height * 0.5;
@@ -175,7 +175,7 @@ module rf {
             -width_half,-height_half,0,1,1,
             width_half,-height_half,0,0,1
         ];
-        let v:Vector3D = TEMP_VECTOR3D;
+        let v:IVector3D = TEMP_VECTOR3D;
 
         let variable = variables[VA.pos];
         let pos = variable ? variable.size * 4 : -1;
@@ -195,7 +195,7 @@ module rf {
                 v.y = points[p+1];
                 v.z = points[p+2];
                 if(undefined != matrix3D){
-                    matrix3D.transformVector(v,v);
+                    matrix3D.m3_transformVector(v,v);
                 }
                 empty_float32_pos.wPoint3(position * pos + (i * 3) , v.x,v.y,v.z);
             }
@@ -206,7 +206,7 @@ module rf {
                 v.z = 1;
     
                 if(undefined != matrix3D){
-                    matrix3D.transformRotation(v,v);
+                    matrix3D.m3_transformRotation(v,v);
                 }
                 empty_float32_normal.wPoint3(position * normal +  (i * 3) , v.x,v.y,v.z);
             }
@@ -273,10 +273,10 @@ module rf {
             this.vertex.uploadContext(program);
             let{sceneTransform,invSceneTransform}=mesh;
             let worldTranform = TEMP_MATRIX;
-            worldTranform.copyFrom(sceneTransform);
-            worldTranform.append(camera.worldTranform);
-            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform.rawData);
-            c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform.rawData);
+            worldTranform.set(sceneTransform);
+            worldTranform.m3_append(camera.worldTranform);
+            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+            c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
         }
         
     }
@@ -303,14 +303,14 @@ module rf {
 
             let variables = this.variables;
 
-            let matrix3D = new Matrix3D();
+            let matrix3D = newMatrix3D();
 
             geometry_plane(width,height,0,variables);
             numVertices += 4;
             quad ++;
 
             
-            matrix3D.appendRotation(180,Vector3D.Y_AXIS);
+            matrix3D.m3_rotation(180*DEGREES_TO_RADIANS,Y_AXIS);
             geometry_plane(width,height,1,variables,matrix3D);
             numVertices += 4;
             quad ++;
@@ -332,50 +332,50 @@ module rf {
 
     export class BoxGeometry extends GeometryBase{
         create( width:number , height:number , depth:number){
-            let matrix3D = new Matrix3D();
+            let matrix3D = newMatrix3D();
             let numVertices = 0;
             let quad = 0;
             let variables = this.variables;
 
-            matrix3D.appendTranslation(0,0,depth * 0.5);
+            matrix3D.m3_translation(0,0,depth * 0.5);
             geometry_plane(width,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
-            matrix3D.identity();
-            matrix3D.appendRotation(180,Vector3D.Y_AXIS);
-            matrix3D.appendTranslation(0,0,-depth * 0.5);
+            matrix3D.m3_identity();
+            matrix3D.m3_rotation(180 * DEGREES_TO_RADIANS,Y_AXIS);
+            matrix3D.m3_translation(0,0,-depth * 0.5);
             geometry_plane(width,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
 
-            matrix3D.identity();
-            matrix3D.appendRotation(-90,Vector3D.Y_AXIS);
-            matrix3D.appendTranslation(width * 0.5,0,0);
+            matrix3D.m3_identity();
+            matrix3D.m3_rotation(-90 * DEGREES_TO_RADIANS,Y_AXIS);
+            matrix3D.m3_translation(width * 0.5,0,0);
             geometry_plane(depth,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
-            matrix3D.identity();
-            matrix3D.appendRotation(90,Vector3D.Y_AXIS);
-            matrix3D.appendTranslation(-width * 0.5,0,0);
+            matrix3D.m3_identity();
+            matrix3D.m3_rotation(90 * DEGREES_TO_RADIANS,Y_AXIS);
+            matrix3D.m3_translation(-width * 0.5,0,0);
             geometry_plane(depth,height,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
 
-            matrix3D.identity();
-            matrix3D.appendRotation(90,Vector3D.X_AXIS);
-            matrix3D.appendTranslation(0,height * 0.5,0);
+            matrix3D.m3_identity();
+            matrix3D.m3_rotation(90 * DEGREES_TO_RADIANS,X_AXIS);
+            matrix3D.m3_translation(0,height * 0.5,0);
             geometry_plane(width,depth,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
 
 
-            matrix3D.identity();
-            matrix3D.appendRotation(-90,Vector3D.X_AXIS);
-            matrix3D.appendTranslation(0,-height * 0.5,0);
+            matrix3D.m3_identity();
+            matrix3D.m3_rotation(-90 * DEGREES_TO_RADIANS,X_AXIS);
+            matrix3D.m3_translation(0,-height * 0.5,0);
             geometry_plane(width,depth,quad,variables,matrix3D);
             numVertices += 4;
             quad++;
