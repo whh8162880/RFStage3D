@@ -125,7 +125,7 @@ module rf{
             particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
             let particle = new Particle();
             particle.setSca(100,100,100);
-            particle.load("b");
+            particle.load("c");
             scene.addChild(particle);
 
 
