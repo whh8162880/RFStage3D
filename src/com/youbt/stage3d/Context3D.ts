@@ -366,7 +366,7 @@ namespace rf {
 		 * @param data 
 		 * @param format FLOAT_1 2 3 4
 		 */
-		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array, format: number): void {
+		public setProgramConstantsFromVector(variable: string, data: number | number[] | Float32Array, format: number,array:boolean = true): void {
 			let p = this.cProgram;
 			let uniforms = p.uniforms;
 			let g = gl;
@@ -379,7 +379,12 @@ namespace rf {
 			}
 
 			if (undefined != index) {
-				gl['uniform' + format + 'fv'](index, data);
+				if(array){
+					gl['uniform' + format + 'fv'](index, data);
+				}else{
+					gl['uniform' + format + 'f'](index, data);
+				}
+				
 			}
 		}
 
