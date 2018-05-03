@@ -7,4 +7,14 @@ module rf{
     export var max_vc:number = 100;
     export let c_white:string = `rgba(255,255,255,255)`;
     export let pixelRatio:number = 2;
+
+
+    export enum ExtensionDefine{
+        JPG = ".jpg",
+        PNG = ".png",
+        KM = ".km",
+        DAT = ".dat",
+        P3D = ".p3d",
+        PARTICLE = ".pa"
+    }
 }

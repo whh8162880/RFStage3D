@@ -222,7 +222,7 @@ module rf {
         variables:{ [key: string]: IVariable };
         vertex:VertexBuffer3D;
         index:IndexBuffer3D;
-        _mesh:IMeshData;
+        data:IMeshData;
         constructor(variables?:{ [key: string]: IVariable }){
             if(undefined == variables){
                 variables = vertex_mesh_variable;
@@ -235,19 +235,35 @@ module rf {
         numVertices:number = 0;
         numTriangles:number = 0;
 
-        setData(mesh:IMeshData){
 
-            this._mesh = mesh;
+        initData(data:IMeshData){
+            let c = context3D;
+            let{variables,data32PerVertex,vertex,index,vertexBuffer,indexBuffer}=data;
+            if(!vertexBuffer){
+                let info: VertexInfo = new VertexInfo(vertex, data32PerVertex, variables);
+                data.vertexBuffer = vertexBuffer = c.createVertexBuffer(info);
+            }
+            if(!indexBuffer){
+                if(index){
+                   data.indexBuffer = indexBuffer = c.createIndexBuffer(index);
+                }
+            }
+        }
 
-            let{variables:meshVar,numVertices,numTriangles,data32PerVertex,vertex,index,vertexBuffer,indexBuffer}=mesh;
+
+        setData(data:IMeshData){
+
+            this.data = data;
+
+            let{variables:meshVar,numVertices,numTriangles,data32PerVertex}=data;
             let{variables}=this;
             let c = context3D;
 
             if(!meshVar){
-                mesh.variables = variables;
-                mesh.data32PerVertex = data32PerVertex;
+                data.variables = variables;
+                data.data32PerVertex = data32PerVertex;
             }else{
-                variables = mesh.variables;
+                variables = data.variables;
             }
             
             this.numVertices = numVertices;
@@ -255,18 +271,10 @@ module rf {
             this.data32PerVertex = data32PerVertex;
 
 
-            if(!vertexBuffer){
-                let info: VertexInfo = new VertexInfo(vertex, data32PerVertex, variables);
-                mesh.vertexBuffer = vertexBuffer = c.createVertexBuffer(info);
-            }
+            this.initData(data);
 
+            let{vertexBuffer,indexBuffer}=data
             this.vertex = vertexBuffer;
-
-            if(!indexBuffer){
-                if(index){
-                   mesh.indexBuffer = indexBuffer = c.createIndexBuffer(index);
-                }
-            }
             this.index = indexBuffer;
 
             // if (index) {

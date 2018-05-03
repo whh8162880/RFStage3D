@@ -91,4 +91,35 @@ module rf{
         name:string;
         frames:{[key:string]:Float32Array};
     }
+
+
+    //==========================================================================================================================================
+    //  PARTICLE
+    //==========================================================================================================================================
+    export interface IParticlePropertyData{
+        delay:number;
+        duration:number;
+        index:number;
+        startTime:number;
+        total:number;
+        totalTime:number;
+    }
+
+    export interface IParticleRuntimeData extends IMeshData{
+        props:IParticlePropertyData[];
+    }
+
+    export interface IParticleSettingData{
+        offset:number;
+        speed:number;
+        pos:IVector3D;
+        rot:IVector3D;
+    }
+
+    export interface IParticleData{
+        material:IMaterialData;
+        mesh:IMeshData;
+        runtime:IParticleRuntimeData;
+        setting:IParticleSettingData;
+    }
 }

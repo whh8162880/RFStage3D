@@ -4,12 +4,14 @@ module rf {
         scene: Scene;
         geometry: GeometryBase;
         invSceneTransform: IMatrix3D;
-        skAnim:SkeletonAnimation;
+        skAnim: SkeletonAnimation;
         constructor(variables?: { [key: string]: IVariable }) {
             super(variables ? variables : vertex_mesh_variable);
             this.invSceneTransform = newMatrix3D();
             this.nativeRender = true;
         }
+
+
 
 
         updateSceneTransform(): void {
@@ -21,20 +23,14 @@ module rf {
 
         }
 
-
-        init(geometry: GeometryBase, material: Material) {
-            this.geometry = geometry;
-            this.material = material;
-        }
-
         render(camera: Camera, now: number, interval: number): void {
             const { geometry, material, skAnim } = this;
             if (undefined != geometry && undefined != material) {
                 let b = material.uploadContext(camera, this, now, interval);
                 if (true == b) {
-                    const{program}=material;
+                    const { program } = material;
                     if (undefined != skAnim) {
-                        skAnim.uploadContext(camera,this,program,now,interval);
+                        skAnim.uploadContext(camera, this, program, now, interval);
                     }
                     geometry.uploadContext(camera, this, program, now, interval);
                     context3D.drawTriangles(geometry.index, geometry.numTriangles)
@@ -63,33 +59,22 @@ module rf {
 
         loadCompelte(e: EventX) {
             let item: ResItem = e.data;
-            let amf = singleton(AMF3);
             let byte = item.data;
-            var inflate = new Zlib.Inflate(new Uint8Array(byte));
-            var plain;
-            if(inflate instanceof Uint8Array){
-                plain = inflate;
-            }else{
-                plain = inflate.decompress();
-            }
-            
-            amf.setArrayBuffer(plain.buffer);
-            // amf.setArrayBuffer(byte);
-            let o = amf.readObject();
+            let o = amf_readObject(byte);
             this.setKFM(o);
         }
 
-        setKFM(kfm:ISkeletonMeshData) {
-            let{mesh,skeleton:skeletonData,material:materialData}=kfm;
-            let{material,geometry}=this;
+        setKFM(kfm: ISkeletonMeshData) {
+            let { mesh, skeleton: skeletonData, material: materialData } = kfm;
+            let { material, geometry } = this;
             let c = context3D;
 
-            if(!geometry){
+            if (!geometry) {
                 this.geometry = geometry = new GeometryBase(this.variables);
             }
             geometry.setData(mesh);
 
-            if(!material){
+            if (!material) {
                 this.material = material = new PhongMaterial();
             }
             material.setData(kfm.material);
@@ -97,7 +82,7 @@ module rf {
             material.diffTex.url = this.id + material.diffTex.url;
 
 
-            
+
 
 
             // this.material["diffTex"] = this.id + kfm["diff"];
@@ -114,9 +99,9 @@ module rf {
             let action = "stand";
             let animationData = kfm.anims[action];
             skeleton.initAnimationData(animationData);
-            this.skAnim.play(animationData,engineNow);
+            this.skAnim.play(animationData, engineNow);
 
-            
+
         }
     }
 
@@ -126,18 +111,18 @@ module rf {
         defaultMatrices: Float32Array;
         vertex: VertexBuffer3D;
         boneCount: number;
-        animations: { [key: string]:ISkeletonAnimationData } = {};
-        
+        animations: { [key: string]: ISkeletonAnimationData } = {};
+
         constructor(config: ISkeletonData) {
 
-            let { boneCount ,defaultMatrices } = this;
+            let { boneCount, defaultMatrices } = this;
 
             this.boneCount = boneCount = config.boneCount;
             let buffer = new ArrayBuffer(16 * 4 * boneCount);
             this.defaultMatrices = defaultMatrices = new Float32Array(buffer);
 
             function init(bone: IBone) {
-                let { inv, matrix, parent, children, name ,index} = bone;
+                let { inv, matrix, parent, children, name, index } = bone;
                 if (undefined != inv) {
                     bone.inv = inv = new Float32Array(inv);
                 }
@@ -148,9 +133,9 @@ module rf {
                     // matrix3d_multiply(sceneTransform, parent.sceneTransform, sceneTransform);
                 }
 
-                if(index > -1){
+                if (index > -1) {
                     let matrice = new Float32Array(buffer, index * 16 * 4, 16);
-                    matrice.m3_append(sceneTransform,false,inv);
+                    matrice.m3_append(sceneTransform, false, inv);
                     // matrix3d_multiply(inv,sceneTransform,matrice);
                 }
 
@@ -168,62 +153,62 @@ module rf {
             this.vertex = context3D.createVertexBuffer(new VertexInfo(new Float32Array(config.vertex), config.data32PerVertex, vertex_skeleton_variable));
         }
 
-        initAnimationData(anim:ISkeletonAnimationData){
+        initAnimationData(anim: ISkeletonAnimationData) {
             anim.skeleton = this;
             anim.matrices = [];
             let frames = anim.frames;
-            for(let key in frames){
+            for (let key in frames) {
                 frames[key] = new Float32Array(frames[key]);
             }
             this.animations[anim.name] = anim;
         }
 
 
-        createAnimation(){
+        createAnimation() {
             let anim = recyclable(SkeletonAnimation);
             anim.skeleton = this;
             return anim;
         }
 
 
-        getMatricesData(anim:ISkeletonAnimationData,frame:number){
+        getMatricesData(anim: ISkeletonAnimationData, frame: number) {
             let result = anim.matrices[frame];
-            if(undefined != result){
+            if (undefined != result) {
                 return result;
             }
 
-            let{boneCount,rootBone}=this;
-            let{frames}=anim;
+            let { boneCount, rootBone } = this;
+            let { frames } = anim;
 
 
-            let map:{[key:string]:IBone} = {};
+            let map: { [key: string]: IBone } = {};
 
             let buffer = new ArrayBuffer(16 * 4 * boneCount);
             result = new Float32Array(buffer);
             anim.matrices[frame] = result;
 
 
-            function update(bone:IBone){
-                let { inv, matrix,sceneTransform, parent, children, name ,index} = bone;
+            function update(bone: IBone) {
+                let { inv, matrix, sceneTransform, parent, children, name, index } = bone;
                 let frameData = frames[bone.name];
 
-                if(frameData){
-                    matrix.set(frameData.slice(frame*16,(frame+1)*16));
+                if (frameData) {
+                    matrix.set(frameData.slice(frame * 16, (frame + 1) * 16));
                 }
 
                 if (parent) {
-                    sceneTransform.m3_append(parent.sceneTransform,false,matrix)
+                    sceneTransform.m3_append(parent.sceneTransform, false, matrix)
                     // matrix3d_multiply(matrix, parent.sceneTransform, sceneTransform);
                     // multiplyMatrices(parent.sceneTransform,matrix,sceneTransform);
-                    
-                }else{
+
+                } else {
                     sceneTransform.set(matrix);
                 }
 
-                if(index > -1){
+                if (index > -1) {
                     let matrice = new Float32Array(buffer, index * 16 * 4, 16);
                     // matrix3d_multiply(inv, sceneTransform, matrice);
-                    matrice.m3_append(sceneTransform,false,inv);
+                    matrice.m3_append(sceneTransform, false, inv);
                     // multiplyMatrices(sceneTransform,inv,matrice);
                 }
 
@@ -236,7 +221,7 @@ module rf {
 
             update(rootBone);
 
-            
+
             return result;
         }
 
@@ -316,38 +301,38 @@ module rf {
         // }
     }
 
-    export class SkeletonAnimation{
+    export class SkeletonAnimation {
         skeleton: Skeleton;
-        pose:{[key:string]:Float32Array} = {};
-        starttime:number;
-        nextTime:number;
-        animationData:ISkeletonAnimationData;
+        pose: { [key: string]: Float32Array } = {};
+        starttime: number;
+        nextTime: number;
+        animationData: ISkeletonAnimationData;
 
-        currentFrame:number = 0;
+        currentFrame: number = 0;
 
-        play(animationData:ISkeletonAnimationData,now:number){
+        play(animationData: ISkeletonAnimationData, now: number) {
             this.animationData = animationData;
             this.nextTime = now + animationData.eDuration * 1000;
         }
 
         uploadContext(camera: Camera, mesh: Mesh, program: Program3D, now: number, interval: number) {
-            let{animationData,skeleton,starttime,currentFrame,nextTime}=this;
+            let { animationData, skeleton, starttime, currentFrame, nextTime } = this;
             skeleton.vertex.uploadContext(program);
-            let matrixes:Float32Array;
-            if(undefined == animationData){
+            let matrixes: Float32Array;
+            if (undefined == animationData) {
                 matrixes = skeleton.defaultMatrices;
-            }else{
-                if(currentFrame >= animationData.totalFrame){
+            } else {
+                if (currentFrame >= animationData.totalFrame) {
                     currentFrame = 0;
                 }
-    
-                if(now > nextTime){
-                    this.nextTime = nextTime  + animationData.eDuration * 1000;
-                    this.currentFrame = currentFrame+1;
+
+                if (now > nextTime) {
+                    this.nextTime = nextTime + animationData.eDuration * 1000;
+                    this.currentFrame = currentFrame + 1;
                 }
-                matrixes = skeleton.getMatricesData(animationData,currentFrame);
+                matrixes = skeleton.getMatricesData(animationData, currentFrame);
             }
-            context3D.setProgramConstantsFromMatrix(VC.vc_bones,matrixes);
+            context3D.setProgramConstantsFromMatrix(VC.vc_bones, matrixes);
         }
 
     }

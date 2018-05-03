@@ -66,7 +66,7 @@ module rf{
                     if(false == readly){
                         if(LoadStates.COMPLETE != status){
                             if(LoadStates.WAIT == status){
-                                tex.load();
+                                tex.load(this.getTextUrl(data));
                             }
                             b =false;
                         }
@@ -74,6 +74,10 @@ module rf{
                 }
             });
             return b;
+        }
+
+        getTextUrl(data:ITextureData):string{
+            return data.url;
         }
 
     }
