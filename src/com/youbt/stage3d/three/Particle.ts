@@ -140,14 +140,22 @@ module rf {
             let fragmentDefine = "";
             let fragmentFunctions = "";
 
-
-
+            //速度
             node = nodes[P_PARTICLE.VELOCITY];
             if(node){
                 vertexDefine += "#define VELOCITY\n"
             }
 
+            //加速度
+            node = nodes[P_PARTICLE.ACCELERITION];
+            if(node){
+                vertexDefine += "#define ACCELERITION\n"
+            }
 
+            node = nodes[P_PARTICLE.ROTATION];
+            if(node){
+                vertexDefine += "#define ROTATION\n"
+            }
 
             let vertexCode = `
                 ${vertexDefine}
@@ -162,23 +170,49 @@ module rf {
 #ifdef VELOCITY
                 attribute vec3 ${P_PARTICLE.VELOCITY};
 #endif
+
+#ifdef ACCELERITION
+                attribute vec3 ${P_PARTICLE.ACCELERITION};
+#endif
+
+#ifdef ROTATION
+                attribute vec4 ${P_PARTICLE.ROTATION};
+#endif
                 uniform mat4 ${VC.mvp};
                 uniform float ${P_PARTICLE.NOW};
 
                 varying vec2 vUV;
                 varying vec2 vTime;
 
+                vec4 quaXpos(in vec4 qua,in vec3 pos){
+                    vec4 temp = vec4(cross(qua.xyz,pos.xyz) + (qua.w * pos.xyz) , -dot(qua.xyz,pos.xyz));
+                    temp = vec4(cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) + (temp.w * qua.xyz),0.0);
+                    return temp;
+                }
+
                 void main(void) {
                     vec3 b_pos = ${VA.pos};
                     vec3 p_pos = vec3(0.0);
-
+                    vec3 b_veo = vec3(0.0);
+                    
                     //先处理时间  vec2 timeNode(float now,in vec3 pos,in vec4 time)
                     vec2 time = timeNode(${P_PARTICLE.NOW},b_pos,${P_PARTICLE.TIME});
 
 #ifdef VELOCITY
                     //处理速度
-                    vec3 b_veo = ${P_PARTICLE.VELOCITY};
+                    b_veo += ${P_PARTICLE.VELOCITY};
                     p_pos += (time.xxx * b_veo);
+#endif
+                    
+                   
+#ifdef ACCELERITION
+                    temp = ${P_PARTICLE.ACCELERITION} * time.x;        //at;
+                    b_veo += temp;              //vt = v0+a*t;
+                    p_pos += temp * time.x * 0.5;               //s = v0*t + a*t*t*0.5;
+#endif
+
+#ifdef ROTATION
+                    b_pos += quaXpos(${P_PARTICLE.ROTATION},b_pos).xyz;
 #endif
 
                     vUV = ${VA.uv};
@@ -277,15 +311,7 @@ module rf {
 
 
         //==========================VELOCITY_Node====================================
-        velocityNode(info:IParticleNodeInfo){
-            info.key = `velocity_`;
-
-            let vcode = `
-                void velocityNode(in vec3 velocity,in vec2 time,inout pos){
-                    pos += (time.xxx * velocity.xyz)
-                }
-            `
-        }
+        
 
     }
 }
