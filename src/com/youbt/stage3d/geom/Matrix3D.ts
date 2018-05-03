@@ -1,17 +1,17 @@
 //Matrix3D算法相关
-const rf_v3_identity = [0,0,0,0];
+const rf_v3_identity = [0, 0, 0, 0];
 const rf_m3_identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 const rf_m2_identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 const rf_m3_temp = new Float32Array(16);
 
-interface IArrayBase{
-    clone():IArrayBase;
+interface IArrayBase {
+    clone(): IArrayBase;
     set(array: ArrayLike<number> | IArrayBase, offset?: number): void;
     readonly length: number;
     [n: number]: number;
 }
 
-interface IMatrix3D extends IArrayBase{
+interface IMatrix3D extends IArrayBase {
     m3_identity();
     m3_append(m3: ArrayLike<number> | IArrayBase, prepend?: boolean, from?: ArrayLike<number>);
     m3_rotation(degrees: number, axis: IVector3D | number[], prepend?: boolean, from?: ArrayLike<number>);
@@ -89,7 +89,7 @@ Object.defineProperties(Float32Array.prototype, {
             let c = Math.cos(angle);
             let s = Math.sin(angle);
             let t = 1 - c;
-            const { 0:x, 1:y, 2:z } = axis;
+            const { 0: x, 1: y, 2: z } = axis;
             let tx = t * x, ty = t * y;
             let b = rf_m3_temp;
             b.set([
@@ -179,10 +179,10 @@ Object.defineProperties(Float32Array.prototype, {
      */
     m3_decompose: {
         value: function (pos: Float32Array | number[], rot: Float32Array | number[], sca: Float32Array | number[], orientationStyle?: number) {
-            if(undefined == orientationStyle){
+            if (undefined == orientationStyle) {
                 orientationStyle = 0;
             }
-            
+
             let [
                 m0, m1, m2, m3,
                 m4, m5, m6, m7,
@@ -196,7 +196,7 @@ Object.defineProperties(Float32Array.prototype, {
                 pos[2] = m14;
             }
 
-            const{sqrt,atan2} = Math;
+            const { sqrt, atan2 } = Math;
 
             const sx = sqrt(m0 * m0 + m1 * m1 + m2 * m2);
             const sy = sqrt(m4 * m4 + m5 * m5 + m6 * m6);
@@ -269,7 +269,7 @@ Object.defineProperties(Float32Array.prototype, {
 
     m3_recompose: {
         value: function (pos: Float32Array | number[], rot: Float32Array | number[], sca: Float32Array | number[], orientationStyle?: number) {
-            if(undefined == orientationStyle){
+            if (undefined == orientationStyle) {
                 orientationStyle = 0;
             }
 
@@ -345,9 +345,9 @@ Object.defineProperties(Float32Array.prototype, {
     },
 
     m3_copyColumnFrom: {
-        value: function (column: number, vector3D:ArrayLike<number>) {
+        value: function (column: number, vector3D: ArrayLike<number>) {
             column *= 4
-            this[column    ] = vector3D[0];
+            this[column] = vector3D[0];
             this[column + 1] = vector3D[1];
             this[column + 2] = vector3D[2];
             this[column + 3] = vector3D[3];
@@ -357,7 +357,7 @@ Object.defineProperties(Float32Array.prototype, {
     m3_copyColumnTo: {
         value: function (column: number, vector3D: Float32Array | number[]) {
             column *= 4
-            vector3D[0] = this[column    ];
+            vector3D[0] = this[column];
             vector3D[1] = this[column + 1];
             vector3D[2] = this[column + 2];
             vector3D[3] = this[column + 3];
@@ -366,7 +366,7 @@ Object.defineProperties(Float32Array.prototype, {
 
     m3_transformVector: {
         value: function (v: Float32Array | number[], result?: IVector3D | number[]) {
-            const { 0:x, 1:y, 2:z } = v;
+            const { 0: x, 1: y, 2: z } = v;
             if (undefined == result) {
                 result = new Float32Array(rf_v3_identity);
             }
@@ -380,16 +380,16 @@ Object.defineProperties(Float32Array.prototype, {
     },
 
     m3_transformVectors: {
-        value: function (vin: ArrayLike<number>, vout: Float32Array | number[]){
+        value: function (vin: ArrayLike<number>, vout: Float32Array | number[]) {
             let i = 0;
-            let v = [0,0,0];
-            let v2 = [0,0,0];
+            let v = [0, 0, 0];
+            let v2 = [0, 0, 0];
             while (i + 3 <= vin.length) {
-                v[0] = vin[i    ];
+                v[0] = vin[i];
                 v[1] = vin[i + 1];
                 v[2] = vin[i + 2];
                 this.transformVector(v, v2);  //todo: simplify operation
-                vout[i    ] = v2[0];
+                vout[i] = v2[0];
                 vout[i + 1] = v2[1];
                 vout[i + 2] = v2[2];
                 i += 3;
@@ -400,7 +400,7 @@ Object.defineProperties(Float32Array.prototype, {
 
     m3_transformRotation: {
         value: function (v: Float32Array | number[], result?: IVector3D | number[]) {
-            const { 0:x, 1:y, 2:z } = v;
+            const { 0: x, 1: y, 2: z } = v;
             if (undefined == result) {
                 result = new Float32Array(rf_v3_identity);
             }
@@ -414,76 +414,97 @@ Object.defineProperties(Float32Array.prototype, {
     }
 })
 
-interface IVector3D extends IArrayBase{
-    x:number;
-    y:number;
-    z:number;
-    w:number;
-    v3_lengthSquared:number;
-    v3_length:number;
-    v3_add(v:IVector3D | ArrayLike<number>):IVector3D;
-    v3_sub(v:IVector3D | ArrayLike<number>):IVector3D;
-    v3_scale(v:number);
-    v3_normalize(from?:ArrayLike<number>);
-    v3_dotProduct(t:ArrayLike<number>);
-    v3_crossProduct(t:ArrayLike<number>,out?:IVector3D | number[]);
+interface IVector3D extends IArrayBase {
+    x: number;
+    y: number;
+    z: number;
+    w: number;
+    v3_lengthSquared: number;
+    v3_length: number;
+    v3_add(v: IVector3D | ArrayLike<number>): IVector3D;
+    v3_sub(v: IVector3D | ArrayLike<number>): IVector3D;
+    v3_scale(v: number);
+    v3_normalize(from?: ArrayLike<number>);
+    v3_dotProduct(t: ArrayLike<number>);
+    v3_crossProduct(t: ArrayLike<number>, out?: IVector3D | number[]);
 }
 
 Object.defineProperties(Float32Array.prototype, {
-    v3_lengthSquared:{
-        get(){
-            const{0:x,1:y,2:z}=this;
-            return x*x + y*y + z*z;
+    v3_lengthSquared: {
+        get() {
+            const { 0: x, 1: y, 2: z } = this;
+            return x * x + y * y + z * z;
         }
     },
-    v3_length:{
-        get(){
-            const{0:x,1:y,2:z}=this;
-            return Math.sqrt(x*x + y*y + z*z);
+    v3_length: {
+        get() {
+            const { 0: x, 1: y, 2: z } = this;
+            return Math.sqrt(x * x + y * y + z * z);
         }
     },
-    v3_add:{
-        value:function(v:IVector3D | ArrayLike<number>){
+    v3_add: {
+        value: function (v: IVector3D | ArrayLike<number>) {
             let o = new Float32Array(4);
-            for(let i = 0;i<3;i++) o[i] = this[i] + v[i];
+            for (let i = 0; i < 3; i++) o[i] = this[i] + v[i];
             return o;
         }
     },
-    v3_sub:{
-        value:function(v:IVector3D | ArrayLike<number>){
+    v3_sub: {
+        value: function (v: IVector3D | ArrayLike<number>) {
             let o = new Float32Array(4);
-            for(let i = 0;i<3;i++) o[i] = this[i] - v[i];
+            for (let i = 0; i < 3; i++) o[i] = this[i] - v[i];
             return o;
         }
     },
-    v3_scale:{
-        value:function(v:number){
+    v3_scale: {
+        value: function (v: number) {
             this[0] *= v;
             this[1] *= v;
             this[2] *= v;
         }
     },
-    v3_normalize:{
-        value:function(from?:ArrayLike<number>){
+    v3_normalize: {
+        value: function (from?: ArrayLike<number>) {
             let leng = this.v3_length;
-            if (leng != 0){
+            if (leng != 0) {
                 let v = 1 / leng;
                 this[0] *= v;
                 this[1] *= v;
                 this[2] *= v;
             }
         }
+    },
+    v3_dotProduct: {
+        value: function (t: ArrayLike<number>) {
+            return this[0] * t[0] + this[1] * t[1] + this[2] * t[2];
+        }
+    },
+    v3_crossProduct: {
+        value: function (t: ArrayLike<number>, out?: IVector3D | number[]) {
+            const { 0: x, 1: y, 2: z } = this;
+            const { 0: ax, 1: ay, 2: az } = t;
+
+            if (undefined == out) {
+                out = new Float32Array(4);
+            }
+
+            out[0] = y * az - z * ay;
+            out[1] = z * ax - x * az;
+            out[2] = x * ay - y * ax;
+
+            return out;
+        }
     }
 })
 
 
-interface IMatrix extends IArrayBase{
+interface IMatrix extends IArrayBase {
     m2_identity();
 }
 
 Object.defineProperties(Float32Array.prototype, {
-    m2_identitye:{
-        value:function(){
+    m2_identitye: {
+        value: function () {
             this.set(rf_m2_identity);
         }
     }
@@ -651,8 +672,8 @@ Object.defineProperties(Float32Array.prototype, {
 
 
 
-interface Float32Array extends IMatrix3D,IMatrix,IVector3D{
-   
+interface Float32Array extends IMatrix3D, IMatrix, IVector3D {
+
 }
 
 module rf {
@@ -660,7 +681,7 @@ module rf {
     const DEG_2_RAD = Math.PI / 180;
 
     export function newMatrix3D(v?: ArrayLike<number> | ArrayBuffer) {
-        let out:Float32Array;
+        let out: Float32Array;
         if (v instanceof ArrayBuffer) {
             out = new Float32Array(v);
         } else {
@@ -674,7 +695,7 @@ module rf {
     }
 
     export function newMatrix(v?: ArrayLike<number> | ArrayBuffer) {
-        let out:Float32Array;
+        let out: Float32Array;
         if (v instanceof ArrayBuffer) {
             out = new Float32Array(v);
         } else {
@@ -687,25 +708,25 @@ module rf {
         return out;
     }
 
-    export function newVector3D(x?: ArrayLike<number> | ArrayBuffer | number,y?:number,z?:number,w?:number){
-        if(undefined == x){
+    export function newVector3D(x?: ArrayLike<number> | ArrayBuffer | number, y?: number, z?: number, w?: number) {
+        if (undefined == x) {
             return new Float32Array(rf_v3_identity);
         }
 
-        if(x instanceof ArrayBuffer){
+        if (x instanceof ArrayBuffer) {
             return new Float32Array(x);
         }
 
-        if(undefined == y){
+        if (undefined == y) {
             y = 0;
         }
-        if(undefined == z){
+        if (undefined == z) {
             z = 0;
         }
-        if(undefined == w){
+        if (undefined == w) {
             w = 0;
         }
-        return new Float32Array([Number(x),y,z,w]);
+        return new Float32Array([Number(x), y, z, w]);
     }
 
     // export const matrix3d_identity = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);

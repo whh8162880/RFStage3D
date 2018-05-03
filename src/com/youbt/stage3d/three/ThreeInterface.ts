@@ -116,10 +116,29 @@ module rf{
         rot:IVector3D;
     }
 
+    export interface IParticleNodeInfo{
+        name:string;
+        type:number;
+
+        key:string;
+
+        vertexFunction:string;
+
+        fragmentFunction:string;
+
+    }
+
+    export interface IParticleTimeNodeInfo extends IParticleNodeInfo{
+        usesDuration:boolean;
+        usesLooping:boolean;
+        usesDelay:boolean;
+    }
+
     export interface IParticleData{
         material:IMaterialData;
         mesh:IMeshData;
         runtime:IParticleRuntimeData;
         setting:IParticleSettingData;
+        nodes:{[key:string]:IParticleNodeInfo}
     }
 }
