@@ -368,7 +368,7 @@ module rf{
 
 		asyncsourceComplete(e:EventX):void{
 			let source = this.source;
-			let cs:DisplaySymbol = source.setting[this.clsName];
+			let cs:IDisplaySymbol = source.setting[this.clsName];
 			if(cs){
 				let skin = this.skin as Component;
 				skin.source = source.source;

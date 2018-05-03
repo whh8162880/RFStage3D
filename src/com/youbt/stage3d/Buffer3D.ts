@@ -351,8 +351,8 @@ module rf {
 
     export class Texture extends Buffer3D {
         key: number | string;
+        data:ITextureData;
         texture: WebGLTexture;
-        mipmap: boolean = false;
         width: number = 0;
         height: number = 0;
 
@@ -384,57 +384,61 @@ module rf {
 
             g.bindTexture(g.TEXTURE_2D, tex);
 
+            let{data:textureData}=this;
+
             // g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,true);
 
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g[textureData.mag]);
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g[textureData.mix]);
+            let pepeat = textureData.repeat ? g.REPEAT : g.CLAMP_TO_EDGE;
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, pepeat);   //U方向上设置
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, pepeat);
 
-
-            if(this.mipmap){
-
-                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
-
-                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR_MIPMAP_LINEAR);
-
-                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.REPEAT);   //U方向上设置
-                g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.REPEAT);   //v方向上设置
-
-            }else{
-                //设置纹理参数 https://blog.csdn.net/a23366192007/article/details/51264454
-            /**
-             * void texParameteri(GLenum target, GLenum pname, GLint param) ;
-                @pname:是纹理的参数：只能是下列四个
-                    GL_TEXTURE_MIN_FILTER：指定纹理图片缩小时用到的算法
-                    GL_TEXTURE_MAG_FILTER：指定纹理图片放大时用到的算法 
-                    GL_TEXTURE_WRAP_S ：纹理包装算法，在s(u)方向 
-                    GL_TEXTURE_WRAP_T ：纹理包装算法，在t(v)方向
-                @param:是第二个参数的值（value）
-                    放大和缩小所用的算法只有两个 NEAREST和LINEAR,
-                    （即第三个参数param的值是webgl.NEAREST或webgl.LINEAR）分别是最近点采样和线性采样，
-                    前者效率高单效果不好，后者效率不高单效果比较好。
-             */
-
-
-            /**
-             *  Mag Modes
-             *      gl.NEAREST
-             *      gl.LINEAR
-             */
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
-            /**  Min Modes
-            *      gl.NEAREST
-            *      gl.LINEAR
-                   gl.NEAREST_MIPMAP_NEAREST;      limit:power of two   
-                   gl.NEAREST_MIPMAP_LINEAR;       limit:power of two
-                   gl.LINEAR_MIPMAP_LINEAR         limit:power of two
-                   gl.LINEAR_MIPMAP_NEAREST        limit:power of two
-            * */
-            //如果我们的贴图长宽不满足2的幂条件。那么MIN_FILTER 和 MAG_FILTER, 只能是 NEAREST或者LINEAR
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
-
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);   //U方向上设置
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);   //v方向上设置
 
             
-            }
+            // if(textureData.mipmap){
+            //     g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.LINEAR);
+            //     g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.LINEAR_MIPMAP_LINEAR);
+            //     g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.REPEAT);   //U方向上设置
+            //     g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.REPEAT);   //v方向上设置
+            // }else{
+            //     //设置纹理参数 https://blog.csdn.net/a23366192007/article/details/51264454
+            // /**
+            //  * void texParameteri(GLenum target, GLenum pname, GLint param) ;
+            //     @pname:是纹理的参数：只能是下列四个
+            //         GL_TEXTURE_MIN_FILTER：指定纹理图片缩小时用到的算法
+            //         GL_TEXTURE_MAG_FILTER：指定纹理图片放大时用到的算法 
+            //         GL_TEXTURE_WRAP_S ：纹理包装算法，在s(u)方向 
+            //         GL_TEXTURE_WRAP_T ：纹理包装算法，在t(v)方向
+            //     @param:是第二个参数的值（value）
+            //         放大和缩小所用的算法只有两个 NEAREST和LINEAR,
+            //         （即第三个参数param的值是webgl.NEAREST或webgl.LINEAR）分别是最近点采样和线性采样，
+            //         前者效率高单效果不好，后者效率不高单效果比较好。
+            //  */
+
+
+            // /**
+            //  *  Mag Modes
+            //  *      gl.NEAREST
+            //  *      gl.LINEAR
+            //  */
+            // g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g.NEAREST);
+            // /**  Min Modes
+            // *      gl.NEAREST
+            // *      gl.LINEAR
+            //        gl.NEAREST_MIPMAP_NEAREST;      limit:power of two   
+            //        gl.NEAREST_MIPMAP_LINEAR;       limit:power of two
+            //        gl.LINEAR_MIPMAP_LINEAR         limit:power of two
+            //        gl.LINEAR_MIPMAP_NEAREST        limit:power of two
+            // * */
+            // //如果我们的贴图长宽不满足2的幂条件。那么MIN_FILTER 和 MAG_FILTER, 只能是 NEAREST或者LINEAR
+            // g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g.NEAREST);
+
+            // g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, g.CLAMP_TO_EDGE);   //U方向上设置
+            // g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, g.CLAMP_TO_EDGE);   //v方向上设置
+
+            
+            // }
             //如果我们的贴图长宽不满足2的幂条件。那么wrap_s 和 wrap_t 必须是 clap_to_edge
             //Wrapping Modes 
             //g.REPEAT                  limit:power of two   
@@ -477,7 +481,7 @@ module rf {
 
             //  createmipmap  limit:power of two
 
-            if(this.mipmap){
+            if(textureData.mipmap){
                 g.generateMipmap(g.TEXTURE_2D);
             }
 
@@ -524,7 +528,7 @@ module rf {
 
         load(url?:string){
             if(undefined == url){
-                url = this.key as string;
+                url = this.data.url as string;
             }
             if(LoadStates.WAIT == this.status){
                 this.status = LoadStates.LOADING;
@@ -550,7 +554,6 @@ module rf {
             if (this.texture) {
                 gl.deleteTexture(this.texture);
                 this.texture = undefined;
-                this.mipmap = false;
             }
             this.readly = false;
             // if (this.pixels) {

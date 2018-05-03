@@ -284,7 +284,7 @@ module rf {
                 vo = source.setSourceVO(name, p.x, p.y, 1);
                 if (undefined != vo) {
                     format.draw(context, char, vo);
-                    let texture = context3D.textureObj[source.name];
+                    let texture = context3D.textureObj[source.textureData.key];
                     if(undefined != texture){
                         texture.readly = false;
                     }

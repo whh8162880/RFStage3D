@@ -58,12 +58,12 @@ namespace rf {
 		FLOAT_4 = 4
 	}
 
-	export enum Context3DTriangleFace {
-		BACK = 'back', //CCW
-		FRONT = 'front', //CW
-		FRONT_AND_BACK = 'frontAndBack',
-		NONE = 'none'
-	}
+	// export enum Context3DTriangleFace {
+	// 	BACK = 'back', //CCW
+	// 	FRONT = 'front', //CW
+	// 	FRONT_AND_BACK = 'frontAndBack',
+	// 	NONE = 'none'
+	// }
 
 	export class Context3D {
 		//todo:enableErrorChecking https://www.khronos.org/webgl/wiki/Debugging
@@ -114,26 +114,33 @@ namespace rf {
 				return;
 			}
 			this.triangleFaceToCull = triangleFaceToCull;
-
 			let g = gl
 			g.frontFace(g.CW);
-			switch (triangleFaceToCull) {
-				case Context3DTriangleFace.NONE:
-					g.disable(g.CULL_FACE);
-					break;
-				case Context3DTriangleFace.BACK:
-					g.enable(g.CULL_FACE);
-					g.cullFace(g.BACK);
-					break;
-				case Context3DTriangleFace.FRONT:
-					g.enable(g.CULL_FACE);
-					g.cullFace(g.FRONT);
-					break;
-				case Context3DTriangleFace.FRONT_AND_BACK:
-					g.enable(g.CULL_FACE);
-					g.cullFace(g.FRONT_AND_BACK);
-					break;
+
+			if(triangleFaceToCull == "NONE"){
+				g.disable(g.CULL_FACE);
+			}else{
+				g.enable(g.CULL_FACE);
+				g.cullFace(g[triangleFaceToCull]);
 			}
+
+			// switch (triangleFaceToCull) {
+			// 	case Context3DTriangleFace.NONE:
+			// 		g.disable(g.CULL_FACE);
+			// 		break;
+			// 	case Context3DTriangleFace.BACK:
+			// 		g.enable(g.CULL_FACE);
+			// 		g.cullFace(g.BACK);
+			// 		break;
+			// 	case Context3DTriangleFace.FRONT:
+			// 		g.enable(g.CULL_FACE);
+			// 		g.cullFace(g.FRONT);
+			// 		break;
+			// 	case Context3DTriangleFace.FRONT_AND_BACK:
+			// 		g.enable(g.CULL_FACE);
+			// 		g.cullFace(g.FRONT_AND_BACK);
+			// 		break;
+			// }
 		}
 
 		/**
@@ -152,8 +159,8 @@ namespace rf {
 		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
 		 */
 		depthMask:boolean;
-		passCompareMode:number;
-		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
+		passCompareMode:string;
+		public setDepthTest(depthMask: boolean, passCompareMode: string): void {
 
 			if(this.depthMask == depthMask && this.passCompareMode == passCompareMode){
 				return;
@@ -164,7 +171,7 @@ namespace rf {
 			let g = gl;
 			g.enable(g.DEPTH_TEST);
 			g.depthMask(depthMask);
-			g.depthFunc(passCompareMode);
+			g.depthFunc(g[passCompareMode]);
 		}
 
 
@@ -180,16 +187,17 @@ namespace rf {
 			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
 			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
 		 */
-		sourceFactor:number;
-		destinationFactor:number;
-		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
+		sourceFactor:string;
+		destinationFactor:string;
+		public setBlendFactors(sourceFactor: string, destinationFactor: string): void {
 			if(this.sourceFactor == sourceFactor && this.destinationFactor == destinationFactor){
 				return;
 			}
 			this.sourceFactor = sourceFactor;
 			this.destinationFactor = destinationFactor;
-			gl.enable(gl.BLEND); //stage3d cant disable blend?
-			gl.blendFunc(sourceFactor, destinationFactor);
+			let g = gl;
+			g.enable(g.BLEND); //stage3d cant disable blend?
+			g.blendFunc(g[sourceFactor], g[destinationFactor]);
 		}
 
 		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number = -1, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
@@ -248,18 +256,34 @@ namespace rf {
 			// return buffer;
 		}
 
-		public createIndexBuffer(data: number[] | Uint16Array): IndexBuffer3D {
+		public createIndexBuffer(data: number[] | Uint16Array | ArrayBuffer): IndexBuffer3D {
 			let buffer = recyclable(IndexBuffer3D);
-			buffer.uploadFromVector(data);
+			if(data instanceof ArrayBuffer){
+				buffer.uploadFromVector(new Uint16Array(data));
+			}else{
+				buffer.uploadFromVector(data);
+			}
 			return buffer
 		}
+
+		public getTextureData(url:string,mipmap?:boolean,mag?:string,mix?:string,repeat?:boolean){
+			let data = {} as ITextureData;
+			data.url = url;
+			data.mipmap = undefined != mipmap ? mipmap : false;
+			data.mag = undefined != mag ? mag : "NEAREST";
+			data.mix = undefined != mix ? mix : "NEAREST";
+			data.repeat = undefined != repeat ? repeat : false;
+			return data;
+		}
+
 
 
 		public textureObj:{[key:string]:Texture} = {};
 
-		public createTexture(key:string,pixels?: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
+		public createTexture(key:ITextureData,pixels?: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
 			let texture = recyclable(Texture);
-			texture.key = key;
+			texture.key = key.key ? key.key : (key.key = `${key.url}_${key.mipmap}_${key.mag}_${key.mix}_${key.repeat}`);
+			texture.data = key;
 			texture.pixels = pixels;
 			
 			if(pixels){
@@ -267,8 +291,7 @@ namespace rf {
 				texture.height = pixels.height;
 			}
 			
-			texture.mipmap = mipmap
-			this.textureObj[key] = texture;
+			this.textureObj[key.key] = texture;
 			return texture;
 		}
 
@@ -279,7 +302,6 @@ namespace rf {
 			texture.pixels = new BitmapData(width, height);
 			texture.width = width;
 			texture.height = height;
-			texture.mipmap = mipmap
 			this.textureObj[key] = texture;
 			return texture;
 		}
@@ -344,7 +366,7 @@ namespace rf {
 		 * @param data 
 		 * @param format FLOAT_1 2 3 4
 		 */
-		public setProgramConstantsFromVector(variable: string, data: number[] | Float32Array, format: number): void {
+		public setProgramConstantsFromVector(variable: string, data: number | number[] | Float32Array, format: number,array:boolean = true): void {
 			let p = this.cProgram;
 			let uniforms = p.uniforms;
 			let g = gl;
@@ -357,7 +379,12 @@ namespace rf {
 			}
 
 			if (undefined != index) {
-				gl['uniform' + format + 'fv'](index, data);
+				if(array){
+					gl['uniform' + format + 'fv'](index, data);
+				}else{
+					gl['uniform' + format + 'f'](index, data);
+				}
+				
 			}
 		}
 

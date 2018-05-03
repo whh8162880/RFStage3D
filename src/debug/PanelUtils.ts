@@ -23,7 +23,7 @@ module rf{
             const{source} = this;
             
             let clsname:string = "ui.asyncpanel.create";
-            let cs:DisplaySymbol = source.setting[clsname];
+            let cs:IDisplaySymbol = source.setting[clsname];
             
             this.skin = new Component(source.source);
             this.skin.setSymbol(cs);

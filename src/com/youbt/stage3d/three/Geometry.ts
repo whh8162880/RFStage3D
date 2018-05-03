@@ -221,6 +221,8 @@ module rf {
     export class GeometryBase implements IGeometry{
         variables:{ [key: string]: IVariable };
         vertex:VertexBuffer3D;
+        index:IndexBuffer3D;
+        data:IMeshData;
         constructor(variables?:{ [key: string]: IVariable }){
             if(undefined == variables){
                 variables = vertex_mesh_variable;
@@ -228,10 +230,62 @@ module rf {
             this.variables = variables;
             this.data32PerVertex = variables["data32PerVertex"].size;
         }
+
         data32PerVertex:number = 0;
         numVertices:number = 0;
         numTriangles:number = 0;
-        index:IndexBuffer3D;
+
+
+        initData(data:IMeshData){
+            let c = context3D;
+            let{variables,data32PerVertex,vertex,index,vertexBuffer,indexBuffer}=data;
+            if(!vertexBuffer){
+                let info: VertexInfo = new VertexInfo(vertex, data32PerVertex, variables);
+                data.vertexBuffer = vertexBuffer = c.createVertexBuffer(info);
+            }
+            if(!indexBuffer){
+                if(index){
+                   data.indexBuffer = indexBuffer = c.createIndexBuffer(index);
+                }
+            }
+        }
+
+
+        setData(data:IMeshData){
+
+            this.data = data;
+
+            let{variables:meshVar,numVertices,numTriangles,data32PerVertex}=data;
+            let{variables}=this;
+            let c = context3D;
+
+            if(!meshVar){
+                data.variables = variables;
+                data.data32PerVertex = data32PerVertex;
+            }else{
+                variables = data.variables;
+            }
+            
+            this.numVertices = numVertices;
+            this.numTriangles = numTriangles;
+            this.data32PerVertex = data32PerVertex;
+
+
+            this.initData(data);
+
+            let{vertexBuffer,indexBuffer}=data
+            this.vertex = vertexBuffer;
+            this.index = indexBuffer;
+
+            // if (index) {
+            //     geometry.index = c.createIndexBuffer(new Uint16Array(index));
+            // }else{
+            //     geometry.numTriangles *= 3;
+            // }
+        }
+        
+        
+        
 
 
         get pos(){
