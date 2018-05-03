@@ -88,6 +88,8 @@ namespace rf {
         init(): void;
     }
 
+    
+
     class C implements ICapabilities {
         platform: string;
         userAgent: string;
@@ -201,10 +203,6 @@ namespace rf {
          }
         
 
-        private isPowerOfTwo(n: number): boolean {
-            return (n !== 0) && ((n & (n - 1)) === 0);
-        }
-
         private describeRange(value: any[]): string {
             return '[' + value[0] + ', ' + value[1] + ']';
         }
@@ -224,7 +222,7 @@ namespace rf {
                 //
                 // We could also test for WEBGL_draw_buffers, but many systems do not have it yet
                 // due to driver bugs, etc.
-                if (this.isPowerOfTwo(g.getParameter(g.MAX_VERTEX_UNIFORM_VECTORS)) && this.isPowerOfTwo(g.getParameter(g.MAX_FRAGMENT_UNIFORM_VECTORS))) {
+                if (isPowerOfTwo(g.getParameter(g.MAX_VERTEX_UNIFORM_VECTORS)) && isPowerOfTwo(g.getParameter(g.MAX_FRAGMENT_UNIFORM_VECTORS))) {
                     return 'Yes, D3D11';
                 } else {
                     return 'Yes, D3D9';
