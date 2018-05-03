@@ -23,14 +23,14 @@ module rf {
                     qax + percent * (-qbx - qax),
                     qay + percent * (-qby - qay),
                     qaz + percent * (-qbz - qaz),
-                    qaw + percent * (-qbw - qbw)
+                    qaw + percent * (-qbw - qaw)
                 );
             }
             return new Quaternion(
                 qax + percent * (qbx - qax),
                 qay + percent * (qby - qay),
                 qaz + percent * (qbz - qaz),
-                qaw + percent * (qbw - qbw)
+                qaw + percent * (qbw - qaw)
             );
 
 

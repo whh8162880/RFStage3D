@@ -718,4 +718,19 @@ module rf{
 		}
 
 	}
+
+
+	export function amf_readObject(byte:ArrayBuffer | Uint8Array){
+		let amf = singleton(AMF3);
+		var inflate = new Zlib.Inflate(new Uint8Array(byte));
+		var plain;
+		if(inflate instanceof Uint8Array){
+			plain = inflate;
+		}else{
+			plain = inflate.decompress();
+		}
+		amf.setArrayBuffer(plain.buffer);
+		let o = amf.readObject();
+		return o;
+	}
 }

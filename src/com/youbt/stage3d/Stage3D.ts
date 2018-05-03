@@ -88,7 +88,7 @@ module rf{
 
         public render(camera: Camera, now: number, interval: number): void {
             let{camera:_camera}=this;
-            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this.material;
+            const{depthMask,passCompareMode,srcFactor,dstFactor,cull}=this.material;
             let c = context3D;
             let g = gl;
            
@@ -100,9 +100,9 @@ module rf{
                 _camera.updateSceneTransform();
             }
 
-            c.setCulling(triangleFaceToCull)
+            c.setCulling(cull)
             c.setDepthTest(depthMask,passCompareMode);
-            c.setBlendFactors(sourceFactor,destinationFactor);
+            c.setBlendFactors(srcFactor,dstFactor);
 
             super.render(_camera,now,interval);
         }
@@ -206,7 +206,7 @@ module rf{
 
         public render(camera: Camera, now: number, interval: number): void {
             let{camera:_camera}=this;
-            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this.material;
+            const{depthMask,passCompareMode,srcFactor,dstFactor,cull}=this.material;
             let c = context3D;
             let g = gl;
            
@@ -218,9 +218,9 @@ module rf{
                 _camera.updateSceneTransform();
             }
 
-            c.setCulling(triangleFaceToCull)
+            c.setCulling(cull)
             c.setDepthTest(depthMask,passCompareMode);
-            c.setBlendFactors(sourceFactor,destinationFactor);
+            c.setBlendFactors(srcFactor,dstFactor);
 
             super.render(_camera,now,interval);
         }
@@ -229,7 +229,7 @@ module rf{
     export class UIContainer extends AllActiveSprite{
         public render(camera: Camera, now: number, interval: number): void {
             const{cameraUI}=ROOT;
-            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=this.material;
+            const{depthMask,passCompareMode,srcFactor,dstFactor,cull}=this.material;
             let c = context3D;
             let g = gl;
            
@@ -237,9 +237,9 @@ module rf{
                 cameraUI.updateSceneTransform();
             }
 
-            c.setCulling(triangleFaceToCull)
+            c.setCulling(cull)
             c.setDepthTest(depthMask,passCompareMode);
-            c.setBlendFactors(sourceFactor,destinationFactor);
+            c.setBlendFactors(srcFactor,dstFactor);
 
             super.render(cameraUI,now,interval);
         }

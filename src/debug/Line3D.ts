@@ -165,10 +165,10 @@ module rf{
                 this.program = p
             }
 
-            const{depthMask,passCompareMode,sourceFactor,destinationFactor,triangleFaceToCull}=scene.material;
-            c.setCulling(triangleFaceToCull)
+            const{depthMask,passCompareMode,srcFactor,dstFactor,cull}=scene.material;
+            c.setCulling(cull)
             c.setDepthTest(depthMask,passCompareMode);
-            c.setBlendFactors(sourceFactor,destinationFactor);
+            c.setBlendFactors(srcFactor,dstFactor);
 
             // c.setBlendFactors(gl.ONE,gl.ZERO);
             // c.setDepthTest(true,gl.LESS);
