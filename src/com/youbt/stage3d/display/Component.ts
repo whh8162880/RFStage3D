@@ -25,6 +25,7 @@ module rf{
 		filter:any[];
 		format:object;
 		input:boolean;
+		multiline:boolean;
 		color:number;
 	}
 
@@ -143,7 +144,7 @@ module rf{
 						this[ele.name] = sp;
 						sp.name = ele.name;
 						
-						sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
+						sp.setSize(Math.round(sp.width * ele.scaleX),Math.round(sp.height * ele.scaleY));
 					}
 					this.addChild(sp);
 				}else if(ele.type == SymbolConst.TEXT){
@@ -158,10 +159,11 @@ module rf{
 
 						(sp as TextField).init(this.source, format);
 						(sp as TextField).color = textElement.color;
+						(sp as TextField).multiline = textElement.multiline;
 						if(textElement.input){//暂时还没写可输入
 							// (sp as TextField).type = TextFieldType.INPUT;
-							// (sp as TextField).selectable = true;
-							// sp.mouseEnabled = true;
+							(sp as TextField).selectable = true;
+							sp.mouseEnabled = true;
 						}else{
 							// (sp as TextField).type = TextFieldType.DYNAMIC;
 						}

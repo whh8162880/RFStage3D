@@ -1,5 +1,160 @@
 ///<reference path="./Sprite.ts" />
 module rf {
+    export class TextEditor extends MiniDispatcher{
+        private _text:TextField;
+
+        private _inputdiv:HTMLDivElement;
+        //生成input和textarea
+        private _input:HTMLInputElement;
+        private _area:HTMLTextAreaElement;
+
+        private _current:any;
+
+        //将需要编辑的textfiled传递进来
+        //根据样式生成对应的页面input
+        //input编辑完成后失去焦点及更新原有的textfiled
+        //
+        //
+        //根据文本是否是多行文本 单行使用input多行使用textarea
+        //新建文本容器 文本容器使用rect进行裁剪
+        //根据文本确定宽高 属性
+        //
+        public init():void
+        {
+            let self = this;
+            let inputele:any;
+
+            let div = document.createElement("div");
+            div.setAttribute("id", "edittxt");
+            div.style.opacity = "0";
+            self._defaultValue(div);
+            self._inputdiv = div;
+            document.body.appendChild(div);
+
+            //创建html textarea 将文本属性赋值
+            inputele = document.createElement("input");
+            self._defaultValue(inputele);
+            self._defaultTxt(inputele);
+            self._input = inputele;
+            div.appendChild(inputele);
+            inputele.type = "text";
+
+            inputele = document.createElement("textarea");
+            inputele.style["resize"] = "none";
+            self._defaultValue(inputele);
+            self._defaultTxt(inputele);
+            self._area = inputele;
+            div.appendChild(inputele);
+        }
+
+        setTextfiled(text:TextField):void
+        {
+            let self = this;
+            if(self._inputdiv == undefined)
+            {
+                this.init();
+            }
+            if(self._text != undefined)
+            {
+                this.blurHandler();
+            }
+
+            self._text = text;
+            //根据传递进来的textfiled选择对应的输入
+            let inpunt = text.multiline ? this._area : this._input;
+            self._current = inpunt;
+
+            this.updateinfo();//更新文本的父对象宽高和坐标 文本信息
+        }
+        
+        private updateinfo():void
+        {
+            let {_inputdiv, _text, _current} = this;
+
+            let lineheight:number = _text.lineheight;
+            let tw:number = _text.width;
+            let th:number = _text.height < lineheight ? lineheight : _text.height;
+
+            _inputdiv.style.opacity = "1";
+            _inputdiv.style.width = tw + "px";
+            _inputdiv.style.height = th + "px";
+            _inputdiv.style.left = _text.x + "px";
+            _inputdiv.style.top = _text.y + "px";
+            _inputdiv.style.clip = "rect(0px," + tw + "px,"+ th + "px, 0px)";//rect(top,right,bottom,left)
+
+            //需要设置字体 颜色 字体大小 默认值 
+            //传递进来的textfiled需要不显示
+            //需要正确计算出位置 需要赋值间距
+            let format:TextFormat = _text.format;
+            _current.style.width = tw + "px";
+            _current.style.height = th + "px";
+            _current.style.top = "0px";
+            if(_text.maxChars != undefined)
+            {
+                _current.setAttribute("maxlength", _text.maxChars);
+            }else{
+                _current.removeAttribute("maxlength");
+            }
+            _current.style["text-align"] = format.align;
+            _current.style.color = format.getColorStr(_text.color);
+            _current.style.font = format.font;
+            // _current.style.lineheight = "2em";//lineheight + "px";
+            _current.value = _text.$text;
+            if(_current.onblur == undefined)
+            {
+                _current.onblur = this.blurHandler.bind(this);
+            }
+
+            _current.selectionStart = _current.value.length;
+            _current.selectionEnd = _current.value.length;
+
+            setTimeout(() => {
+                _current.focus();
+            }, 20);
+                
+        }
+
+        private _defaultValue(ele:any):void
+        {
+            ele.style.position = "absolute";
+            ele.style.left = "0px";
+            ele.style.top = "-300px";
+            ele.style.border = "none";
+            ele.style.padding = "0";
+            ele.style.width = "0px";
+            ele.style.height = "0px";
+        }
+
+        private _defaultTxt(ele:any):void
+        {
+            ele.setAttribute("tabindex", "-1");//关闭tab切换
+            ele.style.outline = "thin";
+            ele.style.background = "none";
+            ele.style.color = "#ffffff";
+
+            ele.style.overflow = "hidden";
+            ele.style.wordBreak = "break-all";
+        }
+
+        private blurHandler():void
+        {
+            let self = this;
+            //抛出事件 更新文本
+            this.dispatchEvent(new EventX("onblur", self._current.value));
+
+            self._inputdiv.style.opacity = "0";
+            self._inputdiv.style.top = "-300px";
+            self._current.onblur = null;
+            
+            self._current.maxlength = 0;
+            self._current.value = "";
+            self._current.style.top = "-300px";
+            self._current = null;
+            self._text = null;
+        }
+    }
+
+    let txtedit:TextEditor = new TextEditor();
 
     export let emote_images: { [key: string]: Image } = {};
 
@@ -93,7 +248,7 @@ module rf {
             context.fillText(text, x, y + h - oy, w);
         }
 
-        private getColorStr(color: number): string {
+        getColorStr(color: number): string {
             let s = color.toString(16);
             return "#000000".substr(0, 7 - s.length) + s;
         }
@@ -132,7 +287,13 @@ module rf {
         color: number;
         element: HtmlElement;
         gap: number = 0;
-        wordWrap: boolean;
+        // wordWrap: boolean = false;
+        multiline:boolean = false;
+        maxChars:number;
+        lineheight:number;
+
+        protected _edit:boolean = false;
+
         init(source?: BitmapSource, format?: TextFormat): void {
             if (undefined != source) {
                 this.source = source;
@@ -176,12 +337,10 @@ module rf {
                 element.str = value;
             }
 
-            this.w = 0;
-            this.h = 0;
-
-            let lines = this.tranfromHtmlElement2CharDefine(element, this.wordWrap ? this.w : Infinity);
+            let lines = this.tranfromHtmlElement2CharDefine(element, this.multiline ? this.width : Infinity);
             let len = lines.length;
             let oy = 0;
+            let lineh:number;
             for (let i = 0; i < len; i++) {
                 let line = lines[i]
                 let textLine = this.textLines[i];
@@ -193,7 +352,13 @@ module rf {
                 textLine.renderText(line);
                 oy += line.h + 4;
                 this.addChild(textLine);
+                if(lineh == undefined)
+                {
+                    lineh = line.h;
+                }
             }
+
+            this.lineheight = lineh;
 
             while (lines.length > len) {
                 let textLine = lines.pop();
@@ -201,13 +366,6 @@ module rf {
             }
 
             this.layout();
-        }
-
-        setSize(width:number, height:number):void
-        {
-            this._ow = width;
-            this._oh = height;
-            super.setSize(width, height);
         }
 
         cleanAll():void{
@@ -224,33 +382,36 @@ module rf {
 
             this.updateHitArea();
             
-            const{w,h,childrens}=this;
+            const{childrens, w, h}=this;
 
             //根据align属性进行重新布局
-            // var line:Text3DLine;
-            // var lx:int = 1;
+            let _w:number = this.width;
 
-            if(_ow == 0)
+            if(_w == 0)
             {
                 return;
             }
-            let offsetx:number;
+
+            let align_type:number = 0;
             if(format.align == TextFormatAlign.CENTER){
-                offsetx = _ow - w >> 1;
+                align_type = 1;
             }else if(format.align == TextFormatAlign.RIGHT){
-                offsetx = _ow - w;
+                align_type = 2;
             }
 
             let len = childrens.length;
 
             //fisrt 取出完整的width
             //second 根据align获取偏移offsetx
-            let dx = offsetx;
             for(let i = 0; i < len; i++)
             {
                 let display = childrens[i];
-                display.x = dx;
-                dx += display.w;
+                if(align_type == 1)
+                {
+                    display.x = _w - display.width >> 1;
+                }else if(align_type == 2){
+                    display.x = _w - display.width;
+                }
             }
                
 
@@ -270,8 +431,6 @@ module rf {
 //             }
         }
 
-
-
         getCharSourceVO(char: string, format: TextFormat): BitmapSourceVO {
             let source = this.source;
             let name = format.font + "_" + char;
@@ -284,7 +443,12 @@ module rf {
                 vo = source.setSourceVO(name, p.x, p.y, 1);
                 if (undefined != vo) {
                     format.draw(context, char, vo);
-                    let texture = context3D.textureObj[source.textureData.key];
+                    let c = context3D;
+                    let{textureData}=source;
+                    if(!textureData){
+                        source.textureData = textureData = c.getTextureData(source.name);
+                    }
+                    let texture = context3D.textureObj[textureData.key];
                     if(undefined != texture){
                         texture.readly = false;
                     }
@@ -333,7 +497,7 @@ module rf {
                         lineCount++;
                         //自动换行结束
                     }
-                    if (ox && ox + html.image.w > width) {
+                    if (ox && ox + html.image.width > width) {
                         //自动换行开始
                         while (chars.length > oi) {
                             char = chars.pop();
@@ -456,6 +620,39 @@ module rf {
                 line.chars.length = 0;
             }
             return lines;
+        }
+
+        set selectable(val:boolean)
+        {
+           if(val)
+           {
+                this.addEventListener(MouseEventX.MouseDown, this.mouseDownHandler, this);
+           }else{
+                this.removeEventListener(MouseEventX.MouseDown, this.mouseDownHandler);
+           }
+        }
+
+        protected mouseDownHandler(event:MouseEventX):void {
+            let editing = this._edit;
+            console.log(editing);
+            if(editing)
+            {
+                return;
+            }
+            this._edit = editing = true;
+            //启动文本编辑器
+            txtedit.setTextfiled(this);
+            txtedit.addEventListener("onblur", this.onblurHandler, this);
+            this.visible = false;
+        }
+
+        private onblurHandler(event:EventX):void
+        {
+            this._edit = false;
+            txtedit.removeEventListener("onblur", this.onblurHandler);
+            let val:string = event.data;
+            this.visible = true;
+            this.text = val;
         }
     }
 
@@ -659,8 +856,8 @@ module rf {
                     }
                     html.imageTag = o[3];
                     html.image = image;
-                    html.w = image.w;
-                    html.h = image.h;
+                    html.w = image.width;
+                    html.h = image.height;
                     htmlProParser(o[1], o[2], html, html.image);
                 }
             } else if (o[1] == "a") {
@@ -676,8 +873,8 @@ module rf {
                 html.imageTag = -1;
                 htmlProParser(o[1], o[2], html, text);
                 text.text = o[3];
-                html.w = text.w;
-                html.h = text.h;
+                html.w = text.width;
+                html.h = text.height;
             } else if (o[1] == "b") {
                 last = html = parent.createAndCopyFormat(last, html.newline);
                 var format: TextFormat = parent.format;
@@ -944,7 +1141,7 @@ module rf {
                 let display = char.display;
                 if (display instanceof Sprite) {
                     display.x = char.sx;
-                    display.y = (h - display.h) >> 1
+                    display.y = (h - display.height) >> 1
                     this.addChild(display);
                 } else {
                     g.drawBitmap(char.sx, h - display.h, display, ele.color);
@@ -957,9 +1154,6 @@ module rf {
     export class TextALink extends TextField {
 
     }
-
-
-
 
 
 
