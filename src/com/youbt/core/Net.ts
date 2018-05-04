@@ -1,11 +1,11 @@
 
 module rf {
-    export enum HttpResponseType {
+    export const enum HttpResponseType {
         TEXT,
         ARRAY_BUFFER
     }
 
-    export enum HttpMethod {
+    export const enum HttpMethod {
         GET,
         POST
     }

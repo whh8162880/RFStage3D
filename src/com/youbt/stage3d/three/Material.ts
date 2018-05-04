@@ -1,10 +1,10 @@
 module rf{
     export class Material {
-        cull: string;
-        srcFactor: string;
-        dstFactor: string;
+        cull: number;
+        srcFactor: number;
+        dstFactor: number;
         depthMask: boolean = false;
-        passCompareMode: string;
+        passCompareMode: number;
         alphaTest:number;
 
         program:Program3D;
@@ -19,20 +19,20 @@ module rf{
 
         setData(data:IMaterialData){
             if(!data){
-                this.cull = "BACK";
+                this.cull = WebGLConst.BACK;
                 this.depthMask = true;
-                this.passCompareMode = "LEQUAL";
-                this.srcFactor = "SRC_ALPHA";
-                this.dstFactor = "ONE_MINUS_SRC_ALPHA";
+                this.passCompareMode = WebGLConst.LEQUAL;
+                this.srcFactor = WebGLConst.SRC_ALPHA;
+                this.dstFactor = WebGLConst.ONE_MINUS_SRC_ALPHA;
                 this.alphaTest = -1;
             }else{
                 let{cull,depthMask,passCompareMode,srcFactor,dstFactor,alphaTest,diffTex}=data;
 
-                this.cull = cull ? cull : "BACK";
+                this.cull = (undefined == cull) ? cull : WebGLConst.BACK;
                 this.depthMask = undefined != depthMask ? depthMask : true;
-                this.passCompareMode = passCompareMode ? passCompareMode : "LEQUAL";
-                this.srcFactor = srcFactor ? srcFactor : "SRC_ALPHA";
-                this.dstFactor = dstFactor ? dstFactor : "ONE_MINUS_SRC_ALPHA";
+                this.passCompareMode = passCompareMode ? passCompareMode : WebGLConst.LEQUAL;
+                this.srcFactor = srcFactor ? srcFactor : WebGLConst.SRC_ALPHA;
+                this.dstFactor = dstFactor ? dstFactor : WebGLConst.ONE_MINUS_SRC_ALPHA;
                 this.alphaTest = Number(alphaTest);
                 
                 if(diffTex){

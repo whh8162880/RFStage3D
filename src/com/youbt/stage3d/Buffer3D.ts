@@ -1,7 +1,7 @@
 ///<reference path="../core/Config.ts"/>
 ///<reference path="three/Geometry.ts"/>
 module rf {
-    export enum VA {
+    export const enum VA {
         pos = "pos",
         normal = "normal",
         tangent = "tangent",
@@ -11,11 +11,11 @@ module rf {
         weight = "weight"
     }
 
-    export enum FS {
+    export const enum FS {
         diff = "diff"
     }
 
-    export enum VC {
+    export const enum VC {
         mv = "mv",
         invm = "invm",
         p = "p",

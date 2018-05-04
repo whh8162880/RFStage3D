@@ -12,9 +12,9 @@ module rf{
         key:string;
         url:string;
         mipmap:boolean;
-        mag:string;
-        mix:string;
-        repeat:boolean;
+        mag:number;
+        mix:number;
+        repeat:number;
     }
 
 
@@ -23,10 +23,10 @@ module rf{
      */
     export interface IMaterialData extends IData{
         depthMask:boolean;
-        passCompareMode:string;
-        srcFactor:string;
-        dstFactor:string;
-        cull:string;
+        passCompareMode:number;
+        srcFactor:number;
+        dstFactor:number;
+        cull:number;
         alphaTest:number; //0表示不剔除
         diffTex?:ITextureData;
     }

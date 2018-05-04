@@ -10,14 +10,14 @@ module rf {
     /**
      * 加载优先级枚举
      */
-    export enum LoadPriority {
+    export const enum LoadPriority {
         low,
         middle,
         high,
         max,
     }
 
-    export enum LoadStates {
+    export const enum LoadStates {
         WAIT,
         LOADING,
         COMPLETE,
@@ -224,7 +224,7 @@ module rf {
     /**
      * 资源类型
      */
-    export enum ResType {
+    export const enum ResType {
         /**
          * 二进制
          */
