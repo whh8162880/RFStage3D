@@ -121,12 +121,12 @@ module rf{
             // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
  */
-            particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
-            particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
-            let particle = new Particle();
-            particle.setSca(100,100,100);
-            particle.load("b");
-            scene.addChild(particle);
+            // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
+            // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
+            // let particle = new Particle();
+            // particle.setSca(100,100,100);
+            // particle.load("b");
+            // scene.addChild(particle);
 
 
             // new AMF3Test().load("assets/test.dat");
@@ -165,8 +165,8 @@ module rf{
             
             
 
-            let profile = singleton(GUIProfile);
-            tipContainer.addChild(profile);
+            // let profile = singleton(GUIProfile);
+            // tipContainer.addChild(profile);
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);
@@ -345,7 +345,7 @@ module rf{
 
             // 潘华专用  
             new Pan_Test();
-            new Eva_Text();
+            // new Eva_Text();
         }
 
 
