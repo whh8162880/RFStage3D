@@ -147,12 +147,14 @@ module rf {
             //抛出事件 更新文本
             this.dispatchEvent(new EventX("onblur", self._current.value));
 
-            self._current.style.opacity = "0";
-            self._current.style.top = "-300px";
+            self._inputdiv.style.opacity = "0";
+            self._inputdiv.style.top = "-300px";
+            self._inputdiv.style.width = "0px";
+            self._inputdiv.style.height = "0px";
+
             self._current.style.width = "0px";
             self._current.style.height = "0px";
             self._current.onblur = null;
-            
             self._current.maxlength = 0;
             self._current.value = "";
             self._current.style.top = "-300px";
