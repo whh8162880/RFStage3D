@@ -83,7 +83,7 @@ module rf {
             material.passCompareMode = WebGLConst.ALWAYS;
             material.srcFactor = WebGLConst.SRC_ALPHA;
             material.dstFactor = WebGLConst.ONE_MINUS_SRC_ALPHA;
-            material.cull = WebGLConst.ONE;
+            material.cull = WebGLConst.NONE;
             uiContainer.material = material;
             ROOT.addChild(uiContainer);
             popContainer.mouseEnabled = false;

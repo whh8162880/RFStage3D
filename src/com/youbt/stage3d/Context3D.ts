@@ -121,7 +121,7 @@ namespace rf {
 				g.disable(g.CULL_FACE);
 			}else{
 				g.enable(g.CULL_FACE);
-				g.cullFace(g[triangleFaceToCull]);
+				g.cullFace(triangleFaceToCull);
 			}
 
 			// switch (triangleFaceToCull) {
@@ -171,7 +171,7 @@ namespace rf {
 			let g = gl;
 			g.enable(g.DEPTH_TEST);
 			g.depthMask(depthMask);
-			g.depthFunc(g[passCompareMode]);
+			g.depthFunc(passCompareMode);
 		}
 
 
