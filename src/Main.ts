@@ -76,7 +76,7 @@ module rf{
             let w_e = w * 1.1
             
             let m = new PhongMaterial();
-            m.cull = "BACK";
+            m.cull = WebGLConst.BACK;
             // let geo = new BoxGeometry(variables).create(w,w,w)
 
             let r = 40;
@@ -121,12 +121,23 @@ module rf{
             // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
  */
+<<<<<<< HEAD
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
             // let particle = new Particle();
             // particle.setSca(100,100,100);
             // particle.load("b");
             // scene.addChild(particle);
+=======
+            particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
+            particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
+            // particle_Perfix = "assets/particle/";
+            // particle_Texture_Perfix = "assets/tex/particle/";
+            let particle = new Particle();
+            particle.setSca(100,100,100);
+            particle.load("c");
+            scene.addChild(particle);
+>>>>>>> dafb29eff1b0ff01dbdd3972933301947e09e049
 
 
             // new AMF3Test().load("assets/test.dat");

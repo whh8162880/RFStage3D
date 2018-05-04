@@ -1,7 +1,7 @@
 ///<reference path="../core/Config.ts"/>
 ///<reference path="three/Geometry.ts"/>
 module rf {
-    export enum VA {
+    export const enum VA {
         pos = "pos",
         normal = "normal",
         tangent = "tangent",
@@ -11,11 +11,11 @@ module rf {
         weight = "weight"
     }
 
-    export enum FS {
+    export const enum FS {
         diff = "diff"
     }
 
-    export enum VC {
+    export const enum VC {
         mv = "mv",
         invm = "invm",
         p = "p",
@@ -388,9 +388,9 @@ module rf {
 
             // g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,true);
 
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, g[textureData.mag]);
-            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, g[textureData.mix]);
-            let pepeat = textureData.repeat ? g.REPEAT : g.CLAMP_TO_EDGE;
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MAG_FILTER, textureData.mag);
+            g.texParameteri(g.TEXTURE_2D, g.TEXTURE_MIN_FILTER, textureData.mix);
+            let pepeat = textureData.repeat;
             g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_S, pepeat);   //U方向上设置
             g.texParameteri(g.TEXTURE_2D, g.TEXTURE_WRAP_T, pepeat);
 

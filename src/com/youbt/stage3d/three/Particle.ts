@@ -66,7 +66,7 @@ module rf {
     }
 
 
-    export enum P_PARTICLE {
+    export const enum P_PARTICLE {
         TIME = "p_time", //dataLength=4
         //scale
         SCALE = "p_scale",//dataLength=4
@@ -184,10 +184,9 @@ module rf {
                 varying vec2 vUV;
                 varying vec2 vTime;
 
-                vec4 quaXpos(in vec4 qua,in vec3 pos){
+                void quaXpos(in vec4 qua,inout vec3 pos){
                     vec4 temp = vec4(cross(qua.xyz,pos.xyz) + (qua.w * pos.xyz) , -dot(qua.xyz,pos.xyz));
-                    temp = vec4(cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) + (temp.w * qua.xyz),0.0);
-                    return temp;
+                    pos = cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) - (temp.w * qua.xyz);
                 }
 
                 void main(void) {
@@ -212,7 +211,7 @@ module rf {
 #endif
 
 #ifdef ROTATION
-                    b_pos += quaXpos(${P_PARTICLE.ROTATION},b_pos).xyz;
+                    quaXpos(${P_PARTICLE.ROTATION},b_pos);
 #endif
 
                     vUV = ${VA.uv};

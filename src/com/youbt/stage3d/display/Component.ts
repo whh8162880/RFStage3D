@@ -36,14 +36,14 @@ module rf{
 	}
 
 
-	export enum SymbolConst{
+	export const enum SymbolConst{
 		SYMBOL = 0,
 		BITMAP = 1,
 		TEXT = 2,
 		RECTANGLE = 3
 	}
 
-	export enum ComponentConst{
+	export const enum ComponentConst{
 		Label,
 		Button,
 		CheckBox,

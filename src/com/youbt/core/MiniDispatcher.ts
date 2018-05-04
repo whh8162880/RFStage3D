@@ -9,7 +9,7 @@ module rf {
 	}
 
 
-	export enum EventT {
+	export const enum EventT {
 		ENTER_FRAME=1,
 		RESIZE,
 		FAILED,
@@ -32,7 +32,7 @@ module rf {
 		REMOVE_FROM_STAGE,
 		COMPLETE_LOADED
 	}
-	export enum MouseEventX {
+	export const enum MouseEventX {
 		MouseDown = 50,
 		MouseRightDown,
 		MouseMiddleDown,
