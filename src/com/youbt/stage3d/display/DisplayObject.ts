@@ -14,7 +14,7 @@ module rf {
         render?(camera: Camera, now: number, interval: number,target?:Sprite): void
     }
 
-    export enum DChange {
+    export const enum DChange {
         trasnform = 0b1,
         alpha = trasnform << 1,
         vertex = alpha << 1,

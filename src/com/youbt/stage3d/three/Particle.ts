@@ -66,7 +66,7 @@ module rf {
     }
 
 
-    export enum P_PARTICLE {
+    export const enum P_PARTICLE {
         TIME = "p_time", //dataLength=4
         //scale
         SCALE = "p_scale",//dataLength=4

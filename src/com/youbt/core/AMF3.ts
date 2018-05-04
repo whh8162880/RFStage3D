@@ -100,7 +100,7 @@ module rf{
 
 
 
-    export enum AMF3Define{
+    export const enum AMF3Define{
         UNDEFINED = 0x00,
         NULL = 0x01,
         FALSE = 0x02,
