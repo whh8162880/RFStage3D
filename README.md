@@ -170,6 +170,12 @@ node --inspect-brk APP.js
 
 四元数   --魏玲
 ```typescript
+    四元数(xi,yj,zk,w) 
+        i*i = j*j = k*k = i*j*k = -1 ;
+        i*j=k,j*i=-k ;
+        j*k=i,k*j=-i ;
+        k*i=j,i*k=-j ;
+
     (x,y,z 旋转轴 w旋转角度) => qua( sin(w/2) * x , sin(w/2) * y , sin(w/2) * z , cos(w/2) );
     点(p)和四元数(q)之间的计算
         =q * p * q'
@@ -188,4 +194,42 @@ node --inspect-brk APP.js
             y:(-Qz*qa + qz*Qa - Qw*qy + qw*Qy)
             z:(-Qa*qy + qa*Qy - Qw*qz + qw*Qz)
           )
+    也许会看不懂上面内容 继续求证
+    四元数(x,y,z,w) * 四元数(r,g,b,a) = ?
+
+    = (xi,yj,zk,w) * (ri,gj,bk,a)
+    =(
+        xi*ri + xi*gj + xi*bk + xi*a + 
+        yj*ri + yj*gj + yj*bk + yj*a + 
+        zk*ri + zk*gj + zk*bk + zk*a + 
+        w*ri + w*gj + w*bk + w*a
+     )
+    =(
+        -xr + xg*K - xb*J + xa*i +
+        -yr*K - yg + yb*I + ya*J +
+        zr*J -zg*I - zb + za*K +
+        wr*I + wg*J + wb*K + wa
+     )
+    =(
+        (xa + yb - zg + wr) * I + 
+        (-xb + ya + zr + wg) * J + 
+        (xg - yr + za + wb)* K + 
+        -xr - yg - zb + wa
+     )
+
+    看明白了？
+    假设  w = a = 0 那么我们就能推导出cross的公式
+
+    X = I * (yb - zg)
+    Y = J * (zr - xb)
+    Z = K * (xg - yr)
+    W = -xr-yg-zb;
+
+    那么旋转轴就出来了（X = yb - zg , Y = zr - xb , Z = xg - yr）; 抛弃旋转角度 W
+
+    
+
+
+    
+
 ```

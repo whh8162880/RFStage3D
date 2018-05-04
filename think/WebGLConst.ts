@@ -4,6 +4,7 @@ namespace jy {
      * https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API/Constants  
      * 
      * 使用此常量以便减少字符串，并加快调用
+     * (g|gl)\.([A-Z_])+  替换成 WebGLConst.$2
      */
     export const enum WebGLConst {
         /**
