@@ -28,7 +28,7 @@ module rf{
             }else{
                 let{cull,depthMask,passCompareMode,srcFactor,dstFactor,alphaTest,diffTex}=data;
 
-                this.cull = (undefined == cull) ? cull : WebGLConst.BACK;
+                this.cull = (undefined != cull) ? cull : WebGLConst.BACK;
                 this.depthMask = undefined != depthMask ? depthMask : true;
                 this.passCompareMode = passCompareMode ? passCompareMode : WebGLConst.LEQUAL;
                 this.srcFactor = srcFactor ? srcFactor : WebGLConst.SRC_ALPHA;
