@@ -167,11 +167,16 @@ module rf {
 
     export let emote_images: { [key: string]: Image } = {};
 
-    const enum TextFormatAlign{
+    export const enum TextFormatAlign{
         LEFT = "left",
         RIGHT = "right",
         CENTER = "center"
     };
+
+    export const enum TextFieldType{
+        INPUT = "input",
+        DYNAMIC = "dynamic"
+    }
 
     export class TextFormat {
         family: string = "微软雅黑";
@@ -302,6 +307,7 @@ module rf {
         lineheight:number;
 
         protected _edit:boolean = false;
+        private _type:string = TextFieldType.DYNAMIC;
 
         init(source?: BitmapSource, format?: TextFormat): void {
             if (undefined != source) {
@@ -419,7 +425,6 @@ module rf {
                     display.x = _w - display.width;
                 }
             }
-               
 
 //             if(u){
 // //				-偏移量
@@ -626,14 +631,32 @@ module rf {
             return lines;
         }
 
-        set selectable(val:boolean)
+        updateHitArea():void{
+            super.updateHitArea();
+            //可编辑的需要固定hitarea
+            let {_type} = this;
+            if(_type == TextFieldType.INPUT)
+            {
+                let {_width, _height} = this;
+                let hitarea = this.hitArea;
+                hitarea.updateArea(_width, _height, 0);
+            }
+        }
+
+        set type(val:string)
         {
-           if(val)
-           {
+            this._type = val;
+            if(val == TextFieldType.INPUT)
+            {
                 this.addEventListener(MouseEventX.MouseDown, this.mouseDownHandler, this);
-           }else{
+            }else{
                 this.removeEventListener(MouseEventX.MouseDown, this.mouseDownHandler);
-           }
+            }
+        }
+
+        get type():string
+        {
+            return this._type;
         }
 
         protected mouseDownHandler(event:MouseEventX):void {
