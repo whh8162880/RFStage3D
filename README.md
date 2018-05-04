@@ -159,3 +159,33 @@ http://benvanik.github.io/WebGL-Inspector/
 
 #node调试
 node --inspect-brk APP.js
+
+
+2D地图深度计算推导 --魏玲
+```typescript
+    假设displayObject.rotationX = a; (90 > a > 0);
+    z = y * tan(90-a) + offZ*cos(90-a);
+    y = y - offZ*cosz*tanz
+```
+
+四元数   --魏玲
+```typescript
+    (x,y,z 旋转轴 w旋转角度) => qua( sin(w/2) * x , sin(w/2) * y , sin(w/2) * z , cos(w/2) );
+    点(p)和四元数(q)之间的计算
+        =q * p * q'
+        =(qx,qy,qz,qw) * (px,py,pz,0) * (-qx,-qy,-qz,qw)
+        =( cross([qx,qy,qz],[px,py,pz]) + qw * [px,py,pz] , -dot([qx,qy,yz],[px,py,pz])) * (-qx,-qy,-qz,qw)
+        =Q( 
+            x:(qy*pz - py*qz + qw * px),
+            y:(qz*px - pz*qx + qw * py),
+            z:(qx*py - px*qy + qw * pz),
+            w:(-qx*px- qy*py - qz*pz)  
+          ) * (-qx,-qy,-qz,qw)
+        = (Qx,Qy,Qz,Qw) * (-qx,-qy,-qz,qw)
+        = cross([Qx,Qy,Qz],[-qx,-qy,-qz]) + Qw * [-qx,-qy,-qz] + qw * [Qx,Qy,Qz]
+        =P(
+            x:(-Qy*qz + qy*Qz - Qw*qx + qw*Qx)
+            y:(-Qz*qa + qz*Qa - Qw*qy + qw*Qy)
+            z:(-Qa*qy + qa*Qy - Qw*qz + qw*Qz)
+          )
+```
