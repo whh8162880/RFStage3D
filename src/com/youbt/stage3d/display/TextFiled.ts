@@ -314,10 +314,6 @@ module rf {
         }
 
 
-        //保存外部设置的宽高 用于layout
-        private _ow:number = 0;
-        private _oh:number = 0;
-
         private lines: Recyclable<Line>[] = [];
 
         private textLines: Recyclable<TextLine>[] = [];
@@ -359,6 +355,7 @@ module rf {
                 textLine.y = oy;
                 textLine.source = this.source;
                 textLine.renderText(line);
+                textLine.updateHitArea();//必须更新hitarea w h 会出现不正确现象
                 oy += line.h + 4;
                 this.addChild(textLine);
                 if(lineh == undefined)
@@ -382,7 +379,7 @@ module rf {
         }
 
         layout(): void {
-            const{format,_ow}=this;
+            const{format}=this;
 
             if(format.align == TextFormatAlign.LEFT)
             {
@@ -391,7 +388,7 @@ module rf {
 
             this.updateHitArea();
             
-            const{childrens, w, h}=this;
+            const{childrens}=this;
 
             //根据align属性进行重新布局
             let _w:number = this.width;
@@ -415,6 +412,7 @@ module rf {
             for(let i = 0; i < len; i++)
             {
                 let display = childrens[i];
+                console.log(`width:${_w} dw:${display.width}`);
                 if(align_type == 1)
                 {
                     display.x = _w - display.width >> 1;
@@ -610,8 +608,6 @@ module rf {
                         ox += (vo.w + this.gap);
                         oi++;
                     }
-
-
                 }
                 html = html.next;
             }
