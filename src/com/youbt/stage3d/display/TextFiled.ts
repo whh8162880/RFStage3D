@@ -69,7 +69,11 @@ module rf {
         
         private updateinfo():void
         {
-            let {_inputdiv, _text, _current} = this;
+            let self = this;
+
+            let _text:TextField = self._text;
+            let _inputdiv:any = self._inputdiv;
+            let _current:any = self._current;
 
             let lineheight:number = _text.lineheight;
             let tw:number = _text.width;
@@ -98,6 +102,7 @@ module rf {
             _current.style["text-align"] = format.align;
             _current.style.color = format.getColorStr(_text.color);
             _current.style.font = format.font;
+            _current.style["letter-spacing"] = "1px";
             // _current.style.lineheight = "2em";//lineheight + "px";
             _current.value = _text.$text;
             if(_current.onblur == undefined)
@@ -142,8 +147,10 @@ module rf {
             //抛出事件 更新文本
             this.dispatchEvent(new EventX("onblur", self._current.value));
 
-            self._inputdiv.style.opacity = "0";
-            self._inputdiv.style.top = "-300px";
+            self._current.style.opacity = "0";
+            self._current.style.top = "-300px";
+            self._current.style.width = "0px";
+            self._current.style.height = "0px";
             self._current.onblur = null;
             
             self._current.maxlength = 0;
@@ -634,7 +641,6 @@ module rf {
 
         protected mouseDownHandler(event:MouseEventX):void {
             let editing = this._edit;
-            console.log(editing);
             if(editing)
             {
                 return;
