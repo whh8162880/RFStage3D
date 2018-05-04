@@ -412,7 +412,6 @@ module rf {
             for(let i = 0; i < len; i++)
             {
                 let display = childrens[i];
-                console.log(`width:${_w} dw:${display.width}`);
                 if(align_type == 1)
                 {
                     display.x = _w - display.width >> 1;
