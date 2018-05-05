@@ -153,9 +153,6 @@ module rf {
 
         sceneAlpha: number = 1;
 
-        w: number = 0;
-        h: number = 0;
-
         _visible: boolean = true;
         states: number = 0;
 
@@ -166,6 +163,11 @@ module rf {
         parent: DisplayObjectContainer;
         stage: Stage3D;
         name: string;
+
+        protected w: number = 0;
+        protected h: number = 0;
+        protected _width:number;
+        protected _height:number;
 
         constructor() {
             super();
@@ -486,8 +488,8 @@ module rf {
         removeFromStage(): void { };
 
         setSize(width: number, height: number): void {
-            this.w = width;
-            this.h = height;
+            this._width = width;
+            this._height = height;
             this.invalidate();
         }
 
@@ -646,6 +648,15 @@ module rf {
             this._rotationZ = rot.z;
             
 			this.setChange(DChange.trasnform);
-		}
+        }
+        
+        get width():number
+        {
+            return this._width == undefined ? this.w : this._width;
+        }
+        get height():number
+        {
+            return this._height == undefined ? this.h : this._height;
+        }
     }
 }

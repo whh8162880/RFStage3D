@@ -74,6 +74,8 @@ module rf {
         ROTATION = "p_init_rotation",//dataLength=4
         //旋转速度
         VROTATION = "p_vrotation",//dataLength=4
+
+        ROTATION_HEAD = "p_rotation2head",
         //pos
         POSITION = "p_position",//dataLength=3
         //FOLLOW  0:位置 1:角度
@@ -82,6 +84,9 @@ module rf {
         VELOCITY = "p_velocity",//dataLength=3
         //Accelerition 加速度
         ACCELERITION = "p_accelerition",//dataLength = 3;
+        //按照朝向旋转
+        BILLBOARD = "p_billboard",
+       
         //billboard
         // names[ParticleInfo.e_AnimNodeType_Billboard] = "p_billboard";
         //segemntedColor
@@ -157,6 +162,16 @@ module rf {
                 vertexDefine += "#define ROTATION\n"
             }
 
+            node = nodes[P_PARTICLE.VROTATION];
+            if(node){
+                vertexDefine += "#define VROTATION\n"
+            }
+
+            node = nodes[P_PARTICLE.ROTATION_HEAD];
+            if(node){
+                vertexDefine += "#define ROTATION_HEAD\n"
+            }
+
             let vertexCode = `
                 ${vertexDefine}
 
@@ -167,17 +182,11 @@ module rf {
                 attribute vec3 ${VA.pos};
                 attribute vec2 ${VA.uv};
                 attribute vec4 ${P_PARTICLE.TIME};
-#ifdef VELOCITY
                 attribute vec3 ${P_PARTICLE.VELOCITY};
-#endif
-
-#ifdef ACCELERITION
                 attribute vec3 ${P_PARTICLE.ACCELERITION};
-#endif
-
-#ifdef ROTATION
                 attribute vec4 ${P_PARTICLE.ROTATION};
-#endif
+                attribute vec4 ${P_PARTICLE.VROTATION};
+
                 uniform mat4 ${VC.mvp};
                 uniform float ${P_PARTICLE.NOW};
 
@@ -193,6 +202,7 @@ module rf {
                     vec3 b_pos = ${VA.pos};
                     vec3 p_pos = vec3(0.0);
                     vec3 b_veo = vec3(0.0);
+                    vec4 temp = vec4(0.0);
                     
                     //先处理时间  vec2 timeNode(float now,in vec3 pos,in vec4 time)
                     vec2 time = timeNode(${P_PARTICLE.NOW},b_pos,${P_PARTICLE.TIME});
@@ -212,6 +222,42 @@ module rf {
 
 #ifdef ROTATION
                     quaXpos(${P_PARTICLE.ROTATION},b_pos);
+#endif
+
+#ifdef VROTATION
+                    temp = ${P_PARTICLE.VROTATION};
+                    temp.w *= time.x;
+                    temp.xyz *= sin(temp.w);
+                    temp.w = cos(temp.w);
+                    quaXpos(temp,b_pos);
+#endif
+
+#ifdef ROTATION_HEAD
+    #ifdef BILLBOARD
+    #else
+                    vec3 xAxis = vec3(1.0,0.0,0.0);
+                    vec3 n_veo = b_veo;
+                    // n_veo = vec3(0.0,1.0,1.0);
+                    //if n_veo.xyz is (0,0,0) ,change it to (0,1,0).
+                    //and if n_veo.yz is (0,0) ,change it to (0.00001,0)
+                    n_veo.y += step(dot(n_veo.xyz,n_veo.xyz),0.0) + step(n_veo.y+n_veo.z,0.0) * 0.00001;
+
+                    n_veo = normalize(n_veo);
+
+                    
+                    temp.w = dot(n_veo,xAxis);
+                    temp.xyz = normalize(cross(xAxis,n_veo));
+
+                    //两倍角公式获得 cos sin
+                    //cos2a = cosa^2 - sina^2 = 2cosa^2 - 1 = 1 - 2sina^2;
+                    //cosa = sqt((1 + cos2a)/2);
+                    //sina = sqt((1 - cos2a)/2);
+
+                    temp.xyz *= sqrt( (1.0-temp.w) * 0.5);
+                    temp.w = sqrt((1.0 + temp.w) * 0.5);
+                    quaXpos(temp,b_pos);
+                   
+    #endif
 #endif
 
                     vUV = ${VA.uv};
@@ -237,6 +283,7 @@ module rf {
                     vec2 tUV = vUV;
                     vec4 c = texture2D(${FS.diff}, tUV);
                     // c = vec4(vTime.y);
+                    // c.w = 1.0;
                     gl_FragColor = c;
                     // gl_FragColor = vec4(1.0);
                 }

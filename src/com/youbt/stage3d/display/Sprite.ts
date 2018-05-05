@@ -157,12 +157,15 @@ module rf {
                     if(this.hitArea.allWays){
                         return this;
                     }
-                    let g = this.$graphics;
-                    if(undefined != g){
-                        if( g.hitArea.checkIn(dx,dy,scale) == true ){
-                            return this;
-                        }
+                    if( this.hitArea.checkIn(dx,dy,scale) == true ){
+                        return this;
                     }
+                    // let g = this.$graphics;
+                    // if(undefined != g){
+                    //     if( g.hitArea.checkIn(dx,dy,scale) == true ){
+                    //         return this;
+                    //     }
+                    // }
                 }
             }
 
