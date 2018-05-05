@@ -172,6 +172,12 @@ module rf {
                 vertexDefine += "#define ROTATION_HEAD\n"
             }
 
+            node = nodes[P_PARTICLE.SCALE];
+            if(node){
+                vertexFunctions +=  this.scaleNode(node as IParticleScaleNodeInfo);
+                vertexDefine += "#define SCALE\n"
+            }
+
             let vertexCode = `
                 ${vertexDefine}
 
@@ -186,6 +192,7 @@ module rf {
                 attribute vec3 ${P_PARTICLE.ACCELERITION};
                 attribute vec4 ${P_PARTICLE.ROTATION};
                 attribute vec4 ${P_PARTICLE.VROTATION};
+                attribute vec4 ${P_PARTICLE.SCALE};
 
                 uniform mat4 ${VC.mvp};
                 uniform float ${P_PARTICLE.NOW};
@@ -214,17 +221,20 @@ module rf {
 #endif
                     
                    
-#ifdef ACCELERITION
-                    temp = ${P_PARTICLE.ACCELERITION} * time.x;        //at;
-                    b_veo += temp;              //vt = v0+a*t;
+#ifdef ACCELERITION 
+                    //加速度
+                    temp = ${P_PARTICLE.ACCELERITION} * time.x; //at;
+                    b_veo += temp;                              //vt = v0+a*t;
                     p_pos += temp * time.x * 0.5;               //s = v0*t + a*t*t*0.5;
 #endif
 
-#ifdef ROTATION
+#ifdef ROTATION     
+                    //初始化旋转角度
                     quaXpos(${P_PARTICLE.ROTATION},b_pos);
 #endif
 
-#ifdef VROTATION
+#ifdef VROTATION    
+                        //旋转动画
                     temp = ${P_PARTICLE.VROTATION};
                     temp.w *= time.x;
                     temp.xyz *= sin(temp.w);
@@ -232,17 +242,17 @@ module rf {
                     quaXpos(temp,b_pos);
 #endif
 
-#ifdef ROTATION_HEAD
+#ifdef ROTATION_HEAD    
+                    //按朝向旋转(面向(0,0,1))
     #ifdef BILLBOARD
     #else
                     vec3 xAxis = vec3(1.0,0.0,0.0);
                     vec3 n_veo = b_veo;
                     // n_veo = vec3(0.0,1.0,1.0);
-                    //and if n_veo.yz is (0,0) ,change it to (0.00001,0)
+                    //if n_veo.yz is (0,0) ,change it to (0.00001,0)
                     n_veo.y += step(n_veo.y+n_veo.z,0.0) * 0.00001;
 
                     n_veo = normalize(n_veo);
-
                     
                     temp.w = dot(n_veo,xAxis);
                     temp.xyz = normalize(cross(xAxis,n_veo));
@@ -259,6 +269,10 @@ module rf {
     #endif
 #endif
 
+#ifdef SCALE
+                    //缩放
+                    scaleNode(${P_PARTICLE.SCALE},time,b_pos);
+#endif
                     vUV = ${VA.uv};
                     vTime = time;
                     gl_Position = ${VC.mvp} * vec4(b_pos + p_pos,1.0);
@@ -303,9 +317,6 @@ module rf {
 
 
         //==========================TimeNode====================================
-        timeSetting(mesh: Particle, info: IParticleTimeNodeInfo, now: number) {
-
-        }
         timeNode(info: IParticleTimeNodeInfo) {
 
             info.key = `time_${info.usesDuration}_${info.usesLooping}_${info.usesDelay}_`;
@@ -356,7 +367,54 @@ module rf {
 
 
         //==========================VELOCITY_Node====================================
-        
+        scaleNode(info:IParticleScaleNodeInfo){
+
+
+            let vcode = `
+                void scaleNode(in vec4 scale,in vec2 time,inout vec3 pos){
+                    float temp = 0.0;`
+            if(info.usesCycle){
+                if(info.usesPhase){
+                    vcode += `
+                    temp += sin(scale.z * time.y + scale.w);`   
+                }else{
+                    vcode += `
+                    temp = sin(scale.z * time.y);`
+                }
+            }else{
+                vcode += `
+                    temp = time.y;`
+            }
+
+            vcode += `
+                    temp = (temp * scale.y) + scale.x;
+            `
+
+            switch (info.scaleType) {
+                case 0:
+                vcode += `
+                    pos.xyz *= temp;` 
+                    break;
+                case 1:
+                vcode += `
+                    pos.x *= temp;` 
+                    break;
+                case 2:
+                vcode += `
+                    pos.y *= temp;` 
+                    break;
+                case 3:
+                vcode += `
+                    pos.z *= temp;` 
+                    break;
+            }
+
+            vcode += `
+                }
+            `   
+
+            return vcode;
+        }
 
     }
 }
