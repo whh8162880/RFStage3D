@@ -134,6 +134,13 @@ module rf{
         usesDelay:boolean;
     }
 
+
+    export interface IParticleScaleNodeInfo extends IParticleNodeInfo{
+        scaleType:number;
+        usesCycle:boolean;
+        usesPhase:boolean;
+    }
+
     export interface IParticleData{
         material:IMaterialData;
         mesh:IMeshData;
