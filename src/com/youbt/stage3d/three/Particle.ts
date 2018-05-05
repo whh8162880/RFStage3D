@@ -238,9 +238,8 @@ module rf {
                     vec3 xAxis = vec3(1.0,0.0,0.0);
                     vec3 n_veo = b_veo;
                     // n_veo = vec3(0.0,1.0,1.0);
-                    //if n_veo.xyz is (0,0,0) ,change it to (0,1,0).
                     //and if n_veo.yz is (0,0) ,change it to (0.00001,0)
-                    n_veo.y += step(dot(n_veo.xyz,n_veo.xyz),0.0) + step(n_veo.y+n_veo.z,0.0) * 0.00001;
+                    n_veo.y += step(n_veo.y+n_veo.z,0.0) * 0.00001;
 
                     n_veo = normalize(n_veo);
 
