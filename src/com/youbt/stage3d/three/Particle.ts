@@ -111,15 +111,12 @@ module rf {
         ACCELERITION = "p_accelerition",//dataLength = 3;
         //按照朝向旋转
         BILLBOARD = "p_billboard",
-       
-        //billboard
-        // names[ParticleInfo.e_AnimNodeType_Billboard] = "p_billboard";
-        //segemntedColor
-        // names[ParticleInfo.e_AnimNodeType_SegmentColor] = "p_segment_color";
+         //segemntedColor
+        SegmentColor = "p_segment_color",
         //uv动画
         // names[ParticleInfo.e_AnimNodeType_SpriteSheetAnim] = "p_sprite_sheet_anim";
-
-        NOW = "now"
+        NOW = "now",
+        
     }
 
     export class ParticleMaterial extends Material {
@@ -182,30 +179,40 @@ module rf {
                 vertexDefine += "#define ACCELERITION\n"
             }
 
+            //初始化旋转
             node = nodes[P_PARTICLE.ROTATION];
             if(node){
                 vertexDefine += "#define ROTATION\n"
             }
 
+            //旋转速度
             node = nodes[P_PARTICLE.VROTATION];
             if(node){
                 vertexDefine += "#define VROTATION\n"
             }
 
+            //旋转到方向
             node = nodes[P_PARTICLE.ROTATION_HEAD];
             if(node){
                 vertexDefine += "#define ROTATION_HEAD\n"
             }
 
+            //缩放
             node = nodes[P_PARTICLE.SCALE];
             if(node){
                 vertexFunctions +=  this.scaleNode(node as IParticleScaleNodeInfo);
                 vertexDefine += "#define SCALE\n"
             }
 
+            //公告板(始终面朝摄像机)
             node = nodes[P_PARTICLE.BILLBOARD];
             if(node){
                 vertexDefine += "#define BILLBOARD\n"
+            }
+
+            node = nodes[P_PARTICLE.POSITION];
+            if(node){
+                vertexDefine += "#define POSITION\n"
             }
 
             let vertexCode = `
@@ -228,6 +235,7 @@ module rf {
                 attribute vec4 ${P_PARTICLE.ROTATION};
                 attribute vec4 ${P_PARTICLE.VROTATION};
                 attribute vec4 ${P_PARTICLE.SCALE};
+                attribute vec3 ${P_PARTICLE.POSITION};
 
                 uniform mat4 ${VC.mvp};
                 uniform mat4 ${VC.invm};
@@ -312,6 +320,10 @@ module rf {
 
 #ifdef BILLBOARD
                      b_pos = (vec4(b_pos,0.0) * ${VC.invm}).xyz;
+#endif
+
+#ifdef POSITION
+                     b_pos += ${P_PARTICLE.POSITION};
 #endif
 
                     vUV = ${VA.uv};
