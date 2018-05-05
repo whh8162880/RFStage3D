@@ -327,8 +327,7 @@ module rf {
             this.vertex.uploadContext(program);
             let{sceneTransform,invSceneTransform}=mesh;
             let worldTranform = TEMP_MATRIX;
-            worldTranform.set(sceneTransform);
-            worldTranform.m3_append(camera.worldTranform);
+            worldTranform.m3_append(camera.worldTranform,false,sceneTransform);
             c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
             c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
         }

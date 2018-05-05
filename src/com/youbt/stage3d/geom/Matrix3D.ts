@@ -678,6 +678,12 @@ interface Float32Array extends IMatrix3D, IMatrix, IVector3D {
 
 module rf {
 
+    export const enum Orientation3D {
+        EULER_ANGLES,// = "eulerAngles",
+        AXIS_ANGLE,// = "axisAngle",
+        QUATERNION,// = "quaternion",
+    }
+
     const DEG_2_RAD = Math.PI / 180;
 
     export function newMatrix3D(v?: ArrayLike<number> | ArrayBuffer) {

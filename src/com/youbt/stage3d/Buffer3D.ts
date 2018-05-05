@@ -16,6 +16,7 @@ module rf {
     }
 
     export const enum VC {
+        m = "m",
         mv = "mv",
         invm = "invm",
         p = "p",

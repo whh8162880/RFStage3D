@@ -54,12 +54,37 @@ module rf {
         }
 
         uploadContext(camera: Camera, mesh: Particle, program: Program3D, now: number, interval: number) {
-            super.uploadContext(camera, mesh, program, now, interval);
-            const { vertexBuffer } = this.runtimeData;
-            const { setting } = mesh.data
-            vertexBuffer.uploadContext(program);
-
+            // super.uploadContext(camera, mesh, program, now, interval);
             let c = context3D;
+            let{sceneTransform}=mesh;
+            const { vertexBuffer } = this.runtimeData;
+            const { setting,nodes} = mesh.data;
+
+            //设置模型顶点数据 (pos uv)
+            this.vertex.uploadContext(program);
+            //设置模型particle点数据(pos rot sca time velocity accelerition billboard ...)
+            vertexBuffer.uploadContext(program);
+            
+            let worldTranform = TEMP_MATRIX;
+            let rot = TEMP_VECTOR3D;
+            //设置矩阵信息
+            worldTranform.m3_append(camera.worldTranform,false,sceneTransform);
+            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+            
+            //BILLBOARD
+            if(nodes[P_PARTICLE.BILLBOARD]){
+                worldTranform.m3_append(camera.sceneTransform,false,sceneTransform);
+                if(nodes[P_PARTICLE.ROTATION_HEAD]){
+                    c.setProgramConstantsFromMatrix(VC.mv,worldTranform);
+                }
+                worldTranform.m3_decompose(undefined,rot,undefined,Orientation3D.AXIS_ANGLE);
+                worldTranform.m3_rotation(-rot.w,rot,false,rf_m3_identity);
+                c.setProgramConstantsFromMatrix(VC.invm,worldTranform);
+            }
+           
+
+            
+            //TIME
             c.setProgramConstantsFromVector(P_PARTICLE.NOW, engineNow / 1000 * setting.speed, 1, false);
 
         }
@@ -178,12 +203,22 @@ module rf {
                 vertexDefine += "#define SCALE\n"
             }
 
+            node = nodes[P_PARTICLE.BILLBOARD];
+            if(node){
+                vertexDefine += "#define BILLBOARD\n"
+            }
+
             let vertexCode = `
                 ${vertexDefine}
 
                 precision mediump float;
 
                 ${vertexFunctions}
+
+                void quaXpos(in vec4 qua,inout vec3 pos){
+                    vec4 temp = vec4(cross(qua.xyz,pos.xyz) + (qua.w * pos.xyz) , -dot(qua.xyz,pos.xyz));
+                    pos = cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) - (temp.w * qua.xyz);
+                }
 
                 attribute vec3 ${VA.pos};
                 attribute vec2 ${VA.uv};
@@ -195,15 +230,14 @@ module rf {
                 attribute vec4 ${P_PARTICLE.SCALE};
 
                 uniform mat4 ${VC.mvp};
+                uniform mat4 ${VC.invm};
+                uniform mat4 ${VC.mv};
+
                 uniform float ${P_PARTICLE.NOW};
+                
 
                 varying vec2 vUV;
                 varying vec2 vTime;
-
-                void quaXpos(in vec4 qua,inout vec3 pos){
-                    vec4 temp = vec4(cross(qua.xyz,pos.xyz) + (qua.w * pos.xyz) , -dot(qua.xyz,pos.xyz));
-                    pos = cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) - (temp.w * qua.xyz);
-                }
 
                 void main(void) {
                     vec3 b_pos = ${VA.pos};
@@ -243,19 +277,21 @@ module rf {
 #endif
 
 #ifdef ROTATION_HEAD    
-                    //按朝向旋转(面向(0,0,1))
+                    // b_veo = vec3(-1.0,0.0,0.0);
+                    //if b_veo.yz is (0,0) ,change it to (0.00001,0);
+                    b_veo.y += step(b_veo.y+b_veo.z,0.0) * 0.00001;
     #ifdef BILLBOARD
+                    temp = ${VC.mv} * vec4(b_veo,0.0);
+                    temp.xyz = normalize(vec3(temp.xy,0.0));
+                    b_pos =  b_pos * mat3(
+                        temp.x,-temp.y,0.0,
+                        temp.y,temp.x,0.0,
+                        0.0,0.0,1.0);
     #else
+                    b_veo = normalize(b_veo);
                     vec3 xAxis = vec3(1.0,0.0,0.0);
-                    vec3 n_veo = b_veo;
-                    // n_veo = vec3(0.0,1.0,1.0);
-                    //if n_veo.yz is (0,0) ,change it to (0.00001,0)
-                    n_veo.y += step(n_veo.y+n_veo.z,0.0) * 0.00001;
-
-                    n_veo = normalize(n_veo);
-                    
-                    temp.w = dot(n_veo,xAxis);
-                    temp.xyz = normalize(cross(xAxis,n_veo));
+                    temp.w = dot(b_veo,xAxis);
+                    temp.xyz = normalize(cross(xAxis,b_veo));
 
                     //两倍角公式获得 cos sin
                     //cos2a = cosa^2 - sina^2 = 2cosa^2 - 1 = 1 - 2sina^2;
@@ -273,6 +309,11 @@ module rf {
                     //缩放
                     scaleNode(${P_PARTICLE.SCALE},time,b_pos);
 #endif
+
+#ifdef BILLBOARD
+                     b_pos = (vec4(b_pos,0.0) * ${VC.invm}).xyz;
+#endif
+
                     vUV = ${VA.uv};
                     vTime = time;
                     gl_Position = ${VC.mvp} * vec4(b_pos + p_pos,1.0);
@@ -318,9 +359,6 @@ module rf {
 
         //==========================TimeNode====================================
         timeNode(info: IParticleTimeNodeInfo) {
-
-            info.key = `time_${info.usesDuration}_${info.usesLooping}_${info.usesDelay}_`;
-
             let vcode = `
                 vec2 timeNode(float now,in vec3 pos,in vec4 time){
                     //time: x:startTime, y:durtion,z:delay+durtion,w:1/durtion;
