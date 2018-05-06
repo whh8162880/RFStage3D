@@ -177,7 +177,7 @@ module rf {
         public clean(): void {
             let vo = this.first;
             var next;
-            length = 0;
+            this.length = 0;
             while (vo) {
                 next = vo.next;
                 if (true == vo.close) {
@@ -200,7 +200,7 @@ module rf {
                     }
                     vo.recycle();
                 } else {
-                    length++;
+                    this.length++;
                 }
                 vo = next;
             }
@@ -243,7 +243,6 @@ module rf {
         public onRecycle(): void {
             let vo = this.first;
             var next;
-            length = 0;
             while (vo) {
                 next = vo.next;
                 vo.recycle();

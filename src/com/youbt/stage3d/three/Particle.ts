@@ -81,8 +81,24 @@ module rf {
                 worldTranform.m3_rotation(-rot.w,rot,false,rf_m3_identity);
                 c.setProgramConstantsFromMatrix(VC.invm,worldTranform);
             }
-           
 
+            let node = nodes[P_PARTICLE.SEGMENT_COLOR];
+            if(node){
+                let{data:segmentData}=node as IParticleSegmentColorNodeInfo;
+                if(segmentData instanceof ArrayBuffer){
+                    (node as IParticleSegmentColorNodeInfo).data = segmentData = new Float32Array(segmentData);
+                }
+                c.setProgramConstantsFromVector(P_PARTICLE.SEGMENT_COLOR,segmentData,4);
+            }
+
+            node = nodes[P_PARTICLE.SPRITE_SHEET] as IParticleSpriteSheetAnimNodeInfo;
+            if(node){
+                let{data}=node as IParticleSpriteSheetAnimNodeInfo;
+                if(data instanceof ArrayBuffer){
+                    (node as IParticleSpriteSheetAnimNodeInfo).data = data = new Float32Array(data); 
+                }
+                c.setProgramConstantsFromVector(P_PARTICLE.SPRITE_SHEET,data,4);
+            }
             
             //TIME
             c.setProgramConstantsFromVector(P_PARTICLE.NOW, engineNow / 1000 * setting.speed, 1, false);
@@ -112,9 +128,10 @@ module rf {
         //按照朝向旋转
         BILLBOARD = "p_billboard",
          //segemntedColor
-        SegmentColor = "p_segment_color",
+        SEGMENT_COLOR = "p_segment_color",
         //uv动画
-        // names[ParticleInfo.e_AnimNodeType_SpriteSheetAnim] = "p_sprite_sheet_anim";
+        SPRITE_SHEET = "p_sprite_sheet_anim",
+        //时间
         NOW = "now",
         
     }
@@ -142,8 +159,11 @@ module rf {
                 this.program = program = this.createProgram(mesh);
             }
 
+            let{cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
+
             c.setProgram(program);
-            c.setCulling(this.cull);
+            c.setCulling(cull);
+            c.setBlendFactors(srcFactor,dstFactor);
 
             let t: Texture
 
@@ -215,17 +235,23 @@ module rf {
                 vertexDefine += "#define POSITION\n"
             }
 
+            node = nodes[P_PARTICLE.SEGMENT_COLOR];
+            if(node){
+                vertexFunctions += this.segmentColorNode(node as IParticleSegmentColorNodeInfo);
+                vertexDefine += "#define SegmentColor\n";
+                fragmentDefine += "#define SegmentColor\n";
+            }
+
+            node = nodes[P_PARTICLE.SPRITE_SHEET];
+            if(node){
+                fragmentFunctions += this.spriteSheetNode(node as IParticleSpriteSheetAnimNodeInfo);
+                fragmentDefine += "#define SPRITE_SHEET\n";
+            }
+
             let vertexCode = `
                 ${vertexDefine}
 
                 precision mediump float;
-
-                ${vertexFunctions}
-
-                void quaXpos(in vec4 qua,inout vec3 pos){
-                    vec4 temp = vec4(cross(qua.xyz,pos.xyz) + (qua.w * pos.xyz) , -dot(qua.xyz,pos.xyz));
-                    pos = cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) - (temp.w * qua.xyz);
-                }
 
                 attribute vec3 ${VA.pos};
                 attribute vec2 ${VA.uv};
@@ -246,6 +272,15 @@ module rf {
 
                 varying vec2 vUV;
                 varying vec2 vTime;
+                varying vec4 vSegMul;
+                varying vec4 vSegAdd;
+
+                ${vertexFunctions}
+
+                void quaXpos(in vec4 qua,inout vec3 pos){
+                    vec4 temp = vec4(cross(qua.xyz,pos.xyz) + (qua.w * pos.xyz) , -dot(qua.xyz,pos.xyz));
+                    pos = cross(temp.xyz,-qua.xyz) + (qua.w * temp.xyz) - (temp.w * qua.xyz);
+                }
 
                 void main(void) {
                     vec3 b_pos = ${VA.pos};
@@ -326,6 +361,11 @@ module rf {
                      b_pos += ${P_PARTICLE.POSITION};
 #endif
 
+
+#ifdef SegmentColor
+                    segmentColorNode(time);
+#endif
+
                     vUV = ${VA.uv};
                     vTime = time;
                     gl_Position = ${VC.mvp} * vec4(b_pos + p_pos,1.0);
@@ -344,12 +384,21 @@ module rf {
 
                 varying vec2 vUV;
                 varying vec2 vTime;
+                varying vec4 vSegMul;
+                varying vec4 vSegAdd;
 
                 void main(void){
                     vec2 tUV = vUV;
+#ifdef SPRITE_SHEET
+                    segmentColorNode(vTime,tUV);
+#endif
                     vec4 c = texture2D(${FS.diff}, tUV);
                     // c = vec4(vTime.y);
                     // c.w = 1.0;
+#ifdef SegmentColor
+                    c *= vSegMul;
+                    c += vSegAdd;
+#endif
                     gl_FragColor = c;
                     // gl_FragColor = vec4(1.0);
                 }
@@ -466,5 +515,190 @@ module rf {
             return vcode;
         }
 
+
+        segmentColorNode(info:IParticleSegmentColorNodeInfo){
+            let{data,usesMul,usesAdd,add,mul,len} = info;
+            if(data instanceof ArrayBuffer){
+                info.data = data = new Float32Array(info.data);
+            }
+
+            
+            let vcode = `
+                uniform vec4 ${P_PARTICLE.SEGMENT_COLOR}[${data.length / 4}];
+                void segmentColorNode(in vec2 time){
+                    vec4 life = ${P_PARTICLE.SEGMENT_COLOR}[0];
+                    vec4 temp = vec4(0.0);`;
+
+            if(usesMul){
+                vcode +=`
+                    vec4 mul = ${P_PARTICLE.SEGMENT_COLOR}[${mul}];`
+            }else{
+                vcode +=`
+                    vec4 mul = vec4(1.0);`
+            }
+
+            if(usesAdd){
+                vcode +=`
+                    vec4 add = ${P_PARTICLE.SEGMENT_COLOR}[${add}];`
+            }else{
+                vcode +=`
+                    vec4 add = vec4(0.0);`
+            }
+
+
+            if(len>0){
+                vcode +=`
+                    temp.x = min(life.x , time.y);`
+                if(usesMul){
+                    vcode +=`
+                    mul += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${mul + 2}];`
+                }
+                if(usesAdd){
+                    vcode +=`
+                    add += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${add + 2}];`
+                }
+            }
+
+            if(len>1){
+                vcode +=`
+                    temp.x = min(life.y , max(0.0 , time.y - life.x));`
+                if(usesMul){
+                    vcode +=`
+                    mul += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${mul + 3}];`
+                }
+                if(usesAdd){
+                    vcode +=`
+                    add += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${add + 3}];`
+                }
+            }
+
+
+            if(len>2){
+                vcode +=`
+                    temp.x = min(life.z , max(0.0 , temp.x - life.y));`
+                if(usesMul){
+                    vcode +=`
+                    mul += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${mul + 4}];`
+                }
+                if(usesAdd){
+                    vcode +=`
+                    add += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${add + 4}];`
+                }
+            }
+
+
+            if(len>3){
+                vcode +=`
+                    temp.x = min(life.w , max(0.0 , temp.x - life.z));`
+                if(usesMul){
+                    vcode +=`
+                    mul += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${mul + 5}];`
+                }
+                if(usesAdd){
+                    vcode +=`
+                    add += temp.x * ${P_PARTICLE.SEGMENT_COLOR}[${add + 5}];`
+                }
+            }
+
+            if(len == 0){
+                vcode +=`
+                    temp.y = time.y;`
+            }else{
+                switch (len) {
+                    case 1:
+                    vcode +=`
+                    temp.y = max(0.0,time.y - life.x);`
+                        break;
+                    case 2:
+                    vcode +=`
+                    temp.y = max(0.0,time.y - life.y);`
+                        break;
+                    case 3:
+                    vcode +=`
+                    temp.y = max(0.0,time.y - life.z);`
+                        break;
+                    case 4:
+                    vcode +=`
+                    temp.y = max(0.0,time.y - life.w);`
+                        break;
+                }
+            }
+
+            if(usesMul){
+                vcode +=`
+                    mul += temp.y * ${P_PARTICLE.SEGMENT_COLOR}[${mul + 1}];`
+            }
+
+            if(usesAdd){
+                vcode +=`
+                    add += temp.y * ${P_PARTICLE.SEGMENT_COLOR}[${add + 1}];`
+            }
+            vcode +=`
+                    vSegMul = mul;
+                    vSegAdd = add;`
+
+            vcode +=`
+                }`
+
+            return vcode;
+        }
+
+
+        spriteSheetNode(info:IParticleSpriteSheetAnimNodeInfo){
+            let{rows,usesCycle,usesPhase}=info;
+            let code = `
+                uniform vec4 ${P_PARTICLE.SPRITE_SHEET}[2];
+                void segmentColorNode(in vec2 time,inout vec2 uv){
+                    vec4 data = ${P_PARTICLE.SPRITE_SHEET}[0];
+                    vec4 info = ${P_PARTICLE.SPRITE_SHEET}[1];
+                    vec2 temp = vec2(0.0);
+                    uv.x *= data.y;`;
+
+            if(rows > 1){
+                code += `
+                    uv.y *= data.z;`
+            }
+
+            if(usesCycle){
+                if(usesPhase){
+                    code += `
+                    temp.x = time.x + info.z;
+                    `
+                }else{
+                    code += `
+                    temp.x = time.x;
+                    `
+                }
+
+                code +=`
+                    temp.y = fract(temp.x / info.y) * info.y * info.x;`
+            }else{
+                code +=`
+                    temp.y = time.y * data.x;`
+            }
+
+
+            if(rows > 1){
+                code +=`
+                    uv.y += (temp.y - fract(temp.y)) * data.z;`
+            }
+
+            code += `
+                    temp.x = temp.y / data.y;
+                    temp.x = (temp.x - fract(temp.x)) * data.y;`;
+
+            if(rows > 1){
+                code += `
+                    uv.x += fract(temp.x);`
+            }else{
+                code += `
+                    uv.x += temp.x;`
+            }
+
+            code +=`
+                }`
+
+            return code;
+        }
     }
 }
