@@ -141,6 +141,24 @@ module rf{
         usesPhase:boolean;
     }
 
+    export interface IParticleSegmentColorNodeInfo extends IParticleNodeInfo{
+        usesMul:boolean;
+        usesAdd:boolean;
+        len:number;
+        mul:number;
+        add:number;
+        data:Float32Array;
+    }
+
+    export interface IParticleSpriteSheetAnimNodeInfo extends IParticleNodeInfo{
+        usesCycle:boolean;
+        usesPhase:boolean;
+        totalFrames:number;
+        colum:number;
+        rows:number;
+        data:Float32Array;
+    }
+
     export interface IParticleData{
         material:IMaterialData;
         mesh:IMeshData;

@@ -127,7 +127,7 @@ module rf{
             particle_Texture_Perfix = "assets/tex/particle/";
             let particle = new Particle();
             particle.setSca(100,100,100);
-            particle.load("c");
+            particle.load("a");
             scene.addChild(particle);
 
 
