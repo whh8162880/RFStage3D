@@ -2,7 +2,7 @@
 namespace rf {
 	export let context3D: Context3D;
 
-	// export enum Context3DCompareMode {
+	// export const enum Context3DCompareMode {
 	// 	ALWAYS = 'always',
 	// 	EQUAL = 'equal',
 	// 	GREATER = 'greater',
@@ -13,7 +13,7 @@ namespace rf {
 	// 	NOT_EQUAL = 'notEqual'
 	// }
 
-	export enum Context3DTextureFormat {
+	export const enum Context3DTextureFormat {
 		BGRA = 'bgra'
 	}
 
@@ -50,7 +50,7 @@ namespace rf {
 	// 	}
 	// }
 
-	export enum Context3DVertexBufferFormat {
+	export const enum Context3DVertexBufferFormat {
 		BYTES_4 = 4,
 		FLOAT_1 = 1,
 		FLOAT_2 = 2,
@@ -58,7 +58,7 @@ namespace rf {
 		FLOAT_4 = 4
 	}
 
-	// export enum Context3DTriangleFace {
+	// export const enum Context3DTriangleFace {
 	// 	BACK = 'back', //CCW
 	// 	FRONT = 'front', //CW
 	// 	FRONT_AND_BACK = 'frontAndBack',
@@ -107,9 +107,9 @@ namespace rf {
 			this.dc = 0;
 		}
 
-		triangleFaceToCull:string;
+		triangleFaceToCull:number;
 
-		public setCulling(triangleFaceToCull: string): void {
+		public setCulling(triangleFaceToCull: number): void {
 			if(this.triangleFaceToCull == triangleFaceToCull){
 				return;
 			}
@@ -117,11 +117,11 @@ namespace rf {
 			let g = gl
 			g.frontFace(g.CW);
 
-			if(triangleFaceToCull == "NONE"){
+			if(triangleFaceToCull == 0){
 				g.disable(g.CULL_FACE);
 			}else{
 				g.enable(g.CULL_FACE);
-				g.cullFace(g[triangleFaceToCull]);
+				g.cullFace(triangleFaceToCull);
 			}
 
 			// switch (triangleFaceToCull) {
@@ -159,8 +159,8 @@ namespace rf {
 		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
 		 */
 		depthMask:boolean;
-		passCompareMode:string;
-		public setDepthTest(depthMask: boolean, passCompareMode: string): void {
+		passCompareMode:number;
+		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
 
 			if(this.depthMask == depthMask && this.passCompareMode == passCompareMode){
 				return;
@@ -171,7 +171,7 @@ namespace rf {
 			let g = gl;
 			g.enable(g.DEPTH_TEST);
 			g.depthMask(depthMask);
-			g.depthFunc(g[passCompareMode]);
+			g.depthFunc(passCompareMode);
 		}
 
 
@@ -187,9 +187,9 @@ namespace rf {
 			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
 			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
 		 */
-		sourceFactor:string;
-		destinationFactor:string;
-		public setBlendFactors(sourceFactor: string, destinationFactor: string): void {
+		sourceFactor:number;
+		destinationFactor:number;
+		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
 			if(this.sourceFactor == sourceFactor && this.destinationFactor == destinationFactor){
 				return;
 			}
@@ -197,7 +197,7 @@ namespace rf {
 			this.destinationFactor = destinationFactor;
 			let g = gl;
 			g.enable(g.BLEND); //stage3d cant disable blend?
-			g.blendFunc(g[sourceFactor], g[destinationFactor]);
+			g.blendFunc(sourceFactor, destinationFactor);
 		}
 
 		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number = -1, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
@@ -266,13 +266,13 @@ namespace rf {
 			return buffer
 		}
 
-		public getTextureData(url:string,mipmap?:boolean,mag?:string,mix?:string,repeat?:boolean){
+		public getTextureData(url:string,mipmap?:boolean,mag?:number,mix?:number,repeat?:number){
 			let data = {} as ITextureData;
 			data.url = url;
 			data.mipmap = undefined != mipmap ? mipmap : false;
-			data.mag = undefined != mag ? mag : "NEAREST";
-			data.mix = undefined != mix ? mix : "NEAREST";
-			data.repeat = undefined != repeat ? repeat : false;
+			data.mag = undefined != mag ? mag : WebGLConst.NEAREST;
+			data.mix = undefined != mix ? mix : WebGLConst.NEAREST;
+			data.repeat = undefined != repeat ? repeat : WebGLConst.CLAMP_TO_EDGE;
 			return data;
 		}
 

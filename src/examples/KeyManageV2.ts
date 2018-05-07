@@ -1,6 +1,6 @@
 module rf{
 
-    export enum Keybord{
+    export const enum Keybord{
         A = 65,
         // [静态] 与 A 键的键控代码值 (65) 关联的常数。 Keyboard 
         ALTERNATE  = 18,

@@ -107,7 +107,11 @@ module rf{
                 child.parent = undefined;
 				child.removeFromStage();
             }
-            this.setChange(DChange.batch);
+
+            if(len > 0){
+                this.setChange(DChange.batch);
+            }
+            
 			this.childrens.length = 0;
         }
         

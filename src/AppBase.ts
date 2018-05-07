@@ -67,10 +67,10 @@ module rf {
             let container = new Scene(vertex_mesh_variable);
             let material = new Material();
             material.depthMask = true;
-            material.passCompareMode = "LEQUAL";
-            material.srcFactor = "SRC_ALPHA"
-            material.dstFactor = "ONE_MINUS_SRC_ALPHA";
-            material.cull = "NONE";
+            material.passCompareMode = WebGLConst.LEQUAL;
+            material.srcFactor = WebGLConst.SRC_ALPHA;
+            material.dstFactor = WebGLConst.ONE_MINUS_SRC_ALPHA;;
+            material.cull = WebGLConst.NONE;;
             container.material = material;
             container.camera = ROOT.camera3D;
             ROOT.addChild(container);
@@ -80,10 +80,10 @@ module rf {
             uiContainer.renderer = new BatchRenderer(uiContainer);
             material = new Material();
             material.depthMask = false;
-            material.passCompareMode = "ALWAYS";
-            material.srcFactor = "SRC_ALPHA";
-            material.dstFactor = "ONE_MINUS_SRC_ALPHA";
-            material.cull = "NONE";
+            material.passCompareMode = WebGLConst.ALWAYS;
+            material.srcFactor = WebGLConst.SRC_ALPHA;
+            material.dstFactor = WebGLConst.ONE_MINUS_SRC_ALPHA;
+            material.cull = WebGLConst.NONE;
             uiContainer.material = material;
             ROOT.addChild(uiContainer);
             popContainer.mouseEnabled = false;

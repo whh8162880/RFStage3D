@@ -12,9 +12,9 @@ module rf{
         key:string;
         url:string;
         mipmap:boolean;
-        mag:string;
-        mix:string;
-        repeat:boolean;
+        mag:number;
+        mix:number;
+        repeat:number;
     }
 
 
@@ -23,10 +23,10 @@ module rf{
      */
     export interface IMaterialData extends IData{
         depthMask:boolean;
-        passCompareMode:string;
-        srcFactor:string;
-        dstFactor:string;
-        cull:string;
+        passCompareMode:number;
+        srcFactor:number;
+        dstFactor:number;
+        cull:number;
         alphaTest:number; //0表示不剔除
         diffTex?:ITextureData;
     }
@@ -132,6 +132,31 @@ module rf{
         usesDuration:boolean;
         usesLooping:boolean;
         usesDelay:boolean;
+    }
+
+
+    export interface IParticleScaleNodeInfo extends IParticleNodeInfo{
+        scaleType:number;
+        usesCycle:boolean;
+        usesPhase:boolean;
+    }
+
+    export interface IParticleSegmentColorNodeInfo extends IParticleNodeInfo{
+        usesMul:boolean;
+        usesAdd:boolean;
+        len:number;
+        mul:number;
+        add:number;
+        data:Float32Array;
+    }
+
+    export interface IParticleSpriteSheetAnimNodeInfo extends IParticleNodeInfo{
+        usesCycle:boolean;
+        usesPhase:boolean;
+        totalFrames:number;
+        colum:number;
+        rows:number;
+        data:Float32Array;
     }
 
     export interface IParticleData{
