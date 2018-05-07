@@ -129,6 +129,7 @@ module rf {
 
     export class DisplayObject extends MiniDispatcher implements IMouse {
         hitArea: HitArea;
+        tt:ITimeTicker;
         mouseEnabled:boolean = false;
         mouseChildren:boolean = true;
         mousedown:boolean = false;

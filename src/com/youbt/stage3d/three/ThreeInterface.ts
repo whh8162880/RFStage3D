@@ -166,4 +166,30 @@ module rf{
         setting:IParticleSettingData;
         nodes:{[key:string]:IParticleNodeInfo}
     }
+
+    //====================================================================================
+    //  Skill
+    //====================================================================================
+    export interface ISkillBaseEvent{
+        type:number;
+        time:number;
+        next:ISkillBaseEvent;
+        pre:ISkillBaseEvent;
+    }
+    export interface ISkillPointData{
+        skillEvents:ISkillBaseEvent[];
+        createEvents:ISkillBaseEvent[];
+        time:number;
+        index:number;
+    }
+
+    export interface ISkillLineData{
+        desc:string;
+        count:number;
+        points:ISkillPointData[];
+    }
+
+    export interface ISkillData{
+        lines:ISkillLineData[];
+    }
 }
