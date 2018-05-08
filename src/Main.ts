@@ -103,6 +103,9 @@ module rf{
             mesh.material = m;
             scene.addChild(mesh);
 
+
+            
+
             // plane = new PlaneGeometry(variables).create(w*2,w);
             // mesh = new Mesh(variables);
             // mesh.init(plane,m);
@@ -135,6 +138,17 @@ module rf{
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
+
+
+            var gui = new dat.GUI();
+            var fodler = gui.addFolder("mesh");
+            fodler.add(kfmMesh,"x",-1000,1000);
+            fodler.add(kfmMesh,"y",-1000,1000);
+            fodler.add(kfmMesh,"z",-1000,1000);
+            fodler.add(kfmMesh,"rotationX",-360,360);
+            fodler.add(kfmMesh,"rotationY",-360,360);
+            fodler.add(kfmMesh,"rotationZ",-360,360);
+
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
