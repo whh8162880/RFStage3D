@@ -51,15 +51,17 @@ namespace rf {
 	// 		TimeMixer
 	//===========================================================================================
 	export interface ITimeMixer{
-		time:number;
+		now:number;
 		speed:number;
+		interval?:number;
 	}
-	export function newTimeMixer(time:number = 0,speed:number = 1):ITimeMixer{
-		return {time:time,speed:speed}
+	export function newTimeMixer(now:number = 0,speed:number = 1):ITimeMixer{
+		return {now:now,speed:speed}
 	}
 	export function tm_add(t:ITimeMixer,interval:number){
-		t.time += interval * t.speed;
-		return t.time;
+		t.interval = interval * t.speed;
+		t.now += t.interval;
+		return t.now;
 	}
 	
 

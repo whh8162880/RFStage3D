@@ -166,9 +166,6 @@ module rf{
             // m.invert();
             // m.invert();
 
-            
-            
-
             let profile = singleton(GUIProfile);
             tipContainer.addChild(profile);
 
