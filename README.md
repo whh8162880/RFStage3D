@@ -244,7 +244,7 @@ node --inspect-brk APP.js
 怎么做？
 使用Microsoft/dts-gen，假设我们要为 cannon.js （一个js实现的3d物理引擎） 生成dts
 1、npm install -g dts-gen
-2、nmp install -g cannon
+2、npm install -g cannon
 3、dts-gen -m cannon
 4、把生成的d.ts复制到到自己项目中
 
