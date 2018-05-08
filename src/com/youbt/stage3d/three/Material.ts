@@ -227,6 +227,7 @@ module rf{
 
                     vec3  invLight = normalize(${VC.invm} * vec4(${VC.lightDirection}, 0.0)).xyz;
                     float diffuse  = clamp(dot(t_normal.xyz, invLight), 0.1, 1.0);
+                    diffuse += 0.5;
                     vDiffuse = vec4(vec3(diffuse), 1.0);
                     vUV = ${VA.uv};
                     gl_Position = ${VC.mvp} * t_pos;

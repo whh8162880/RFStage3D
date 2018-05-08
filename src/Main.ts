@@ -51,7 +51,7 @@ module rf{
             camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
 
-            let w = 100;
+            let w = 500;
 
             let t = 2;
             let tr = new Trident(w*2,t);
@@ -83,10 +83,11 @@ module rf{
 
             m.diffTex = {url:"assets/a10010m/diff.png"} as ITextureData;
 
-            // let plane = new PlaneGeometry(variables).create(w,w);
-            // let mesh = new Mesh(variables);
-            // mesh.init(plane,m);
-            // scene.addChild(mesh);
+            let plane = new PlaneGeometry(variables).create(w,w);
+            let mesh = new Mesh(variables);
+            mesh.rotationX = -90;
+            mesh.init(plane,m);
+            scene.addChild(mesh);
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
             // mesh = new Mesh(variables);
