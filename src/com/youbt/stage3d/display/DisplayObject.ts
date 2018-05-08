@@ -2,8 +2,6 @@
 module rf {
     export var ROOT: Stage3D;
 
-    export var tween:TweenManager;
-
     export interface IMouse {
         mouseEnabled?:boolean,
         mouseChildren?:boolean,
@@ -129,7 +127,6 @@ module rf {
 
     export class DisplayObject extends MiniDispatcher implements IMouse {
         hitArea: HitArea;
-        tt:ITimeTicker;
         mouseEnabled:boolean = false;
         mouseChildren:boolean = true;
         mousedown:boolean = false;

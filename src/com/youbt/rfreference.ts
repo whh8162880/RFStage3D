@@ -13,14 +13,12 @@
 ///<reference path="./core/CallbackInfo.ts" />
 ///<reference path="./core/SourceManager.ts" />
 ///<reference path="./core/AMF3.ts" />
+///<reference path="./core/Tween.ts" />
 
 ///<reference path="./stage3d/geom/Matrix3D.ts" />
-///<reference path="./stage3d/geom/Vector3D.ts" />
 ///<reference path="./stage3d/geom/Quaternion.ts" />
 
 ///<reference path="./stage3d/three/Geometry.ts" />
 ///<reference path="./stage3d/three/Material.ts" />
 ///<reference path="./stage3d/Shader.ts" />
 
-///<reference path="./tween/TweenManager.ts" />
-///<reference path="./tween/Tween.ts" />

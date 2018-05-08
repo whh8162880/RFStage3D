@@ -36,6 +36,7 @@ module rf {
                     context3D.drawTriangles(geometry.index, geometry.numTriangles)
                 }
             }
+            
             super.render(camera, now, interval);
         }
     }

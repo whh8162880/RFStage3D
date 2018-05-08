@@ -6,7 +6,15 @@ module rf{
         ALPHA
     }
 
-    export class FilterBase{
+    export interface IFilterBase{
+        type:number;
+        key:string;
+        target:Sprite;
+        tweener:ITweener;
+        enabled:boolean;
     }
 
+    export function newFilterBase(target:RenderBase,type:number):IFilterBase{
+        return {type:type,target:target} as IFilterBase;
+    }
 }

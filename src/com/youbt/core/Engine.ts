@@ -47,6 +47,22 @@ namespace rf {
 	}
 
 
+	//===========================================================================================
+	// 		TimeMixer
+	//===========================================================================================
+	export interface ITimeMixer{
+		time:number;
+		speed:number;
+	}
+	export function newTimeMixer(time:number = 0,speed:number = 1):ITimeMixer{
+		return {time:time,speed:speed}
+	}
+	export function tm_add(t:ITimeMixer,interval:number){
+		t.time += interval * t.speed;
+		return t.time;
+	}
+	
+
 	export let nativeMouseX:number = 0;
 	export let nativeMouseY:number = 0;
 
@@ -76,6 +92,9 @@ namespace rf {
 
 	export const getT: ({ (): number }) = window.performance ? performance.now.bind(performance) : Date.now;
 
+
+	export const defaultTimeMixer:ITimeMixer = newTimeMixer(0.0,1.0);
+	
 	// export let engie_animation_request:Function = undefined;
 	export class Engine {
 		//当前程序开始时间
