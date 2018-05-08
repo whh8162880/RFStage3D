@@ -172,6 +172,7 @@ module rf{
     //====================================================================================
     export interface ISkillBaseEvent{
         type:number;
+        key:string;
         time:number;
         next:ISkillBaseEvent;
         pre:ISkillBaseEvent;
@@ -187,6 +188,7 @@ module rf{
         desc:string;
         count:number;
         points:ISkillPointData[];
+        runtime:{[key:string]:RenderBase};
     }
 
     export interface ISkillData{

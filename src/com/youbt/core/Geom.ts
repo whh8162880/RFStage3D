@@ -1,4 +1,3 @@
-///<reference path="../stage3d/geom/Vector3D.ts" />
 ///<reference path="../stage3d/geom/Matrix3D.ts" />
 module rf {
     export declare type PosKey = "x" | "y";

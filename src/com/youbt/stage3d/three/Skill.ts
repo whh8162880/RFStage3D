@@ -1,9 +1,15 @@
 module rf{
     export var skill_Perfix: string;
+
+
+    export interface ISkillEffectCreateEvent extends ISkillBaseEvent{
+        res:string;
+    }
+    export function skill_MeshCreate(line:ISkillLineData,event:ISkillEffectCreateEvent){
+        let mesh = line.runtime[event.key];
+    }
+
     export class Skill extends SceneObject{
-        constructor(){
-            super();
-        }
         
         load(url: string) {
             if (url.lastIndexOf(ExtensionDefine.SKILL) == -1) {
@@ -21,9 +27,10 @@ module rf{
             this.play(amf_readObject(byte));
         }
 
+        data:ISkillData;
 
         play(data:ISkillData){
-
+            
         }
 
         update(now: number, interval: number): void{
