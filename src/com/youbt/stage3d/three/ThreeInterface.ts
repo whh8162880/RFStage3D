@@ -78,6 +78,7 @@ module rf{
         mesh:IMeshData;
         skeleton:ISkeletonData;
         material:IMaterialData;
+        anims:string[];
     }
 
 

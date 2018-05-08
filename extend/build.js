@@ -33,7 +33,7 @@ function formatAssets(assets){
             r.push([path.resolve(file.slice(0,i+1)).replace(/\\/g,"/").toLowerCase(),1]);
         }else{
             if((i = file.lastIndexOf("*")) == file.length-1){
-                r.push([(file.slice(0,i)).replace(/\\/g,"/").toLowerCase(),2]);
+                r.push([path.resolve(file.slice(0,i)).replace(/\\/g,"/").toLowerCase(),2]);
             }else{
                 r.push([(file).replace(/\\/g,"/").toLowerCase(),3]);
             }
