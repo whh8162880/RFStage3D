@@ -2,8 +2,6 @@
 module rf {
     export var ROOT: Stage3D;
 
-    export var tween:TweenManager;
-
     export interface IMouse {
         mouseEnabled?:boolean,
         mouseChildren?:boolean,

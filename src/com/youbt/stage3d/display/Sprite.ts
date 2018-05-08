@@ -1,11 +1,13 @@
 ///<reference path="./DisplayObjectContainer.ts" />
 ///<reference path="../camera/Camera.ts" />
+///<reference path="./Filter.ts" />
 module rf {
 
     export abstract class RenderBase extends DisplayObjectContainer implements I3DRender {
         nativeRender:boolean = false;
         variables:{ [key: string]: IVariable };
         material:Material;
+        tm:ITimeMixer;
         // triangleFaceToCull: string = Context3DTriangleFace.NONE;
         // sourceFactor: number;
         // destinationFactor: number;
@@ -22,6 +24,7 @@ module rf {
         }
         constructor(variables?:{ [key: string]: IVariable }) {
             super();
+            this.tm = defaultTimeMixer;
             this.variables = variables;
         }
 

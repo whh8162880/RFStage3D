@@ -13,7 +13,8 @@ module rf{
         KM = ".km",
         DAT = ".dat",
         P3D = ".p3d",
-        PARTICLE = ".pa"
+        PARTICLE = ".pa",
+        SKILL = ".sk"
     }
     
     export function isPowerOfTwo(n: number): boolean {
