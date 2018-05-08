@@ -104,7 +104,21 @@ module rf {
             }
         }
 
+        setSize(width:number, height:number):void
+        {
+            super.setSize(width, height);
+            let hitArea = this.hitArea;
+            let {w, h} = this;
+            hitArea.clean();
+            hitArea.updateArea(w, h, 0);
+        }
+
         public updateHitArea():void{
+            let locksize = this.locksize;
+            if(locksize)
+            {
+                return;
+            }
             let hitArea = this.hitArea;
             hitArea.clean();
             for(let child of this.childrens){

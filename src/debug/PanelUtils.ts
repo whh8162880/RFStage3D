@@ -1,20 +1,17 @@
+///<reference path="../com/youbt/mvc/manage/PanelSourceManage.ts" />
 module rf{
     export class PanelUtils{
         skin:Component;
         setting:object;
-        btn_random:Button;
-        btn_create:Button;
+        btn_random:IButton = null;
+        btn_create:IButton = null;
 
         bg:IconView;
-
-        manage:PanelSourceManage;
 
         source:AsyncResource;
 
         constructor(){
-            let {manage} = this;
-            manage = singleton(PanelSourceManage);
-            this.source = manage.load("../assets/create.p3d", "create");
+            this.source = sourceManger.load("../assets/create.p3d", "create");
             this.source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this)
         }
 
@@ -24,9 +21,11 @@ module rf{
             
             let clsname:string = "ui.asyncpanel.create";
             let cs:IDisplaySymbol = source.setting[clsname];
-            
+
             this.skin = new Component(source.source);
-            this.skin.setSymbol(cs);
+
+            uiparser.parser(this, cs);
+
             this.skin.renderer = new BatchRenderer(this.skin);
             popContainer.addChild(this.skin);
 
@@ -36,9 +35,6 @@ module rf{
         protected bindComponents():void
         {
             const{skin} = this;
-            this.btn_random = new Button(skin["btn_random"]);
-            this.btn_create = new Button(skin['btn_create']);
-
             this.bg = new IconView(skin.source);
             skin.addChildAt(this.bg, 0);
             this.bg.setUrl('assets/createbg.jpg');
@@ -51,6 +47,4 @@ module rf{
             alert("随机按钮点击");
         }
     }
-
-    let sourceManger:PanelSourceManage = singleton(PanelSourceManage)
 }
