@@ -86,7 +86,8 @@ module rf{
             let plane = new PlaneGeometry(variables).create(w,w);
             let mesh = new Mesh(variables);
             mesh.rotationX = -90;
-            mesh.init(plane,m);
+            mesh.geometry = plane;
+            mesh.material = m;
             scene.addChild(mesh);
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
