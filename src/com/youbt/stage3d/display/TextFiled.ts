@@ -76,8 +76,8 @@ module rf {
             let _current:any = self._current;
 
             let lineheight:number = _text.lineheight;
-            let tw:number = _text.width;
-            let th:number = _text.height < lineheight ? lineheight : _text.height;
+            let tw:number = _text.w;
+            let th:number = _text.h < lineheight ? lineheight : _text.h;
 
             _inputdiv.style.opacity = "1";
             _inputdiv.style.width = tw + "px";
@@ -348,7 +348,7 @@ module rf {
                 element.str = value;
             }
 
-            let lines = this.tranfromHtmlElement2CharDefine(element, this.multiline ? this.width : Infinity);
+            let lines = this.tranfromHtmlElement2CharDefine(element, this.multiline ? this.w : Infinity);
             let len = lines.length;
             let oy = 0;
             let lineh:number;
@@ -397,7 +397,7 @@ module rf {
             const{childrens}=this;
 
             //根据align属性进行重新布局
-            let _w:number = this.width;
+            let _w:number = this.w;
 
             if(_w == 0)
             {
@@ -420,9 +420,9 @@ module rf {
                 let display = childrens[i];
                 if(align_type == 1)
                 {
-                    display.x = _w - display.width >> 1;
+                    display.x = _w - display.w >> 1;
                 }else if(align_type == 2){
-                    display.x = _w - display.width;
+                    display.x = _w - display.w;
                 }
             }
 
@@ -508,7 +508,7 @@ module rf {
                         lineCount++;
                         //自动换行结束
                     }
-                    if (ox && ox + html.image.width > width) {
+                    if (ox && ox + html.image.w > width) {
                         //自动换行开始
                         while (chars.length > oi) {
                             char = chars.pop();
@@ -629,18 +629,6 @@ module rf {
                 line.chars.length = 0;
             }
             return lines;
-        }
-
-        updateHitArea():void{
-            super.updateHitArea();
-            //可编辑的需要固定hitarea
-            let {_type} = this;
-            if(_type == TextFieldType.INPUT)
-            {
-                let {_width, _height} = this;
-                let hitarea = this.hitArea;
-                hitarea.updateArea(_width, _height, 0);
-            }
         }
 
         set type(val:string)
@@ -882,8 +870,8 @@ module rf {
                     }
                     html.imageTag = o[3];
                     html.image = image;
-                    html.w = image.width;
-                    html.h = image.height;
+                    html.w = image.w;
+                    html.h = image.h;
                     htmlProParser(o[1], o[2], html, html.image);
                 }
             } else if (o[1] == "a") {
@@ -899,8 +887,8 @@ module rf {
                 html.imageTag = -1;
                 htmlProParser(o[1], o[2], html, text);
                 text.text = o[3];
-                html.w = text.width;
-                html.h = text.height;
+                html.w = text.w;
+                html.h = text.h;
             } else if (o[1] == "b") {
                 last = html = parent.createAndCopyFormat(last, html.newline);
                 var format: TextFormat = parent.format;
@@ -1167,7 +1155,7 @@ module rf {
                 let display = char.display;
                 if (display instanceof Sprite) {
                     display.x = char.sx;
-                    display.y = (h - display.height) >> 1
+                    display.y = (h - display.h) >> 1
                     this.addChild(display);
                 } else {
                     g.drawBitmap(char.sx, h - display.h, display, ele.color);

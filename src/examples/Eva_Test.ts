@@ -53,7 +53,7 @@ module rf{
 
     }
 
-    export class TestModel extends BaseMode{
+    export class TestModel extends BaseModel{
         constructor(){
             super("Test");
         }
