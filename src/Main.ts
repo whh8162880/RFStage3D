@@ -69,6 +69,8 @@ module rf{
 
             sp = tr;
 
+            
+
             // line.rotationX = 45;
             // let line = new Line3D();
             // line.clear();

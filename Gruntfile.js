@@ -43,7 +43,8 @@ module.exports = function (grunt) {
     // grunt.loadNpmTasks("grunt-contrib-uglify");
     // grunt.registerTask("default", ["ts","uglify:min"]);
     
-    grunt.loadNpmTasks("grunt-ts");
-    grunt.loadNpmTasks('grunt-contrib-copy');
-    grunt.registerTask("default", ["ts","copy:main"]);
+    // grunt.loadNpmTasks("grunt-ts");
+    // grunt.loadNpmTasks('grunt-contrib-copy');
+    // grunt.registerTask("default", ["ts","copy:main"]);
+    grunt.registerTask("default", []);
 };
