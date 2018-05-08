@@ -10,7 +10,6 @@ module rf {
             this.createSource();
             Engine.start();
             ROOT = singleton(Stage3D);
-            tween = singleton(TweenManager);
         }
 
 
@@ -96,7 +95,7 @@ module rf {
         public update(now: number, interval: number): void {
             //todo
             ROOT.update(now,interval);
-            tween.tick(interval);
+            tweenUpdate();
         }
 
         public resize(width:number,height:number):void{

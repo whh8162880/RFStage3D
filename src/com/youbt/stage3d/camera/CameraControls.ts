@@ -34,6 +34,8 @@ module rf{
         }
 
 
+        tweener:ITweener;
+
         mouseWheelHandler(event:EventX):void{
            
             // const{distance} = this;
@@ -49,13 +51,12 @@ module rf{
 
             wheel = wheel*step;
 
-
+            let{tweener}=this;
+            if(tweener){
+                tweenStop(tweener);
+            }
+            this.tweener = tweenTo({tdistance: distance+wheel*2},Math.abs(wheel)*2,defaultTimeMixer,this);
             
-
-            let tweener = tween.get(this,undefined,undefined,true);
-            tweener.to( { tdistance: distance+wheel*2},Math.abs(wheel)*2);
-            
-
             
             // this.object.z += e.deltaY > 0 ? 1: -1
             // this.distance = this.object.pos.subtract(this.target).length;

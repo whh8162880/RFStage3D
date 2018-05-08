@@ -202,7 +202,6 @@ module rf{
 	
 	export class PanelBase extends SkinBase{
 		isShow:boolean = false;
-		effectTweener:Tween;
 
 		constructor(){
 			super(new Component());

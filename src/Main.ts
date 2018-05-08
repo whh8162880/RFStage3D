@@ -44,9 +44,19 @@ module rf{
             
             let camera = ROOT.camera3D;
             scene.camera = camera
-            let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
-            f = camera.originFar;
-            camera.z = f
+            // let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar / 2;
+            let f = camera.originFar / 2;
+            f = Math.sqrt(f*f / 3);
+            // let{x,y,z} = camera;
+            // let cos = Math.cos(45 * DEGREES_TO_RADIANS);
+            // let sin = Math.sin(45 * DEGREES_TO_RADIANS);
+            // x = f * sin * cos;
+            // y = f * sin * sin;
+            // z = f * cos;
+            // camera.setPos(f * sin * cos,f * sin * sin,f * cos);
+            camera.setPos(f,f,f);
+
+            // camera.z = f
             // camera.y = f;
             camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
@@ -54,7 +64,7 @@ module rf{
             let w = 500;
 
             let t = 2;
-            let tr = new Trident(w*2,t);
+            let tr = new Trident(w,t);
             scene.addChild(tr);
 
             sp = tr;
@@ -81,9 +91,10 @@ module rf{
 
             let r = 40;
 
-            m.diffTex = {url:"assets/a10010m/diff.png"} as ITextureData;
+            // m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
+            m.diff = new Color(0xAAAAAA);
 
-            let plane = new PlaneGeometry(variables).create(w,w);
+            let plane = new PlaneGeometry(variables).create(w*2,w*2);
             let mesh = new Mesh(variables);
             mesh.rotationX = -90;
             mesh.geometry = plane;
@@ -115,22 +126,22 @@ module rf{
             // mesh.setPos(0,70,0);
             // scene.addChild(mesh);
 
-/**
+
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            kfmMesh.load("assets/a10010m/");
+            kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
- */
+
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
-            particle_Perfix = "assets/particle/";
-            particle_Texture_Perfix = "assets/tex/particle/";
-            let particle = new Particle();
-            particle.setSca(100,100,100);
-            particle.load("a");
-            scene.addChild(particle);
+            // particle_Perfix = "assets/particle/";
+            // particle_Texture_Perfix = "assets/tex/particle/";
+            // let particle = new Particle();
+            // particle.setSca(100,100,100);
+            // particle.load("a");
+            // scene.addChild(particle);
 
 
             // new AMF3Test().load("assets/test.dat");

@@ -145,7 +145,7 @@ module rf{
         createProgram(mesh:Mesh){
 
 
-            const{diffTex,emissiveTex,specularTex} = this;
+            const{diffTex,emissiveTex,specularTex,diff} = this;
             const{skAnim}=mesh;
 
             let c = context3D;
@@ -158,7 +158,11 @@ module rf{
             if(undefined != diffTex){
                 key += "-diff";
                 f_def += "#define DIFF\n";
+            }else if(undefined != diff){
+                f_def += "#define VC_DIFF\n";
             }
+
+            
 
             if(undefined != emissiveTex){
                 key += "-emissive"

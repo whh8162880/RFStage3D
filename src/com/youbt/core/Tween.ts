@@ -43,6 +43,8 @@ module rf {
                 s = target[k];
                 if (undefined != s) {
                     s = (so && undefined != so[k]) ? so[k] : s;
+                }else{
+                    s = 0;
                 }
             } else {
                 s = (so && undefined != so[k]) ? so[k] : 0;
@@ -50,6 +52,7 @@ module rf {
             e = eo[k];
             data[l++] = { k: k, s: s, e: e, d: e - s, n: 0 }
         }
+        tweener.l = l;
         return tweener;
     }
 
@@ -59,6 +62,7 @@ module rf {
         if (tweener.l > 0) {
             tweenLink.add(tweener);
         }
+        return tweener;
     }
 
     export function tweenUpdate() {

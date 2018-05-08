@@ -82,10 +82,6 @@ module rf {
 
             material.diffTex.url = this.id + material.diffTex.url;
 
-
-
-
-
             // this.material["diffTex"] = this.id + kfm["diff"];
             // this.material["diffTex"] = this.id + "diff.png";
             //=========================
@@ -96,11 +92,13 @@ module rf {
             //  Animation
             //===========================
             this.skAnim = skeleton.createAnimation();
+
+
             // let action = "Take 001";
-            let action = "stand";
-            let animationData = kfm.anims[action];
-            skeleton.initAnimationData(animationData);
-            this.skAnim.play(animationData, engineNow);
+            // let action = "stand";
+            // let animationData = kfm.anims[action];
+            // skeleton.initAnimationData(animationData);
+            // this.skAnim.play(animationData, engineNow);
 
 
         }

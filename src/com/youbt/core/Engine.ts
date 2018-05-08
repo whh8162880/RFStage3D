@@ -145,6 +145,8 @@ namespace rf {
 				}
 				let now: number = time - Engine.startTime;
 				let interval: number = (Engine.interval = now - engineNow);
+				defaultTimeMixer.now = now;
+				defaultTimeMixer.interval = interval;
 				nextUpdateTime += frameInterval;
 				engineNow = now;
 				Engine.update(now, interval);
