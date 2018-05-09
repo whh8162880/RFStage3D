@@ -142,6 +142,8 @@ module rf{
 
             status = 1;
 
+            this.status = status;
+
             const{d_setting} = this;
 
             let res:ResItem = e.data;
@@ -175,7 +177,7 @@ module rf{
 
             for(let key of objkeys)
             {
-                sourceManger.set(key, objkeys[key])
+                sourceManger.set(key, this.setting[key])
             }
 
             this.simpleDispatch(EventT.COMPLETE);

@@ -25,7 +25,8 @@ module rf{
 
             this.skin = new Component(source.source);
 
-            uiparser.parser(this, cs);
+            // uiparser.parser(this, cs);
+            this.skin.setSymbol(cs);
 
             this.skin.renderer = new BatchRenderer(this.skin);
             popContainer.addChild(this.skin);
@@ -40,7 +41,10 @@ module rf{
             skin.addChildAt(this.bg, 0);
             this.bg.setUrl('assets/createbg.jpg');
 
+            this.btn_random = skin["btn_random"];
             this.btn_random.addClick(this.randomHandler);
+
+            this.dele_info = skin["dele_info"];
 
             if(this.dele_info.btn_create != undefined)
             {
