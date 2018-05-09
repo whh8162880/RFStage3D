@@ -3,12 +3,12 @@
     /* Basic Options */
     "target": "es5",                          /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017','ES2018' or 'ESNEXT'. */
     
-    // "module": "amd",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
-    // "outFile": "./examples/js/rfstage3d.js",                       /* Concatenate and emit output to single file. */
+    "module": "amd",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    "outFile": "./examples/js/rfstage3d.js",                       /* Concatenate and emit output to single file. */
     // "sourceMap":false,
-    // "declaration": true,
+    "declaration": true,
 
-    "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
+    // "module": "commonjs",                     /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */
     "outDir": "./bin-debug/",
     "sourceMap":true,
 
@@ -17,7 +17,7 @@
    
     //"sourceRoot":"./src/test/",
     //"esModuleInterop": true,                   /* Enables emit interoperability between CommonJS and ES Modules via creation of namespace objects for all imports. Implies 'allowSyntheticDefaultImports'. */
-    "watch": true,
+    "watch": false,
     "lib": [
       "es5",
       "dom"

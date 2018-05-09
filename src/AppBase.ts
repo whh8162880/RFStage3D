@@ -38,6 +38,7 @@ module rf {
         }
 
         createSource():void{
+            // panels= singleton(PanelSourceManage)
             let bmd = new BitmapData(2048,2048,true);
             let source = new BitmapSource().create("component",bmd,true);
             let vo = source.setSourceVO("origin",1,1);

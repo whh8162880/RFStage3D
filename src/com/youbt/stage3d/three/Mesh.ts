@@ -97,13 +97,11 @@ module rf {
             // let animationData = kfm.anims[action];
             // skeleton.initAnimationData(animationData);
             // this.skAnim.play(animationData, engineNow);
-            this.anims = anims;
         }
 
-
-        anims = ["stand","run"];
-        
-
+        refreshGUI(gui:dat.GUI){
+            alert(gui);
+        }
     }
 
     export class Skeleton {

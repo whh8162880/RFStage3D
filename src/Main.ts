@@ -94,7 +94,7 @@ module rf{
             let r = 40;
 
             // m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
-            m.diff = new Color(0xAAAAAA);
+            m.diff = newColor(0xAAAAAA);
 
             let plane = new PlaneGeometry(variables).create(w*2,w*2);
             let mesh = new Mesh(variables);
@@ -139,20 +139,18 @@ module rf{
             // kfmMesh.load("assets/hero001/");
             scene.addChild(kfmMesh);
 
-
             var gui = new dat.GUI();
             var folder = gui.addFolder("mesh");
-            folder.add(kfmMesh,"id");
-            var posFolder = folder.addFolder("position");
-            posFolder.add(kfmMesh,"x",-1000,1000).step(0.01);
-            posFolder.add(kfmMesh,"y",-1000,1000).step(0.01);
-            posFolder.add(kfmMesh,"z",-1000,1000).step(0.01);
-            var rotFolder = folder.addFolder("rotation");
-            rotFolder.add(kfmMesh,"rotationX",-360,360);
-            rotFolder.add(kfmMesh,"rotationY",-360,360);
-            rotFolder.add(kfmMesh,"rotationZ",-360,360);
+            // folder.add(kfmMesh,"refreshGUI");
+            // var posFolder = folder.addFolder("position");
+            // posFolder.add(kfmMesh,"x",-1000,1000).step(0.01);
+            // posFolder.add(kfmMesh,"y",-1000,1000).step(0.01);
+            // posFolder.add(kfmMesh,"z",-1000,1000).step(0.01);
+            // var rotFolder = folder.addFolder("rotation");
+            // rotFolder.add(kfmMesh,"rotationX",-360,360);
+            // rotFolder.add(kfmMesh,"rotationY",-360,360);
+            // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
-            folder.add(kfmMesh,"anims",kfmMesh.anims);
 
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";

@@ -1,6 +1,8 @@
 //之后移植到Sprite里面
 module rf{
 
+	export var manage:PanelSourceManage;
+
 	export const enum PanelEvent{
 		SHOW = "PanelEvent_SHOW",
 		HIDE = "PanelEvent_HIDE",
@@ -391,8 +393,4 @@ module rf{
 
 
 	}
-
-
-	let manage:PanelSourceManage = singleton(PanelSourceManage);
-    
 }
