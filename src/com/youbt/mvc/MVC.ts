@@ -6,7 +6,7 @@ module rf{
 
         SINGLETON_MSG:string = "Facade Singleton already constructed!";
         mediatorMap:{[key:string]:Mediator}= {};
-        modelMap:{[key:string]:BaseMode}= {};
+        modelMap:{[key:string]:BaseModel}= {};
 
 
         constructor(){
@@ -88,7 +88,7 @@ module rf{
         isReady:boolean = false;
 
         name:string;
-        data:BaseMode;
+        data:BaseModel;
 
 		constructor(NAME:string){
 			super();
@@ -225,7 +225,7 @@ module rf{
         }
     }
     
-    export class BaseMode extends MiniDispatcher{
+    export class BaseModel extends MiniDispatcher{
         modelName:string;
         
         isReady:boolean;
