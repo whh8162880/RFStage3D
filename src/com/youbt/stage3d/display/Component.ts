@@ -42,20 +42,6 @@ module rf{
 		RECTANGLE = 3
 	}
 
-	export const enum ComponentConst{
-		Label,
-		Button,
-		CheckBox,
-		RadioButton,
-		List,
-		MList,
-		TabItem,
-		Tab
-	}
-
-
-
-
     export class Component extends Sprite{
         constructor(source?:BitmapSource){
 			super(source);
@@ -518,5 +504,21 @@ module rf{
 				this.dispatchEvent(new EventX(EventT.CHANGE));
 			}
 		}
+	}
+
+	export const enum ComponentConst{
+		Label = 0,
+		Button = 1,
+		CheckBox = 2,
+		RadioButton = 3,
+		List = 4,
+		MList = 5,
+		TabItem = 6,
+		Tab = 7
+	}
+
+	export var ComponentClass:{ [type: string]: { new(): Component } } = {
+		0 : Label,
+		1 : Button
 	}
 }
