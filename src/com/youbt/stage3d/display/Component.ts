@@ -1,3 +1,4 @@
+///<reference path="../../mvc/manage/PanelSourceManage.ts" />
 ///<reference path="./Sprite.ts" />
 module rf{
 
@@ -107,6 +108,7 @@ module rf{
 			
 			let tempMatrix:IMatrix = newMatrix();
 
+			let names:any[];
 			for(let ele of elements)
 			{
 				if(ele.type == SymbolConst.SYMBOL){

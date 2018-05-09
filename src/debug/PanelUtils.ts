@@ -5,6 +5,7 @@ module rf{
         setting:object;
         btn_random:IButton = null;
         btn_create:IButton = null;
+        dele_info:IInfoDele = null;
 
         bg:IconView;
 
@@ -40,11 +41,32 @@ module rf{
             this.bg.setUrl('assets/createbg.jpg');
 
             this.btn_random.addClick(this.randomHandler);
+
+            if(this.dele_info.btn_create != undefined)
+            {
+                this.dele_info.btn_create.addClick(this.createHandler);
+            }else{
+                alert("1112");
+            }
         }
 
         protected randomHandler(e:EventX):void
         {
             alert("随机按钮点击");
         }
+
+        protected createHandler(e:EventX):void
+        {
+            alert("dele_info 创建点击");
+        }
+    }
+
+    export interface IInfoDele{
+        txt_name:TextField;
+        txt_warning:TextField;
+        txt_cool:TextField;
+        txt_addmsg:TextField;
+        btn_random:IButton;
+        btn_create:IButton;
     }
 }

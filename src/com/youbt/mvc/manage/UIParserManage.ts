@@ -1,4 +1,6 @@
 module rf{
+    //思路：生成接口类型 接口包含有名称的内容 解析内容时对应赋值 子对象依然是这样操作
+    //目前只在第一层操作是这样 子对象应该还没有实现 待实现
     export class UIParserManage{
         private _funcs:object;
         constructor(){
@@ -8,6 +10,7 @@ module rf{
             funcs["txt"] = this.parserTxt;
             funcs["ck"] = this.parserCk;
             funcs["rb"] = this.parserRb;
+            funcs["dele"] = this.parserDele;
 
             this._funcs = funcs;
 
@@ -20,7 +23,7 @@ module rf{
             let keys:any[] = Object.keys(m);
             //根据setting 生成对应的组件 赋值给skin mediator
             let skin:Component = m.skin;
-            let source:BitmapSource = skin.source;
+            // let source:BitmapSource = skin.source;
             if(setting == undefined)
             {
                 return;   
@@ -31,13 +34,19 @@ module rf{
 			{
 				return;
             }
-            
+
+            this.parserElements(skin, elements);
+        }
+
+        parserElements(skin:any, arr:any[]):void
+        {
+            let source:BitmapSource = skin.source;
             let childsp:any;
 
             let {_funcs} = this;
 
             let names:any[];
-            for(let ele of elements)
+            for(let ele of arr)
 			{
                 if(ele.name != undefined)
                 {
@@ -55,10 +64,10 @@ module rf{
                             childsp = this.parserNormal(ele, source);
                             skin.addChild(childsp);
                         }
-                        if(m.hasOwnProperty(ele.name))
-                        {
-                            m[ele.name] = childsp;
-                        }
+                        // if(m.hasOwnProperty(ele.name))
+                        // {
+                        //     m[ele.name] = childsp;
+                        // }
                     }
                 }else{
                     childsp = this.parserNormal(ele, source);
@@ -116,6 +125,27 @@ module rf{
         }
 
         parserNormal(ele:IDisplayFrameElement, source:BitmapSource):any
+        {
+            let sp:any;
+            if(ele.rect){//目前还没写9宫
+                //sp = new ScaleRectSprite3D(source);
+            }else{
+                sp = new Component(source);
+            }
+            sp.mouseEnabled = true;
+            sp.x = ele.x;
+            sp.y = ele.y;
+            
+            (sp as Component).setSymbol(ele as IDisplaySymbol);
+            
+            sp.name = ele.name;
+            
+            sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
+
+            return sp;
+        }
+
+        parserDele(ele:IDisplayFrameElement, source:BitmapSource):any
         {
             let sp:any;
             if(ele.rect){//目前还没写9宫
