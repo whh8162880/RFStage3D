@@ -48,7 +48,8 @@ module rf {
         r:number,
         g:number,
         b:number,
-        a:number
+        a:number,
+        hex?:number;
     }
 
 
@@ -67,6 +68,8 @@ module rf {
         if(undefined == out){
             out = rgb_color_temp
         }
+        out.hex = color;
+        out.a = 1.0;
         out.r = ((color & 0x00ff0000) >>> 16) / 0xFF;
         out.g = ((color & 0x0000ff00) >>> 8) / 0xFF;
         out.b = (color & 0x000000ff) / 0xFF;
@@ -75,6 +78,10 @@ module rf {
 
     export function toCSS(color:IColor):string{
         return `rgba(${color.r*0xFF},${color.g*0xFF},${color.b*0xFF},${color.a*0xFF})`;
+    }
+
+    export function newColor(hex:number):IColor{
+        return toRGB(hex,{} as IColor);
     }
 
 
@@ -150,27 +157,6 @@ module rf {
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
     export let TEMP_VECTOR3D: IVector3D = newVector3D();
     export let TEMP_DECOMPOSE: IVector3D[] = [newVector3D(), newVector3D(), newVector3D()];
-
-
-    export class Color{
-        r:number;
-        g:number;
-        b:number;
-        a:number = 1.0;
-        private _hex:number;
-        constructor(hex:number = 0xFFFFFF){
-            this.hex = hex;
-        }
-
-        set hex(hex:number){
-            this._hex = hex
-            toRGB(hex,this);
-        }
-        get hex():number{
-            return this._hex;
-        }
-    }
-
 
     /**
     * 经纬度 定位信息

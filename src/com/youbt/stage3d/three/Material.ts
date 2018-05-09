@@ -10,7 +10,7 @@ module rf{
         program:Program3D;
 
         //贴图
-        diff:Color;
+        diff:IColor;
         diffTex:ITextureData;
 
         createProgram(mesh:Mesh){
@@ -38,7 +38,7 @@ module rf{
                 if(diffTex){
                     this.diffTex = diffTex;
                 }else{
-                    this.diff = new Color(0xFFFFFF);
+                    this.diff = newColor(0xFFFFFF);
                 }
             }
             
@@ -86,11 +86,11 @@ module rf{
 
     export class PhongMaterial extends Material{
         //自发光
-        emissive:Color;
+        emissive:IColor;
         emissiveTex:ITextureData;
 
         //高光
-        specular:Color;
+        specular:IColor;
         specularTex:ITextureData;
 
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){

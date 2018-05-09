@@ -66,7 +66,7 @@ module rf {
         }
 
         setKFM(kfm: ISkeletonMeshData) {
-            let { mesh, skeleton: skeletonData, material: materialData } = kfm;
+            let { mesh, skeleton: skeletonData, material: materialData,anims } = kfm;
             let { material, geometry } = this;
             let c = context3D;
 
@@ -92,15 +92,15 @@ module rf {
             //  Animation
             //===========================
             this.skAnim = skeleton.createAnimation();
-
-
             // let action = "Take 001";
             // let action = "stand";
             // let animationData = kfm.anims[action];
             // skeleton.initAnimationData(animationData);
             // this.skAnim.play(animationData, engineNow);
+        }
 
-
+        refreshGUI(gui:dat.GUI){
+            alert(gui);
         }
     }
 
