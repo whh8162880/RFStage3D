@@ -12,14 +12,14 @@ interface IArrayBase {
 }
 
 interface IMatrix3D extends IArrayBase {
-    m3_identity();
-    m3_append(m3: ArrayLike<number> | IArrayBase, prepend?: boolean, from?: ArrayLike<number>);
-    m3_rotation(degrees: number, axis: IVector3D | number[], prepend?: boolean, from?: ArrayLike<number>);
-    m3_scale(x: number, y: number, z: number, prepend?: boolean, from?: ArrayLike<number>);
-    m3_translation(x: number, y: number, z: number, prepend?: boolean, from?: ArrayLike<number>);
-    m3_invert(from?: ArrayLike<number>);
+    m3_identity():IMatrix3D;
+    m3_append(m3: ArrayLike<number> | IArrayBase, prepend?: boolean, from?: ArrayLike<number>):IMatrix3D;
+    m3_rotation(degrees: number, axis: IVector3D | number[], prepend?: boolean, from?: ArrayLike<number>):IMatrix3D;
+    m3_scale(x: number, y: number, z: number, prepend?: boolean, from?: ArrayLike<number>):IMatrix3D;
+    m3_translation(x: number, y: number, z: number, prepend?: boolean, from?: ArrayLike<number>):IMatrix3D;
+    m3_invert(from?: ArrayLike<number>):IMatrix3D;
     m3_decompose(pos: IVector3D | number[], rot: IVector3D | number[], sca: IVector3D | number[], orientationStyle?: number);
-    m3_recompose(pos: IVector3D | number[], rot: IVector3D | number[], sca: IVector3D | number[], orientationStyle?: number);
+    m3_recompose(pos: IVector3D | number[], rot: IVector3D | number[], sca: IVector3D | number[], orientationStyle?: number):IMatrix3D;
     m3_copyColumnFrom(column: number, vector3D: IVector3D | number[]);
     m3_copyColumnTo(column: number, vector3D: IVector3D | number[]);
     m3_transformVector(v: IVector3D | number[], result?: IVector3D | number[]);
@@ -33,7 +33,8 @@ interface IMatrix3D extends IArrayBase {
 Object.defineProperties(Float32Array.prototype, {
     m3_identity: {
         value: function () {
-            this.set(rf_m3_identity)
+            this.set(rf_m3_identity);
+            return this;
         }
     },
 
@@ -81,6 +82,8 @@ Object.defineProperties(Float32Array.prototype, {
             this[13] = a41 * b12 + a42 * b22 + a43 * b32 + a44 * b42;
             this[14] = a41 * b13 + a42 * b23 + a43 * b33 + a44 * b43;
             this[15] = a41 * b14 + a42 * b24 + a43 * b34 + a44 * b44;
+
+            return this;
         }
     },
 
@@ -98,7 +101,7 @@ Object.defineProperties(Float32Array.prototype, {
                 tx * z - s * y, ty * z + s * x, t * z * z + c, 0,
                 0, 0, 0, 1
             ]);
-            this.m3_append(b, prepend, from);
+            return this.m3_append(b, prepend, from);
         }
     },
 
@@ -117,6 +120,7 @@ Object.defineProperties(Float32Array.prototype, {
                 this[2] *= x; this[6] *= y; this[10] *= z;
                 this[3] *= x; this[7] *= y; this[11] *= z;
             }
+            return this;
         }
     },
 
@@ -135,6 +139,7 @@ Object.defineProperties(Float32Array.prototype, {
                 this[13] = from[13] + y;
                 this[14] = from[14] + z;
             }
+            return this;
         }
     },
 
@@ -168,6 +173,8 @@ Object.defineProperties(Float32Array.prototype, {
             this[13] = (a * z - b * x + c * w) * ivd;
             this[14] = (-m * t + n * r - o * q) * ivd;
             this[15] = (i * t - j * r + k * q) * ivd;
+
+            return this;
         }
     },
 
@@ -341,6 +348,7 @@ Object.defineProperties(Float32Array.prototype, {
                     }
                     break;
             }
+            return this;
         }
     },
 

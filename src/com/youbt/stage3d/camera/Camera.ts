@@ -1,9 +1,8 @@
 ///<reference path="../display/DisplayObject.ts" />
 module rf{
-    export class Camera extends DisplayObject implements IResizeable{
+    export class Camera extends DisplayObject{
         len:IMatrix3D;
         far :number;
-
         originFar:number;
         worldTranform:IMatrix3D;
         constructor(far:number = 10000){
@@ -14,127 +13,118 @@ module rf{
             this.worldTranform = newMatrix3D();
         }
 
-        resize(width: number, height: number): void{}
-
         public updateSceneTransform(sceneTransform?:IMatrix3D):void{
             if( this.states | DChange.trasnform){
                 this.updateTransform();
-                this.sceneTransform.set(this.transform);
-                this.sceneTransform.m3_invert();
-                this.worldTranform.set(this.sceneTransform);
-                this.worldTranform.m3_append(this.len);
-                this.states &= ~DChange.trasnform;
+                this.sceneTransform.m3_invert(this.transform);
+                this.worldTranform.m3_append(this.len,false,this.sceneTransform);
+                // this.states &= ~DChange.trasnform;
             }
+            this.states = 0;
         }
     }
 
-    export class CameraUI extends Camera{
-        resize(width: number, height: number): void{
-            this.w = width;
-            this.h = height;
-
-            let rawData = this.len;
-
-            rawData[0] = 2/width;
-            rawData[1] = 0;
-            rawData[2] = 0;
-            rawData[3] = 0;
-
-            rawData[4] = 0;
-            rawData[5] = -2/height;
-            rawData[6] = 0;
-            rawData[7] = 0;
-
-            rawData[8] = 0;
-            rawData[9] = 0;
-            rawData[10] = 1/this.far;
-            rawData[11] = 0;
-
-            rawData[12] = -1;
-            rawData[13] = 1;
-            rawData[14] = 0;
-            rawData[15] = 1;
-
-            this.states |= DChange.trasnform;
+    export function CameraUIResize(width: number, height: number,len:IMatrix3D,far:number,originFar,camera?:Camera){
+        if(camera){
+            camera.w = width;
+            camera.h = height;
+            camera.states |= DChange.trasnform;
         }
+        
+
+        len[0] = 2/width;
+        len[1] = 0;
+        len[2] = 0;
+        len[3] = 0;
+
+        len[4] = 0;
+        len[5] = -2/height;
+        len[6] = 0;
+        len[7] = 0;
+
+        len[8] = 0;
+        len[9] = 0;
+        len[10] = 1/far;
+        len[11] = 0;
+
+        len[12] = -1;
+        len[13] = 1;
+        len[14] = 0;
+        len[15] = 1;
+
+        
     }
 
-    // Orthographic Projection
-    export class CameraOrth extends Camera{
-        
-        resize(width: number, height: number): void{
-            this.w = width;
-            this.h = height;
 
-            let rawData = this.len;
-
-            rawData[0] = 2/width;
-            rawData[1] = 0;
-            rawData[2] = 0;
-            rawData[3] = 0;
-
-            rawData[4] = 0;
-            rawData[5] = 2/height;
-            rawData[6] = 0;
-            rawData[7] = 0;
-
-            rawData[8] = 0;
-            rawData[9] = 0;
-            rawData[10] = 1/this.far;
-            rawData[11] = 0;
-
-            rawData[12] = 0;
-            rawData[13] = 0;
-            rawData[14] = -1/this.far*Math.PI*100;
-            rawData[15] = 1;
-
-            this.states |= DChange.trasnform;
+    export function CameraOrthResize(width: number, height: number,len:IMatrix3D,far:number,originFar,camera?:Camera){
+        if(camera){
+            camera.w = width;
+            camera.h = height;
+            camera.states |= DChange.trasnform;
         }
+       
 
-        
+        len[0] = 2/width;
+        len[1] = 0;
+        len[2] = 0;
+        len[3] = 0;
+
+        len[4] = 0;
+        len[5] = 2/height;
+        len[6] = 0;
+        len[7] = 0;
+
+        len[8] = 0;
+        len[9] = 0;
+        len[10] = 1/far;
+        len[11] = 0;
+
+        len[12] = 0;
+        len[13] = 0;
+        len[14] = -1/far*Math.PI*100;
+        len[15] = 1;
+
+       
     }
 
     //  Perspective Projection Matrix
-    export class Camera3D extends Camera{
-        resize(width: number, height: number): void{
-            this.w = width;
-            this.h = height;
-
-            let zNear = 0.1;
-            let zFar = this.far;
-
-            // let len = new PerspectiveMatrix3D();
-            // len.perspectiveFieldOfViewLH(45,width/height,0.1,10000);
-            // len.perspectiveFieldOfViewRH(45,width/height,0.1,10000);
-            // this.len = len;
-            // len.transpose();
-
-            // xScale, 0.0, 0.0, 0.0,
-            // 0.0, yScale, 0.0, 0.0,
-            // 0.0, 0.0, (zFar + zNear) / (zFar - zNear), 1.0,
-            // 0.0, 0.0, 2.0 * zFar * zNear / (zNear - zFar), 0.0
-            
-            // (zFar + zNear) / (zFar - zNear)
-            // 2.0 * zFar * zNear / (zNear - zFar)
-
-            // this.len = len;
-            let rawData = this.len;
-
-            // let yScale: number = 1.0 / Math.tan(45 / 2.0);
-            // let xScale: number = yScale / width * height;
-            // rawData[0] = xScale;        rawData[1] = 0;                   rawData[2] = 0;                                       rawData[3] = 0;
-            // rawData[4] = 0;             rawData[5] = yScale;              rawData[6] = 0;                                       rawData[7] = 0;
-            // rawData[8] = 0;             rawData[9] = 0;                   rawData[10] = (zFar + zNear) / (zFar - zNear);        rawData[11] = 1.0;
-            // rawData[12] = 0;            rawData[13] = 0;                  rawData[14] = 2.0 * zFar * zNear / (zNear - zFar);    rawData[15] = 0;
-
-
-            rawData[0] = 2/width;      rawData[1] = 0;             rawData[2] = 0;                  rawData[3] = 0;
-            rawData[4] = 0;            rawData[5] = 2/height;      rawData[6] = 0;                  rawData[7] = 0;
-            rawData[8] = 0;            rawData[9] = 0;             rawData[10] = 1/this.far;        rawData[11] = 1/this.originFar;
-            rawData[12] = 0;           rawData[13] = 0;            rawData[14] = -1/this.far*Math.PI*100;       rawData[15] = 0;
-
-            
-            this.states |= DChange.trasnform;
+    export function Camera3DResize(width: number, height: number,len:IMatrix3D,far:number,originFar,camera?:Camera): void{
+        if(camera){
+            camera.w = width;
+            camera.h = height;
+            camera.states |= DChange.trasnform;
         }
+        
+
+        // let zNear = 0.1;
+        // let zFar = far;
+
+        // let len = new PerspectiveMatrix3D();
+        // len.perspectiveFieldOfViewLH(45,width/height,0.1,10000);
+        // len.perspectiveFieldOfViewRH(45,width/height,0.1,10000);
+        // this.len = len;
+        // len.transpose();
+
+        // xScale, 0.0, 0.0, 0.0,
+        // 0.0, yScale, 0.0, 0.0,
+        // 0.0, 0.0, (zFar + zNear) / (zFar - zNear), 1.0,
+        // 0.0, 0.0, 2.0 * zFar * zNear / (zNear - zFar), 0.0
+        
+        // (zFar + zNear) / (zFar - zNear)
+        // 2.0 * zFar * zNear / (zNear - zFar)
+
+        // this.len = len;
+        // let yScale: number = 1.0 / Math.tan(45 / 2.0);
+        // let xScale: number = yScale / width * height;
+        // rawData[0] = xScale;        rawData[1] = 0;                   rawData[2] = 0;                                       rawData[3] = 0;
+        // rawData[4] = 0;             rawData[5] = yScale;              rawData[6] = 0;                                       rawData[7] = 0;
+        // rawData[8] = 0;             rawData[9] = 0;                   rawData[10] = (zFar + zNear) / (zFar - zNear);        rawData[11] = 1.0;
+        // rawData[12] = 0;            rawData[13] = 0;                  rawData[14] = 2.0 * zFar * zNear / (zNear - zFar);    rawData[15] = 0;
+
+
+        len[0] = 2/width;      len[1] = 0;             len[2] = 0;                  len[3] = 0;
+        len[4] = 0;            len[5] = 2/height;      len[6] = 0;                  len[7] = 0;
+        len[8] = 0;            len[9] = 0;             len[10] = 1/far;        len[11] = 1/originFar;
+        len[12] = 0;           len[13] = 0;            len[14] = -1/far*Math.PI*100;       len[15] = 0;
     }
 }

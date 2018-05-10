@@ -35,17 +35,20 @@ module rf{
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
             let sun = new DirectionalLight();
-            sun.setPos(100,100,100);
+            let fff = 10000 / Math.PI2;
+            sun.setPos(fff,fff,fff);
+            let v = TEMP_VECTOR3D;
+            v[0] = v[1] = v[2] = 0;
+            sun.lookat(v);
             scene.sun = sun;
             
-
-
             var g:Graphics;
             
             let camera = ROOT.camera3D;
-            scene.camera = camera
+            scene.camera = camera;
+
             // let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar / 2;
-            let f = camera.originFar / 2;
+            let f = camera.originFar;
             f = Math.sqrt(f*f / 3);
             // let{x,y,z} = camera;
             // let cos = Math.cos(45 * DEGREES_TO_RADIANS);
@@ -65,7 +68,7 @@ module rf{
 
             let t = 2;
             let tr = new Trident(w,t);
-            scene.addChild(tr);
+            // scene.addChild(tr);
 
             sp = tr;
 
@@ -95,9 +98,10 @@ module rf{
 
             // m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
             m.diff = newColor(0xAAAAAA);
-
             let plane = new PlaneGeometry(variables).create(w*2,w*2);
             let mesh = new Mesh(variables);
+            mesh.shadowTarget = true;
+            // mesh.shadowable = true;
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
@@ -131,16 +135,39 @@ module rf{
             // mesh.setPos(0,70,0);
             // scene.addChild(mesh);
 
+            let kfmurl = "../assets/mesh/f1/";
+
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            kfmMesh.load("../assets/mesh/a10010m/");
+            kfmMesh.shadowable = true;
+            // kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
+            kfmMesh.load("../assets/mesh/f3/");
             scene.addChild(kfmMesh);
 
-            var gui = new dat.GUI();
-            var folder = gui.addFolder("mesh");
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.setPos(-200,0,0);
+            // kfmMesh.load("../assets/mesh/f1/");
+            // scene.addChild(kfmMesh);
+
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.setPos(200,0,0);
+            // kfmMesh.load("../assets/mesh/f1/");
+            // scene.addChild(kfmMesh);
+
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.setPos(0,0,300);
+            // kfmMesh.rotationY = 180;
+            // kfmMesh.load("../assets/mesh/f1/");
+            // scene.addChild(kfmMesh);
+
+            // var gui = new dat.GUI();
+            // var folder = gui.addFolder("mesh");
             // folder.add(kfmMesh,"refreshGUI");
             // var posFolder = folder.addFolder("position");
             // posFolder.add(kfmMesh,"x",-1000,1000).step(0.01);

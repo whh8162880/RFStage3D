@@ -3052,7 +3052,7 @@ declare module rf {
         load(url: string): void;
         loadCompelte(e: EventX): void;
         setKFM(kfm: ISkeletonMeshData): void;
-        refreshGUI(gui: dat.GUI): void;
+        // refreshGUI(gui: dat.GUI): void;
     }
     class Skeleton {
         rootBone: IBone;

@@ -45,7 +45,21 @@ module rf{
         }
 
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
-            return false;
+            let c = context3D;
+
+            let{program,cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
+            if(!program){
+                this.program = program = this.createProgram(mesh);
+            }
+
+            
+            c.setCulling(cull);
+            c.setBlendFactors(srcFactor,dstFactor);
+            c.setDepthTest(depthMask,passCompareMode);
+
+            c.setProgram(program);
+
+            return true;
         }
 
 
@@ -78,6 +92,59 @@ module rf{
 
         getTextUrl(data:ITextureData):string{
             return data.url;
+        }
+
+    }
+
+
+    export class ShadowMaterial extends Material{
+
+        createProgram(mesh:Mesh){
+            let c = context3D;
+            let key = "ShadowMaterial";
+
+            let p = c.programs[key];
+
+            if(undefined != p){
+                return p;
+            }
+
+
+            let vertexCode = `
+                precision mediump float;
+                attribute vec3 ${VA.pos};
+
+                uniform mat4 ${VC.mvp};
+
+                varying vec3 vPos;
+
+
+                void main(void){
+                    vec4 t_pos = ${VC.mvp} * vec4(${VA.pos},1.0);
+                    gl_Position = t_pos;
+                    vPos = t_pos.xyz;
+                }
+            `
+
+            let fragmentCode = `
+                precision mediump float;
+
+                varying vec3 vPos;
+
+                void main(void){
+                    vec3 pos = vPos;
+                    pos.x = (pos.x + 1.0)*0.5;
+                    pos.y = -(pos.y - 1.0)*0.5;
+                    pos.z = 0.0;
+                    gl_FragColor = vec4(pos.xyz,1.0);
+                }
+                
+            `
+            
+
+            p = c.createProgram(vertexCode,fragmentCode,key);
+
+            return p;
         }
 
     }
@@ -125,16 +192,17 @@ module rf{
             if(undefined != diffTex){
                 t = c.textureObj[diffTex.key];
                 t.uploadContext(program,0,FS.diff);
+            }else if(undefined != diff){
+                c.setProgramConstantsFromVector(VC.vc_diff,[diff.r,diff.g,diff.b,diff.a],4);
             }
 
+            if(mesh.shadowTarget){
+                ROOT.shadow.rtt.uploadContext(program,0,FS.SHADOW);
+            }
 
             // c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
 
             // c.setProgramConstantsFromVector(VC.vc_diff,[Math.random(),Math.random(),Math.random(),1.0],4);
-            if(undefined != diff){
-                c.setProgramConstantsFromVector(VC.vc_diff,[diff.r,diff.g,diff.b,diff.a],4);
-            }
-
             if(undefined != emissive){
                 c.setProgramConstantsFromVector(VC.vc_emissive,[emissive.r,emissive.g,emissive.b,0.0],4);
             }
@@ -146,7 +214,7 @@ module rf{
 
 
             const{diffTex,emissiveTex,specularTex,diff} = this;
-            const{skAnim}=mesh;
+            const{skAnim,shadowTarget}=mesh;
 
             let c = context3D;
             
@@ -162,14 +230,17 @@ module rf{
                 f_def += "#define VC_DIFF\n";
             }
 
-            
-
             if(undefined != emissiveTex){
                 key += "-emissive"
             }
 
             if(undefined != specularTex){
                 key += "-specular"
+            }
+
+            if(shadowTarget){
+                key += "-shadow";
+                f_def += "#define SHADOW"
             }
 
             if(undefined != skAnim){
@@ -201,6 +272,7 @@ module rf{
                 uniform vec3 ${VC.lightDirection};
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
+                varying vec3 vShadowPos;
 #ifdef USE_SKINNING
                 uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
                 mat4 getBoneMatrix( const in float i ) {
@@ -249,6 +321,7 @@ module rf{
                 ${f_def}
 
                 uniform sampler2D ${FS.diff};
+                uniform sampler2D ${FS.SHADOW};
 
                 uniform vec4 ${VC.vc_diff};
                 uniform vec4 ${VC.vc_emissive};
@@ -271,7 +344,13 @@ module rf{
                             vec4 c = vec4(1.0,1.0,1.0,1.0) ;
                         #endif
                     #endif
-                    c *= vDiffuse;
+
+                    #ifdef SHADOW
+                        c = texture2D(${FS.SHADOW}, tUV);
+                        // c = vec4(tUV,0.0,1.0) ;
+                    #endif
+
+                    // c *= vDiffuse;
 
                     if(c.w < 0.1){
                         discard;
