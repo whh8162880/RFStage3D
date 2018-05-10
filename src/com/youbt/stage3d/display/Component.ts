@@ -97,7 +97,6 @@ module rf{
 			let names:any[];
 			for(let ele of elements)
 			{
-				console.log(ele.name);
 				if(ComponentClass.hasOwnProperty(ele.type.toString()))
 				{
 					//文本这样处理是不行的
@@ -208,6 +207,7 @@ module rf{
         set data(value:any){this._data = value;this.doData();}
         get data():any{return this._data;}
 		doData():void{}
+		refreshData():void{this.doData();}
 		
 		bindComponents():void{}
 

@@ -376,7 +376,6 @@ module rf{
 
             // 潘华专用  
             new Pan_Test();
-            // new Eva_Text();
         }
 
 
