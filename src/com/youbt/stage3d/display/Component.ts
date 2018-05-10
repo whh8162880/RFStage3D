@@ -1,3 +1,4 @@
+///<reference path="../../mvc/manage/PanelSourceManage.ts" />
 ///<reference path="./Sprite.ts" />
 module rf{
 
@@ -89,80 +90,56 @@ module rf{
 				return;
 			}
 			
-			let sp:Sprite;
+			let sp:Component;
 			
 			let tempMatrix:IMatrix = newMatrix();
 
+			let names:any[];
 			for(let ele of elements)
 			{
-				if(ele.type == SymbolConst.SYMBOL){
-					if(null == ele.name){
-						// ele.name = RFProfile.addInstance(element);
-					}
-					
+				if(ComponentClass.hasOwnProperty(ele.type.toString()))
+				{
+					//文本这样处理是不行的
 					sp = this[ele.name];
-					if(!sp){
-						if(ele.rect){//目前还没写9宫
-							//sp = new ScaleRectSprite3D(source);
-						}else{
-							sp = new Component(this.source);
-						}
-						sp.mouseEnabled = true;
-						sp.x = ele.x;
-						sp.y = ele.y;
-						if(ele.matrix2d){
-							tempMatrix.set(ele.matrix2d);
-						}else{
-							tempMatrix.m2_identity();
-						}
-						// if(sceneMatrix){
-						// 	tempMatrix.concat(sceneMatrix);
-						// }
-						
-						(sp as Component).setSymbol(ele as IDisplaySymbol,tempMatrix);
-						
-						this[ele.name] = sp;
-						sp.name = ele.name;
-						
-						sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
-					}
-					this.addChild(sp);
-				}else if(ele.type == SymbolConst.TEXT){
-					let textElement = ele as IDisplayTextElement;
-					if(!this.hasOwnProperty(ele.name))
+					if(!sp)
 					{
-						sp = recyclable(TextField);
-						let e_format:object = textElement.format;
-						let format:TextFormat = recyclable(TextFormat).init();
-						format.size = e_format["size"] == undefined ? 12 : e_format["size"];
-						format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
+						sp = recyclable(ComponentClass[ele.type]);
+						sp.source = this.source;
+						if(ele.type == ComponentConst.Label)
+						{//文本处理
+							let textElement = ele as IDisplayTextElement;
+							let textfield:TextField = recyclable(TextField);
+							let e_format:object = textElement.format;
+							let format:TextFormat = recyclable(TextFormat).init();
+							format.size = e_format["size"] == undefined ? 12 : e_format["size"];
+							format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
 
-						(sp as TextField).init(this.source, format);
-						(sp as TextField).color = textElement.color;
-						(sp as TextField).multiline = textElement.multiline;
-						if(textElement.input){
-							(sp as TextField).type = TextFieldType.INPUT;
-							sp.mouseEnabled = true;
+							textfield.init(this.source, format);
+							textfield.color = textElement.color;
+							textfield.multiline = textElement.multiline;
+							if(textElement.input){
+								textfield.type = TextFieldType.INPUT;
+								textfield.mouseEnabled = true;
+							}else{
+								textfield.type = TextFieldType.DYNAMIC;
+							}
+							
+							textfield.setSize(textElement.width,textElement.height);
+							textfield.text = textElement.text;
+							sp["text"] = textfield;
+							sp.addChild(textfield);
+							sp.x = ele.x;
+							sp.y = ele.y;
+							sp.setSize(textfield.w, textfield.h);
+							this.addChild(sp);
 						}else{
-							(sp as TextField).type = TextFieldType.DYNAMIC;
+							sp.setSymbol(ele as IDisplaySymbol);
 						}
-						
-						sp.setSize(textElement.width,textElement.height);
-						(sp as TextField).text = textElement.text;
 						sp.x = ele.x;
 						sp.y = ele.y;
+						sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
 						this.addChild(sp);
-						if(ele.name){
-							this[ele.name] = sp;
-							sp.name = ele.name;
-						}
-					}else{
-						sp = this[ele.name];
-						if((sp as TextField).text != textElement.text)
-						{
-							textElement.text = (sp as TextField).text;
-						}
-						this.addChild(sp);
+						this[ele.name] = sp;
 					}
 				}else{
 					this.renderFrameElement(ele);
@@ -186,7 +163,7 @@ module rf{
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
 		renderFrameElement(element:IDisplayFrameElement,clean:Boolean = false):void{
-			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName);
+			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 1);
 			if(vo == undefined)
 			{
 				return;
@@ -230,6 +207,7 @@ module rf{
         set data(value:any){this._data = value;this.doData();}
         get data():any{return this._data;}
 		doData():void{}
+		refreshData():void{this.doData();}
 		
 		bindComponents():void{}
 
@@ -506,19 +484,48 @@ module rf{
 		}
 	}
 
+	export class TabItem extends Button{
+		static colors:object = null;
+
+		index:number = 0;
+		target:Sprite = null;
+
+		doSelected():void{
+			this.clipRefresh();
+
+			let text:TextField = this.text;
+			let colors:object = TabItem.colors;
+			let {_selected, _label} = this;
+			if(colors != undefined && text != undefined)
+			{
+				text.html = true;
+				// text.text = HtmlUtil.renderColor(_label , _selected ? colors["normal"] : colors["select"]);
+			}
+		}
+	}
+	
+
 	export const enum ComponentConst{
-		Label = 0,
-		Button = 1,
-		CheckBox = 2,
-		RadioButton = 3,
-		List = 4,
-		MList = 5,
-		TabItem = 6,
-		Tab = 7
+		Component,
+		Label,
+		Button,
+		CheckBox,
+		RadioButton,
+		TabItem,
+		ScrollBar,
+		Dele,
+		List,
+		MList,
+		Tab
 	}
 
-	export var ComponentClass:{ [type: string]: { new(): Component } } = {
-		0 : Label,
-		1 : Button
+	export let ComponentClass:{ [type: string]: { new(): Component } } = {
+		0 : Component,
+		1 : Label,
+		2 : Button,
+		3 : CheckBox,
+		4 : RadioButton,
+		5 : TabItem,
+		7 : Component
 	}
 }

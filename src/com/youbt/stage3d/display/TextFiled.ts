@@ -82,8 +82,8 @@ module rf {
             _inputdiv.style.opacity = "1";
             _inputdiv.style.width = tw + "px";
             _inputdiv.style.height = th + "px";
-            _inputdiv.style.left = _text.x + "px";
-            _inputdiv.style.top = _text.y + "px";
+            _inputdiv.style.left = _text.sceneTransform[12] + "px";
+            _inputdiv.style.top = _text.sceneTransform[13] + "px";
             _inputdiv.style.clip = "rect(0px," + tw + "px,"+ th + "px, 0px)";//rect(top,right,bottom,left)
 
             //需要设置字体 颜色 字体大小 默认值 
