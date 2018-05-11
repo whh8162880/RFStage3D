@@ -11,7 +11,7 @@ module rf{
         load(url:string, uri:string):AsyncResource
         {
             let res:AsyncResource = this.getres(url, uri);
-            if(res.status == 0)
+            if(res.status == LoadStates.WAIT)
             {
                 res.load(url);
             }
@@ -109,12 +109,14 @@ module rf{
 
         load(url:string):void
         {
+            this.status = LoadStates.LOADING;
             loadRes(url, this.p3dloadComplete, this, ResType.text);
         }
 
         p3dloadComplete(e:EventX):void{
             if(e.type !=  EventT.COMPLETE)
             {
+                this.status = LoadStates.FAILED;
                 return;
             }
             let res:ResItem = e.data;
@@ -133,16 +135,13 @@ module rf{
          }
 
          onImageComplete(e:EventX):void{
-            let {status} = this;
             if(e.type !=  EventT.COMPLETE)
             {
-                status = 0;
+                this.status = LoadStates.FAILED;
                 return;
             }
 
-            status = 1;
-
-            this.status = status;
+            this.status = LoadStates.COMPLETE;
 
             const{d_setting} = this;
 
