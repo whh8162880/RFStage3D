@@ -59,6 +59,11 @@ module rf {
                 this.blurHandler();
             }
 
+            if(text == undefined)
+            {
+                return;
+            }
+
             self._text = text;
             //根据传递进来的textfiled选择对应的输入
             let inpunt = text.multiline ? this._area : this._input;
@@ -668,6 +673,15 @@ module rf {
             this.visible = true;
             this.text = val;
         }
+
+        removeFromStage():void{
+            super.removeFromStage();
+            if(this._edit)
+            {
+                txtedit.setTextfiled(undefined);
+            }
+			// this.simpleDispatch(EventT.REMOVE_FROM_STAGE);
+		}
     }
 
 
