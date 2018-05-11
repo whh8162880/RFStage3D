@@ -21,15 +21,23 @@
 
         <script type="text/javascript" src="../assets/lib/inflate.min.js"></script>
         <script type="text/javascript" src="../assets/lib/dat.gui.js"></script>
+        <script type="text/javascript" src="../assets/lib/cannon.js"></script>
+        <!-- <script type="text/javascript" src="../assets/lib/ammo.js"></script> -->
+        <script type="text/javascript" src="../assets/lib/ammo.wasm.js"></script>
 <%script%/>
         <!-- <script src="assets/jQuery.js"></script> -->
         <!-- <script src="assets/stage3d.js"></script> -->
 
         <script>
             function main(){
-                // selectd("States");
-                var m = new rf.Main();
-                m.init(document.getElementById("game"));
+                Ammo().then(function(Ammo){
+                    var m = new rf.ammoTest();
+                    m.init(document.getElementById("game"));
+                } )
+                
+                // var m = new rf.cannonTest();
+                // m.init(document.getElementById("game"));
+
                 // init();
                 // debugModel(false);
             }
