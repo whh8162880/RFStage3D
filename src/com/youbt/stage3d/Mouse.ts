@@ -1,6 +1,6 @@
 ///<reference path="./Stage3D.ts" />
 module rf{
-    interface IMouseElement{
+    export interface IMouseElement{
         target:DisplayObject
         time:number;
         down:number;
@@ -10,7 +10,7 @@ module rf{
         out?:number;
     }
 
-    interface ITouchlement{
+    export interface ITouchlement{
         target:DisplayObject;
         time:number;
         data:MouseEventData;

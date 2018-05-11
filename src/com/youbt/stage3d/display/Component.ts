@@ -1,5 +1,5 @@
+///<reference path="../../mvc/manage/PanelSourceManage.ts" />
 ///<reference path="./Sprite.ts" />
-
 module rf{
 
 	export interface IDisplayFrameElement{
@@ -43,25 +43,9 @@ module rf{
 		RECTANGLE = 3
 	}
 
-	export const enum ComponentConst{
-		Label,
-		Button,
-		CheckBox,
-		RadioButton,
-		List,
-		MList,
-		TabItem,
-		Tab
-	}
-
-
-
-
     export class Component extends Sprite{
         constructor(source?:BitmapSource){
 			super(source);
-			
-			this._skin = {};
         }
 
         currentClip:number;
@@ -69,8 +53,6 @@ module rf{
         symbol:IDisplaySymbol;
 		
 		sceneMatrix:IMatrix;
-
-		_skin:object;
 
 		setSymbol(symbol:IDisplaySymbol,matrix?:IMatrix):void{
 			this.symbol = symbol;
@@ -108,82 +90,56 @@ module rf{
 				return;
 			}
 			
-			let sp:Sprite;
+			let sp:Component;
 			
 			let tempMatrix:IMatrix = newMatrix();
 
+			let names:any[];
 			for(let ele of elements)
 			{
-				if(ele.type == SymbolConst.SYMBOL){
-					if(null == ele.name){
-						// ele.name = RFProfile.addInstance(element);
-					}
-					
+				if(ComponentClass.hasOwnProperty(ele.type.toString()))
+				{
+					//文本这样处理是不行的
 					sp = this[ele.name];
-					if(!sp){
-						if(ele.rect){//目前还没写9宫
-							//sp = new ScaleRectSprite3D(source);
-						}else{
-							sp = new Component(this.source);
-						}
-						sp.mouseEnabled = true;
-						sp.x = ele.x;
-						sp.y = ele.y;
-						if(ele.matrix2d){
-							tempMatrix.set(ele.matrix2d);
-						}else{
-							tempMatrix.m2_identity();
-						}
-						// if(sceneMatrix){
-						// 	tempMatrix.concat(sceneMatrix);
-						// }
-						
-						(sp as Component).setSymbol(ele as IDisplaySymbol,tempMatrix);
-						
-						this._skin[ele.name] = sp;
-						this[ele.name] = sp;
-						sp.name = ele.name;
-						
-						sp.setSize(Math.round(sp.width * ele.scaleX),Math.round(sp.height * ele.scaleY));
-					}
-					this.addChild(sp);
-				}else if(ele.type == SymbolConst.TEXT){
-					let textElement = ele as IDisplayTextElement;
-					if(!this._skin.hasOwnProperty(ele.name))
+					if(!sp)
 					{
-						sp = recyclable(TextField);
-						let e_format:object = textElement.format;
-						let format:TextFormat = recyclable(TextFormat).init();
-						format.size = e_format["size"] == undefined ? 12 : e_format["size"];
-						format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
+						sp = recyclable(ComponentClass[ele.type]);
+						sp.source = this.source;
+						if(ele.type == ComponentConst.Label)
+						{//文本处理
+							let textElement = ele as IDisplayTextElement;
+							let textfield:TextField = recyclable(TextField);
+							let e_format:object = textElement.format;
+							let format:TextFormat = recyclable(TextFormat).init();
+							format.size = e_format["size"] == undefined ? 12 : e_format["size"];
+							format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
 
-						(sp as TextField).init(this.source, format);
-						(sp as TextField).color = textElement.color;
-						(sp as TextField).multiline = textElement.multiline;
-						if(textElement.input){
-							(sp as TextField).type = TextFieldType.INPUT;
-							sp.mouseEnabled = true;
+							textfield.init(this.source, format);
+							textfield.color = textElement.color;
+							textfield.multiline = textElement.multiline;
+							if(textElement.input){
+								textfield.type = TextFieldType.INPUT;
+								textfield.mouseEnabled = true;
+							}else{
+								textfield.type = TextFieldType.DYNAMIC;
+							}
+							
+							textfield.setSize(textElement.width,textElement.height);
+							textfield.text = textElement.text;
+							sp["text"] = textfield;
+							sp.addChild(textfield);
+							sp.x = ele.x;
+							sp.y = ele.y;
+							sp.setSize(textfield.w, textfield.h);
+							this.addChild(sp);
 						}else{
-							(sp as TextField).type = TextFieldType.DYNAMIC;
+							sp.setSymbol(ele as IDisplaySymbol);
 						}
-						
-						sp.setSize(textElement.width,textElement.height);
-						(sp as TextField).text = textElement.text;
 						sp.x = ele.x;
 						sp.y = ele.y;
+						sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
 						this.addChild(sp);
-						if(ele.name){
-							this._skin[ele.name] = sp;
-							this[ele.name] = sp;
-							sp.name = ele.name;
-						}
-					}else{
-						sp = this[ele.name];
-						if((sp as TextField).text != textElement.text)
-						{
-							textElement.text = (sp as TextField).text;
-						}
-						this.addChild(sp);
+						this[ele.name] = sp;
 					}
 				}else{
 					this.renderFrameElement(ele);
@@ -207,7 +163,7 @@ module rf{
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
 		renderFrameElement(element:IDisplayFrameElement,clean:Boolean = false):void{
-			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName);
+			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 1);
 			if(vo == undefined)
 			{
 				return;
@@ -251,6 +207,7 @@ module rf{
         set data(value:any){this._data = value;this.doData();}
         get data():any{return this._data;}
 		doData():void{}
+		refreshData():void{this.doData();}
 		
 		bindComponents():void{}
 
@@ -300,15 +257,275 @@ module rf{
 	}
 
 	export interface IButton extends ILabel{
-		addClick(func:Function,thisObj?:any)
+		mouseDown:boolean;
+		addClick(func:Function,thisObj?:any);
 	}
 	export class Button extends Label implements IButton{
+		mouseDown:boolean = false;
 		bindComponents():void
-        {
+		{
+			// if(this["label"] != undefined)
+			// {
+			// 	this.text = this["label"];
+			// 	this.text.html = true;
+			// }
+			this.mouseChildren = false;
+
+			this.doEnabled();
+		}
+
+		doEnabled():void
+		{
+			this.mouseEnabled = this._enabled;
+			this.setEnable(this._enabled);
+		}
+
+		private setEnable(show:Boolean):void
+		{
+			// _enableFlag = show;
+			if(show){
+				this.on(MouseEventX.MouseDown,this.mouseDownHandler, this);
+				this.on(MouseEventX.ROLL_OVER,this.rollHandler, this);
+				this.on(MouseEventX.ROLL_OUT,this.rollHandler, this);
+			
+				this.mouseEnabled = true;
+			}else{
+				this.off(MouseEventX.MouseDown,this.mouseDownHandler);
+				this.off(MouseEventX.ROLL_OVER,this.rollHandler);
+				this.off(MouseEventX.ROLL_OUT,this.rollHandler);
+				this.mouseEnabled = false;
+			}
+		}
+		
+		protected mouseDownHandler(event:EventX):void{
+			this.on(MouseEventX.MouseUp, this.mouseUpHandler, this);
+			this.mouseDown = true;
+			this.clipRefresh();
+		}
+
+		protected mouseUpHandler(event:EventX):void{
+			this.mouseDown = false;
+			this.off(MouseEventX.MouseUp, this.mouseUpHandler);
+			this.clipRefresh();
+		}
+
+		protected rollHandler(event:EventX):void{
+			this.clipRefresh();
+		}
+
+		protected clipRefresh():void{
+			const{mouseDown} = this;
+			this.gotoAndStop(mouseDown ? 2 : (this.mouseroll ? 1 : 0));
 		}
 
 		addClick(listener:Function,thisObj?:any){
 			this.on(MouseEventX.CLICK,listener,thisObj);
 		}
+	}
+
+	export class CheckBox extends Button{
+
+		doEnabled():void
+		{
+			super.doEnabled();
+			let {_enabled} = this;
+			if(_enabled){
+				this.on(MouseEventX.CLICK, this.clickHandler, this);
+			}else{
+				this.off(MouseEventX.CLICK, this.clickHandler);
+			}
+		}
+
+		protected clickHandler(event:EventX):void{
+			this.selected = !this._selected
+		}
+
+		doSelected():void{
+			this.simpleDispatch(EventT.SELECT);
+			this.clipRefresh();
+		}
+	}
+
+	export class RadioButton extends CheckBox{
+		protected _group:string;
+		constructor(source?:BitmapSource, group?:string)
+		{
+			super(source);
+			if(group != undefined)
+			{
+				this.group = group;
+			}
+		}
+
+		doSelected():void{
+			this.simpleDispatch(EventT.SELECT, this);
+			this.clipRefresh();
+			if(!this._selected){
+				this.on(MouseEventX.CLICK, this.clickHandler, this);
+			}else{
+				this.off(MouseEventX.CLICK, this.clickHandler);
+			}
+		}
+
+		set group(name:string){
+			let {_group} = this;
+			var radioButtonGroup:RadioButtonGroup;
+			if(_group){
+				radioButtonGroup = RadioButtonGroup.getGroup(_group);
+				if(radioButtonGroup){
+					radioButtonGroup.removeRadioButton(this);
+				}
+			}
+			this._group = name;
+			if(this._group){
+				radioButtonGroup = RadioButtonGroup.getGroup(_group,true);
+				radioButtonGroup.addRadioButton(this);
+			}
+		}
+		get group():string{
+			return this._group;
+		}
+	}
+
+	export class RadioButtonGroup extends MiniDispatcher{
+		private static groupDict:object = {};
+
+		private name:String;
+		private list:any[];
+
+		constructor(name:string){
+			super();
+			this.name = name;
+			this.list = [];
+			RadioButtonGroup.groupDict[name] = this;
+		}
+
+		static getGroup(name:string, autoCreate:boolean = false):RadioButtonGroup
+		{
+			let group:RadioButtonGroup = this.groupDict[name];
+			if(!group)
+			{
+				if(autoCreate){
+					group = new RadioButtonGroup(name);
+				}
+			}
+			return group;
+		}
+		private _selectRadioButton:RadioButton;
+		set selectRadioButton(radioButton:RadioButton){
+			this._selectRadioButton = radioButton;
+			if(this._selectRadioButton){
+				this._selectRadioButton.selected = true;
+			}
+		}
+		get selectRadioButton():RadioButton{
+			return this._selectRadioButton;
+		}
+		
+		
+		private _selectIndex:number;
+		set selectIndex(value:number){
+			
+			this._selectIndex = value;
+			
+			var item:RadioButton = this.list[value];
+			if(item){
+				item.selected = true;
+			}
+		}
+		
+		get selectIndex():number
+		{
+			return this._selectIndex;
+		}
+		
+		/**
+		 *  
+		 * @param radioButton
+		 * 
+		 */		
+		addRadioButton(radioButton:RadioButton):void{
+			if(this.list.indexOf(radioButton)==-1){
+				if(this._selectRadioButton != undefined){
+					this._selectRadioButton = radioButton;
+					radioButton.selected = true;
+				}else{
+					radioButton.addEventListener(EventT.SELECT, this.radioButtonSelectHandler, radioButton);
+				}
+				this.list.push(radioButton);
+			}
+		}
+		
+		/**
+		 * 
+		 * @param radioButton
+		 * 
+		 */		
+		removeRadioButton(radioButton:RadioButton):void{
+			var i:number = this.list.indexOf(radioButton);
+			if(i==-1){
+				return;
+			}
+			radioButton.removeEventListener(EventT.SELECT,this.radioButtonSelectHandler);
+			this.list.splice(i,1);
+		}
+		
+		protected radioButtonSelectHandler(event:EventX):void{
+			var target:RadioButton = event.data as RadioButton;
+			if(target && target.selected){
+				if(this._selectRadioButton){
+					this._selectRadioButton.selected = false;
+					this._selectRadioButton.addEventListener(EventT.SELECT, this.radioButtonSelectHandler, this._selectRadioButton);
+				}
+				this._selectRadioButton = target;
+				this._selectRadioButton.removeEventListener(EventT.SELECT, this.radioButtonSelectHandler);
+				this.dispatchEvent(new EventX(EventT.CHANGE));
+			}
+		}
+	}
+
+	export class TabItem extends Button{
+		static colors:object = null;
+
+		index:number = 0;
+		target:Sprite = null;
+
+		doSelected():void{
+			this.clipRefresh();
+
+			let text:TextField = this.text;
+			let colors:object = TabItem.colors;
+			let {_selected, _label} = this;
+			if(colors != undefined && text != undefined)
+			{
+				text.html = true;
+				// text.text = HtmlUtil.renderColor(_label , _selected ? colors["normal"] : colors["select"]);
+			}
+		}
+	}
+	
+
+	export const enum ComponentConst{
+		Component,
+		Label,
+		Button,
+		CheckBox,
+		RadioButton,
+		TabItem,
+		ScrollBar,
+		Dele,
+		List,
+		MList,
+		Tab
+	}
+
+	export let ComponentClass:{ [type: string]: { new(): Component } } = {
+		0 : Component,
+		1 : Label,
+		2 : Button,
+		3 : CheckBox,
+		4 : RadioButton,
+		5 : TabItem,
+		7 : Component
 	}
 }

@@ -50,6 +50,10 @@ module rf {
 
         combine(hitArea:HitArea,x:number,y:number):boolean{
             let b = false;
+            if(hitArea == undefined)
+            {
+                return b;
+            }
             if(this.left > hitArea.left+x){
                 this.left = hitArea.left+x;
                 b = true;
@@ -140,6 +144,9 @@ module rf {
         _y: number = 0;
         _z: number = 0;
 
+        w: number = 0;
+        h: number = 0;
+
         _rotationX: number = 0;
         _rotationY: number = 0;
         _rotationZ: number = 0;
@@ -162,10 +169,7 @@ module rf {
         stage: Stage3D;
         name: string;
 
-        protected w: number = 0;
-        protected h: number = 0;
-        protected _width:number;
-        protected _height:number;
+        locksize:boolean = false;
 
         constructor() {
             super();
@@ -486,8 +490,9 @@ module rf {
         removeFromStage(): void { };
 
         setSize(width: number, height: number): void {
-            this._width = width;
-            this._height = height;
+            this.locksize = true;
+            this.w = width;
+            this.h = height;
             this.invalidate();
         }
 
@@ -646,15 +651,6 @@ module rf {
             this._rotationZ = rot.z;
             
 			this.setChange(DChange.trasnform);
-        }
-        
-        get width():number
-        {
-            return this._width == undefined ? this.w : this._width;
-        }
-        get height():number
-        {
-            return this._height == undefined ? this.h : this._height;
         }
     }
 }

@@ -103,8 +103,6 @@ namespace rf {
 			g.clearDepth(depth); // TODO:dont need to call this every time
 			g.clearStencil(stencil); //stencil buffer
 			g.clear(this._clearBit);
-			this.triangles = 0;
-			this.dc = 0;
 		}
 
 		triangleFaceToCull:number;
@@ -266,7 +264,7 @@ namespace rf {
 			return buffer
 		}
 
-		public getTextureData(url:string,mipmap?:boolean,mag?:number,mix?:number,repeat?:number){
+		public getTextureData(url:string,mipmap?:boolean,mag?:number,mix?:number,repeat?:number,y?:boolean){
 			let data = {} as ITextureData;
 			data.url = url;
 			data.mipmap = undefined != mipmap ? mipmap : false;
@@ -280,7 +278,7 @@ namespace rf {
 
 		public textureObj:{[key:string]:Texture} = {};
 
-		public createTexture(key:ITextureData,pixels?: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData, mipmap: boolean = false): Texture {
+		public createTexture(key:ITextureData,pixels?: ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement | BitmapData): Texture {
 			let texture = recyclable(Texture);
 			texture.key = key.key ? key.key : (key.key = `${key.url}_${key.mipmap}_${key.mag}_${key.mix}_${key.repeat}`);
 			texture.data = key;
@@ -295,52 +293,107 @@ namespace rf {
 			return texture;
 		}
 
-
-		public createEmptyTexture(key:string,width: number, height: number, mipmap: boolean = false): Texture {
+		public createEmptyTexture(key:ITextureData,width: number, height: number): Texture {
 			let texture = recyclable(Texture);
-			texture.key = key;
-			texture.pixels = new BitmapData(width, height);
+			texture.key = key.key ? key.key : (key.key = `${key.url}_${key.mipmap}_${key.mag}_${key.mix}_${key.repeat}`);
+			texture.data = key;
 			texture.width = width;
 			texture.height = height;
-			this.textureObj[key] = texture;
+			this.textureObj[key.key] = texture;
 			return texture;
 		}
 
-		private _rttFramebuffer: WebGLFramebuffer;
-		public setRenderToTexture(
-			texture: Texture,
-			enableDepthAndStencil: boolean = false,
-			antiAlias: number = 0,
-			surfaceSelector: number /*int*/ = 0,
-			colorOutputIndex: number /*int*/ = 0
-		): void {
+
+		public createRttTexture(key:ITextureData,width: number, height: number): RTTexture {
+			let texture = new RTTexture();
+			texture.key = key.key ? key.key : (key.key = `${key.url}_${key.mipmap}_${key.mag}_${key.mix}_${key.repeat}`);
+			texture.data = key;
+			texture.width = width;
+			texture.height = height;
+			this.textureObj[key.key] = texture;
+			return texture;
+		}
+
+
+		public setRenderToTexture(texture:RTTexture,enableDepthAndStencil: boolean = true,antiAlias: number = 0,surfaceSelector: number /*int*/ = 0,colorOutputIndex: number /*int*/ = 0){
+			let g = gl;
+
+			if(!texture.readly){
+				if(false == texture.awaken()){
+					return;
+				}
+			}
+
+
+			let{frameBuffer,renderBuffer,texture:textureObj,width,height} = texture;
+			g.bindFramebuffer(g.FRAMEBUFFER,frameBuffer);
+
+			// if(frameBuffer){
+			// 	g.deleteFramebuffer(frameBuffer);
+			// }
+
+			// width = stageWidth;
+			// height = stageHeight;
+
+			// width = height = 512;
+
+			// // this.configureBackBuffer(width,height,0,true);
+
+			// g.bindTexture(g.TEXTURE_2D,textureObj);
+			// g.texImage2D(g.TEXTURE_2D,0,g.RGBA,width,height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+
+			// texture.frameBuffer = frameBuffer = g.createFramebuffer();
+			// g.bindFramebuffer(g.FRAMEBUFFER,frameBuffer);
+
+			// if(renderBuffer){
+			// 	g.deleteRenderbuffer(renderBuffer);
+			// }
+			// texture.renderBuffer = renderBuffer = g.createRenderbuffer();
+
+			// g.bindRenderbuffer(g.RENDERBUFFER,renderBuffer);
+			// g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT16,width,height);
+			// g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,renderBuffer);
+			
+			// g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,textureObj,0);
+
+
+			// this.configureBackBuffer(stageWidth,stageHeight,0,true);
+
+			// g.bindRenderbuffer(g.RENDERBUFFER,undefined);
+			// g.bindFramebuffer(g.FRAMEBUFFER,undefined);
+			// g.bindFramebuffer(g.FRAMEBUFFER, texture.frameBuffer);
+
+			// let{renderBuffer}=texture;
+			// if(renderBuffer){
+			// 	g.deleteRenderbuffer(renderBuffer);
+			// }
+			// texture.renderBuffer = renderBuffer = g.createRenderbuffer();
+			// g.bindRenderbuffer(g.RENDERBUFFER,renderBuffer);
+			// g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT16,256,256);
+			// g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,renderBuffer);
+			// g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,texture.texture,0);
+			// g.bindRenderbuffer(g.RENDERBUFFER,undefined);
+
 			if (enableDepthAndStencil) {
-				this._clearBit = gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT;
-				gl.enable(gl.DEPTH_TEST);
-				gl.enable(gl.STENCIL_TEST);
+				texture.cleanBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
+				g.enable(g.DEPTH_TEST);
+				g.enable(g.STENCIL_TEST);
 			} else {
-				this._clearBit = gl.COLOR_BUFFER_BIT;
-				gl.disable(gl.DEPTH_TEST);
-				gl.disable(gl.STENCIL_TEST);
+				texture.cleanBit = g.COLOR_BUFFER_BIT;
+				g.disable(g.DEPTH_TEST);
+				g.disable(g.STENCIL_TEST);
 			}
 
+			g.clearColor(0,0,0,1);
+			g.clearDepth(1.0);
+			g.clearStencil(0.0)
+			g.clear(texture.cleanBit);
 			//TODO: antiAlias surfaceSelector colorOutputIndex
-			if (!this._rttFramebuffer) {
-				this._rttFramebuffer = gl.createFramebuffer();
-				gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
-
-				var renderbuffer: WebGLRenderbuffer = gl.createRenderbuffer();
-				gl.bindRenderbuffer(gl.RENDERBUFFER, renderbuffer);
-				gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, 512, 512); //force 512
-
-				gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, renderbuffer);
-				gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture.texture, 0);
-			}
-			gl.bindFramebuffer(gl.FRAMEBUFFER, this._rttFramebuffer);
 		}
 
 		public setRenderToBackBuffer(): void {
-			gl.bindFramebuffer(gl.FRAMEBUFFER, null);
+			let g = gl;
+			g.bindFramebuffer(g.FRAMEBUFFER, null);
 		}
 
 		programs: { [key: string]: Recyclable<Program3D> } = {};

@@ -1,56 +1,100 @@
+///<reference path="../com/youbt/mvc/MVC.ts" />
 module rf{
     export class PanelUtils{
-        skin:Component;
-        setting:object;
-        btn_random:Button;
-        btn_create:Button;
+        constructor(){
+            mainKey.regKeyDown(Keybord.A,this.onKeyDownHandle,this)
+        }
+    
+        onKeyDownHandle(e:KeyboardEvent):void{
+            let m = singleton(CreateMeidator);
+            facade.toggleMediator(m);
+        }
+    }
+
+    export interface IInfoDele{
+        txt_name:TextField;
+        txt_warning:TextField;
+        txt_cool:TextField;
+        txt_addmsg:TextField;
+        btn_random:IButton;
+        btn_create:IButton;
+    }
+
+    export class CreateMeidator extends Mediator{
+        $panel:CreatePanel;
+        constructor(){
+            super("CreateMeidator");
+            this.setPanel(new CreatePanel());
+        }
+        mediatorReadyHandle():void{
+            super.mediatorReadyHandle();
+        }
+
+        awaken():void{
+            console.log("mediator awaken")
+        }
+
+    }
+
+    export class CreatePanel extends Panel{
+        constructor(){
+            super("create","ui.asyncpanel.create");
+        }
+
+        btn_random:IButton = null;
+        btn_create:IButton = null;
+        dele_info:IInfoDele = null;
 
         bg:IconView;
 
-        manage:PanelSourceManage;
-
-        source:AsyncResource;
-
-        constructor(){
-            let {manage} = this;
-            manage = singleton(PanelSourceManage);
-            this.source = manage.load("../assets/create.p3d", "create");
-            this.source.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this)
-        }
-
-        private asyncsourceComplete(e:EventX):void
-        {
-            const{source} = this;
-            
-            let clsname:string = "ui.asyncpanel.create";
-            let cs:IDisplaySymbol = source.setting[clsname];
-            
-            this.skin = new Component(source.source);
-            this.skin.setSymbol(cs);
-            this.skin.renderer = new BatchRenderer(this.skin);
-            popContainer.addChild(this.skin);
-
-            this.bindComponents();
-        }
-
-        protected bindComponents():void
-        {
-            const{skin} = this;
-            this.btn_random = new Button(skin["btn_random"]);
-            this.btn_create = new Button(skin['btn_create']);
-
-            this.bg = new IconView(skin.source);
-            skin.addChildAt(this.bg, 0);
+        bindComponents():void{
+            this.bg = new IconView(this.source);
+            this.addChildAt(this.bg, 0);
             this.bg.setUrl('assets/createbg.jpg');
 
+            // this.btn_random = skin["btn_random"];
             this.btn_random.addClick(this.randomHandler);
+
+            if(this.dele_info.btn_create != undefined)
+            {
+                this.dele_info.btn_create.addClick(this.createHandler);
+            }else{
+                alert("1112");
+            }
+        }
+
+        protected createHandler(e:EventX):void
+        {
+            alert("dele_info 创建点击");
         }
 
         protected randomHandler(e:EventX):void
         {
             alert("随机按钮点击");
         }
+        
+        key:KeyManagerV2
+        awaken():void{
+            this.key = new KeyManagerV2(this);
+            this.key.regKeyDown(Keybord.B,this.onKeyHandle,this);
+            this.key.awaken();
+        }
+
+        onKeyHandle(e:KeyboardEvent):void{
+            console.log("key_down_"+e.keyCode);
+        }
+
+        sleep():void{
+            this.key.sleep();
+
+            console.log("key_sleep");
+        }
+
     }
 
-    let sourceManger:PanelSourceManage = singleton(PanelSourceManage)
+    export class CreateModel extends BaseModel{
+        constructor(){
+            super("CreateModel");
+        }
+    }
 }

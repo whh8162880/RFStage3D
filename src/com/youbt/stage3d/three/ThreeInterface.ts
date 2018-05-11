@@ -29,6 +29,9 @@ module rf{
         cull:number;
         alphaTest:number; //0表示不剔除
         diffTex?:ITextureData;
+        specularTex?:ITextureData;
+        normalTex?:ITextureData;
+        emissiveTex?:ITextureData;
     }
 
     /**
@@ -78,6 +81,7 @@ module rf{
         mesh:IMeshData;
         skeleton:ISkeletonData;
         material:IMaterialData;
+        anims:string[];
     }
 
 
