@@ -79,8 +79,13 @@ namespace rf {
 			// ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
 		}
 
-		public configureBackBuffer(width: number,height: number,antiAlias: number,enableDepthAndStencil: boolean = true): void {
+		backBufferWidth:number;
+		backBufferHeight:number;
+		antiAlias:number;
+		public configureBackBuffer(width: number,height: number,antiAlias: number = 0,enableDepthAndStencil: boolean = true): void {
 			let g = gl;
+			this.backBufferWidth = width;
+			this.backBufferHeight = height;
 			g.viewport(0, 0, width, height);
 			g.canvas.width = width;
 			g.canvas.height = height;
@@ -324,55 +329,9 @@ namespace rf {
 				}
 			}
 
-
 			let{frameBuffer,renderBuffer,texture:textureObj,width,height} = texture;
+			g.viewport(0,0,width,height);
 			g.bindFramebuffer(g.FRAMEBUFFER,frameBuffer);
-
-			// if(frameBuffer){
-			// 	g.deleteFramebuffer(frameBuffer);
-			// }
-
-			// width = stageWidth;
-			// height = stageHeight;
-
-			// width = height = 512;
-
-			// // this.configureBackBuffer(width,height,0,true);
-
-			// g.bindTexture(g.TEXTURE_2D,textureObj);
-			// g.texImage2D(g.TEXTURE_2D,0,g.RGBA,width,height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
-
-			// texture.frameBuffer = frameBuffer = g.createFramebuffer();
-			// g.bindFramebuffer(g.FRAMEBUFFER,frameBuffer);
-
-			// if(renderBuffer){
-			// 	g.deleteRenderbuffer(renderBuffer);
-			// }
-			// texture.renderBuffer = renderBuffer = g.createRenderbuffer();
-
-			// g.bindRenderbuffer(g.RENDERBUFFER,renderBuffer);
-			// g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT16,width,height);
-			// g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,renderBuffer);
-			
-			// g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,textureObj,0);
-
-
-			// this.configureBackBuffer(stageWidth,stageHeight,0,true);
-
-			// g.bindRenderbuffer(g.RENDERBUFFER,undefined);
-			// g.bindFramebuffer(g.FRAMEBUFFER,undefined);
-			// g.bindFramebuffer(g.FRAMEBUFFER, texture.frameBuffer);
-
-			// let{renderBuffer}=texture;
-			// if(renderBuffer){
-			// 	g.deleteRenderbuffer(renderBuffer);
-			// }
-			// texture.renderBuffer = renderBuffer = g.createRenderbuffer();
-			// g.bindRenderbuffer(g.RENDERBUFFER,renderBuffer);
-			// g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT16,256,256);
-			// g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,renderBuffer);
-			// g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,texture.texture,0);
-			// g.bindRenderbuffer(g.RENDERBUFFER,undefined);
 
 			if (enableDepthAndStencil) {
 				texture.cleanBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
@@ -384,16 +343,17 @@ namespace rf {
 				g.disable(g.STENCIL_TEST);
 			}
 
-			g.clearColor(0,0,0,1);
+			g.clearColor(0,0,0,0);
 			g.clearDepth(1.0);
 			g.clearStencil(0.0)
 			g.clear(texture.cleanBit);
-			//TODO: antiAlias surfaceSelector colorOutputIndex
 		}
 
 		public setRenderToBackBuffer(): void {
 			let g = gl;
+			let{backBufferWidth,backBufferHeight}=this;
 			g.bindFramebuffer(g.FRAMEBUFFER, null);
+			g.viewport(0,0,backBufferWidth,backBufferHeight);
 		}
 
 		programs: { [key: string]: Recyclable<Program3D> } = {};

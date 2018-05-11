@@ -20,6 +20,7 @@ module rf {
         m = "m",
         mv = "mv",
         invm = "invm",
+        sunmvp = "sunmvp",
         p = "p",
         mvp = "mvp",
         ui = "ui",

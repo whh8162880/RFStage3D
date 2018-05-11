@@ -25,7 +25,15 @@ module rf {
                         skAnim.uploadContext(camera, this, program, now, interval);
                     }
                     geometry.uploadContext(camera, this, program, now, interval);
-                    context3D.drawTriangles(geometry.index, geometry.numTriangles)
+
+                    let{shadowTarget,shadowMatrix}=this;
+
+                    let c = context3D;
+                    if(shadowTarget){
+                        c.setProgramConstantsFromMatrix(VC.sunmvp,shadowMatrix);
+                    }
+
+                    c.drawTriangles(geometry.index, geometry.numTriangles)
                 }
             }
             

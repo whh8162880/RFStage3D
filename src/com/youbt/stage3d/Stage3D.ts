@@ -7,6 +7,7 @@ module rf {
         scene: Scene;
         shadowable: boolean;
         shadowTarget:boolean;
+        shadowMatrix:IMatrix3D;
         geometry: GeometryBase;
         invSceneTransform: IMatrix3D;
         addChild(child: DisplayObject) {
@@ -274,30 +275,36 @@ module rf {
             // c.configureBackBuffer(w,h,0);
 
             let g = gl;
-            g.viewport(0,0,w,h);
-
             c.setRenderToTexture(rtt,true);
 
             m.uploadContext(sun,undefined,now,interval);
             let p = m.program;
             for(let vo = link.getFrist();vo;vo = vo.next){
                 if(vo.close == false){
-                    let{shadowable,geometry}=vo.data as SceneObject;
+                    let obj = vo.data as SceneObject;
+                    let{shadowable,shadowTarget,geometry,shadowMatrix,sceneTransform}=obj;
+                    let worldTranform = TEMP_MATRIX;
                     if(shadowable){
-                        geometry.uploadContext(sun,vo.data,p,now,interval);
+                        geometry.vertex.uploadContext(p);
+                        worldTranform.m3_append(sun.worldTranform,false,sceneTransform);
+                        c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
                         c.drawTriangles(geometry.index,geometry.numTriangles);
+                    }
+                    if(shadowTarget){
+                        if(!shadowMatrix){
+                            obj.shadowMatrix = shadowMatrix = newMatrix3D();
+                        }
+                        shadowMatrix.m3_append(sun.worldTranform,false,sceneTransform);
                     }
                 }
             }
-            let matrix = TEMP_MATRIX;
+            // let matrix = TEMP_MATRIX;
             // matrix.m3_scale(w / stageWidth,h / stageHeight,1);
             // matrix.m3_identity();
             // this.debugImage.render(undefined,matrix);
 
 
             c.setRenderToBackBuffer();
-
-            g.viewport(0,0,stageWidth,stageHeight);
 
             // c.configureBackBuffer(stageWidth,stageHeight,0);
             

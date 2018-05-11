@@ -330,6 +330,7 @@ module rf {
             worldTranform.m3_append(camera.worldTranform,false,sceneTransform);
             c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
             c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
+            return worldTranform;
         }
         
     }

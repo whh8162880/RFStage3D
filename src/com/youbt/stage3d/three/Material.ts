@@ -133,9 +133,9 @@ module rf{
 
                 void main(void){
                     vec3 pos = vPos;
-                    pos.x = (pos.x + 1.0)*0.5;
-                    pos.y = -(pos.y - 1.0)*0.5;
-                    pos.z = 0.0;
+                    // pos.x = (pos.x + 1.0)*0.5;
+                    // pos.y = -(pos.y - 1.0)*0.5;
+                    // pos.z = 0.0;
                     gl_FragColor = vec4(pos.xyz,1.0);
                 }
                 
@@ -240,7 +240,8 @@ module rf{
 
             if(shadowTarget){
                 key += "-shadow";
-                f_def += "#define SHADOW"
+                f_def += "#define SHADOW";
+                v_def += "#define SHADOW";
             }
 
             if(undefined != skAnim){
@@ -270,9 +271,11 @@ module rf{
                 uniform mat4 ${VC.mvp};
                 uniform mat4 ${VC.invm};
                 uniform vec3 ${VC.lightDirection};
+                uniform mat4 ${VC.sunmvp};
+
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
-                varying vec3 vShadowPos;
+                varying vec3 vShadowUV;
 #ifdef USE_SKINNING
                 uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
                 mat4 getBoneMatrix( const in float i ) {
@@ -307,6 +310,12 @@ module rf{
                     vDiffuse = vec4(vec3(diffuse), 1.0);
                     vUV = ${VA.uv};
                     gl_Position = ${VC.mvp} * t_pos;
+#ifdef SHADOW
+                    t_pos = t_pos * ${VC.sunmvp};
+                    t_pos.xy = (t_pos.xy + 1.0) * 0.5;
+                    // t_pos.y = -(t_pos.y - 1.0) * 0.5;
+                    vShadowUV = t_pos.xyz;
+#endif
                 }
             `
             
@@ -329,7 +338,7 @@ module rf{
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
 
-
+                varying vec3 vShadowUV;
                 
                 void main(void){
 
@@ -346,11 +355,23 @@ module rf{
                     #endif
 
                     #ifdef SHADOW
-                        c = texture2D(${FS.SHADOW}, tUV);
-                        // c = vec4(tUV,0.0,1.0) ;
+
+                        vec4 s = texture2D(${FS.SHADOW}, vShadowUV.xy);
+                        // c = vec4(vShadowUV.xy,0.0,1.0) ;
+                        // if(s.w * s.z > 0.0){
+                        //     discard;
+                        // }
+
+                        // vec4 s = texture2D(${FS.SHADOW}, tUV);
+                        // if(s.w > 0.0){
+                        //     discard;
+                        // }
+                        c = vec4(1.0 - s.zzz,s.w);
+                    #else
+                        c = vec4(0.0);
                     #endif
 
-                    // c *= vDiffuse;
+                    c *= vDiffuse;
 
                     if(c.w < 0.1){
                         discard;

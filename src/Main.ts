@@ -34,9 +34,16 @@ module rf{
             // gl.depthMask(true);
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
+
+            let camera = ROOT.camera2D;
+            scene.camera = camera;
+            let f = camera.originFar;
+            f = Math.sqrt(f*f / 3);
+
             let sun = new DirectionalLight();
-            let fff = 10000 / Math.PI2;
-            sun.setPos(fff,fff,fff);
+            // let fff = 10000 / Math.PI2;
+            
+            sun.setPos(f,f,f);
             let v = TEMP_VECTOR3D;
             v[0] = v[1] = v[2] = 0;
             sun.lookat(v);
@@ -44,12 +51,10 @@ module rf{
             
             var g:Graphics;
             
-            let camera = ROOT.camera3D;
-            scene.camera = camera;
+           
 
             // let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar / 2;
-            let f = camera.originFar;
-            f = Math.sqrt(f*f / 3);
+            
             // let{x,y,z} = camera;
             // let cos = Math.cos(45 * DEGREES_TO_RADIANS);
             // let sin = Math.sin(45 * DEGREES_TO_RADIANS);
@@ -121,12 +126,16 @@ module rf{
             // mesh.init(box,m);
             // mesh.setPos(0,-110,0);
             // scene.addChild(mesh);
-
-            // let sphere = new SphereGeometry(variables).create(r,r,w*.5);
-            // mesh = new Mesh(variables);
-            // mesh.init(sphere,m);
-            // mesh.setPos(0,0,0);
-            // scene.addChild(mesh);
+            let sphere = new SphereGeometry(variables).create(r,r,50);
+            mesh = new Mesh(variables);
+            mesh.shadowable = true;
+            mesh.shadowTarget = false;
+            mesh.geometry = sphere;
+            mesh.material = new PhongMaterial();
+            mesh.material.setData(undefined);
+            mesh.material.diff = newColor(0xAAAAAA);
+            mesh.setPos(0,50,0);
+            scene.addChild(mesh);
 
 
             // let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
@@ -145,7 +154,7 @@ module rf{
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
             kfmMesh.load("../assets/mesh/f3/");
-            scene.addChild(kfmMesh);
+            // scene.addChild(kfmMesh);
 
             // kfmMesh = new KFMMesh(new PhongMaterial());
             // kfmMesh.setSca(100,100,100);
