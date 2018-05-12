@@ -7,60 +7,37 @@ module rf{
     export class Facade extends MiniDispatcher{
 
         SINGLETON_MSG:string = "Facade Singleton already constructed!";
-        mediatorMap:{[key:string]:Mediator}= {};
+        // mediatorMap:{[key:string]:Mediator}= {};
         modelMap:{[key:string]:BaseModel}= {};
 
+        protected mediatorTypes:{[key:string]:number} = {};
 
         constructor(){
             super();
         }
 
-
-        mediator:Mediator = null;
-        type:number;
-        toggleMediator(mediator:Mediator,type:number = -1):Mediator{
+        toggleMediator(m:any,type:number = -1):Mediator{
+            let mediator:Mediator = singleton(m);
             let panel = mediator._panel;
 
-            if(panel == null) return null;
+            if(mediator.isReady == false && type == 0)
+            {
+                if(mediator.hasEventListener(EventT.COMPLETE_LOADED))
+                {
+                    mediator.removeEventListener(EventT.COMPLETE_LOADED, this.mediatorCompleteHandler);
+                }
+                return mediator;
+            }
             if(mediator.isReady == false && mediator.startSync())
             {
-                this.mediator = mediator;
-                this.type = type;
-                mediator.addEventListener(EventT.COMPLETE_LOADED,this.onCompleteHandle,this);
-                return;
+                this.mediatorTypes[mediator.name] = type;
+                mediator.addEventListener(EventT.COMPLETE_LOADED, this.mediatorCompleteHandler, this);
+                return mediator;
             }
 
-            this.mediator = null;
-            switch(type){
-                case 1:
-                    if(panel.isShow == false)
-                    {
-                        panel.show();
-                    }else{
-                        panel.bringTop();
-                    }
-                break;
-                case 0:
-                    if(panel.isShow)panel.hide();
-                break;
-                case -1:
-                    panel.isShow?panel.hide():panel.show();
-                break;
-            }
+            this.togglepanel(mediator._panel)
 
             return mediator;
-        }
-
-        onCompleteHandle(e:EventX):void{
-            let mediator = this.mediator;
-            if(mediator && mediator.hasEventListener(EventT.COMPLETE_LOADED)){
-                mediator.off(EventT.COMPLETE_LOADED, this.onCompleteHandle);
-            }
-
-            if(mediator){
-                this.toggleMediator(this.mediator,this.type);
-            }   
-
         }
 
         registerEvent(events:{[key:string]:EventHandler},thisobj:any):void{
@@ -78,13 +55,40 @@ module rf{
             }
         }
 
+        private togglepanel(panel:Panel, type:number = -1):void
+        {
+            switch(type){
+                case 1:
+                    if(panel.isShow == false)
+                    {
+                        panel.show();
+                    }else{
+                        panel.bringTop();
+                    }
+                break;
+                case 0:
+                    if(panel.isShow)panel.hide();
+                break;
+                case -1:
+                    panel.isShow?panel.hide():panel.show();
+                break;
+            }
+        }
+
+        private mediatorCompleteHandler(event:EventX):void
+        {
+            let mediator:Mediator = event.data as Mediator;
+            mediator.removeEventListener(EventT.COMPLETE_LOADED, this.mediatorCompleteHandler);
+            let type:number = this.mediatorTypes[mediator.name];
+            delete this.mediatorTypes[mediator.name];
+            this.togglepanel(mediator._panel, type);
+        }
     }
 
     export let facade = singleton(Facade);
 
-
     export class Mediator extends MiniDispatcher{
-
+        static NAME:string;
         eventInterests:{[key:string]:EventHandler};
 
         isReady:boolean = false;
@@ -96,14 +100,13 @@ module rf{
 			super();
 			this.name = NAME;
 			this.mEventListeners = {};
-			facade.mediatorMap[this.name] = this;
 			this.eventInterests = {};
 		}
 		
 		_panel:Panel
 		setPanel(panel:Panel):void{
            if(this._panel){
-               this.setBindView(false);
+               ThrowError("has panel");
             }
 
 			this._panel = panel;
@@ -129,51 +132,25 @@ module rf{
         preViewCompleteHandler(e:EventX):void{
             if(e)
             {
-                let skin = e.currentTarget  as Component;
+                let skin = e.currentTarget as Component;
                 skin.removeEventListener(EventT.COMPLETE,this.preViewCompleteHandler);
                 this.setBindView(true);
             }
             //checkModeldata
-            // TimerUtil.add(this.mediatorReadyHandle,100);
+            // TimerUtil.add(this. ,100);
             this.mediatorReadyHandle();
             this.simpleDispatch(EventT.COMPLETE_LOADED,this);
-
         }
-
-        // _readyExecutes:Function[];
-        // _readyExecutesArgs:{[key:string]:any} = {}
-        // addReadyExecute(fun:Function,...args):void{
-            // const {_panel} = this;
-            // let _readyExecutes = this._readyExecutes;
-            // let _readyExecutesArgs = this._readyExecutesArgs
-
-            // if(this.isReady){
-			// 	if(_panel && !_panel.loaded)
-			// 	{
-
-            //         let length:number = _readyExecutes.length;
-            //         _readyExecutes.push(fun);
-            //         _readyExecutesArgs[length] =args;
-			// 		return;
-            //     }
-            //     fun.apply(null,args);
-			// 	return;
-			// }else{
-			// 	this.startSync();
-            // }
-            
-            // let length:number = _readyExecutes.length;
-            // _readyExecutes.push(fun);
-            // _readyExecutesArgs[length] =args;
-			
-        // }
 
         awakenAndSleepHandle(e:EventX):void{
             let type = e.type;
             switch(type){
                 case EventT.ADD_TO_STAGE:
                     facade.registerEvent(this.eventInterests,this);
-                    this.awaken();
+                    if(this.isReady)
+                    {
+                        this.awaken();
+                    }
 					break;
 				case EventT.REMOVE_FROM_STAGE:
                     facade.removeEvent(this.eventInterests)
@@ -194,20 +171,6 @@ module rf{
 
         mediatorReadyHandle():void{
             this.isReady = true;
-
-        //    let _readyExecutes = this._readyExecutes;
-        //    let _readyExecutesArgs = this._readyExecutesArgs;
-        //     if(_readyExecutes.length){
-        //         let i = 0;
-        //         while(_readyExecutes.length){
-        //             let fun = _readyExecutes.shift();
-        //             let args = _readyExecutesArgs[i];
-        //             fun.apply(null,args);
-
-        //             i++;
-        //         }
-		// 	}
-
             if(this._panel.isShow){
                 facade.registerEvent(this.eventInterests,this);
                 this.awaken();
@@ -261,23 +224,23 @@ module rf{
 		HIDE = "PanelEvent_HIDE",
     }
     
-    export class Panel extends Component{
+    export class Panel extends Component implements IResizeable{
 		uri:string;
 		clsName:string;
-		_resizeable:boolean;
         isShow:boolean = false;
 		container:DisplayObjectContainer;
         isModel:boolean;
         loadSource:AsyncResource;
 
 		isReadyShow:boolean = false;
-		loaded:boolean = false;
+        loaded:boolean = false;
+        protected centerFlag:Boolean = false;
+        protected _resizeable:boolean = false;
 
 		constructor(uri:string,cls:string){
 			super();
 			this.uri = uri;
 			this.clsName = cls;
-			this._resizeable=true;
 		}
 
 		getURL():string
@@ -290,8 +253,8 @@ module rf{
 		}
 		
 		show(container:any=null, isModal:boolean=false):void{
-
-			if(this.loaded == false)
+            let {loaded, _resizeable, centerFlag, isShow} = this;
+			if(loaded == false)
 			{
 				this.isReadyShow=true;
 				this.container = container;
@@ -300,18 +263,26 @@ module rf{
 				return;
             }
             
-            if(this.isShow)
+            if(isShow)
 			{
 				this.bringTop();
 				return;
-			}
+            }
+            
 			if(!container)
 			{
 				container = popContainer;
 			}
-			container.addChild(this);
-
-			this.isShow = true;
+            container.addChild(this);
+            
+            if(_resizeable || isModal)
+            {
+                Engine.addResize(this);
+                // this.resize(stageWidth, stageHeight);
+            }else if(centerFlag){
+                this.centerLayout();
+            }
+            this.isShow = true;
 			this.awaken();
 			this.effectTween(1);
 
@@ -325,17 +296,14 @@ module rf{
 		}
 
 		load():void{
-			if(this.loadSource == undefined ||this.loadSource.status == 0 )
-			{
-				let url = this.getURL();
-				this.loadSource = sourceManger.load(url, this.uri);
+            if(this.loaded)
+            {
+                this.asyncsourceComplete(undefined);
+            }else{
+                let url = this.getURL();
+                this.loadSource = sourceManger.load(url, this.uri);
 				this.loadSource.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this);
-				// this.showload();
-			}else{
-				this.asyncsourceComplete(undefined);
-			}
-
-
+            }
 		}
 
 		asyncsourceComplete(e:EventX):void{
@@ -404,13 +372,71 @@ module rf{
 
             // this.effectEndByBitmapCache(type);
             if(type == 0){
+                if(this._resizeable || this.isModel){
+                    Engine.removeResize(this);
+                }
                 this.remove();
             }
             
         }
-
-        awaken():void{}
-		sleep():void{}
+        
+        resize(width: number, height: number):void
+        {
+            let {centerFlag} = this;
+            if(centerFlag)
+			{
+				this.centerLayout();
+			}
+        }
+        protected centerLayout():void
+		{
+            this.x = stageWidth - this.w >> 1;
+            this.y = stageHeight - this.h >> 1;
+            if(this.y < 0)
+            {
+                this.y = 0;
+            }
+		}
 	}
 
+    export class TEventInteresterDele extends Component{
+        protected _eventInterests:{[key:string]:EventHandler};
+        constructor(source?:BitmapSource){
+            super(source);
+
+            this._eventInterests = {};
+
+            //这个地方加添加和移除监听
+            //添加到时候将所有事件注册 移除时将所有事件移除
+            this.setBindView(true);
+        }
+
+        protected bindEventInterests():void{
+			
+        }
+        
+        setBindView(isBind:boolean):void{
+            if(isBind){
+                this.addEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle,this);
+                this.addEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle,this);
+            }else{
+                this.removeEventListener(EventT.ADD_TO_STAGE,this.awakenAndSleepHandle);
+                this.removeEventListener(EventT.REMOVE_FROM_STAGE,this.awakenAndSleepHandle);
+            }
+        }
+
+        awakenAndSleepHandle(e:EventX):void{
+            let type = e.type;
+            switch(type){
+                case EventT.ADD_TO_STAGE:
+                    facade.registerEvent(this._eventInterests,this);
+                    this.awaken();
+					break;
+				case EventT.REMOVE_FROM_STAGE:
+                    facade.removeEvent(this._eventInterests)
+					this.sleep();
+					break;
+			}
+        }
+    }
 }
