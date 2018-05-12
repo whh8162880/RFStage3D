@@ -233,3 +233,19 @@ node --inspect-brk APP.js
     
 
 ```
+
+
+
+如何为为一个js库生成.d.ts文件
+'''
+为什么要这么做？
+为了ts代码中能够识别js中的定义，以便自动代码提示。
+
+怎么做？
+使用Microsoft/dts-gen，假设我们要为 cannon.js （一个js实现的3d物理引擎） 生成dts
+1、npm install -g dts-gen
+2、npm install -g cannon
+3、dts-gen -m cannon
+4、把生成的d.ts复制到到自己项目中
+
+'''

@@ -35,10 +35,11 @@ function formatAssets(assets){
             if((i = file.lastIndexOf("*")) == file.length-1){
                 r.push([path.resolve(file.slice(0,i)).replace(/\\/g,"/").toLowerCase(),2]);
             }else{
-                r.push([path.resolve(file).replace(/\\/g,"/").toLowerCase(),3]);
+                r.push([(file).replace(/\\/g,"/").toLowerCase(),3]);
             }
         }
     }
+
 
     return r;
 }

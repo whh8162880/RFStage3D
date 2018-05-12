@@ -10,7 +10,6 @@ module rf {
             this.createSource();
             Engine.start();
             ROOT = singleton(Stage3D);
-            tween = singleton(TweenManager);
         }
 
 
@@ -39,6 +38,7 @@ module rf {
         }
 
         createSource():void{
+            // panels= singleton(PanelSourceManage)
             let bmd = new BitmapData(2048,2048,true);
             let source = new BitmapSource().create("component",bmd,true);
             let vo = source.setSourceVO("origin",1,1);
@@ -96,7 +96,7 @@ module rf {
         public update(now: number, interval: number): void {
             //todo
             ROOT.update(now,interval);
-            tween.tick(interval);
+            tweenUpdate();
         }
 
         public resize(width:number,height:number):void{

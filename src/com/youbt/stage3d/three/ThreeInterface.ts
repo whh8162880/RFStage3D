@@ -29,6 +29,9 @@ module rf{
         cull:number;
         alphaTest:number; //0表示不剔除
         diffTex?:ITextureData;
+        specularTex?:ITextureData;
+        normalTex?:ITextureData;
+        emissiveTex?:ITextureData;
     }
 
     /**
@@ -78,6 +81,7 @@ module rf{
         mesh:IMeshData;
         skeleton:ISkeletonData;
         material:IMaterialData;
+        anims:string[];
     }
 
 
@@ -165,5 +169,33 @@ module rf{
         runtime:IParticleRuntimeData;
         setting:IParticleSettingData;
         nodes:{[key:string]:IParticleNodeInfo}
+    }
+
+    //====================================================================================
+    //  Skill
+    //====================================================================================
+    export interface ISkillBaseEvent{
+        type:number;
+        key:string;
+        time:number;
+        next:ISkillBaseEvent;
+        pre:ISkillBaseEvent;
+    }
+    export interface ISkillPointData{
+        skillEvents:ISkillBaseEvent[];
+        createEvents:ISkillBaseEvent[];
+        time:number;
+        index:number;
+    }
+
+    export interface ISkillLineData{
+        desc:string;
+        count:number;
+        points:ISkillPointData[];
+        runtime:{[key:string]:RenderBase};
+    }
+
+    export interface ISkillData{
+        lines:ISkillLineData[];
     }
 }

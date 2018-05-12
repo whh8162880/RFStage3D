@@ -47,6 +47,24 @@ namespace rf {
 	}
 
 
+	//===========================================================================================
+	// 		TimeMixer
+	//===========================================================================================
+	export interface ITimeMixer{
+		now:number;
+		speed:number;
+		interval?:number;
+	}
+	export function newTimeMixer(now:number = 0,speed:number = 1):ITimeMixer{
+		return {now:now,speed:speed}
+	}
+	export function tm_add(t:ITimeMixer,interval:number){
+		t.interval = interval * t.speed;
+		t.now += t.interval;
+		return t.now;
+	}
+	
+
 	export let nativeMouseX:number = 0;
 	export let nativeMouseY:number = 0;
 
@@ -76,6 +94,9 @@ namespace rf {
 
 	export const getT: ({ (): number }) = window.performance ? performance.now.bind(performance) : Date.now;
 
+
+	export const defaultTimeMixer:ITimeMixer = newTimeMixer(0.0,1.0);
+	
 	// export let engie_animation_request:Function = undefined;
 	export class Engine {
 		//当前程序开始时间
@@ -124,6 +145,8 @@ namespace rf {
 				}
 				let now: number = time - Engine.startTime;
 				let interval: number = (Engine.interval = now - engineNow);
+				defaultTimeMixer.now = now;
+				defaultTimeMixer.interval = interval;
 				nextUpdateTime += frameInterval;
 				engineNow = now;
 				Engine.update(now, interval);

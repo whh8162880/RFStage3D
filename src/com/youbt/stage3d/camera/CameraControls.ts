@@ -16,11 +16,11 @@ module rf{
         }
 
         updateSun(){
-            const{object,target}=this;
-            let sun = scene.sun;
-            sun.x = object._x - target.x;
-            sun.y = object._y - target.y;
-            sun.z = object._z - target.z;
+            // const{object,target}=this;
+            // let sun = scene.sun;
+            // sun.x = object._x - target.x;
+            // sun.y = object._y - target.y;
+            // sun.z = object._z - target.z;
         }
 
         set tdistance(value:number){
@@ -33,6 +33,8 @@ module rf{
             return this.distance;
         }
 
+
+        tweener:ITweener;
 
         mouseWheelHandler(event:EventX):void{
            
@@ -49,13 +51,12 @@ module rf{
 
             wheel = wheel*step;
 
-
+            let{tweener}=this;
+            if(tweener){
+                tweenStop(tweener);
+            }
+            this.tweener = tweenTo({tdistance: distance+wheel*2},Math.abs(wheel)*2,defaultTimeMixer,this);
             
-
-            let tweener = tween.get(this,undefined,undefined,true);
-            tweener.to( { tdistance: distance+wheel*2},Math.abs(wheel)*2);
-            
-
             
             // this.object.z += e.deltaY > 0 ? 1: -1
             // this.distance = this.object.pos.subtract(this.target).length;

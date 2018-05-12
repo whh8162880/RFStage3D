@@ -322,7 +322,7 @@ module rf {
         }
 
 
-        uploadContext(camera:Camera,mesh:Mesh, program:Program3D, now: number, interval: number){
+        uploadContext(camera:Camera,mesh:SceneObject, program:Program3D, now: number, interval: number){
             let c = context3D;
             this.vertex.uploadContext(program);
             let{sceneTransform,invSceneTransform}=mesh;
@@ -330,6 +330,7 @@ module rf {
             worldTranform.m3_append(camera.worldTranform,false,sceneTransform);
             c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
             c.setProgramConstantsFromMatrix(VC.invm,invSceneTransform);
+            return worldTranform;
         }
         
     }

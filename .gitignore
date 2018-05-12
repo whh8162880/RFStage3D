@@ -1,8 +1,10 @@
 .tscache
+debug.html
 /build
 .vs
 .vscode
 /bin-debug
 /node_modules
+/examples
 async2github.cmd
 Main.ts

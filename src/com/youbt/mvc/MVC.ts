@@ -1,3 +1,5 @@
+///<reference path="../stage3d/display/Component.ts" />
+///<reference path="./manage/PanelSourceManage.ts" />
 module rf{
     //var facade
     //facade 注册记录保存所有Model class 等信息
@@ -6,7 +8,7 @@ module rf{
 
         SINGLETON_MSG:string = "Facade Singleton already constructed!";
         mediatorMap:{[key:string]:Mediator}= {};
-        modelMap:{[key:string]:BaseMode}= {};
+        modelMap:{[key:string]:BaseModel}= {};
 
 
         constructor(){
@@ -88,7 +90,7 @@ module rf{
         isReady:boolean = false;
 
         name:string;
-        data:BaseMode;
+        data:BaseModel;
 
 		constructor(NAME:string){
 			super();
@@ -98,8 +100,8 @@ module rf{
 			this.eventInterests = {};
 		}
 		
-		_panel:TPanel
-		setPanel(panel:TPanel):void{
+		_panel:Panel
+		setPanel(panel:Panel):void{
            if(this._panel){
                this.setBindView(false);
             }
@@ -225,7 +227,7 @@ module rf{
         }
     }
     
-    export class BaseMode extends MiniDispatcher{
+    export class BaseModel extends MiniDispatcher{
         modelName:string;
         
         isReady:boolean;
@@ -254,5 +256,161 @@ module rf{
         }
     }
 
+    export const enum PanelEvent{
+		SHOW = "PanelEvent_SHOW",
+		HIDE = "PanelEvent_HIDE",
+    }
+    
+    export class Panel extends Component{
+		uri:string;
+		clsName:string;
+		_resizeable:boolean;
+        isShow:boolean = false;
+		container:DisplayObjectContainer;
+        isModel:boolean;
+        loadSource:AsyncResource;
+
+		isReadyShow:boolean = false;
+		loaded:boolean = false;
+
+		constructor(uri:string,cls:string){
+			super();
+			this.uri = uri;
+			this.clsName = cls;
+			this._resizeable=true;
+		}
+
+		getURL():string
+		{
+			let url:string = "";
+			if(!url){
+				url = "../assets/" + this.uri + ".p3d";
+			}
+			return url;
+		}
+		
+		show(container:any=null, isModal:boolean=false):void{
+
+			if(this.loaded == false)
+			{
+				this.isReadyShow=true;
+				this.container = container;
+				this.isModel = isModal;
+				this.load();
+				return;
+            }
+            
+            if(this.isShow)
+			{
+				this.bringTop();
+				return;
+			}
+			if(!container)
+			{
+				container = popContainer;
+			}
+			container.addChild(this);
+
+			this.isShow = true;
+			this.awaken();
+			this.effectTween(1);
+
+			
+
+			this.addEventListener(MouseEventX.MouseDown,this.panelClickHandler,this);
+			// if(this.hasEventListener(PanelEvent.SHOW))
+			// {
+			// 	this.simpleDispatch(PanelEvent.SHOW);
+			// }
+		}
+
+		load():void{
+			if(this.loadSource == undefined ||this.loadSource.status == 0 )
+			{
+				let url = this.getURL();
+				this.loadSource = sourceManger.load(url, this.uri);
+				this.loadSource.addEventListener(EventT.COMPLETE, this.asyncsourceComplete, this);
+				// this.showload();
+			}else{
+				this.asyncsourceComplete(undefined);
+			}
+
+
+		}
+
+		asyncsourceComplete(e:EventX):void{
+			let loadSource = this.loadSource;
+			let cs:IDisplaySymbol = loadSource.setting[this.clsName];
+			if(cs){
+				this.source = loadSource.source;
+				this.setSymbol(cs);
+				this.renderer = new BatchRenderer(this);
+			}
+
+			this.loaded = true;
+			this.simpleDispatch(EventT.COMPLETE);
+
+			if(this.isReadyShow){
+				this.show(this.container,this.isModel);
+			}
+		}
+
+
+		hide(e:EventX = undefined):void{
+            this.isReadyShow=false;
+            
+            if(!this.isShow){
+				return;
+			}
+
+			this.isShow = false;
+
+			// this.sleep();
+			this.effectTween(0);
+			
+			// this.hideState();
+			this.removeEventListener(MouseEventX.MouseDown,this.panelClickHandler);
+			if(this.hasEventListener(PanelEvent.HIDE)){
+				this.simpleDispatch(PanelEvent.HIDE);
+			}
+		}
+
+        bringTop():void
+		{
+            let {parent} = this;
+			if(parent == null) return;
+			parent.addChild(this);
+		}
+
+		panelClickHandler(e:MouseEventX):void{
+			this.bringTop();
+        }
+        
+        effectTween(type:number):void{
+			
+            // this.getTweener(type);
+        
+
+            // if(type){
+            
+            // 	_tween = tween.get(this._skin);
+            // 	_tween.to({alpha:1},200);
+            // }else{
+            // 	_tween = tween.get(this._skin);
+            // 	_tween.to({alpha:1},200);
+            // }
+
+            // _tween.call(this.effectEndByBitmapCache,this,type);
+
+            // this.effectEndByBitmapCache(type);
+            if(type == 0){
+                this.remove();
+            }
+            
+        }
+
+        awaken():void{}
+		sleep():void{}
+	}
 
 }

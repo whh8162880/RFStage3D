@@ -12,13 +12,15 @@ module rf {
     }
 
     export const enum FS {
-        diff = "diff"
+        diff = "diff",
+        SHADOW = "shadow"
     }
 
     export const enum VC {
         m = "m",
         mv = "mv",
         invm = "invm",
+        sunmvp = "sunmvp",
         p = "p",
         mvp = "mvp",
         ui = "ui",
@@ -370,11 +372,6 @@ module rf {
             let g = gl;
             let data = this.pixels;
 
-            if (undefined == data) {
-                this.readly = false;
-                return false;
-            }
-
             if (data instanceof BitmapData) {
                 data = data.canvas;
             }
@@ -476,7 +473,13 @@ module rf {
                 g.getExtension('WEBGL_depth_texture').UNSIGNED_INT_24_8_WEBGL
              */
 
-            g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, data);
+            if(data){
+                g.texImage2D(g.TEXTURE_2D, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, data);
+            }else{
+                g.texImage2D(g.TEXTURE_2D,0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            }
+
+            
 
             
 
@@ -566,10 +569,59 @@ module rf {
     }
 
 
-    export class RttTexture extends Texture {
-        create(width: number, height: number): void {
-            this.width = width;
-            this.height = height;
+    export class RTTexture extends Texture{
+        frameBuffer:WebGLFramebuffer;
+        renderBuffer:WebGLRenderbuffer;
+        cleanBit:number;
+        cleanColor:IColor;
+
+        awaken(){
+            let b = super.awaken();
+            let g = gl;
+
+            if(b){
+                let{frameBuffer,renderBuffer,texture,width,height} = this;
+
+                if(!frameBuffer){
+                    this.frameBuffer = frameBuffer = g.createFramebuffer();
+                }
+
+                g.bindFramebuffer(g.FRAMEBUFFER,frameBuffer);
+
+                if(!renderBuffer){
+                    this.renderBuffer = renderBuffer = g.createRenderbuffer();
+                }
+
+                g.bindRenderbuffer(g.RENDERBUFFER,renderBuffer);
+                g.renderbufferStorage(g.RENDERBUFFER,g.DEPTH_COMPONENT16,width,height);
+                g.framebufferRenderbuffer(g.FRAMEBUFFER,g.DEPTH_ATTACHMENT,g.RENDERBUFFER,renderBuffer);
+                
+                g.framebufferTexture2D(g.FRAMEBUFFER,g.COLOR_ATTACHMENT0,g.TEXTURE_2D,texture,0);
+
+                g.bindRenderbuffer(g.RENDERBUFFER,undefined);
+                g.bindFramebuffer(g.FRAMEBUFFER,undefined);
+
+            }
+
+            return b;
+        }
+
+        recycle(): void {
+            let g = gl;
+            let{frameBuffer,renderBuffer,texture} = this;
+            if(frameBuffer){
+                g.deleteFramebuffer(frameBuffer);
+                this.frameBuffer = undefined;
+            }
+            if(renderBuffer){
+                g.deleteRenderbuffer(renderBuffer);
+                this.renderBuffer = undefined;
+            }
+            if(texture){
+                g.deleteTexture(texture);
+                this.texture = undefined;
+            }
+            this.readly = false;
         }
     }
 }

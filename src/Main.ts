@@ -34,30 +34,53 @@ module rf{
             // gl.depthMask(true);
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
-            let sun = new DirectionalLight();
-            sun.setPos(100,100,100);
-            scene.sun = sun;
-            
 
-
-            var g:Graphics;
-            
             let camera = ROOT.camera3D;
-            scene.camera = camera
-            let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar;
-            f = camera.originFar;
-            camera.z = f
-            // camera.y = f;
+            scene.camera = camera;
+            let f = camera.originFar;
+            f = Math.sqrt(f*f / 3);
+            camera.setPos(0,f,f);
             camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
 
-            let w = 100;
+
+            let sun = new DirectionalLight();
+            // f = 1000 / Math.PI2;
+            // f = Math.sqrt(f*f / 3);
+            sun.setPos(f,f,f);
+            let v = TEMP_VECTOR3D;
+            v[0] = v[1] = v[2] = 0;
+            sun.lookat(v);
+            scene.sun = sun;
+            
+            var g:Graphics;
+            
+           
+
+            // let f = Math.sin(45 * DEGREES_TO_RADIANS) * camera.originFar / 2;
+            
+            // let{x,y,z} = camera;
+            // let cos = Math.cos(45 * DEGREES_TO_RADIANS);
+            // let sin = Math.sin(45 * DEGREES_TO_RADIANS);
+            // x = f * sin * cos;
+            // y = f * sin * sin;
+            // z = f * cos;
+            // camera.setPos(f * sin * cos,f * sin * sin,f * cos);
+           
+
+            // camera.z = f
+            // camera.y = f;
+           
+
+            let w = 500;
 
             let t = 2;
-            let tr = new Trident(w*2,t);
-            scene.addChild(tr);
+            let tr = new Trident(w,t);
+            // scene.addChild(tr);
 
             sp = tr;
+
+            
 
             // line.rotationX = 45;
             // let line = new Line3D();
@@ -81,12 +104,19 @@ module rf{
 
             let r = 40;
 
-            m.diffTex = {url:"assets/a10010m/diff.png"} as ITextureData;
+            // m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
+            m.diff = newColor(0xAAAAAA);
+            let plane = new PlaneGeometry(variables).create(w*2,w*2);
+            let mesh = new Mesh(variables);
+            mesh.shadowTarget = true;
+            // mesh.shadowable = true;
+            mesh.rotationX = -90;
+            mesh.geometry = plane;
+            mesh.material = m;
+            scene.addChild(mesh);
 
-            // let plane = new PlaneGeometry(variables).create(w,w);
-            // let mesh = new Mesh(variables);
-            // mesh.init(plane,m);
-            // scene.addChild(mesh);
+
+            
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
             // mesh = new Mesh(variables);
@@ -99,12 +129,16 @@ module rf{
             // mesh.init(box,m);
             // mesh.setPos(0,-110,0);
             // scene.addChild(mesh);
-
-            // let sphere = new SphereGeometry(variables).create(r,r,w*.5);
-            // mesh = new Mesh(variables);
-            // mesh.init(sphere,m);
-            // mesh.setPos(0,0,0);
-            // scene.addChild(mesh);
+            let sphere = new SphereGeometry(variables).create(r,r,50);
+            mesh = new Mesh(variables);
+            mesh.shadowable = true;
+            mesh.shadowTarget = false;
+            mesh.geometry = sphere;
+            mesh.material = new PhongMaterial();
+            mesh.material.setData(undefined);
+            mesh.material.diff = newColor(0xAAAAAA);
+            mesh.setPos(0,50,0);
+            scene.addChild(mesh);
 
 
             // let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
@@ -113,22 +147,61 @@ module rf{
             // mesh.setPos(0,70,0);
             // scene.addChild(mesh);
 
-/**
+            let kfmurl = "../assets/mesh/f1/";
+
+
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
-            kfmMesh.load("assets/a10010m/");
+            kfmMesh.shadowable = true;
+            // kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
-            scene.addChild(kfmMesh);
- */
+            kfmMesh.load("../assets/mesh/f3/");
+            // scene.addChild(kfmMesh);
+
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.setPos(-200,0,0);
+            // kfmMesh.load("../assets/mesh/f1/");
+            // scene.addChild(kfmMesh);
+
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.setPos(200,0,0);
+            // kfmMesh.load("../assets/mesh/f1/");
+            // scene.addChild(kfmMesh);
+
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.setPos(0,0,300);
+            // kfmMesh.rotationY = 180;
+            // kfmMesh.load("../assets/mesh/f1/");
+            // scene.addChild(kfmMesh);
+
+            var gui = new dat.GUI();
+            var folder = gui.addFolder("mesh");
+            // folder.add(mesh,"refreshGUI");
+            var posFolder = folder.addFolder("position");
+            posFolder.add(mesh,"y",50,200).step(0.01);
+
+            var sunFolder = gui.addFolder("sun");
+            sunFolder.add(sun,"y",0,1000);
+            // posFolder.add(kfmMesh,"z",-1000,1000).step(0.01);
+            // var rotFolder = folder.addFolder("rotation");
+            // rotFolder.add(kfmMesh,"rotationX",-360,360);
+            // rotFolder.add(kfmMesh,"rotationY",-360,360);
+            // rotFolder.add(kfmMesh,"rotationZ",-360,360);
+
+
+
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
-            particle_Perfix = "assets/particle/";
-            particle_Texture_Perfix = "assets/tex/particle/";
-            let particle = new Particle();
-            particle.setSca(100,100,100);
-            particle.load("a");
-            scene.addChild(particle);
+            // particle_Perfix = "assets/particle/";
+            // particle_Texture_Perfix = "assets/tex/particle/";
+            // let particle = new Particle();
+            // particle.setSca(100,100,100);
+            // particle.load("a");
+            // scene.addChild(particle);
 
 
             // new AMF3Test().load("assets/test.dat");
@@ -163,9 +236,6 @@ module rf{
             // m.appendTranslation(100,100,100);
             // m.invert();
             // m.invert();
-
-            
-            
 
             let profile = singleton(GUIProfile);
             tipContainer.addChild(profile);
@@ -347,7 +417,6 @@ module rf{
 
             // 潘华专用  
             new Pan_Test();
-            // new Eva_Text();
         }
 
 

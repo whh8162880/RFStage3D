@@ -2,8 +2,6 @@
 module rf {
     export class Mesh extends SceneObject {
         scene: Scene;
-        geometry: GeometryBase;
-        invSceneTransform: IMatrix3D;
         skAnim: SkeletonAnimation;
         constructor(variables?: { [key: string]: IVariable }) {
             super(variables ? variables : vertex_mesh_variable);
@@ -11,16 +9,10 @@ module rf {
             this.nativeRender = true;
         }
 
-
-
-
         updateSceneTransform(): void {
             super.updateSceneTransform();
             let { invSceneTransform, sceneTransform } = this;
-            invSceneTransform.set(sceneTransform);
-            invSceneTransform.m3_invert();
-
-
+            invSceneTransform.m3_invert(sceneTransform);
         }
 
         render(camera: Camera, now: number, interval: number): void {
@@ -33,9 +25,18 @@ module rf {
                         skAnim.uploadContext(camera, this, program, now, interval);
                     }
                     geometry.uploadContext(camera, this, program, now, interval);
-                    context3D.drawTriangles(geometry.index, geometry.numTriangles)
+
+                    let{shadowTarget,shadowMatrix}=this;
+
+                    let c = context3D;
+                    if(shadowTarget){
+                        c.setProgramConstantsFromMatrix(VC.sunmvp,shadowMatrix);
+                    }
+
+                    c.drawTriangles(geometry.index, geometry.numTriangles)
                 }
             }
+            
             super.render(camera, now, interval);
         }
     }
@@ -49,6 +50,7 @@ module rf {
         constructor(material?: Material, variables?: { [key: string]: IVariable }) {
             super(variables);
             this.material = material;
+            // this.shadowable = true;
         }
 
         load(url: string) {
@@ -65,7 +67,7 @@ module rf {
         }
 
         setKFM(kfm: ISkeletonMeshData) {
-            let { mesh, skeleton: skeletonData, material: materialData } = kfm;
+            let { mesh, skeleton: skeletonData, material: materialData,anims } = kfm;
             let { material, geometry } = this;
             let c = context3D;
 
@@ -77,32 +79,30 @@ module rf {
             if (!material) {
                 this.material = material = new PhongMaterial();
             }
-            material.setData(kfm.material);
+            material.setData(materialData);
 
             material.diffTex.url = this.id + material.diffTex.url;
 
-
-
-
-
-            // this.material["diffTex"] = this.id + kfm["diff"];
-            // this.material["diffTex"] = this.id + "diff.png";
-            //=========================
-            //skeleton
-            //=========================
-            let skeleton = new Skeleton(kfm.skeleton);
-            //===========================
-            //  Animation
-            //===========================
-            this.skAnim = skeleton.createAnimation();
+            if(skeletonData){
+                //=========================
+                //skeleton
+                //=========================
+                let skeleton = new Skeleton(skeletonData);
+                //===========================
+                //  Animation
+                //===========================
+                this.skAnim = skeleton.createAnimation();
+            }
             // let action = "Take 001";
-            let action = "stand";
-            let animationData = kfm.anims[action];
-            skeleton.initAnimationData(animationData);
-            this.skAnim.play(animationData, engineNow);
-
-
+            // let action = "stand";
+            // let animationData = kfm.anims[action];
+            // skeleton.initAnimationData(animationData);
+            // this.skAnim.play(animationData, engineNow);
         }
+
+        // refreshGUI(gui:dat.GUI){
+        //     alert(gui);
+        // }
     }
 
     export class Skeleton {
