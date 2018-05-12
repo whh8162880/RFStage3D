@@ -35,14 +35,18 @@ module rf{
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
 
-            let camera = ROOT.camera2D;
+            let camera = ROOT.camera3D;
             scene.camera = camera;
             let f = camera.originFar;
             f = Math.sqrt(f*f / 3);
+            camera.setPos(0,f,f);
+            camera.lookat(newVector3D(0,0,0));
+            new TrackballControls(camera);
+
 
             let sun = new DirectionalLight();
-            // let fff = 10000 / Math.PI2;
-            
+            // f = 1000 / Math.PI2;
+            // f = Math.sqrt(f*f / 3);
             sun.setPos(f,f,f);
             let v = TEMP_VECTOR3D;
             v[0] = v[1] = v[2] = 0;
@@ -62,12 +66,11 @@ module rf{
             // y = f * sin * sin;
             // z = f * cos;
             // camera.setPos(f * sin * cos,f * sin * sin,f * cos);
-            camera.setPos(f,f,f);
+           
 
             // camera.z = f
             // camera.y = f;
-            camera.lookat(newVector3D(0,0,0));
-            new TrackballControls(camera);
+           
 
             let w = 500;
 
@@ -175,12 +178,14 @@ module rf{
             // kfmMesh.load("../assets/mesh/f1/");
             // scene.addChild(kfmMesh);
 
-            // var gui = new dat.GUI();
-            // var folder = gui.addFolder("mesh");
-            // folder.add(kfmMesh,"refreshGUI");
-            // var posFolder = folder.addFolder("position");
-            // posFolder.add(kfmMesh,"x",-1000,1000).step(0.01);
-            // posFolder.add(kfmMesh,"y",-1000,1000).step(0.01);
+            var gui = new dat.GUI();
+            var folder = gui.addFolder("mesh");
+            // folder.add(mesh,"refreshGUI");
+            var posFolder = folder.addFolder("position");
+            posFolder.add(mesh,"y",50,200).step(0.01);
+
+            var sunFolder = gui.addFolder("sun");
+            sunFolder.add(sun,"y",0,1000);
             // posFolder.add(kfmMesh,"z",-1000,1000).step(0.01);
             // var rotFolder = folder.addFolder("rotation");
             // rotFolder.add(kfmMesh,"rotationX",-360,360);

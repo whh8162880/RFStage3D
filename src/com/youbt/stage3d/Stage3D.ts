@@ -210,9 +210,9 @@ module rf {
             let c = context3D;
             c.dc = 0;
             c.triangles = 0;
-           
-            this.shadow.render(renderLink,scene.sun,now,interval);
+
             c.clear(0, 0, 0, 1);
+            this.shadow.render(renderLink,scene.sun,now,interval);
             this.render(this.camera, now, interval);
             // this.shadow.render(renderLink,scene.sun,now,interval);
             // let m = TEMP_MATRIX;
@@ -255,8 +255,8 @@ module rf {
             this.m.setData(undefined);
             this.len = newMatrix3D();
             this.debugImage = new DebugImage();
-            // Camera3DResize(w,h,this.len,10000,10000/Math.PI2);
-            CameraOrthResize(w,h,this.len,10000,10000/Math.PI2);
+            Camera3DResize(w,h,this.len,10000,10000/Math.PI2);
+            // CameraOrthResize(w,h,this.len,10000,10000/Math.PI2);
         }
 
         render(link:Link,sun:DirectionalLight,now:number,interval:number){
@@ -270,12 +270,17 @@ module rf {
 
             if(!rtt){
                 this.rtt = rtt = c.createRttTexture(c.getTextureData("ShadowMaterial"),w,h);
+                rtt.cleanColor = newColor(0xFFFFFF);
+                rtt.cleanColor.a = 1.0;
             }
 
             // c.configureBackBuffer(w,h,0);
 
             let g = gl;
-            c.setRenderToTexture(rtt,true);
+            c.setRenderToTexture(rtt,false);
+
+            // c.setDepthTest(false,g.ALWAYS);
+            // g.frontFace(g.CW);
 
             m.uploadContext(sun,undefined,now,interval);
             let p = m.program;
@@ -302,10 +307,8 @@ module rf {
             // matrix.m3_scale(w / stageWidth,h / stageHeight,1);
             // matrix.m3_identity();
             // this.debugImage.render(undefined,matrix);
-
-
             c.setRenderToBackBuffer();
-
+            // g.frontFace(g.CCW);
             // c.configureBackBuffer(stageWidth,stageHeight,0);
             
         }

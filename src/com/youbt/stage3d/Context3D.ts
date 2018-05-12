@@ -329,7 +329,7 @@ namespace rf {
 				}
 			}
 
-			let{frameBuffer,renderBuffer,texture:textureObj,width,height} = texture;
+			let{frameBuffer,renderBuffer,texture:textureObj,width,height,cleanColor} = texture;
 			g.viewport(0,0,width,height);
 			g.bindFramebuffer(g.FRAMEBUFFER,frameBuffer);
 
@@ -338,15 +338,21 @@ namespace rf {
 				g.enable(g.DEPTH_TEST);
 				g.enable(g.STENCIL_TEST);
 			} else {
-				texture.cleanBit = g.COLOR_BUFFER_BIT;
+				texture.cleanBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
 				g.disable(g.DEPTH_TEST);
 				g.disable(g.STENCIL_TEST);
 			}
 
-			g.clearColor(0,0,0,0);
-			g.clearDepth(1.0);
-			g.clearStencil(0.0)
+			if(cleanColor){
+				g.clearColor(cleanColor.r,cleanColor.g,cleanColor.b,cleanColor.a);
+			}else{
+				g.clearColor(0,0,0,1);
+			}
+
+
 			g.clear(texture.cleanBit);
+			
+			
 		}
 
 		public setRenderToBackBuffer(): void {

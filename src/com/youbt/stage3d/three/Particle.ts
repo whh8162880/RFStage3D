@@ -1,62 +1,21 @@
+///<reference path="./Mesh.ts" />
 module rf {
     export var particle_Perfix: string;
 
     export var particle_Texture_Perfix: string;
 
-    export class Particle extends Mesh {
 
-        data: IParticleData;
-
-        load(url: string) {
-            if (url.lastIndexOf(ExtensionDefine.PARTICLE) == -1) {
-                url += ExtensionDefine.PARTICLE;
-            }
-            if (url.indexOf("://") == -1) {
-                url = particle_Perfix + url;
-            }
-            loadRes(url, this.loadCompelte, this, ResType.bin);
-        }
-
-        loadCompelte(e: EventX) {
-            let item: ResItem = e.data;
-            let byte = item.data;
-            let o = amf_readObject(byte);
-            this.play(o);
-        }
-
-
-        play(data: IParticleData) {
-            this.data = data;
-            const { setting: settingData, mesh: meshData, material: materialData, runtime: runtimeData } = data;
-
-            let { geometry, material } = this;
-
-            if (!geometry) {
-                this.geometry = geometry = new ParticleGeometry();
-            }
-            geometry.setData(meshData);
-            (geometry as ParticleGeometry).setRuntime(runtimeData);
-
-            if (!material) {
-                this.material = material = new ParticleMaterial();
-            }
-            material.setData(materialData);
-        }
-
-    }
-
-
-    export class ParticleGeometry extends GeometryBase {
+     export class ParticleGeometry extends GeometryBase {
         runtimeData: IParticleRuntimeData;
         setRuntime(runtime: IParticleRuntimeData) {
             this.initData(runtime)
             this.runtimeData = runtime;
         }
 
-        uploadContext(camera: Camera, mesh: Particle, program: Program3D, now: number, interval: number) {
+        uploadContext(camera:Camera,mesh:Particle, program:Program3D, now: number, interval: number) {
             // super.uploadContext(camera, mesh, program, now, interval);
             let c = context3D;
-            let{sceneTransform}=mesh;
+            let{sceneTransform}=mesh as Particle;
             const { vertexBuffer } = this.runtimeData;
             const { setting,nodes} = mesh.data;
 
@@ -103,8 +62,54 @@ module rf {
             //TIME
             c.setProgramConstantsFromVector(P_PARTICLE.NOW, engineNow / 1000 * setting.speed, 1, false);
 
+            return worldTranform;
         }
     }
+
+    export class Particle extends Mesh {
+
+        data: IParticleData;
+
+        load(url: string) {
+            if (url.lastIndexOf(ExtensionDefine.PARTICLE) == -1) {
+                url += ExtensionDefine.PARTICLE;
+            }
+            if (url.indexOf("://") == -1) {
+                url = particle_Perfix + url;
+            }
+            loadRes(url, this.loadCompelte, this, ResType.bin);
+        }
+
+        loadCompelte(e: EventX) {
+            let item: ResItem = e.data;
+            let byte = item.data;
+            let o = amf_readObject(byte);
+            this.play(o);
+        }
+
+
+        play(data: IParticleData) {
+            this.data = data;
+            const { setting: settingData, mesh: meshData, material: materialData, runtime: runtimeData } = data;
+
+            let { geometry, material } = this;
+
+            if (!geometry) {
+                this.geometry = geometry = new ParticleGeometry();
+            }
+            geometry.setData(meshData);
+            (geometry as ParticleGeometry).setRuntime(runtimeData);
+
+            if (!material) {
+                this.material = material = new ParticleMaterial();
+            }
+            material.setData(materialData);
+        }
+
+    }
+
+
+   
 
 
     export const enum P_PARTICLE {

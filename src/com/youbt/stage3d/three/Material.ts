@@ -19,7 +19,7 @@ module rf{
 
         setData(data:IMaterialData){
             if(!data){
-                this.cull = WebGLConst.BACK;
+                this.cull = WebGLConst.NONE;
                 this.depthMask = true;
                 this.passCompareMode = WebGLConst.LEQUAL;
                 this.srcFactor = WebGLConst.SRC_ALPHA;
@@ -113,30 +113,28 @@ module rf{
             let vertexCode = `
                 precision mediump float;
                 attribute vec3 ${VA.pos};
-
                 uniform mat4 ${VC.mvp};
-
-                varying vec3 vPos;
-
-
+                // varying vec4 vPos;
                 void main(void){
-                    vec4 t_pos = ${VC.mvp} * vec4(${VA.pos},1.0);
-                    gl_Position = t_pos;
-                    vPos = t_pos.xyz;
+                    gl_Position = ${VC.mvp} * vec4(${VA.pos},1.0);
                 }
             `
 
             let fragmentCode = `
                 precision mediump float;
+                const float PackUpscale = 256. / 255.;
+                const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
+                const float ShiftRight8 = 1. / 256.;
+                vec4 packDepthToRGBA( const in float v ) {
+                    vec4 r = vec4( fract( v * PackFactors ), v );
+                    r.yzw -= r.xyz * ShiftRight8;
+                    return r * PackUpscale;
+                }
 
-                varying vec3 vPos;
-
+                
                 void main(void){
-                    vec3 pos = vPos;
-                    // pos.x = (pos.x + 1.0)*0.5;
-                    // pos.y = -(pos.y - 1.0)*0.5;
-                    // pos.z = 0.0;
-                    gl_FragColor = vec4(pos.xyz,1.0);
+                    // gl_FragColor = packDepthToRGBA(gl_FragCoord.z);
+                    gl_FragColor = gl_FragCoord.zzzz;
                 }
                 
             `
@@ -275,7 +273,7 @@ module rf{
 
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
-                varying vec3 vShadowUV;
+                varying vec4 vShadowUV;
 #ifdef USE_SKINNING
                 uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
                 mat4 getBoneMatrix( const in float i ) {
@@ -311,10 +309,8 @@ module rf{
                     vUV = ${VA.uv};
                     gl_Position = ${VC.mvp} * t_pos;
 #ifdef SHADOW
-                    t_pos = t_pos * ${VC.sunmvp};
-                    t_pos.xy = (t_pos.xy + 1.0) * 0.5;
-                    // t_pos.y = -(t_pos.y - 1.0) * 0.5;
-                    vShadowUV = t_pos.xyz;
+                    t_pos = ${VC.sunmvp} * t_pos;
+                    vShadowUV = t_pos;
 #endif
                 }
             `
@@ -338,7 +334,14 @@ module rf{
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
 
-                varying vec3 vShadowUV;
+                varying vec4 vShadowUV;
+
+                const float UnpackDownscale = 255.0 / 256.0;
+                const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
+                const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1.0);
+                float unpackRGBAToDepth( const in vec4 v ) {
+                    return dot( v, UnpackFactors );
+                }
                 
                 void main(void){
 
@@ -355,20 +358,22 @@ module rf{
                     #endif
 
                     #ifdef SHADOW
-
-                        vec4 s = texture2D(${FS.SHADOW}, vShadowUV.xy);
-                        // c = vec4(vShadowUV.xy,0.0,1.0) ;
-                        // if(s.w * s.z > 0.0){
-                        //     discard;
-                        // }
-
+                        vec3 projCoords = vShadowUV.xyz / vShadowUV.w;
+                        projCoords.xyz = projCoords.xyz * 0.5 + 0.5;
+                        vec4 s = texture2D(${FS.SHADOW}, projCoords.xy);
                         // vec4 s = texture2D(${FS.SHADOW}, tUV);
-                        // if(s.w > 0.0){
-                        //     discard;
+                        // if(unpackRGBAToDepth(s) > projCoords.z){
+                        //     c = vec4(1.0);
+                        // }else{
+                        //     c = vec4(0.0);
                         // }
-                        c = vec4(1.0 - s.zzz,s.w);
-                    #else
-                        c = vec4(0.0);
+                        // c = vec4(unpackRGBAToDepth(s) > projCoords.z ? 1. : 0.);
+                        // c = s;
+                        // c = vec4(projCoords.xy,0.0,1.0);
+                        c = vec4(unpackRGBAToDepth(s));
+                        // c = vec4(vShadowUV.www,1.0);
+                        // c = vec4(projCoords.zzz,1.);
+                        // c = vec4(gl_FragCoord.z/gl_FragCoord.w);
                     #endif
 
                     c *= vDiffuse;

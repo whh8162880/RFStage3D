@@ -573,6 +573,7 @@ module rf {
         frameBuffer:WebGLFramebuffer;
         renderBuffer:WebGLRenderbuffer;
         cleanBit:number;
+        cleanColor:IColor;
 
         awaken(){
             let b = super.awaken();
