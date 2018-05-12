@@ -138,7 +138,7 @@ module rf{
             mesh.material.setData(undefined);
             mesh.material.diff = newColor(0xAAAAAA);
             mesh.setPos(0,50,0);
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             // let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
@@ -153,11 +153,12 @@ module rf{
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
             kfmMesh.shadowable = true;
+            // kfmMesh.shadowTarget = true;
             // kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
             kfmMesh.load("../assets/mesh/f3/");
-            // scene.addChild(kfmMesh);
+            scene.addChild(kfmMesh);
 
             // kfmMesh = new KFMMesh(new PhongMaterial());
             // kfmMesh.setSca(100,100,100);
