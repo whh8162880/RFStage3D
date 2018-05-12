@@ -270,7 +270,7 @@ module rf {
 
             if(!rtt){
                 this.rtt = rtt = c.createRttTexture(c.getTextureData("ShadowMaterial"),w,h);
-                rtt.cleanColor = newColor(0xFFFFFF);
+                rtt.cleanColor = newColor(0);
                 rtt.cleanColor.a = 1.0;
             }
 
