@@ -6,8 +6,7 @@ module rf{
         }
     
         onKeyDownHandle(e:KeyboardEvent):void{
-            let m = singleton(CreateMeidator);
-            facade.toggleMediator(m);
+            facade.toggleMediator(CreateMeidator);
         }
     }
 
@@ -21,9 +20,10 @@ module rf{
     }
 
     export class CreateMeidator extends Mediator{
+        static NAME:string = "CreateMeidator";
         $panel:CreatePanel;
         constructor(){
-            super("CreateMeidator");
+            super(CreateMeidator.NAME);
             this.setPanel(new CreatePanel());
         }
         mediatorReadyHandle():void{
@@ -31,7 +31,7 @@ module rf{
         }
 
         awaken():void{
-            console.log("mediator awaken")
+            console.log("CreateMeidator awaken")
         }
 
     }
@@ -48,6 +48,10 @@ module rf{
         bg:IconView;
 
         bindComponents():void{
+            this.centerFlag = true;
+            this._resizeable = true;
+            this.setSize(1400, 750);
+
             this.bg = new IconView(this.source);
             this.addChildAt(this.bg, 0);
             this.bg.setUrl('assets/createbg.jpg');

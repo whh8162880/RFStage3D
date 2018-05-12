@@ -210,7 +210,8 @@ module rf{
 		refreshData():void{this.doData();}
 		
 		bindComponents():void{}
-
+		awaken():void{}
+        sleep():void{}
 	}
 
 	export interface ILabel{
