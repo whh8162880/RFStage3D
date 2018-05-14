@@ -82,6 +82,7 @@ module rf{
         len[12] = 0;
         len[13] = 0;
         len[14] = -1/far*Math.PI*100;
+        // len[14] = -1/far;
         len[15] = 1;
 
        

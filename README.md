@@ -237,7 +237,7 @@ node --inspect-brk APP.js
 
 
 如何为为一个js库生成.d.ts文件
-'''
+```typescript
 为什么要这么做？
 为了ts代码中能够识别js中的定义，以便自动代码提示。
 
@@ -248,4 +248,18 @@ node --inspect-brk APP.js
 3、dts-gen -m cannon
 4、把生成的d.ts复制到到自己项目中
 
-'''
+```
+
+
+
+
+```typescript
+    关于shadow
+    gl_FragCoord = [
+        0.5,0,0,0,
+        0,0.5,0,0,
+        0,0,0.5,0,
+        0.5,0.5,0.5,1
+    ] * project * view * model * pos;
+
+```

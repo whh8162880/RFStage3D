@@ -65,17 +65,49 @@ namespace rf {
 	// 	NONE = 'none'
 	// }
 
+	// export const enum Context3DConst{
+	// 	CULL = 0b1,
+	// 	DEEP = CULL<<1,
+	// 	FACTOR = DEEP<<1
+	// }
+
+	export interface IContext3DSetting{
+		cull:number;
+		depth:boolean;
+		depthMode:number;
+		src:number;
+		dst:number;
+	}
+
 	export class Context3D {
 		//todo:enableErrorChecking https://www.khronos.org/webgl/wiki/Debugging
 
 		bufferLink:Link;
 		triangles:number;
 		dc:number;
+		// change:number;
+		
+		setting:IContext3DSetting;
+		
 
 		private _clearBit: number;
+		private render_setting:IContext3DSetting;
+
+		createEmptyContext3DSetting(){
+			let setting = {} as IContext3DSetting;
+			setting.cull = WebGLConst.NONE;
+			setting.depth = true;
+			setting.depthMode = WebGLConst.LEQUAL;
+			setting.src = WebGLConst.SRC_ALPHA;
+			setting.dst = WebGLConst.ONE_MINUS_SRC_ALPHA;
+			return setting;
+		}
 		
 		constructor() {
 			this.bufferLink = new Link();
+			this.setting = this.createEmptyContext3DSetting();
+			this.render_setting = {} as IContext3DSetting;
+			// this.change = 0;
 			// ROOT.on(EngineEvent.FPS_CHANGE,this.gc,this)
 		}
 
@@ -99,6 +131,8 @@ namespace rf {
 				g.disable(g.DEPTH_TEST);
 				g.disable(g.STENCIL_TEST);
 			}
+			g.frontFace(g.CW);
+			g.enable(g.BLEND);
 		}
 
 		
@@ -110,41 +144,80 @@ namespace rf {
 			g.clear(this._clearBit);
 		}
 
-		triangleFaceToCull:number;
+		
+		updateSetting(render_setting:IContext3DSetting){
+			let g = gl;
+			const{cull,depth,depthMode,src,dst}=this.setting;
 
-		public setCulling(triangleFaceToCull: number): void {
-			if(this.triangleFaceToCull == triangleFaceToCull){
-				return;
-			}
-			this.triangleFaceToCull = triangleFaceToCull;
-			let g = gl
-			g.frontFace(g.CW);
-
-			if(triangleFaceToCull == 0){
-				g.disable(g.CULL_FACE);
-			}else{
-				g.enable(g.CULL_FACE);
-				g.cullFace(triangleFaceToCull);
+			if(cull != render_setting.cull){
+				if(cull == 0){
+					g.disable(g.CULL_FACE);
+				}else{
+					g.enable(g.CULL_FACE);
+					g.cullFace(cull);
+				}
+				render_setting.cull = cull;
 			}
 
-			// switch (triangleFaceToCull) {
-			// 	case Context3DTriangleFace.NONE:
+
+			if(depth != render_setting.depth || depthMode != render_setting.depthMode){
+				render_setting.depth = depth;
+				render_setting.depthMode = depthMode;
+				if(depth == false){
+					g.disable(g.DEPTH_TEST);
+				}else{
+					g.enable(g.DEPTH_TEST);
+					g.depthMask(depth);
+					g.depthFunc(depthMode);
+				}
+			}
+
+			if(src != render_setting.src && dst != render_setting.dst){
+				render_setting.src = src;
+				render_setting.dst = dst;
+				g.blendFunc(src, dst);
+			}
+
+			// let{change}=this;
+			// if(change & Context3DConst.CULL){
+			// 	let{cull}=this;
+			// 	if(cull == 0){
 			// 		g.disable(g.CULL_FACE);
-			// 		break;
-			// 	case Context3DTriangleFace.BACK:
+			// 	}else{
 			// 		g.enable(g.CULL_FACE);
-			// 		g.cullFace(g.BACK);
-			// 		break;
-			// 	case Context3DTriangleFace.FRONT:
-			// 		g.enable(g.CULL_FACE);
-			// 		g.cullFace(g.FRONT);
-			// 		break;
-			// 	case Context3DTriangleFace.FRONT_AND_BACK:
-			// 		g.enable(g.CULL_FACE);
-			// 		g.cullFace(g.FRONT_AND_BACK);
-			// 		break;
+			// 		g.cullFace(cull);
+			// 	}
+			// 	change &= ~Context3DConst.CULL;
+			// }
+
+			// if(change & Context3DConst.DEEP){
+			// 	let{depthMask,passCompareMode}=this;
+			// 	if(depthMask == false){
+			// 		g.disable(g.DEPTH_TEST);
+			// 	}else{
+			// 		g.enable(g.DEPTH_TEST);
+			// 		g.depthMask(depthMask);
+			// 		g.depthFunc(passCompareMode);
+			// 	}
+			// 	change &= ~Context3DConst.DEEP;
+			// }
+
+			// if(change & Context3DConst.FACTOR){
+			// 	let{sourceFactor,destinationFactor} = this;
+			// 	g.blendFunc(sourceFactor, destinationFactor);
+			// 	change &= ~Context3DConst.FACTOR;
 			// }
 		}
+
+
+		// cull:number;
+		// public setCulling(cull: number): void {
+		// 	if(this.cull == cull){
+		// 		return;
+		// 	}
+		// 	this.cull = cull;
+		// 	this.change |= Context3DConst.CULL;
+		// }
 
 		/**
 		 * 
@@ -161,21 +234,17 @@ namespace rf {
 		 * @constant Context3DCompareMode.LESS_EQUAL=GL.LEQUAL
 		 * @constant Context3DCompareMode.GREATER_EQUAL=L.GEQUAL
 		 */
-		depthMask:boolean;
-		passCompareMode:number;
-		public setDepthTest(depthMask: boolean, passCompareMode: number): void {
+		// depthMask:boolean;
+		// passCompareMode:number;
+		// public setDepthTest(depthMask: boolean, passCompareMode: number): void {
 
-			if(this.depthMask == depthMask && this.passCompareMode == passCompareMode){
-				return;
-			}
-			this.depthMask = depthMask;
-			this.passCompareMode = passCompareMode;
-
-			let g = gl;
-			g.enable(g.DEPTH_TEST);
-			g.depthMask(depthMask);
-			g.depthFunc(passCompareMode);
-		}
+		// 	if(this.depthMask == depthMask && this.passCompareMode == passCompareMode){
+		// 		return;
+		// 	}
+		// 	this.depthMask = depthMask;
+		// 	this.passCompareMode = passCompareMode;
+		// 	this.change |= Context3DConst.DEEP;
+		// }
 
 
 		/**
@@ -190,18 +259,17 @@ namespace rf {
 			Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA = GL.ONE_MINUS_SRC_ALPHA;
 			Context3DBlendFactor.ONE_MINUS_DESTINATION_ALPHA = GL.ONE_MINUS_DST_ALPHA;
 		 */
-		sourceFactor:number;
-		destinationFactor:number;
-		public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
-			if(this.sourceFactor == sourceFactor && this.destinationFactor == destinationFactor){
-				return;
-			}
-			this.sourceFactor = sourceFactor;
-			this.destinationFactor = destinationFactor;
-			let g = gl;
-			g.enable(g.BLEND); //stage3d cant disable blend?
-			g.blendFunc(sourceFactor, destinationFactor);
-		}
+		// sourceFactor:number;
+		// destinationFactor:number;
+		// public setBlendFactors(sourceFactor: number, destinationFactor: number): void {
+		// 	if(this.sourceFactor == sourceFactor && this.destinationFactor == destinationFactor){
+		// 		return;
+		// 	}
+		// 	this.sourceFactor = sourceFactor;
+		// 	this.destinationFactor = destinationFactor;
+			
+		// 	this.change |= Context3DConst.FACTOR;
+		// }
 
 		public createVertexBuffer(data: number[] | Float32Array | VertexInfo, data32PerVertex: number = -1, startVertex: number = 0, numVertices: number = -1): VertexBuffer3D {
 			let buffer: VertexBuffer3D = recyclable(VertexBuffer3D);
@@ -335,12 +403,8 @@ namespace rf {
 
 			if (enableDepthAndStencil) {
 				texture.cleanBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
-				g.enable(g.DEPTH_TEST);
-				g.enable(g.STENCIL_TEST);
 			} else {
 				texture.cleanBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
-				g.disable(g.DEPTH_TEST);
-				g.disable(g.STENCIL_TEST);
 			}
 
 			if(cleanColor){
@@ -357,9 +421,15 @@ namespace rf {
 
 		public setRenderToBackBuffer(): void {
 			let g = gl;
-			let{backBufferWidth,backBufferHeight}=this;
+			let{backBufferWidth,backBufferHeight,render_setting}=this;
 			g.bindFramebuffer(g.FRAMEBUFFER, null);
 			g.viewport(0,0,backBufferWidth,backBufferHeight);
+			render_setting.cull = 0;
+			render_setting.depth = false;
+			render_setting.depthMode = 0;
+			render_setting.src = 0;
+			render_setting.dst = 0;
+			
 		}
 
 		programs: { [key: string]: Recyclable<Program3D> } = {};
@@ -446,8 +516,9 @@ namespace rf {
 		}
 
 
-		public drawTriangles(indexBuffer: IndexBuffer3D, numTriangles:number,firstIndex: number = 0): void {
+		public drawTriangles(indexBuffer: IndexBuffer3D, numTriangles:number,setting?:IContext3DSetting): void {
 			let g = gl;
+			this.updateSetting(setting || this.render_setting);
 			if(undefined != indexBuffer){
 				if (false == indexBuffer.readly) {
 					if (false == indexBuffer.awaken()) {
@@ -457,7 +528,7 @@ namespace rf {
 				indexBuffer.preusetime = engineNow;
 				// g.drawArrays(g.TRIANGLES,0,numTriangles)
 				g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-				g.drawElements(g.TRIANGLES, numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+				g.drawElements(g.TRIANGLES, numTriangles * 3, g.UNSIGNED_SHORT, 0);
 			}else{
 				g.drawArrays(g.TRIANGLES,0,numTriangles * 3);
 			}
@@ -472,22 +543,26 @@ namespace rf {
          *   For instance indices = [1,3,0,4,1,2]; will draw 3 lines :
          *   from vertex number 1 to vertex number 3, from vertex number 0 to vertex number 4, from vertex number 1 to vertex number 2
          */
-		public drawLines(indexBuffer: IndexBuffer3D, numTriangles:number, firstIndex: number = 0, numLines: number = -1): void {
-			if (false == indexBuffer.readly) {
-				if (false == indexBuffer.awaken()) {
-					throw new Error("create indexBuffer error!");
-				}
-			}
-			indexBuffer.preusetime = engineNow;
-			let g = gl;
-			g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
-			g.drawElements(g.LINES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+		// public drawLines(indexBuffer: IndexBuffer3D, numTriangles:number, firstIndex: number = 0, numLines: number = -1): void {
+		// 	if(this.change){
+		// 		this.updateSetting();
+		// 	}
 
-			this.triangles += numTriangles;
-			this.dc ++;
-		}
+		// 	if(undefined != indexBuffer){
+		// 		if (false == indexBuffer.readly) {
+		// 			if (false == indexBuffer.awaken()) {
+		// 				throw new Error("create indexBuffer error!");
+		// 			}
+		// 		}
+		// 		indexBuffer.preusetime = engineNow;
+		// 		let g = gl;
+		// 		g.bindBuffer(g.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
+		// 		g.drawElements(g.LINES, numTriangles < 0 ? indexBuffer.numIndices : numTriangles * 3, g.UNSIGNED_SHORT, firstIndex * 2);
+		// 	}
 
-
+		// 	this.triangles += numTriangles;
+		// 	this.dc ++;
+		// }
 
 		// /*
         //  * [Webgl only]

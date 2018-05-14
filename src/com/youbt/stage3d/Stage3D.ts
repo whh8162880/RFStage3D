@@ -112,9 +112,13 @@ module rf {
                 _camera.updateSceneTransform();
             }
 
-            c.setCulling(cull)
-            c.setDepthTest(depthMask, passCompareMode);
-            c.setBlendFactors(srcFactor, dstFactor);
+            let{setting}=c;
+            setting.cull = cull;
+            setting.depth = depthMask;
+            setting.depthMode = passCompareMode;
+            setting.src = srcFactor;
+            setting.dst = dstFactor;
+
 
             super.render(_camera, now, interval);
         }
@@ -147,7 +151,7 @@ module rf {
             this.camera3D = new Camera();
             this.cameraUI = new Camera();
             this.renderer = new BatchRenderer(this);
-            this.shadow = new ShadowEffect(512,512);
+            this.shadow = new ShadowEffect(1024,1024);
             this.renderLink = new Link();
             this.camera = this.cameraUI;
             this.stage = this;
@@ -270,7 +274,7 @@ module rf {
 
             if(!rtt){
                 this.rtt = rtt = c.createRttTexture(c.getTextureData("ShadowMaterial"),w,h);
-                rtt.cleanColor = newColor(0);
+                rtt.cleanColor = newColor(0xFFFFFF);
                 rtt.cleanColor.a = 1.0;
             }
 
@@ -282,7 +286,12 @@ module rf {
             // c.setDepthTest(false,g.ALWAYS);
             // g.frontFace(g.CW);
 
+            let{passCompareMode,cull,program}=m;
+
             m.uploadContext(sun,undefined,now,interval);
+            // c.setDepthTest(false,passCompareMode);
+            // c.setCulling(cull);
+            // c.setProgram(program);
             let p = m.program;
             for(let vo = link.getFrist();vo;vo = vo.next){
                 if(vo.close == false){
@@ -293,7 +302,7 @@ module rf {
                         geometry.vertex.uploadContext(p);
                         worldTranform.m3_append(sun.worldTranform,false,sceneTransform);
                         c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
-                        c.drawTriangles(geometry.index,geometry.numTriangles);
+                        c.drawTriangles(geometry.index,geometry.numTriangles,rtt.setting);
                     }
                     if(shadowTarget){
                         if(!shadowMatrix){
@@ -325,7 +334,7 @@ module rf {
 
         public render(camera: Camera, now: number, interval: number): void {
             let { camera: _camera } = this;
-            const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
+            // const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
             let c = context3D;
             let g = gl;
 
@@ -337,9 +346,14 @@ module rf {
                 _camera.updateSceneTransform();
             }
 
-            c.setCulling(cull)
-            c.setDepthTest(depthMask, passCompareMode);
-            c.setBlendFactors(srcFactor, dstFactor);
+            this.material.uploadContextSetting();
+
+            // let{setting}=c;
+            // setting.cull = cull;
+            // setting.depth = depthMask;
+            // setting.depthMode = passCompareMode;
+            // setting.src = srcFactor;
+            // setting.dst = dstFactor;
 
             super.render(_camera, now, interval);
         }
@@ -348,17 +362,13 @@ module rf {
     export class UIContainer extends AllActiveSprite {
         public render(camera: Camera, now: number, interval: number): void {
             const { cameraUI } = ROOT;
-            const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
             let c = context3D;
             let g = gl;
 
             if (cameraUI.states) {
                 cameraUI.updateSceneTransform();
             }
-
-            c.setCulling(cull)
-            c.setDepthTest(depthMask, passCompareMode);
-            c.setBlendFactors(srcFactor, dstFactor);
+            this.material.uploadContextSetting();
 
             super.render(cameraUI, now, interval);
         }
@@ -460,10 +470,10 @@ module rf {
             let g = gl;
 
             c.setProgram(p);
-            c.setCulling(g.NONE);
+            // c.setCulling(g.NONE);
+            // c.setBlendFactors(g.SRC_ALPHA,g.ONE_MINUS_DST_ALPHA);
+            // c.setDepthTest(true,g.LEQUAL);
             c.setProgramConstantsFromMatrix(VC.mvp,m);
-            c.setBlendFactors(g.SRC_ALPHA,g.ONE_MINUS_DST_ALPHA);
-            c.setDepthTest(true,g.LEQUAL);
             v.uploadContext(p);
             t.uploadContext(p,0,FS.diff);
             c.drawTriangles(c.getIndexByQuad(1),2);

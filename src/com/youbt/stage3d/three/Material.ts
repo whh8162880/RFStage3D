@@ -44,21 +44,25 @@ module rf{
             
         }
 
+        uploadContextSetting(){
+            let{setting}=context3D;
+            let{program,cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
+            setting.cull = cull;
+            setting.depth = depthMask;
+            setting.depthMode = passCompareMode;
+            setting.src = srcFactor;
+            setting.dst = dstFactor;
+        }
+
+
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
             let c = context3D;
-
-            let{program,cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
+            let{program}=this;
             if(!program){
                 this.program = program = this.createProgram(mesh);
             }
-
-            
-            c.setCulling(cull);
-            c.setBlendFactors(srcFactor,dstFactor);
-            c.setDepthTest(depthMask,passCompareMode);
-
             c.setProgram(program);
-
+            this.uploadContextSetting();
             return true;
         }
 
@@ -122,19 +126,36 @@ module rf{
 
             let fragmentCode = `
                 precision mediump float;
-                const float PackUpscale = 256. / 255.;
-                const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
-                const float ShiftRight8 = 1. / 256.;
-                vec4 packDepthToRGBA( const in float v ) {
-                    vec4 r = vec4( fract( v * PackFactors ), v );
-                    r.yzw -= r.xyz * ShiftRight8;
-                    return r * PackUpscale;
+
+
+                // const float PackUpscale = 256. / 255.;
+                // const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
+                // const float ShiftRight8 = 1. / 256.;
+                // vec4 packDepthToRGBA( const in float v ) {
+                //     vec4 r = vec4( fract( v * PackFactors ), v );
+                //     r.yzw -= r.xyz * ShiftRight8;
+                //     return r * PackUpscale;
+                // }
+
+
+                vec4 packDepthToRGBA(float depth){
+                    float r = depth;
+                    float g = fract(r * 255.0);
+                    float b = fract(g * 255.0);
+                    float a = fract(b * 255.0);
+                    float coef = 1.0 / 255.0;
+                    r -= g * coef;
+                    g -= b * coef;
+                    b -= a * coef;
+                    return vec4(r, g, b, a);
                 }
 
                 varying vec4 vPos;
                 void main(void){
                     // gl_FragColor = packDepthToRGBA(gl_FragCoord.z);
                     gl_FragColor = vec4(gl_FragCoord.zzz,1.0);
+                    // gl_FragColor = vec4(vPos.zzz/vPos.w,1.0);
+                    // gl_FragColor = packDepthToRGBA(vPos.z/vPos.w);
                 }
                 
             `
@@ -161,8 +182,9 @@ module rf{
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
             let scene = mesh.scene;
             let c = context3D;
+            
 
-            let{program,diff,emissive,specular,diffTex,emissiveTex,specularTex}=this;
+            let{diff,diffTex,emissiveTex,specularTex}=this;
 
             let{skAnim}=mesh;
 
@@ -175,14 +197,11 @@ module rf{
                 return false;
             }
 
-            if(undefined == program){
-                this.program = program = this.createProgram(mesh);
-            }
+            super.uploadContext(camera,mesh,now,interval);
+            let{program,emissive,specular} = this;
+            
 
             let sun = scene.sun;
-
-            c.setProgram(program);
-            c.setCulling(this.cull);
             c.setProgramConstantsFromVector(VC.lightDirection,[sun._x,sun._y,sun._z],3);
 
             let t:Texture
@@ -290,9 +309,8 @@ module rf{
                         mat4 boneMatY = getBoneMatrix( ${VA.index}.y );
                         mat4 boneMatZ = getBoneMatrix( ${VA.index}.z );
                         mat4 boneMatW = getBoneMatrix( ${VA.index}.w );
-                    #endif
-
-                    #ifdef USE_SKINNING
+                    // #endif
+                    // #ifdef USE_SKINNING
                         mat4 skinMatrix = mat4( 0.0 );
                         skinMatrix += ${VA.weight}.x * boneMatX;
                         skinMatrix += ${VA.weight}.y * boneMatY;
@@ -310,6 +328,8 @@ module rf{
                     gl_Position = ${VC.mvp} * t_pos;
 #ifdef SHADOW
                     t_pos = ${VC.sunmvp} * t_pos;
+                    // t_pos.xyz /= t_pos.w;
+                    // t_pos.xy = t_pos.xy * 0.5 + 0.5;
                     vShadowUV = t_pos;
 #endif
                 }
@@ -320,8 +340,7 @@ module rf{
 
 
             let fragmentCode = `
-                precision highp float;
-                precision highp int;
+                precision mediump float;    
 
                 ${f_def}
 
@@ -336,11 +355,20 @@ module rf{
 
                 varying vec4 vShadowUV;
 
-                const float UnpackDownscale = 255.0 / 256.0;
-                const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
-                const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1.0);
-                float unpackRGBAToDepth( const in vec4 v ) {
-                    return dot( v, UnpackFactors );
+                // const float UnpackDownscale = 255.0 / 256.0;
+                // const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
+                // const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1.0);
+                // float unpackRGBAToDepth( const in vec4 v ) {
+                //     return dot( v, UnpackFactors );
+                // }
+
+                float unpackRGBAToDepth(vec4 RGBA){
+                    const float rMask = 1.0;
+                    const float gMask = 1.0 / 255.0;
+                    const float bMask = 1.0 / (255.0 * 255.0);
+                    const float aMask = 1.0 / (255.0 * 255.0 * 255.0);
+                    float depth = dot(RGBA, vec4(rMask, gMask, bMask, aMask));
+                    return depth;
                 }
                 
                 void main(void){
@@ -360,12 +388,26 @@ module rf{
 
                     #ifdef SHADOW
                         vec3 projCoords = vShadowUV.xyz / vShadowUV.w;
-                        projCoords.xy = projCoords.xy * 0.5 + 0.5;
+                        projCoords.xyz = projCoords.xyz * 0.5 + 0.5;
+                        // vec3 projCoords = vShadowUV.xyz;
                         vec4 s = texture2D(${FS.SHADOW}, projCoords.xy);
 
-                        if(s.x >= projCoords.z-0.01){
-                            diffuse *= 0.8;
+                        // if(restDepth(s) > projCoords.z-0.2){
+                        //     diffuse.xyz *= 0.8;
+                        // }
+
+                        if(projCoords.z > s.z){
+                            diffuse.xyz *= 0.8;
                         }
+                       
+                        // diffuse.xyz *= s.z;
+                        // c.xyz = vec3(restDepth(s));
+                        // c.xyz = vec3((s.z-.55) * 5.);
+                        // c = s.z;
+
+                        // if(s.x >= projCoords.z-0.01){
+                        //     diffuse.xyz *= 0.8;
+                        // }
 
                         // c = vec4(vec3(projCoords.z),1.);
                         // vec4 s = texture2D(${FS.SHADOW}, tUV);

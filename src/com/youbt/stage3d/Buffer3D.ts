@@ -572,6 +572,7 @@ module rf {
     export class RTTexture extends Texture{
         frameBuffer:WebGLFramebuffer;
         renderBuffer:WebGLRenderbuffer;
+        setting:IContext3DSetting = {} as IContext3DSetting;
         cleanBit:number;
         cleanColor:IColor;
 
