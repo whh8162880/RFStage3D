@@ -12,5 +12,6 @@ step8.服务器上删除分支。[可选]
 
 
 ======Github=======
-
-11111 测试提到 #1
+  添加远程源
+    git remote [id] [url]  
+    git remote three http://192.168.1.53/MelonGroup/Three.git

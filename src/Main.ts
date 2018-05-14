@@ -39,7 +39,7 @@ module rf{
             scene.camera = camera;
             let f = camera.originFar;
             f = Math.sqrt(f*f / 3);
-            camera.setPos(0,f,f);
+            camera.setPos(f,f,f);
             camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
 
@@ -47,6 +47,7 @@ module rf{
             let sun = new DirectionalLight();
             // f = 1000 / Math.PI2;
             // f = Math.sqrt(f*f / 3);
+            f /= 1.5;
             sun.setPos(f,f,f);
             let v = TEMP_VECTOR3D;
             v[0] = v[1] = v[2] = 0;
@@ -99,6 +100,7 @@ module rf{
             let w_e = w * 1.1
             
             let m = new PhongMaterial();
+            m.setData(undefined);
             m.cull = WebGLConst.BACK;
             // let geo = new BoxGeometry(variables).create(w,w,w)
 
@@ -132,12 +134,12 @@ module rf{
             let sphere = new SphereGeometry(variables).create(r,r,50);
             mesh = new Mesh(variables);
             mesh.shadowable = true;
-            mesh.shadowTarget = false;
+            // mesh.shadowTarget = true;
             mesh.geometry = sphere;
             mesh.material = new PhongMaterial();
             mesh.material.setData(undefined);
             mesh.material.diff = newColor(0xAAAAAA);
-            mesh.setPos(0,50,0);
+            mesh.setPos(0,0,0);
             // scene.addChild(mesh);
 
 
@@ -154,10 +156,10 @@ module rf{
             kfmMesh.setSca(100,100,100);
             kfmMesh.shadowable = true;
             // kfmMesh.shadowTarget = true;
-            // kfmMesh.load("../assets/mesh/a10010m/");
+            kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
             // kfmMesh.load("assets/hero001/");
-            kfmMesh.load("../assets/mesh/f3/");
+            // kfmMesh.load("../assets/mesh/f3/");
             scene.addChild(kfmMesh);
 
             // kfmMesh = new KFMMesh(new PhongMaterial());
@@ -179,14 +181,18 @@ module rf{
             // kfmMesh.load("../assets/mesh/f1/");
             // scene.addChild(kfmMesh);
 
+            mesh = kfmMesh;
+
             var gui = new dat.GUI();
             var folder = gui.addFolder("mesh");
             // folder.add(mesh,"refreshGUI");
             var posFolder = folder.addFolder("position");
-            posFolder.add(mesh,"y",50,200).step(0.01);
+            posFolder.add(mesh,"y",-200,200).step(0.01);
 
             var sunFolder = gui.addFolder("sun");
+            sunFolder.add(sun,"x",0,1000);
             sunFolder.add(sun,"y",0,1000);
+            sunFolder.add(sun,"z",0,1000);
             // posFolder.add(kfmMesh,"z",-1000,1000).step(0.01);
             // var rotFolder = folder.addFolder("rotation");
             // rotFolder.add(kfmMesh,"rotationX",-360,360);
@@ -239,7 +245,7 @@ module rf{
             // m.invert();
 
             let profile = singleton(GUIProfile);
-            tipContainer.addChild(profile);
+            // tipContainer.addChild(profile);
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);
