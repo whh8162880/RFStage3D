@@ -389,14 +389,9 @@ module rf{
                     #ifdef SHADOW
                         vec3 projCoords = vShadowUV.xyz / vShadowUV.w;
                         projCoords.xyz = projCoords.xyz * 0.5 + 0.5;
-                        // vec3 projCoords = vShadowUV.xyz;
                         vec4 s = texture2D(${FS.SHADOW}, projCoords.xy);
 
-                        // if(restDepth(s) > projCoords.z-0.2){
-                        //     diffuse.xyz *= 0.8;
-                        // }
-
-                        if(projCoords.z > s.z){
+                        if(projCoords.z > s.z - 0.001){
                             diffuse.xyz *= 0.8;
                         }
                        
