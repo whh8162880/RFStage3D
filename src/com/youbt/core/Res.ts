@@ -133,6 +133,7 @@ module rf {
                 item.name = url;
                 item.complete = [{ thisObj: thisObj, complete: complete }];
                 item.states = LoadStates.WAIT;
+                item.url = url;
                 //添加进加载列表
                 this.link.addByWeight(item, priority);
                 //开始加载
@@ -261,8 +262,9 @@ module rf {
         noDispose: boolean;
         disposeTime: number;
         states: number = 0;
+        url:string;
         onRecycle() {
-            this.name = this.complete = this.data = undefined;
+            this.name = this.complete = this.data = this.url =  undefined;
             this.preUseTime = this.disposeTime = this.states = 0;
             this.noDispose = false;
         }

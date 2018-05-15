@@ -1,5 +1,9 @@
 ///<reference path="../Stage3D.ts" />
 module rf {
+
+    export var skeletonMeshObj:{[key:string]:ISkeletonMeshData} = {};
+
+
     export class Mesh extends SceneObject {
         scene: Scene;
         skAnim: SkeletonAnimation;
@@ -14,6 +18,18 @@ module rf {
             let { invSceneTransform, sceneTransform } = this;
             invSceneTransform.m3_invert(sceneTransform);
         }
+
+
+        renderShadow(sun:Light,p:Program3D,c:Context3D,worldTranform:IMatrix3D,now: number, interval: number){
+            let{geometry,sceneTransform,skAnim}=this;
+            geometry.vertex.uploadContext(p);
+            worldTranform.m3_append(sun.worldTranform,false,sceneTransform);
+            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+            if (undefined != skAnim) {
+                skAnim.uploadContext(sun, this, p, now, interval);
+            }
+        }
+        
 
         render(camera: Camera, now: number, interval: number): void {
             const { geometry, material, skAnim } = this;
@@ -39,37 +55,58 @@ module rf {
             
             super.render(camera, now, interval);
         }
+
+
+        onRecycle(){
+            super.onRecycle();
+        }
     }
 
 
     export class KFMMesh extends Mesh {
-
         id: string;
-
-
+        kfm : ISkeletonMeshData;
+        defaultAnim:string;
+        currentAnim:string;
         constructor(material?: Material, variables?: { [key: string]: IVariable }) {
             super(variables);
             this.material = material;
+            this.defaultAnim = "stand";
             // this.shadowable = true;
         }
 
         load(url: string) {
             this.id = url;
-            url += "mesh.km";
-            loadRes(url, this.loadCompelte, this, ResType.bin);
+            let kfm = skeletonMeshObj[url];
+            if(!kfm){
+                url += "mesh.km";
+                loadRes(url, this.loadCompelte, this, ResType.bin);
+            }
         }
 
         loadCompelte(e: EventX) {
-            let item: ResItem = e.data;
-            let byte = item.data;
-            let o = amf_readObject(byte);
-            this.setKFM(o);
+
+            if(e.type == EventT.COMPLETE){
+                let{url,data:byte}= e.data;
+                let{id}=this;
+                if(url.indexOf(id) != -1){
+                    let o = amf_readObject(byte);
+                    if(o.skeleton){
+                        o.skeleton = new Skeleton(o.skeleton);
+                    }
+                    skeletonMeshObj[id] = o;
+                    this.setKFM(o);
+                    return;
+                }
+            }
         }
 
         setKFM(kfm: ISkeletonMeshData) {
-            let { mesh, skeleton: skeletonData, material: materialData,anims } = kfm;
+            let { mesh, skeleton, material: materialData,anims,defaultAnim } = kfm;
             let { material, geometry } = this;
             let c = context3D;
+
+            this.kfm = kfm;
 
             if (!geometry) {
                 this.geometry = geometry = new GeometryBase(this.variables);
@@ -83,15 +120,13 @@ module rf {
 
             material.diffTex.url = this.id + material.diffTex.url;
 
-            if(skeletonData){
-                //=========================
-                //skeleton
-                //=========================
-                let skeleton = new Skeleton(skeletonData);
+            if(skeleton){
                 //===========================
                 //  Animation
                 //===========================
                 this.skAnim = skeleton.createAnimation();
+                skeleton.addEventListener(EventT.COMPLETE,this.animationLoadCompleteHandler,this);
+                this.playAnim(defaultAnim);
             }
             // let action = "Take 001";
             // let action = "stand";
@@ -100,12 +135,51 @@ module rf {
             // this.skAnim.play(animationData, engineNow);
         }
 
+        
+
+        playAnim(name:string){
+
+            if (name.lastIndexOf(ExtensionDefine.KF) == -1) {
+                name += ExtensionDefine.KF;
+            }
+
+            this.currentAnim = name;
+
+            let { skeleton } = this.skAnim;
+            let anim = skeleton.animations[name];
+            if(!anim){
+                //没有加载动作
+                loadRes(this.id + name,skeleton.loadAnimationComplete,skeleton,ResType.bin);
+            }else{
+
+            }
+        }
+
+        animationLoadCompleteHandler(e:EventX){
+            let anim:ISkeletonAnimationData = e.data;
+            if(anim.name == this.name){
+                this.playAnim(this.name);
+            }
+        }
+
+        onRecycle(){
+            let{skAnim} = this;
+            if(skAnim){
+                skAnim.skeleton.removeEventListener(EventT.COMPLETE,this.animationLoadCompleteHandler);
+            }
+            this.defaultAnim = undefined;
+            this.currentAnim = undefined;
+            this.id = undefined;
+            this.kfm = undefined;
+            super.onRecycle();
+        }
+
         // refreshGUI(gui:dat.GUI){
         //     alert(gui);
         // }
     }
 
-    export class Skeleton {
+    export class Skeleton extends MiniDispatcher {
         rootBone: IBone;
         // bonePose: IBonePose;
         defaultMatrices: Float32Array;
@@ -114,6 +188,7 @@ module rf {
         animations: { [key: string]: ISkeletonAnimationData } = {};
 
         constructor(config: ISkeletonData) {
+            super();
 
             let { boneCount, defaultMatrices } = this;
 
@@ -223,6 +298,16 @@ module rf {
 
 
             return result;
+        }
+
+        loadAnimationComplete(e:EventX):void{
+            if(e.type == EventT.COMPLETE){
+                let item: ResItem = e.data;
+                let byte = item.data;
+                let o = amf_readObject(byte);
+                this.initAnimationData(o);
+                this.simpleDispatch(e.type,o);
+            }
         }
 
         // createSkeletionAnimation() {

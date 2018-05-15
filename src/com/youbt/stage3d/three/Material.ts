@@ -13,7 +13,7 @@ module rf{
         diff:IColor;
         diffTex:ITextureData;
 
-        createProgram(mesh:Mesh){
+        createProgram(mesh:SceneObject){
             return this.program;
         }
 
@@ -55,7 +55,7 @@ module rf{
         }
 
 
-        uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
+        uploadContext(camera:Camera,mesh:SceneObject, now: number, interval: number){
             let c = context3D;
             let{program}=this;
             if(!program){
@@ -113,14 +113,54 @@ module rf{
                 return p;
             }
 
+            let skAnim = mesh.skAnim;
+            let v_def = "";
+
+            if(undefined != skAnim){
+                key += "-skeleton";
+                v_def += "#define USE_SKINNING\n           #define MAX_BONES 50\n";
+            }
+
 
             let vertexCode = `
                 precision mediump float;
+
+                ${v_def}
+
+
+
                 attribute vec3 ${VA.pos};
                 uniform mat4 ${VC.mvp};
                 varying vec4 vPos;
+
+
+#ifdef USE_SKINNING
+                attribute vec4 ${VA.index};
+                attribute vec4 ${VA.weight};
+                uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
+                mat4 getBoneMatrix( const in float i ) {
+                    mat4 bone = ${VC.vc_bones}[ int(i) ];
+                    return bone;
+                }
+#endif
                 void main(void){
-                    gl_Position = vPos = ${VC.mvp} * vec4(${VA.pos},1.0);
+                    vec4 t_pos = vec4(${VA.pos},1.0);
+                    #ifdef USE_SKINNING
+                        mat4 boneMatX = getBoneMatrix( ${VA.index}.x );
+                        mat4 boneMatY = getBoneMatrix( ${VA.index}.y );
+                        mat4 boneMatZ = getBoneMatrix( ${VA.index}.z );
+                        mat4 boneMatW = getBoneMatrix( ${VA.index}.w );
+                    // #endif
+                    // #ifdef USE_SKINNING
+                        mat4 skinMatrix = mat4( 0.0 );
+                        skinMatrix += ${VA.weight}.x * boneMatX;
+                        skinMatrix += ${VA.weight}.y * boneMatY;
+                        skinMatrix += ${VA.weight}.z * boneMatZ;
+                        skinMatrix += ${VA.weight}.w * boneMatW;
+                        t_pos = skinMatrix * t_pos;
+                    #endif
+
+                    gl_Position = vPos = ${VC.mvp} * t_pos;
                 }
             `
 
