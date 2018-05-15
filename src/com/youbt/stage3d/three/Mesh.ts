@@ -102,8 +102,8 @@ module rf {
         }
 
         setKFM(kfm: ISkeletonMeshData) {
-            let { mesh, skeleton, material: materialData,anims,defaultAnim } = kfm;
-            let { material, geometry } = this;
+            let { mesh, skeleton, material: materialData,anims } = kfm;
+            let { material, geometry ,defaultAnim} = this;
             let c = context3D;
 
             this.kfm = kfm;
@@ -137,28 +137,33 @@ module rf {
 
         
 
-        playAnim(name:string){
+        playAnim(name:string,refresh:boolean = false){
+            let{skAnim,tm} = this;
+            if(!skAnim){
+                return;
+            }
 
             if (name.lastIndexOf(ExtensionDefine.KF) == -1) {
                 name += ExtensionDefine.KF;
             }
-
+            if(this.currentAnim == name && !refresh){
+                return;
+            }
             this.currentAnim = name;
-
-            let { skeleton } = this.skAnim;
+            let { skeleton } = skAnim;
             let anim = skeleton.animations[name];
             if(!anim){
                 //没有加载动作
                 loadRes(this.id + name,skeleton.loadAnimationComplete,skeleton,ResType.bin);
             }else{
-
+                this.skAnim.play(anim,tm.now);
             }
         }
 
         animationLoadCompleteHandler(e:EventX){
             let anim:ISkeletonAnimationData = e.data;
-            if(anim.name == this.name){
-                this.playAnim(this.name);
+            if(anim.name == this.currentAnim){
+                this.playAnim(this.currentAnim,true);
             }
         }
 
@@ -392,9 +397,7 @@ module rf {
         starttime: number;
         nextTime: number;
         animationData: ISkeletonAnimationData;
-
         currentFrame: number = 0;
-
         play(animationData: ISkeletonAnimationData, now: number) {
             this.animationData = animationData;
             this.nextTime = now + animationData.eDuration * 1000;
@@ -402,6 +405,7 @@ module rf {
 
         uploadContext(camera: Camera, mesh: Mesh, program: Program3D, now: number, interval: number) {
             let { animationData, skeleton, starttime, currentFrame, nextTime } = this;
+            let {tm} = mesh;
             skeleton.vertex.uploadContext(program);
             let matrixes: Float32Array;
             if (undefined == animationData) {
@@ -411,7 +415,7 @@ module rf {
                     currentFrame = 0;
                 }
 
-                if (now > nextTime) {
+                if (tm.now > nextTime) {
                     this.nextTime = nextTime + animationData.eDuration * 1000;
                     this.currentFrame = currentFrame + 1;
                 }

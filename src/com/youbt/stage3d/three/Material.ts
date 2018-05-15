@@ -46,7 +46,7 @@ module rf{
 
         uploadContextSetting(){
             let{setting}=context3D;
-            let{program,cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
+            let{cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
             setting.cull = cull;
             setting.depth = depthMask;
             setting.depthMode = passCompareMode;

@@ -165,13 +165,7 @@ module rf{
                 this.program = p
             }
 
-            const{depthMask,passCompareMode,srcFactor,dstFactor,cull}=scene.material;
-            c.setCulling(cull)
-            c.setDepthTest(depthMask,passCompareMode);
-            c.setBlendFactors(srcFactor,dstFactor);
-
-            // c.setBlendFactors(gl.ONE,gl.ZERO);
-            // c.setDepthTest(true,gl.LESS);
+            scene.material.uploadContextSetting();
 
             c.setProgram(p);
 
