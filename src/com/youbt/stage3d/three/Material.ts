@@ -244,17 +244,19 @@ module rf{
             let sun = scene.sun;
             c.setProgramConstantsFromVector(VC.lightDirection,[sun._x,sun._y,sun._z],3);
 
-            let t:Texture
+            let t:Texture;
+
+            let textureID = 0;
 
             if(undefined != diffTex){
                 t = c.textureObj[diffTex.key];
-                t.uploadContext(program,0,FS.diff);
+                t.uploadContext(program,textureID++,FS.diff);
             }else if(undefined != diff){
                 c.setProgramConstantsFromVector(VC.vc_diff,[diff.r,diff.g,diff.b,diff.a],4);
             }
 
             if(mesh.shadowTarget){
-                ROOT.shadow.rtt.uploadContext(program,0,FS.SHADOW);
+                ROOT.shadow.rtt.uploadContext(program,textureID++,FS.SHADOW);
             }
 
             // c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
