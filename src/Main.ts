@@ -47,8 +47,7 @@ module rf{
             let sun = new DirectionalLight();
             // f = 1000 / Math.PI2;
             // f = Math.sqrt(f*f / 3);
-            f /= 1.5;
-            sun.setPos(f,f,f);
+            sun.setPos(200,800,200);
             let v = TEMP_VECTOR3D;
             v[0] = v[1] = v[2] = 0;
             sun.lookat(v);
@@ -149,19 +148,28 @@ module rf{
             // mesh.setPos(0,70,0);
             // scene.addChild(mesh);
 
-            let kfmurl = "../assets/mesh/f1/";
+            let kfmurl
+            // kfmurl = "../assets/mesh/f1/";
+            kfmurl = "../assets/mesh/f3/";
+            // kfmurl = "../assets/mesh/a10010m/";
 
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
             kfmMesh.shadowable = true;
             // kfmMesh.shadowTarget = true;
-            kfmMesh.load("../assets/mesh/a10010m/");
+            // kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
-            // kfmMesh.load("assets/hero001/");
+            kfmMesh.load(kfmurl);
             // kfmMesh.load("../assets/mesh/f3/");
             scene.addChild(kfmMesh);
 
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.shadowable = true;
+            // kfmMesh.load("../assets/mesh/a10010m/");
+            // kfmMesh.setPos(100,0,0);
+            // scene.addChild(kfmMesh);
             // kfmMesh = new KFMMesh(new PhongMaterial());
             // kfmMesh.setSca(100,100,100);
             // kfmMesh.setPos(-200,0,0);
@@ -245,7 +253,7 @@ module rf{
             // m.invert();
 
             let profile = singleton(GUIProfile);
-            // tipContainer.addChild(profile);
+            tipContainer.addChild(profile);
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);

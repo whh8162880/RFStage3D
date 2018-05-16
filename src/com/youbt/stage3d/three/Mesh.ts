@@ -58,6 +58,10 @@ module rf {
 
 
         onRecycle(){
+            let{skAnim}=this;
+            if(skAnim){
+                this.skAnim = null;
+            }
             super.onRecycle();
         }
     }
