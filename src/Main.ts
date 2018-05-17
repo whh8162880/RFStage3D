@@ -76,7 +76,7 @@ module rf{
 
             let t = 2;
             let tr = new Trident(w,t);
-            // scene.addChild(tr);
+            scene.addChild(tr);
 
             sp = tr;
 
