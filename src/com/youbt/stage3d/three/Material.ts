@@ -13,7 +13,7 @@ module rf{
         diff:IColor;
         diffTex:ITextureData;
 
-        createProgram(mesh:Mesh){
+        createProgram(mesh:SceneObject){
             return this.program;
         }
 
@@ -46,7 +46,7 @@ module rf{
 
         uploadContextSetting(){
             let{setting}=context3D;
-            let{program,cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
+            let{cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
             setting.cull = cull;
             setting.depth = depthMask;
             setting.depthMode = passCompareMode;
@@ -55,7 +55,7 @@ module rf{
         }
 
 
-        uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
+        uploadContext(camera:Camera,mesh:SceneObject, now: number, interval: number){
             let c = context3D;
             let{program}=this;
             if(!program){
@@ -113,14 +113,54 @@ module rf{
                 return p;
             }
 
+            let skAnim = mesh.skAnim;
+            let v_def = "";
+
+            if(undefined != skAnim){
+                key += "-skeleton";
+                v_def += "#define USE_SKINNING\n           #define MAX_BONES 50\n";
+            }
+
 
             let vertexCode = `
                 precision mediump float;
+
+                ${v_def}
+
+
+
                 attribute vec3 ${VA.pos};
                 uniform mat4 ${VC.mvp};
                 varying vec4 vPos;
+
+
+#ifdef USE_SKINNING
+                attribute vec4 ${VA.index};
+                attribute vec4 ${VA.weight};
+                uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
+                mat4 getBoneMatrix( const in float i ) {
+                    mat4 bone = ${VC.vc_bones}[ int(i) ];
+                    return bone;
+                }
+#endif
                 void main(void){
-                    gl_Position = vPos = ${VC.mvp} * vec4(${VA.pos},1.0);
+                    vec4 t_pos = vec4(${VA.pos},1.0);
+                    #ifdef USE_SKINNING
+                        mat4 boneMatX = getBoneMatrix( ${VA.index}.x );
+                        mat4 boneMatY = getBoneMatrix( ${VA.index}.y );
+                        mat4 boneMatZ = getBoneMatrix( ${VA.index}.z );
+                        mat4 boneMatW = getBoneMatrix( ${VA.index}.w );
+                    // #endif
+                    // #ifdef USE_SKINNING
+                        mat4 skinMatrix = mat4( 0.0 );
+                        skinMatrix += ${VA.weight}.x * boneMatX;
+                        skinMatrix += ${VA.weight}.y * boneMatY;
+                        skinMatrix += ${VA.weight}.z * boneMatZ;
+                        skinMatrix += ${VA.weight}.w * boneMatW;
+                        t_pos = skinMatrix * t_pos;
+                    #endif
+
+                    gl_Position = vPos = ${VC.mvp} * t_pos;
                 }
             `
 
@@ -204,17 +244,19 @@ module rf{
             let sun = scene.sun;
             c.setProgramConstantsFromVector(VC.lightDirection,[sun._x,sun._y,sun._z],3);
 
-            let t:Texture
+            let t:Texture;
+
+            let textureID = 0;
 
             if(undefined != diffTex){
                 t = c.textureObj[diffTex.key];
-                t.uploadContext(program,0,FS.diff);
+                t.uploadContext(program,textureID++,FS.diff);
             }else if(undefined != diff){
                 c.setProgramConstantsFromVector(VC.vc_diff,[diff.r,diff.g,diff.b,diff.a],4);
             }
 
             if(mesh.shadowTarget){
-                ROOT.shadow.rtt.uploadContext(program,0,FS.SHADOW);
+                ROOT.shadow.rtt.uploadContext(program,textureID++,FS.SHADOW);
             }
 
             // c.setProgramConstantsFromVector(VC.lightDirection,[100,100,100],3);
@@ -322,7 +364,6 @@ module rf{
 
                     vec3  invLight = normalize(${VC.invm} * vec4(${VC.lightDirection}, 0.0)).xyz;
                     float diffuse  = clamp(dot(t_normal.xyz, invLight), 0.1, 1.0);
-                    diffuse += 0.5;
                     vDiffuse = vec4(vec3(diffuse), 1.0);
                     vUV = ${VA.uv};
                     gl_Position = ${VC.mvp} * t_pos;
@@ -389,14 +430,9 @@ module rf{
                     #ifdef SHADOW
                         vec3 projCoords = vShadowUV.xyz / vShadowUV.w;
                         projCoords.xyz = projCoords.xyz * 0.5 + 0.5;
-                        // vec3 projCoords = vShadowUV.xyz;
                         vec4 s = texture2D(${FS.SHADOW}, projCoords.xy);
 
-                        // if(restDepth(s) > projCoords.z-0.2){
-                        //     diffuse.xyz *= 0.8;
-                        // }
-
-                        if(projCoords.z > s.z){
+                        if(projCoords.z > s.z - 0.001){
                             diffuse.xyz *= 0.8;
                         }
                        
@@ -425,6 +461,7 @@ module rf{
                         
                     #endif
 
+                    diffuse.xyz += 0.5;
                     c *= diffuse;
 
                     if(c.w < 0.1){

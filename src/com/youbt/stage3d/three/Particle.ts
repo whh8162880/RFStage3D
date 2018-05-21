@@ -164,11 +164,9 @@ module rf {
                 this.program = program = this.createProgram(mesh);
             }
 
-            let{cull,srcFactor,dstFactor,depthMask,passCompareMode}=this;
-
             c.setProgram(program);
-            c.setCulling(cull);
-            c.setBlendFactors(srcFactor,dstFactor);
+            
+            this.uploadContextSetting();
 
             let t: Texture
 

@@ -85,6 +85,13 @@ module rf {
                 child.addToStage();
             }
         }
+
+        renderShadow(sun:Light,p:Program3D,c:Context3D,worldTranform:IMatrix3D,now: number, interval: number){
+            let{geometry,sceneTransform}=this;
+            geometry.vertex.uploadContext(p);
+            worldTranform.m3_append(sun.worldTranform,false,sceneTransform);
+            c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+        }
     }
 
     export class Scene extends SceneObject {
@@ -100,7 +107,7 @@ module rf {
 
         public render(camera: Camera, now: number, interval: number): void {
             let { camera: _camera } = this;
-            const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
+            // const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
             let c = context3D;
             let g = gl;
 
@@ -112,12 +119,14 @@ module rf {
                 _camera.updateSceneTransform();
             }
 
-            let{setting}=c;
-            setting.cull = cull;
-            setting.depth = depthMask;
-            setting.depthMode = passCompareMode;
-            setting.src = srcFactor;
-            setting.dst = dstFactor;
+            this.material.uploadContextSetting();
+
+            // let{setting}=c;
+            // setting.cull = cull;
+            // setting.depth = depthMask;
+            // setting.depthMode = passCompareMode;
+            // setting.src = srcFactor;
+            // setting.dst = dstFactor;
 
 
             super.render(_camera, now, interval);
@@ -128,6 +137,7 @@ module rf {
         constructor(source?: BitmapSource, variables?: { [key: string]: IVariable }) {
             super(source, variables);
             this.hitArea.allWays = true;
+            this.mouseEnabled = false;
         }
     }
 
@@ -288,22 +298,24 @@ module rf {
 
             let{passCompareMode,cull,program}=m;
 
-            m.uploadContext(sun,undefined,now,interval);
+           
             // c.setDepthTest(false,passCompareMode);
             // c.setCulling(cull);
             // c.setProgram(program);
-            let p = m.program;
+            
+            let worldTranform = TEMP_MATRIX;
             for(let vo = link.getFrist();vo;vo = vo.next){
                 if(vo.close == false){
                     let obj = vo.data as SceneObject;
                     let{shadowable,shadowTarget,geometry,shadowMatrix,sceneTransform}=obj;
-                    let worldTranform = TEMP_MATRIX;
+                    
                     if(shadowable){
-                        geometry.vertex.uploadContext(p);
-                        worldTranform.m3_append(sun.worldTranform,false,sceneTransform);
-                        c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
+                        m.uploadContext(sun,obj,now,interval);
+                        let p = m.program;
+                        obj.renderShadow(sun,p,c,worldTranform,now,interval);
                         c.drawTriangles(geometry.index,geometry.numTriangles,rtt.setting);
                     }
+
                     if(shadowTarget){
                         if(!shadowMatrix){
                             obj.shadowMatrix = shadowMatrix = newMatrix3D();

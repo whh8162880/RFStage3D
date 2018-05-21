@@ -161,14 +161,14 @@ http://benvanik.github.io/WebGL-Inspector/
 node --inspect-brk APP.js
 
 
-2D地图深度计算推导 --魏玲
+2D地图深度计算推导
 ```typescript
     假设displayObject.rotationX = a; (90 > a > 0);
     z = y * tan(90-a) + offZ*cos(90-a);
     y = y - offZ*cosz*tanz
 ```
 
-四元数   --魏玲
+四元数
 ```typescript
     四元数(xi,yj,zk,w) 
         i*i = j*j = k*k = i*j*k = -1 ;

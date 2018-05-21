@@ -49,6 +49,7 @@ module rf {
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
+        rect:Size;
         constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }) {
             super();
             this.hitArea = new HitArea();
@@ -660,12 +661,10 @@ module rf {
         renders: Link;
         geo: BatchGeometry = undefined;
         program: Program3D;
-        worldTransform: IMatrix3D;
         t:Texture
         constructor(target: Sprite) {
             this.target = target;
             this.renders = new Link();
-            this.worldTransform = newMatrix3D();
         }
 
         public render(camera: Camera, now: number, interval: number): void {
@@ -706,16 +705,12 @@ module rf {
                 this.createProgram();
             }
 
-            this.worldTransform.set(sceneTransform);
-            this.worldTransform.m3_append(camera.worldTranform);
-
-
             let vo = this.renders.getFrist();
             while (vo) {
                 if (vo.close == false) {
                     let render: I3DRender = vo.data;
                     if (render instanceof BatchGeometry) {
-                        this.dc(render);
+                        this.dc(camera,render);
                     } else {
                         render.render(camera, now, interval);
                     }
@@ -724,17 +719,31 @@ module rf {
             }
         }
 
-        dc(geo: BatchGeometry): void {
+        dc(camera:Camera,geo: BatchGeometry): void {
             // context3D.setBlendFactors()
             let c = context3D;
             let v: VertexBuffer3D = geo.$vertexBuffer;
             if (undefined == v) {
                 geo.$vertexBuffer = v = c.createVertexBuffer(geo.vertex, geo.vertex.data32PerVertex);
             }
+            let g = gl;
+            let{rect,sceneTransform}=this.target;
+            let worldTransform = TEMP_MATRIX;
+            if(rect){
+                let{x,y,w,h}=rect;
+                // x += ;
+                // y += sceneTransform[13];
+                c.setScissor(sceneTransform[12],sceneTransform[13],w,h);
+                worldTransform.m3_translation(x,y,0,true,sceneTransform);
+                worldTransform.m3_append(camera.worldTranform);
+            }else{
+                worldTransform.m3_append(camera.worldTranform,false,sceneTransform);
+            }
+            
             let i: IndexBuffer3D = c.getIndexByQuad(geo.quadcount);
             let p = this.program; 
             c.setProgram(p);
-            c.setProgramConstantsFromMatrix(VC.mvp, this.worldTransform);
+            c.setProgramConstantsFromMatrix(VC.mvp, worldTransform);
             c.setProgramConstantsFromVector(VC.ui, geo.vcData, 4);
             this.t.uploadContext(p,0,FS.diff);
             v.uploadContext(p);

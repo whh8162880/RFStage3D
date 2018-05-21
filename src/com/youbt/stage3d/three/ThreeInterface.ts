@@ -79,7 +79,7 @@ module rf{
 
     export interface ISkeletonMeshData extends IData{
         mesh:IMeshData;
-        skeleton:ISkeletonData;
+        skeleton:Skeleton;
         material:IMaterialData;
         anims:string[];
     }

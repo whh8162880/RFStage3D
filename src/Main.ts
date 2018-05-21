@@ -47,8 +47,7 @@ module rf{
             let sun = new DirectionalLight();
             // f = 1000 / Math.PI2;
             // f = Math.sqrt(f*f / 3);
-            f /= 1.5;
-            sun.setPos(f,f,f);
+            sun.setPos(200,800,200);
             let v = TEMP_VECTOR3D;
             v[0] = v[1] = v[2] = 0;
             sun.lookat(v);
@@ -77,7 +76,7 @@ module rf{
 
             let t = 2;
             let tr = new Trident(w,t);
-            // scene.addChild(tr);
+            scene.addChild(tr);
 
             sp = tr;
 
@@ -149,19 +148,28 @@ module rf{
             // mesh.setPos(0,70,0);
             // scene.addChild(mesh);
 
-            let kfmurl = "../assets/mesh/f1/";
+            let kfmurl
+            // kfmurl = "../assets/mesh/f1/";
+            kfmurl = "../assets/mesh/f3/";
+            // kfmurl = "../assets/mesh/a10010m/";
 
 
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
             kfmMesh.shadowable = true;
             // kfmMesh.shadowTarget = true;
-            kfmMesh.load("../assets/mesh/a10010m/");
+            // kfmMesh.load("../assets/mesh/a10010m/");
             // kfmMesh.load("http://192.168.3.214/webgl/ss/mesh/a01100nan/")
-            // kfmMesh.load("assets/hero001/");
+            kfmMesh.load(kfmurl);
             // kfmMesh.load("../assets/mesh/f3/");
             scene.addChild(kfmMesh);
 
+            // kfmMesh = new KFMMesh(new PhongMaterial());
+            // kfmMesh.setSca(100,100,100);
+            // kfmMesh.shadowable = true;
+            // kfmMesh.load("../assets/mesh/a10010m/");
+            // kfmMesh.setPos(100,0,0);
+            // scene.addChild(kfmMesh);
             // kfmMesh = new KFMMesh(new PhongMaterial());
             // kfmMesh.setSca(100,100,100);
             // kfmMesh.setPos(-200,0,0);
@@ -198,6 +206,20 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationX",-360,360);
             // rotFolder.add(kfmMesh,"rotationY",-360,360);
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
+
+
+            let profile = singleton(GUIProfile);
+            tipContainer.addChild(profile);
+
+
+            let image = new Image();
+            image.renderer = new BatchRenderer(image);
+            new Scroll(image,300,400);
+            image.mouseEnabled = true;
+            image.setPos(100,100,0);
+            image.load("../assets/mesh/f3/f3.png");
+            tipContainer.addChild(image);
+
 
 
 
@@ -244,8 +266,7 @@ module rf{
             // m.invert();
             // m.invert();
 
-            let profile = singleton(GUIProfile);
-            // tipContainer.addChild(profile);
+           
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);

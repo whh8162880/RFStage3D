@@ -19,7 +19,7 @@
 
         <!-- <link rel="stylesheet" href="assets/style.css"> -->
 
-        <script type="text/javascript" src="../assets/lib/inflate.min.js"></script>
+        <!-- <script type="text/javascript" src="../assets/lib/inflate.min.js"></script> -->
         <script type="text/javascript" src="../assets/lib/dat.gui.js"></script>
         <!-- <script type="text/javascript" src="../assets/lib/cannon.js"></script> -->
         <!-- <script type="text/javascript" src="../assets/lib/ammo.js"></script> -->
@@ -30,13 +30,16 @@
 
         <script>
             function main(){
-                Ammo().then(function(Ammo){
-                    var m = new rf.ammoTest();
-                    m.init(document.getElementById("game"));
-                } )
+                // Ammo().then(function(Ammo){
+                //     var m = new rf.ammoTest();
+                //     m.init(document.getElementById("game"));
+                // } )
                 
                 // var m = new rf.cannonTest();
                 // m.init(document.getElementById("game"));
+
+                var m = new rf.Main();
+                m.init(document.getElementById("game"));
 
                 // init();
                 // debugModel(false);
