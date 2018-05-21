@@ -135,6 +135,15 @@ namespace rf {
 			g.enable(g.BLEND);
 		}
 
+		scissoring:boolean;
+		setScissor(x:number,y:number,w:number,h:number):void{
+			let g = gl;
+			g.enable(g.SCISSOR_TEST);
+			y = this.backBufferHeight - y - h;
+			g.scissor(x,y,w,h);
+			this.scissoring = true;
+		}
+
 		
 		public clear(red: number = 0.0,green: number = 0.0,blue: number = 0.0,alpha: number = 1.0,depth: number = 1.0,stencil: number /*uint*/ = 0,	mask: number /* uint */ = 0xffffffff): void {
 			let g = gl;
@@ -535,6 +544,11 @@ namespace rf {
 			
 			this.triangles += numTriangles;
 			this.dc ++;
+
+			if(this.scissoring){
+				g.disable(g.SCISSOR_TEST);
+				this.scissoring = false;
+			}
 		}
 
 

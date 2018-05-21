@@ -2,11 +2,12 @@ module rf{
     export class Scroll{
         vPixel:number = 1;
         hPixel:number = 1;
-        target:Component;
+        target:Sprite;
 
-        constructor(target:Component,w:number,h:number){
+        constructor(target:Sprite,w:number,h:number){
             this.target = target;
             target.rect = {x:0,y:0,w:w,h:h};
+            this.doEnabled();
         }
 
         _enabled:boolean = true;

@@ -208,11 +208,17 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
 
+            let profile = singleton(GUIProfile);
+            tipContainer.addChild(profile);
+
+
             let image = new Image();
+            image.renderer = new BatchRenderer(image);
+            new Scroll(image,300,400);
             image.mouseEnabled = true;
             image.setPos(100,100,0);
             image.load("../assets/mesh/f3/f3.png");
-            ROOT.addChild(image);
+            tipContainer.addChild(image);
 
 
 
@@ -260,8 +266,7 @@ module rf{
             // m.invert();
             // m.invert();
 
-            let profile = singleton(GUIProfile);
-            tipContainer.addChild(profile);
+           
 
             // let s = new Sprite();
             // s.renderer = new BatchRenderer(s);
