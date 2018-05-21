@@ -8,9 +8,9 @@ module rf{
             this.object = object;
             this.target = newVector3D();
             this.distance = this.object.pos.v3_sub(this.target).v3_length;
-            ROOT.on(MouseEventX.MouseDown,this.mouseDownHandler,this);
-            ROOT.on(MouseEventX.MouseWheel,this.mouseWheelHandler,this);
-            ROOT.on(MouseEventX.MouseRightDown,this.mouseRightDownHandler,this);
+            scene.on(MouseEventX.MouseDown,this.mouseDownHandler,this);
+            scene.on(MouseEventX.MouseWheel,this.mouseWheelHandler,this);
+            scene.on(MouseEventX.MouseRightDown,this.mouseRightDownHandler,this);
 
             this.updateSun();
         }
@@ -75,7 +75,7 @@ module rf{
 
         mouseMoveHandler(e:EventX):void{
             const{object,target,mouseSitivity,distance}=this;
-            const{dx,dy}=e.data
+            const{ox,oy}=e.data
             // let dx:number = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
             // let dy:number = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
             // dx *= pixelRatio;
@@ -84,8 +84,8 @@ module rf{
             let speed = (distance > 1000) ? mouseSitivity : mouseSitivity * distance / 1000;
             speed = Math.max(speed,0.1);
 
-            let rx = dy*speed + object.rotationX;
-            let ry = -dx*speed + object.rotationY;
+            let rx = oy*speed + object.rotationX;
+            let ry = -ox*speed + object.rotationY;
             
             if(target){
                 var transform:IMatrix3D = TEMP_MATRIX;
@@ -111,11 +111,11 @@ module rf{
 
 
         mouseRightMoveHandler(event:EventX):void{
-            let{dx,dy}=event.data;
+            let{ox,oy}=event.data;
             const{object,target}=this;
-            dy *= (this.distance / object.originFar);
-            target.y += dy;
-            object.setPos(object._x,object._y += dy ,object._z);
+            oy *= (this.distance / object.originFar);
+            target.y += oy;
+            object.setPos(object._x,object._y += oy ,object._z);
 
             this.updateSun();
             

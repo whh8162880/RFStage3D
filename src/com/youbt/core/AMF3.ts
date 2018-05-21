@@ -722,14 +722,18 @@ module rf{
 
 	export function amf_readObject(byte:ArrayBuffer | Uint8Array){
 		let amf = singleton(AMF3);
-		var inflate = new Zlib.Inflate(new Uint8Array(byte));
-		var plain;
-		if(inflate instanceof Uint8Array){
-			plain = inflate;
-		}else{
-			plain = inflate.decompress();
+		// var inflate = new Zlib.Inflate(new Uint8Array(byte));
+		// var plain;
+		// if(inflate instanceof Uint8Array){
+		// 	plain = inflate;
+		// }else{
+		// 	plain = inflate.decompress();
+		// }
+		// amf.setArrayBuffer(plain.buffer);
+		if(byte instanceof Uint8Array){
+			byte = byte.buffer;
 		}
-		amf.setArrayBuffer(plain.buffer);
+		amf.setArrayBuffer(byte);
 		let o = amf.readObject();
 		return o;
 	}

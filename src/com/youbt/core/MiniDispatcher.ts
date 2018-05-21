@@ -48,25 +48,18 @@ module rf {
 		ROLL_OUT
 	}
 
-	export class MouseEventData implements IRecyclable{
-		constructor(id?:number){
-			this.id = id;
-		}
+	export interface IMouseEventData{
 		id:number;
+		mouseDownX:number;
+		mouseDownY:number;
 		x:number;
 		y:number;
-		dx:number;
-		dy:number;
+		ox:number;
+		oy:number;
 		ctrl:boolean;
 		shift:boolean;
 		alt:boolean;
 		wheel:number;
-
-		onRecycle(){
-			this.ctrl = this.shift = this.alt = false;
-			this.wheel = this.dx = this.dy = this.x = this.y = this.id = 0;
-		}
-
 	}
 
 

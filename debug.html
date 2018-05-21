@@ -30,13 +30,16 @@
 
         <script>
             function main(){
-                Ammo().then(function(Ammo){
-                    var m = new rf.ammoTest();
-                    m.init(document.getElementById("game"));
-                } )
+                // Ammo().then(function(Ammo){
+                //     var m = new rf.ammoTest();
+                //     m.init(document.getElementById("game"));
+                // } )
                 
                 // var m = new rf.cannonTest();
                 // m.init(document.getElementById("game"));
+
+                var m = new rf.Main();
+                m.init(document.getElementById("game"));
 
                 // init();
                 // debugModel(false);

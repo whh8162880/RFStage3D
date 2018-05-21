@@ -208,6 +208,14 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
 
+            let image = new Image();
+            image.mouseEnabled = true;
+            image.setPos(100,100,0);
+            image.load("../assets/mesh/f3/f3.png");
+            ROOT.addChild(image);
+
+
+
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";

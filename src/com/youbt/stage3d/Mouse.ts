@@ -13,7 +13,7 @@ module rf{
     export interface ITouchlement{
         target:DisplayObject;
         time:number;
-        data:MouseEventData;
+        data:IMouseEventData;
         
     }
     export class Mouse{
@@ -72,12 +72,12 @@ module rf{
 
         touchElement:{ [key:number]:ITouchlement } = {};
 
+        eventData:IMouseEventData = {} as IMouseEventData;
+
         mouseHanlder( e ):void{
             let mouse = MouseInstance;
             let mouseX = e.clientX * pixelRatio;
             let mouseY = e.clientY * pixelRatio;
-
-           
 
             nativeMouseX = mouseX;
             nativeMouseY = mouseY;
@@ -92,7 +92,7 @@ module rf{
                 d = mouse.preTarget;
             }
             if(undefined != d){
-                let data = recyclable(MouseEventData);
+                let data = this.eventData;
                 data.id = e.button;
                 data.x = mouseX;
                 data.y = mouseY;
@@ -104,6 +104,9 @@ module rf{
                 if(type == "mousedown"){
                     //判断左右按键
                     element = mouse.mouseElement[data.id];
+                    data.mouseDownX = mouseX;
+                    data.mouseDownY = mouseY;
+
                     element.target = d;
                     element.time = now;
                     d.simpleDispatch(element.down,data,true);
@@ -119,8 +122,6 @@ module rf{
                     data.wheel = e.deltaY
                     d.simpleDispatch(MouseEventX.MouseWheel,data,true);
                 }
-
-                data.recycle();
             }
 
             
@@ -143,15 +144,15 @@ module rf{
 
             let d = ROOT.getObjectByPoint(mouseX,mouseY,1);
             if(undefined != d){
-                let data = recyclable(MouseEventData);
+                let data = mouse.eventData;
                 data.id = e.button;
                 data.x = mouseX;
                 data.y = mouseY;
                 data.ctrl = e.ctrlKey;
                 data.alt = e.altKey;
                 data.shift = e.shiftKey;
-                data.dx = (e.movementX || e.mozMovementX || e.webkitMovementX || 0) * pixelRatio;
-                data.dy = (e.movementY || e.mozMovementY || e.webkitMovementY || 0) * pixelRatio;
+                data.ox = (e.movementX || e.mozMovementX || e.webkitMovementX || 0) * pixelRatio;
+                data.oy = (e.movementY || e.mozMovementY || e.webkitMovementY || 0) * pixelRatio;
                 d.simpleDispatch(MouseEventX.MouseMove,data,true);
 
                 let{preRolled}=mouse;
@@ -168,8 +169,6 @@ module rf{
                     }
                     mouse.preRolled = d;
                 }
-
-                data.recycle();
             }
         }
 
@@ -180,7 +179,7 @@ module rf{
             var touch = e.changedTouches[0];
             let touches =  e.touches;
             let element:ITouchlement;
-            let data:MouseEventData;
+            let data:IMouseEventData;
 
             let now = engineNow;
             let d:DisplayObject;
@@ -192,11 +191,11 @@ module rf{
 
             element = elements[touch.identifier];
             if(undefined == element){
-                elements[touch.identifier] =  element = {target:undefined,time:0,data:new MouseEventData(touch.identifier)}
+                elements[touch.identifier] =  element = {target:undefined,time:0,data:{id:touch.identifier} as IMouseEventData}
             } 
             data = element.data;
-            data.dx = mouseX - data.x;
-            data.dy = mouseY - data.y;
+            data.ox = mouseX - data.x;
+            data.oy = mouseY - data.y;
             data.x = mouseX;
             data.y = mouseY;
 
@@ -294,21 +293,19 @@ module rf{
 
                 if(Math.abs(dlen) > 1.0){
                     //scale
-                    let data = recyclable(MouseEventData);
+                    let data = this.eventData;
                     data.x = x;
                     data.y = y;
                     data.wheel = dlen > 0 ? 120 : -120;
                     preTarget.simpleDispatch(MouseEventX.MouseWheel,data,true);
                     // console.log( "scale" , dlen.toFixed(2));
-                    data.recycle();
                 }else if(Math.abs(dy) > 1.0){
-                    let data = recyclable(MouseEventData);
+                    let data = this.eventData;
                     data.x = x;
                     data.y = y;
                     data.wheel = dy > 0 ? 120 : -120;
                     preTarget.simpleDispatch(MouseEventX.MouseWheel,data,true);
                     // console.log( "scale" , dlen.toFixed(2));
-                    data.recycle();
                 }
 
                 mouse.touchCenterY = y;

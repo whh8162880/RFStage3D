@@ -1,4 +1,0 @@
-module rf{
-    //DataBase
-    //skinBase
-}

@@ -49,6 +49,7 @@ module rf {
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
+        rect:Size;
         constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }) {
             super();
             this.hitArea = new HitArea();

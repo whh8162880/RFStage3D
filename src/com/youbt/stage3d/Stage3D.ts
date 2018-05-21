@@ -137,6 +137,7 @@ module rf {
         constructor(source?: BitmapSource, variables?: { [key: string]: IVariable }) {
             super(source, variables);
             this.hitArea.allWays = true;
+            this.mouseEnabled = false;
         }
     }
 
