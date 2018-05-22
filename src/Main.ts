@@ -9,8 +9,6 @@ module rf{
             super();
         }
 
-        
-
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -18,6 +16,10 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+            let perfix = "../assets/"
+            
+            ROOT_PERFIX = perfix;
 
             // var matrix = new Matrix3D([-1.0938435201278621e-8,-0.968181073665619,-0.2502503693103784,0,-1.4972529544683223e-8,-0.2502503567352837,0.9681810250144678,0,-0.9999999403953552,1.4337268631142944e-8,-1.1758774204986801e-8,0,6.187005396895984e-8,1.6862283945083618,-0.09339626878499985,1]);
             // var vs = matrix.decompose();
@@ -150,7 +152,7 @@ module rf{
 
             let kfmurl
             // kfmurl = "../assets/mesh/f1/";
-            kfmurl = "../assets/mesh/f3/";
+            kfmurl = perfix + "mesh/f3/";
             // kfmurl = "../assets/mesh/a10010m/";
 
 
@@ -217,7 +219,7 @@ module rf{
             new Scroll(image,300,400);
             image.mouseEnabled = true;
             image.setPos(100,100,0);
-            image.load("../assets/mesh/f3/f3.png");
+            image.load(perfix + "mesh/f3/f3.png");
             tipContainer.addChild(image);
 
 

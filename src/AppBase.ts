@@ -1,4 +1,5 @@
 /// <reference path="./com/youbt/rfreference.ts" />
+/// <reference path="./com/youbt/components/rfreference.ts" />
 /// <reference path="./com/youbt/stage3d/Stage3D.ts" />
 ///<reference path="./com/youbt/stage3d/three/Mesh.ts" />
 module rf {

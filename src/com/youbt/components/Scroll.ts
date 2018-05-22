@@ -1,3 +1,4 @@
+/// <reference path="../stage3d/display/Component.ts" />
 module rf{
     export class Scroll{
         vPixel:number = 1;

@@ -2,6 +2,7 @@
 ///<reference path="./Context3D.ts" />
 ///<reference path="./three/Light.ts" />
 module rf {
+    export var ROOT_PERFIX:string;
 
     export class SceneObject extends RenderBase {
         scene: Scene;
