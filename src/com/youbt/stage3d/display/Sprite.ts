@@ -8,6 +8,7 @@ module rf {
         variables:{ [key: string]: IVariable };
         material:Material;
         tm:ITimeMixer;
+        scrollRect:Size;
         // triangleFaceToCull: string = Context3DTriangleFace.NONE;
         // sourceFactor: number;
         // destinationFactor: number;
@@ -49,7 +50,6 @@ module rf {
         $vcox: number = 0;
         $vcoy: number = 0;
         $vcos: number = 1;
-        rect:Size;
         constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }) {
             super();
             this.hitArea = new HitArea();
@@ -147,9 +147,13 @@ module rf {
         }
 
         getObjectByPoint(dx: number, dy: number,scale:number): DisplayObject {
-            if(this.mouseEnabled == false && this.mouseChildren == false){
+
+            let{mouseEnabled,mouseChildren} = this;
+
+            if(mouseEnabled == false && mouseChildren == false){
                 return undefined
             }
+            let{states,scrollRect,hitArea}=this;
 
             if(this.states & DChange.ac){
                 this.updateHitArea()
@@ -158,8 +162,16 @@ module rf {
             dx -= this._x;
             dy -= this._y;
             scale *= this._scaleX;
+
+            let b = true;
+
+            if(scrollRect){
+                let{w,h} = scrollRect;
+                b = size_checkIn(0,w,0,h,dx,dy,scale);
+            }
+
             
-            if(this.hitArea.checkIn(dx,dy,scale) == true){
+            if(b && hitArea.checkIn(dx,dy,scale)){
                 if(this.mouseChildren){
                     let children = this.childrens;
                     let len = children.length;
@@ -171,11 +183,11 @@ module rf {
                         }
                     }
                 }
-                if(this.mouseEnabled){
-                    if(this.hitArea.allWays){
+                if(mouseEnabled){
+                    if(hitArea.allWays){
                         return this;
                     }
-                    if( this.hitArea.checkIn(dx,dy,scale) == true ){
+                    if( hitArea.checkIn(dx,dy,scale) == true ){
                         return this;
                     }
                     // let g = this.$graphics;
@@ -727,12 +739,10 @@ module rf {
                 geo.$vertexBuffer = v = c.createVertexBuffer(geo.vertex, geo.vertex.data32PerVertex);
             }
             let g = gl;
-            let{rect,sceneTransform}=this.target;
+            let{scrollRect,sceneTransform}=this.target;
             let worldTransform = TEMP_MATRIX;
-            if(rect){
-                let{x,y,w,h}=rect;
-                // x += ;
-                // y += sceneTransform[13];
+            if(scrollRect){
+                let{x,y,w,h}=scrollRect;
                 c.setScissor(sceneTransform[12],sceneTransform[13],w,h);
                 worldTransform.m3_translation(x,y,0,true,sceneTransform);
                 worldTransform.m3_append(camera.worldTranform);

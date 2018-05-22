@@ -39,6 +39,10 @@ module rf {
         h:number;
     }
 
+    export function size_checkIn(l:number,r:number,t:number,b:number,dx:number,dy:number,scale:number){
+        return dx > l * scale && dx < r * scale && dy > t * scale && dy < b * scale;
+    }
+
     export interface IFrame extends Size{
         ix:number;
         iy:number;
