@@ -9,8 +9,6 @@ module rf{
             super();
         }
 
-        
-
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -18,6 +16,10 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+            let perfix = "../assets/"
+            
+            ROOT_PERFIX = perfix;
 
             // var matrix = new Matrix3D([-1.0938435201278621e-8,-0.968181073665619,-0.2502503693103784,0,-1.4972529544683223e-8,-0.2502503567352837,0.9681810250144678,0,-0.9999999403953552,1.4337268631142944e-8,-1.1758774204986801e-8,0,6.187005396895984e-8,1.6862283945083618,-0.09339626878499985,1]);
             // var vs = matrix.decompose();
@@ -150,7 +152,7 @@ module rf{
 
             let kfmurl
             // kfmurl = "../assets/mesh/f1/";
-            kfmurl = "../assets/mesh/f3/";
+            kfmurl = perfix + "mesh/f3/";
             // kfmurl = "../assets/mesh/a10010m/";
 
 
@@ -212,12 +214,46 @@ module rf{
             tipContainer.addChild(profile);
 
 
+            
+
+            sp = new Sprite();
+            sp.setPos(100,100,0);
+            tipContainer.addChild(sp);
+            g = sp.graphics;
+            g.clear();
+            g.drawRect(0,0,100,100,0xFFFFFF);
+            g.end();
+
             let image = new Image();
             image.renderer = new BatchRenderer(image);
-            new Scroll(image,300,400);
+            new Scroll(image,100,100);
             image.mouseEnabled = true;
+            // g = image.graphics;
+            // g.clear;
+            // g.drawRect(0,0,100,100,0xFF0000);
+            // g.drawRect(100,0,100,100,0xFFFF00);
+            // g.drawRect(200,0,100,100,0x00FFFF);
+            // g.drawRect(300,0,100,100,0x0000FF);
+
+            // g.drawRect(0,100,100,100,0xFFFF00);
+            // g.drawRect(0,200,100,100,0x00FFFF);
+            // g.drawRect(0,300,100,100,0x0000FF);
+
+            // g.drawRect(100,100,100,100,0x00FFFF);
+            // g.drawRect(100,200,100,100,0x0000FF);
+            // g.drawRect(100,300,100,100,0xFFFF00);
+
+            // g.drawRect(200,100,100,100,0xFFFF00);
+            // g.drawRect(200,200,100,100,0x00FFFF);
+            // g.drawRect(200,300,100,100,0x0000FF);
+
+            // g.drawRect(300,100,100,100,0x0000FF);
+            // g.drawRect(300,200,100,100,0xFFFF00);
+            // g.drawRect(300,300,100,100,0x00FF00);
+
+            // g.end();
             image.setPos(100,100,0);
-            image.load("../assets/mesh/f3/f3.png");
+            image.load(perfix + "mesh/f3/f3.png");
             tipContainer.addChild(image);
 
 

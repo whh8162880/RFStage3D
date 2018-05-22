@@ -40,6 +40,7 @@ module rf{
             let _this = this;
             function m(e){
                 _this.mouseHanlder(e);
+                e.preventDefault();
             };
             
             let canvas = ROOT.canvas;
@@ -204,9 +205,9 @@ module rf{
                 const{clientX:x1,clientY:y1}=touches[1];
                 let x = (x0 + x1) / 2;
                 let y = (y0 + y1) / 2;
-                let dx = x1 - x0;
-                let dy = y1 - y0;
-                let len = Math.sqrt(dx * dx + dy * dy);
+                let ox = x1 - x0;
+                let oy = y1 - y0;
+                let len = Math.sqrt(ox * ox + oy * oy);
                 mouse.touchCenterY = y;
                 mouse.touchLen = len;
             }
@@ -221,18 +222,18 @@ module rf{
 
             if(undefined != d){
                 if(e.type == "touchstart"){
-                    if(true == d.mousedown){
-                        return;
-                    }
+                    // if(true == d.mousedown){
+                    //     return;
+                    // }
                     element.target = d;
                     element.time = now;
-                    d.mousedown = true;
+                    // d.mousedown = true;
                     d.simpleDispatch(MouseEventX.MouseDown,data,true);
                 }else{
-                    if(false == d.mousedown){
-                        return;
-                    }
-                    d.mousedown = false;
+                    // if(false == d.mousedown){
+                    //     return;
+                    // }
+                    // d.mousedown = false;
                     d.simpleDispatch(MouseEventX.MouseUp,data,true);
                     if(element.target == d && now - element.time < 500){
                         d.simpleDispatch(MouseEventX.CLICK,data,true);
@@ -268,8 +269,8 @@ module rf{
                 if(undefined != d){
                     element = elements[touch.identifier];
                     data = element.data;
-                    data.dx = mouseX - data.x;
-                    data.dy = mouseY - data.y;
+                    data.ox = mouseX - data.x;
+                    data.oy = mouseY - data.y;
                     data.x = mouseX;
                     data.y = mouseY;
                     d.simpleDispatch(MouseEventX.MouseMove,data,true);
@@ -284,12 +285,12 @@ module rf{
                 let x = (x0 + x1) / 2;
                 let y = (y0 + y1) / 2;
 
-                let dx = x1 - x0;
-                let dy = y1 - y0;
-                len = Math.sqrt(dx * dx + dy * dy);
+                let ox = x1 - x0;
+                let oy = y1 - y0;
+                len = Math.sqrt(ox * ox + oy * oy);
 
                 let dlen = (touchLen-len) / pixelRatio;
-                dy = (y - centerY) / pixelRatio;
+                oy = (y - centerY) / pixelRatio;
 
                 if(Math.abs(dlen) > 1.0){
                     //scale
@@ -299,11 +300,11 @@ module rf{
                     data.wheel = dlen > 0 ? 120 : -120;
                     preTarget.simpleDispatch(MouseEventX.MouseWheel,data,true);
                     // console.log( "scale" , dlen.toFixed(2));
-                }else if(Math.abs(dy) > 1.0){
+                }else if(Math.abs(oy) > 1.0){
                     let data = this.eventData;
                     data.x = x;
                     data.y = y;
-                    data.wheel = dy > 0 ? 120 : -120;
+                    data.wheel = oy > 0 ? 120 : -120;
                     preTarget.simpleDispatch(MouseEventX.MouseWheel,data,true);
                     // console.log( "scale" , dlen.toFixed(2));
                 }

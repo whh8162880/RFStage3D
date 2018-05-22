@@ -26,6 +26,7 @@ module rf {
         update: TweenUpdateFunction;
         complete: TweenUpdateFunction;
         thisObj: any;
+        completed:boolean;
     }
 
     export function defaultEasingFunction(t: number, b: number, c: number, d: number): number {
@@ -92,7 +93,8 @@ module rf {
     }
 
     export function tweenEnd(tweener: ITweener) {
-        const { caster, l, data, complete, thisObj } = tweener as ITweener;
+        if(tweener.completed) return;
+        const { caster, l, data, complete, thisObj} = tweener as ITweener;
         for (let i = 0; i < l; i++) {
             let item = data[i];
             const { k, e } = item;
@@ -105,10 +107,13 @@ module rf {
             complete.call(thisObj, tweener);
         }
         tweenLink.remove(tweener);
+        tweener.completed = true;
     }
 
     export function tweenStop(tweener: ITweener) {
+        if(tweener.completed) return;
         tweenLink.remove(tweener);
+        tweener.completed = true;
     }
 
 }
