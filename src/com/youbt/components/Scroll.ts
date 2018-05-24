@@ -1,25 +1,61 @@
 /// <reference path="../stage3d/display/Component.ts" />
 module rf{
+
+    export interface IScrollData{
+        nlen:number;
+        olen:number;
+        pos:number;
+        max:number;
+        min:number;
+    }
+
     export class Scroll{
         vStep:number = 1;
         hStep:number = 1;
+
+        vScroll:IScrollData;
+        hScroll:IScrollData;
+
+        rect:Size;
         target:RenderBase;
         tweener:ITweener;
         areacheck:boolean = true;
 
         constructor(target:RenderBase,w:number,h:number){
             this.target = target;
-            target.scrollRect = {x:0,y:0,w:w,h:h};
+            target.addEventListener(EventT.RESIZE,this.resizeHandler,this);
+            target.scrollRect = this.rect = {x:0,y:0,w:w,h:h};
             this.doEnabled();
+            this.resizeHandler();
+        }
+
+        resizeHandler(event?:EventX):void{
+            let{vStep,hStep,vScroll,hScroll}=this;
+            let{w:width,h:height}=this.target;
+            let{w,h}=this.rect; 
+            if(hStep > 0){
+                if(!hScroll){
+                    this.hScroll = hScroll = {nlen:w,olen:width,min:0,max:Math.max(0,width-w)} as IScrollData;
+                }
+            }
+
+            if(vStep > 0){
+                if(!vScroll){
+                    this.vScroll = vScroll = {nlen:h,olen:height,min:0,max:Math.max(0,height-h)} as IScrollData;
+                }
+            }
+           
         }
 
         _enabled:boolean = true;
 		set enabled(value:boolean){if(this._enabled == value){return;}this._enabled = value;this.doEnabled();}
 		get enabled():boolean{return this._enabled;}
 		doEnabled():void{
-            let{_enabled,target}=this;
+            let{_enabled,target,mouseDownHandler}=this;
             if(_enabled){
-                target.on(MouseEventX.MouseDown,this.mouseDownHandler,this)
+                target.on(MouseEventX.MouseDown,mouseDownHandler,this)
+            }else{
+                target.off(MouseEventX.MouseDown,mouseDownHandler)
             }
         }
 
@@ -39,9 +75,9 @@ module rf{
             ROOT.off(MouseEventX.MouseMove,this.mouseMoveHandler);
             ROOT.off(MouseEventX.MouseUp,this.mouseUpHandler);
 
-            let{vStep,hStep,target,areacheck}=this;
-            let{scrollRect,w:width,h:height}=target;
-            let{x,y,w,h}=scrollRect;
+            let{vStep,hStep,target,areacheck,rect}=this;
+            let{w:width,h:height}=target;
+            let{x,y,w,h}=rect;
 
             let o;
 
@@ -116,20 +152,44 @@ module rf{
             
 
             if(o){
-                this.tweener = tweenTo(o,200,defaultTimeMixer,scrollRect);
+                let tweener = tweenTo(o,200,defaultTimeMixer,rect);
+                tweener.thisObj = this;
+                tweener.update = this.refreshScroll;
+                this.tweener = tweener;
             }
         }
 
 
         mouseMoveHandler(event:EventX){
             let data:IMouseEventData = event.data;
-            let{scrollRect}=this.target;
-            let{vStep,hStep}=this;
+            let{vStep,hStep,rect}=this;
             if(hStep > 0){
-                scrollRect.x += data.ox;
+                rect.x += data.ox;
             }
             if(vStep > 0){
-                scrollRect.y += data.oy;
+                rect.y += data.oy;
+            }
+            this.refreshScroll();
+        }
+
+        refreshScroll(tweener?:ITweener){
+            let{hStep,vStep,rect,hScroll,vScroll}=this;
+            let{w:width,h:height}=this.target;
+            let{x,y,w,h}=rect;
+            if(hStep > 0){
+                let{nlen,olen,min,max,pos}=hScroll
+                if(x > min){
+                    olen = width + x;
+                }else if(x < -max){
+                    olen = width - x;
+                }else{
+                    olen = width;
+                }
+                console.log(nlen.toFixed(2),olen.toFixed(2));
+            }
+
+            if(vStep > 0){
+
             }
         }
 

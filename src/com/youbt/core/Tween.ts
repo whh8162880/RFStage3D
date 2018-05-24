@@ -94,7 +94,7 @@ module rf {
 
     export function tweenEnd(tweener: ITweener) {
         if(tweener.completed) return;
-        const { caster, l, data, complete, thisObj} = tweener as ITweener;
+        const { caster, l, data, update,complete, thisObj} = tweener as ITweener;
         for (let i = 0; i < l; i++) {
             let item = data[i];
             const { k, e } = item;
@@ -103,6 +103,11 @@ module rf {
                 caster[k] = e;
             }
         }
+
+        if(undefined != update){
+            update.call(thisObj, tweener);
+        }
+
         if (undefined != complete) {
             complete.call(thisObj, tweener);
         }

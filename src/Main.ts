@@ -216,24 +216,26 @@ module rf{
 
             
 
-            sp = new Sprite();
-            sp.setPos(100,100,0);
-            tipContainer.addChild(sp);
-            g = sp.graphics;
-            g.clear();
-            g.drawRect(0,0,100,100,0xFFFFFF);
-            g.end();
+            // sp = new Sprite();
+            // sp.setPos(100,100,0);
+            // tipContainer.addChild(sp);
+            // g = sp.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFFFFFF);
+            // g.end();
 
             let image = new Image();
             image.renderer = new BatchRenderer(image);
-            new Scroll(image,100,100);
+            let sroll = new Scroll(image,100,100);
+            sroll.vStep = 0;
+            sroll.hStep = 100;
             image.mouseEnabled = true;
-            // g = image.graphics;
-            // g.clear;
-            // g.drawRect(0,0,100,100,0xFF0000);
-            // g.drawRect(100,0,100,100,0xFFFF00);
-            // g.drawRect(200,0,100,100,0x00FFFF);
-            // g.drawRect(300,0,100,100,0x0000FF);
+            g = image.graphics;
+            g.clear;
+            g.drawRect(0,0,100,100,0xFF0000);
+            g.drawRect(100,0,100,100,0xFFFF00);
+            g.drawRect(200,0,100,100,0x00FFFF);
+            g.drawRect(300,0,100,100,0x0000FF);
 
             // g.drawRect(0,100,100,100,0xFFFF00);
             // g.drawRect(0,200,100,100,0x00FFFF);
@@ -251,9 +253,9 @@ module rf{
             // g.drawRect(300,200,100,100,0xFFFF00);
             // g.drawRect(300,300,100,100,0x00FF00);
 
-            // g.end();
+            g.end();
             image.setPos(100,100,0);
-            image.load(perfix + "mesh/f3/f3.png");
+            // image.load(perfix + "mesh/f3/f3.png");
             tipContainer.addChild(image);
 
 
