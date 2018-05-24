@@ -103,7 +103,7 @@ module rf{
             // let geo = new BoxGeometry(variables).create(w,w,w)
 
             let r = 40;
-/*
+
             // m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
             m.diff = newColor(0xAAAAAA);
             let plane = new PlaneGeometry(variables).create(w*2,w*2);
@@ -114,7 +114,7 @@ module rf{
             mesh.geometry = plane;
             mesh.material = m;
             scene.addChild(mesh);
-*/
+
 
             
 
