@@ -923,7 +923,7 @@ module rf {
                     target.$vcox = ox;
                     target.$vcoy = oy;
                     target.$vcos = os;
-                    target.$batchGeometry.vcData.wPoint4(sp.$vcIndex * 4 ,sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha);
+                    target.$batchGeometry.vcData.wPoint4(target.$vcIndex * 4 ,ox, oy, os, target.sceneAlpha);
                 }
             }else{
                 return;

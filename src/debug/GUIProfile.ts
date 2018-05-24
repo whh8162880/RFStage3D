@@ -38,7 +38,6 @@ module rf{
             this.fpsTxt.text = `F:${Engine.fps} C:${Engine.code.toFixed(2)}`;
             this.bufferTex.text = con.toString();
             this.dcTxt.text = `tri:${con.triangles} dc:${con.dc}`;
-
             // this.span.innerHTML = `pixelRatio:${pixelRatio} fps:${Engine.fps} code:${Engine.code.toFixed(2)}`
         }
     }
