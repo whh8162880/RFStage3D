@@ -113,7 +113,7 @@ module rf{
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             
@@ -273,9 +273,10 @@ module rf{
 
 */
             let list = new List(ROOT.source,TestListItemRender,100,20);
+            list.z = 10;
             list.setPos(100,100);
             list.setSize(100,40);
-            list.displayList([0,0,0,0,0]);
+            list.displayList(new Array(100));
             ROOT.addChild(list);
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";

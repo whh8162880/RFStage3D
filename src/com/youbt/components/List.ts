@@ -9,6 +9,15 @@ module rf{
         clazz?:{new ():Component};
     }
 
+    export interface IListRuntime{
+        selectedIndex:number;
+        first:ListItem & Recyclable<Component>;
+        last:ListItem & Recyclable<Component>;
+        displayCount:number;
+        start:number;
+        end:number;
+    }
+
     export interface ListItem extends LinkItem{
         data?:{};
         index?:number;
@@ -18,12 +27,8 @@ module rf{
 
         datas:{}[];
         option : IListOption;
-        selectedIndex:number = -1;
-        first:ListItem & Recyclable<Component>;
-        last:ListItem & Recyclable<Component>;
-        displayCount:number = -1;
+        runtime : IListRuntime;
         scroll:Scroll;
-
         constructor(source:BitmapSource,Clazz:{new ():Component},itemWidth:number,itemHeight:number,gap:number = 0,vertical:boolean = true,columnCount:number = 1){
             super(source);
             this.option = {
@@ -34,15 +39,21 @@ module rf{
                 clazz:Clazz,
                 gap:gap
             } as IListOption;
+
+            this.runtime = {
+                selectedIndex:-1,
+                displayCount:-1,
+            } as IListRuntime;
         }
 
         displayList(data?:{}[]) {
-            this.selectedIndex = -1;
             this.datas = data;
-            this.refreshList();
-            
 
-            let{option,scroll}=this;
+            let{option,scroll,runtime}=this;
+            runtime.selectedIndex = -1;
+            this.refreshList();
+
+            
             let{columnCount,itemWidth,itemHeight,vertical,gap}=option;
             let len = data.length;
 
@@ -58,20 +69,21 @@ module rf{
         }
 
         clear(){
-            let{first}=this;
+            let{runtime}=this;
+            let{first}=runtime;
             while(first){
                 let f = first.__next as ListItem & Recyclable<Component>;
                 this.removeItem(first);
                 first = f;
             }
-            this.first = this.last = undefined;
+            runtime.first = runtime.last = undefined;
         }
 
 
         setSize(width:number, height:number)
         {
             super.setSize(width,height);
-            let{option,scroll}=this;
+            let{option,scroll,runtime}=this;
             let{gap,vertical,columnCount}=option;
             let count = 1;
             if(vertical){
@@ -81,7 +93,7 @@ module rf{
                 let{itemWidth}=option;
                 count = Math.ceil(width / itemWidth) + 1;
             }
-            this.displayCount = count;
+            runtime.displayCount = count;
             if(!scroll){
                 this.renderer = new BatchRenderer(this);
                 this.scroll = scroll = new Scroll(this,width,height);
@@ -90,6 +102,7 @@ module rf{
                 }else{
                     scroll.vStep = 0;
                 }
+                scroll.on(EventT.SCROLL,this.refreshList,this);
             }else{
                 scroll.setArea(width,height,this.w,this.h);
             }
@@ -97,61 +110,88 @@ module rf{
         }
 
 
-        refreshList(){
-            let{datas,displayCount,first,last}=this;
-            let start:number,len:number,datalen:number;
+        refreshList(event?:EventX){
+            let{datas,runtime}=this;
+            let{displayCount,first,last}=runtime;
+            let start:number,end:number,datalen:number;
             datalen = datas.length;
             if(displayCount == -1){
                 start = 0;
-                len = datalen;
+                end = datalen;
             }else{
                 let{option,scrollRect} = this;
                 let{vertical,itemWidth,itemHeight} = option;
                 if(vertical){
-                    start = Math.clamp(Math.floor(scrollRect.y / itemHeight) - 1,0,datalen - displayCount);
+                    start = Math.clamp(Math.floor(-scrollRect.y / itemHeight) ,0,Math.max(0,datalen - displayCount));
                 }else{
                     let{x}=scrollRect;
-                    start = Math.clamp(Math.floor(scrollRect.x / itemWidth) - 1,0,datalen - displayCount);
+                    start = Math.clamp(Math.floor(-scrollRect.x / itemWidth) ,0,Math.max(0,datalen - displayCount));
                 }
-                len = start + displayCount;
+                end = Math.min(start + displayCount,datalen);
             }
 
-            if(first && (first.index > len || last.index < start)){
+
+            if(runtime.start == start && runtime.end == end){
+                return;
+            }
+
+
+            runtime.start = start;
+            runtime.end = end;
+
+
+
+            if(first && (first.index > end || last.index < start)){
                 this.clear();
             }else{
                 while(first){
+                    if(first.index >= start) break;
+
                     let f = first.__next as ListItem & Recyclable<Component>;
-                    if(first.index < start){
-                        this.removeItem(first);
-                    }
+                    this.removeItem(first);
                     first = f;
                 }
-                this.first = first;
+                runtime.first = first;
 
                 while(last){
+                    if(last.index < end) break;
+
                     let l = last.__pre as ListItem & Recyclable<Component>;
-                    if(last.index > len){
-                        this.removeItem(last);
-                    }
+                    this.removeItem(last);
                     last = l;
                 }
-                this.last = last;
+                runtime.last = last;
             }
 
+            if(first){
+                for(let i = first.index - 1; i >= start;i--){
+                    let ins = this.addItem(i,datas[i]);
+                    first.__pre = ins;
+                    ins.__next = first;
+                    first = ins;
+                }
 
-            for(let i = start;i < len;i++){
-                if(first && first.__next){
-                    first = first.__next as ListItem & Recyclable<Component>;
-                }else{
+                for(let i = last.index + 1;i < end;i++){
+                    let ins = this.addItem(i,datas[i]);
+                    last.__next = ins;
+                    ins.__pre = last;
+                    last = ins;
+                }
+            }else{
+                for(let i = start;i < end;i++){
                     let ins = this.addItem(i,datas[i]);
                     if(!last){
-                        this.first = this.last = last = ins;
+                        first = last = ins;
                     }else{
                         last.__next = ins;
-                        this.last = ins;
+                        ins.__pre = last;
+                        last = ins;
                     }
                 }
             }
+
+            runtime.first = first;
+            runtime.last = last;
         }
 
 
@@ -168,11 +208,13 @@ module rf{
             ins.on(MouseEventX.MouseUp,this.itemClickHandler,this);
             ins.data = data;
             this.addChild(ins);
+            console.log(`create:${index}`);
             return ins;
         }
 
 
         removeItem(item:ListItem & Recyclable<Component>){
+            console.log(`remove:${item.index}`);
             item.remove();
             item.recycle();
             item.__next = item.__pre = item.data = undefined;
@@ -182,7 +224,9 @@ module rf{
 
         
         itemClickHandler(event:EventX):void{
-
+            // this.removeItem(event.currentTarget as ListItem & Recyclable<Component>);
+            // let item = event.currentTarget as Component;
+            // item.remove();
         }
 
     }
@@ -195,13 +239,13 @@ module rf{
             g.clear();
             g.drawRect(0,0,100,20,Math.floor(Math.random()*0xFFFFFF));
             g.end();
-            this.t = new TextField()
-            this.addChild(this.t);
+            // this.t = new TextField()
+            // this.addChild(this.t);
         }
 
-        doData(){
-            this.t.text = (this as ListItem).index+"";
-        }
+        // doData(){
+        //     this.t.text = (this as ListItem).index+"";
+        // }
 
 
     }

@@ -911,17 +911,19 @@ module rf {
             this.vertex.variables = variables;
             this.quadcount = this.vertex.numVertices / 4;
             this.vcData = new Float32Array(this.quadcount * 4)
-            let byte = this.vertex.vertex;
+            let{data32PerVertex,vertex:byte}=this.vertex;
+            let offset = vertex_ui_variable["uv"].offset+2
             let vo = this.link.getFrist();
             while(vo){
                 if (vo.close == false) {
                     let sp: Sprite = vo.data;
+                    let{$vcIndex}=sp;
                     let g = sp.$graphics;
-                    if(sp.$vcIndex > 0){
-                        g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex)
+                    if($vcIndex >= 0){
+                        g.byte.update(data32PerVertex,offset,$vcIndex)
                     }
                     byte.set(g.byte,g.$batchOffset);
-                    this.vcData.wPoint4(sp.$vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
+                    this.vcData.wPoint4($vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
                 }
                 vo = vo.next;
             }
