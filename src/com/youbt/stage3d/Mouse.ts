@@ -43,9 +43,10 @@ module rf{
                 e.preventDefault();
             };
             
-            let canvas = ROOT.canvas;
+            // let canvas = ROOT.canvas;
             
             if(false == mobile){
+                let canvas = document;
                 canvas.onmousedown = m;
                 canvas.onmouseup = m;
                 canvas.onmousewheel = m;
@@ -54,6 +55,7 @@ module rf{
                     event.preventDefault();
                 }
             }else{
+                let canvas = ROOT.canvas;
                 canvas.ontouchstart = this.touchHandler;
                 canvas.ontouchmove = this.touchMoveHandler;
                 canvas.ontouchend = this.touchHandler;

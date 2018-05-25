@@ -30,7 +30,8 @@
   "exclude": [
     "think/**/*",
     "src/com/youbt/rfreference.ts",
-    ".d.ts"
+    ".d.ts",
+    "Interface"
   ],
   "templete":"debug.html"
 }

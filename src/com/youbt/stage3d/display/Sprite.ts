@@ -112,9 +112,8 @@ module rf {
         {
             super.setSize(width, height);
             let hitArea = this.hitArea;
-            let {w, h} = this;
             hitArea.clean();
-            hitArea.updateArea(w, h, 0);
+            hitArea.updateArea(width, height, 0);
         }
 
         public updateHitArea():void{
@@ -575,76 +574,6 @@ module rf {
             //     this.numVertices += 1;
             // }
         }
-
-
-        drawCube(x: number, y: number,z: number,
-             width: number, height: number, deep:number,
-            color: number, alpha: number = 1): void {
-
-            const {originU,originV} = this.target.source;
-
-            const rgba = [
-                ((color & 0x00ff0000) >>> 16) / 0xFF,
-                ((color & 0x0000ff00) >>> 8) / 0xFF,
-                (color & 0x000000ff) / 0xFF,
-                alpha
-            ]
-
-
-            const uv = [originU,originV,this.target.$vcIndex];
-
-            const noraml = [0,0,1]
-
-                let x2 = x + width;
-                let y2 = y + height;
-                let z2 = z + deep;
-
-                //前
-                this.addPoint([x,y,z],noraml,uv,rgba);
-                this.addPoint([x2,y,z],noraml,uv,rgba);
-                this.addPoint([x2,y2,z],noraml,uv,rgba);
-                this.addPoint([x,y2,z],noraml,uv,rgba);
-                
-                
-    			// beginFill(0x00FF00)
-                //上
-                this.addPoint([x,y,z],noraml,uv,rgba);
-                this.addPoint([x,y,z2],noraml,uv,rgba);
-                this.addPoint([x2,y,z2],noraml,uv,rgba);
-                this.addPoint([x2,y,z],noraml,uv,rgba);
-                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                
-                //左
-    //			beginFill(0x0000FF)
-                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                
-                //右
-    //			beginFill(0xFFFF00)
-                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                
-                //后
-    //			beginFill(0x00FFFF);
-                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                
-                //下
-    //			beginFill(0xFF00FF)
-                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-        }
     }
 
 
@@ -923,7 +852,7 @@ module rf {
                     target.$vcox = ox;
                     target.$vcoy = oy;
                     target.$vcos = os;
-                    target.$batchGeometry.vcData.wPoint4(sp.$vcIndex * 4 ,sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha);
+                    target.$batchGeometry.vcData.wPoint4(target.$vcIndex * 4 ,ox, oy, os, target.sceneAlpha);
                 }
             }else{
                 return;

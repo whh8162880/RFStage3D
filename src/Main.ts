@@ -1,7 +1,7 @@
 /// <reference path="./com/youbt/rfreference.ts" />
 /// <reference path="./AppBase.ts" />
 module rf{
-    export let sp;
+    // export let sp;
 
     // export var line;
     export class Main extends AppBase{
@@ -75,13 +75,13 @@ module rf{
            
 
             let w = 500;
-
+/*
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
 
             sp = tr;
-
+*/
             
 
             // line.rotationX = 45;
@@ -96,10 +96,7 @@ module rf{
             // scene.addChild(line);
 
             let variables = vertex_mesh_variable;
-
-           
             let w_e = w * 1.1
-            
             let m = new PhongMaterial();
             m.setData(undefined);
             m.cull = WebGLConst.BACK;
@@ -127,7 +124,7 @@ module rf{
             // mesh.setPos(w+80,0,0);
             // scene.addChild(mesh);
 
-            // let box = new BoxGeometry(variables).create(w,w,w);
+  /*          // let box = new BoxGeometry(variables).create(w,w,w);
             // mesh = new Mesh(variables);
             // mesh.init(box,m);
             // mesh.setPos(0,-110,0);
@@ -142,7 +139,7 @@ module rf{
             mesh.material.diff = newColor(0xAAAAAA);
             mesh.setPos(0,0,0);
             // scene.addChild(mesh);
-
+*/
 
             // let torus = new TorusGeomerty(variables).create(r,r,w*.1375,w*.375);
             // mesh = new Mesh(variables);
@@ -155,7 +152,7 @@ module rf{
             kfmurl = perfix + "mesh/f3/";
             // kfmurl = "../assets/mesh/a10010m/";
 
-
+/*
             let kfmMesh = new KFMMesh(new PhongMaterial());
             kfmMesh.setSca(100,100,100);
             kfmMesh.shadowable = true;
@@ -165,7 +162,7 @@ module rf{
             kfmMesh.load(kfmurl);
             // kfmMesh.load("../assets/mesh/f3/");
             scene.addChild(kfmMesh);
-
+*/
             // kfmMesh = new KFMMesh(new PhongMaterial());
             // kfmMesh.setSca(100,100,100);
             // kfmMesh.shadowable = true;
@@ -191,18 +188,18 @@ module rf{
             // kfmMesh.load("../assets/mesh/f1/");
             // scene.addChild(kfmMesh);
 
-            mesh = kfmMesh;
+            // mesh = kfmMesh;
 
-            var gui = new dat.GUI();
-            var folder = gui.addFolder("mesh");
-            // folder.add(mesh,"refreshGUI");
-            var posFolder = folder.addFolder("position");
-            posFolder.add(mesh,"y",-200,200).step(0.01);
+            // var gui = new dat.GUI();
+            // var folder = gui.addFolder("mesh");
+            // // folder.add(mesh,"refreshGUI");
+            // var posFolder = folder.addFolder("position");
+            // posFolder.add(mesh,"y",-200,200).step(0.01);
 
-            var sunFolder = gui.addFolder("sun");
-            sunFolder.add(sun,"x",0,1000);
-            sunFolder.add(sun,"y",0,1000);
-            sunFolder.add(sun,"z",0,1000);
+            // var sunFolder = gui.addFolder("sun");
+            // sunFolder.add(sun,"x",0,1000);
+            // sunFolder.add(sun,"y",0,1000);
+            // sunFolder.add(sun,"z",0,1000);
             // posFolder.add(kfmMesh,"z",-1000,1000).step(0.01);
             // var rotFolder = folder.addFolder("rotation");
             // rotFolder.add(kfmMesh,"rotationX",-360,360);
@@ -211,29 +208,28 @@ module rf{
 
 
             let profile = singleton(GUIProfile);
-            tipContainer.addChild(profile);
+            ROOT.addChild(profile);
 
 
             
 
-            sp = new Sprite();
-            sp.setPos(100,100,0);
-            tipContainer.addChild(sp);
-            g = sp.graphics;
-            g.clear();
-            g.drawRect(0,0,100,100,0xFFFFFF);
-            g.end();
-
+            // sp = new Sprite();
+            // sp.setPos(100,100,0);
+            // tipContainer.addChild(sp);
+            // g = sp.graphics;
+            // g.clear();
+            // g.drawRect(0,0,100,100,0xFFFFFF);
+            // g.end();
+/*
             let image = new Image();
             image.renderer = new BatchRenderer(image);
-            new Scroll(image,100,100);
             image.mouseEnabled = true;
-            // g = image.graphics;
-            // g.clear;
-            // g.drawRect(0,0,100,100,0xFF0000);
-            // g.drawRect(100,0,100,100,0xFFFF00);
-            // g.drawRect(200,0,100,100,0x00FFFF);
-            // g.drawRect(300,0,100,100,0x0000FF);
+            g = image.graphics;
+            g.clear;
+            g.drawRect(0,0,100,100,0xFF0000);
+            g.drawRect(100,0,100,100,0xFFFF00);
+            g.drawRect(200,0,100,100,0x00FFFF);
+            g.drawRect(300,0,100,100,0x0000FF);
 
             // g.drawRect(0,100,100,100,0xFFFF00);
             // g.drawRect(0,200,100,100,0x00FFFF);
@@ -251,13 +247,36 @@ module rf{
             // g.drawRect(300,200,100,100,0xFFFF00);
             // g.drawRect(300,300,100,100,0x00FF00);
 
-            // g.end();
+            g.end();
             image.setPos(100,100,0);
-            image.load(perfix + "mesh/f3/f3.png");
-            tipContainer.addChild(image);
+            // image.load(perfix + "mesh/f3/f3.png");
+            ROOT.addChild(image);
+
+            let sroll = new Scroll(image,100,100);
+            sroll.vStep = 0;
+            sroll.hStep = 100;
 
 
+            let sp = new Sprite();
+            // sp.renderer = new BatchRenderer(sp);
+            sp.setPos(200,200,0);
+            g = sp.graphics;
+            g.clear();
+            g.drawRect(0,0,100,100,0xFFFFFF);
+            g.end();
+            ROOT.addChild(sp);
 
+            let drager = new Drager().bind(sp,true).setArea(100,100,stageWidth,stageHeight);
+            drager.vStep = 1;
+            drager.hStep = 0;
+            drager.areacheck = true;
+
+*/
+            let list = new List(ROOT.source,TestListItemRender,100,20);
+            list.setPos(100,100);
+            list.setSize(100,40);
+            list.displayList([0,0,0,0,0]);
+            ROOT.addChild(list);
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";

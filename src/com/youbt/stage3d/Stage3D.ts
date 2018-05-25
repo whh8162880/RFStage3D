@@ -227,7 +227,9 @@ module rf {
             c.triangles = 0;
 
             c.clear(0, 0, 0, 1);
-            this.shadow.render(renderLink,scene.sun,now,interval);
+            if(renderLink.length){
+                this.shadow.render(renderLink,scene.sun,now,interval);
+            }
             this.render(this.camera, now, interval);
             // this.shadow.render(renderLink,scene.sun,now,interval);
             // let m = TEMP_MATRIX;
