@@ -670,24 +670,19 @@ module rf{
 			//计算一下是否超界
 			let sdata:IScrollData = this._scroll.vScroll;
 			let {step} = this;
-			this._scroll.update(0, -step);
+			this._scroll.update(0, step);
 			this._scroll.end();
 		}
 
 		protected downHandler(event:MouseEventX):void
 		{
 			let {step} = this;
-			this._scroll.update(0, step);
+			this._scroll.update(0, -step);
 			this._scroll.end();
 		}
 
-		private _sx:number;
-		private _sy:number;
 		protected mousedownHandler(event:MouseEventX):void
 		{
-			this._sx = nativeMouseX;
-			this._sy = nativeMouseY;
-
 			ROOT.on(MouseEventX.MouseUp, this.mouseUpHandler, this);
 			ROOT.on(MouseEventX.MouseMove, this.mouseMoveHandler, this)
 		}
