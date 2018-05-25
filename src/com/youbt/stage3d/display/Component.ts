@@ -100,15 +100,16 @@ module rf{
 			let names:any[];
 			for(let ele of elements)
 			{
-				if(ComponentClass.hasOwnProperty(ele.type.toString()))
+				let{type,x,y,rect,name,scaleX,scaleY}=ele;
+				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的
-					sp = this[ele.name];
+					sp = this[name];
 					if(!sp)
 					{
-						sp = recyclable(ComponentClass[ele.type]);
+						sp = recyclable(ComponentClass[type]);
 						sp.source = this.source;
-						if(ele.type == ComponentConst.Label)
+						if(type == ComponentConst.Label)
 						{//文本处理
 							let textElement = ele as IDisplayTextElement;
 							let textfield:TextField = recyclable(TextField);
@@ -131,24 +132,24 @@ module rf{
 							textfield.text = textElement.text;
 							sp["text"] = textfield;
 							sp.addChild(textfield);
-							sp.x = ele.x;
-							sp.y = ele.y;
+							sp.x = x;
+							sp.y = y;
 							sp.setSize(textfield.w, textfield.h);
 							this.addChild(sp);
 						}else{
 							sp.setSymbol(ele as IDisplaySymbol);
 						}
-						sp.x = ele.x;
-						sp.y = ele.y;
+						sp.x = x;
+						sp.y = y;
 						//缺少一个九宫
-						if(ele.rect != undefined)
+						if(rect != undefined)
 						{
-							this.scalerect = new Rect(ele.rect.x, ele.rect.y, ele.rect.right, ele.rect.bottom);
+							this.scalerect = new Rect(rect.x, rect.y, rect.right, rect.bottom);
 						}
-						sp.setSize(Math.round(sp.w * ele.scaleX),Math.round(sp.h * ele.scaleY));
+						sp.setSize(Math.round(sp.w * scaleX),Math.round(sp.h * scaleY));
 						this.addChild(sp);
-						sp.name = ele.name;
-						this[ele.name] = sp;
+						sp.name = name;
+						this[name] = sp;
 					}
 				}else{
 					this.renderFrameElement(ele);
