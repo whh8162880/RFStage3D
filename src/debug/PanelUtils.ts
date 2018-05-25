@@ -55,7 +55,7 @@ module rf{
 
             this.bg = new IconView(this.source);
             this.addChildAt(this.bg, 0);
-            this.bg.setUrl('assets/createbg.jpg');
+            this.bg.setUrl(ROOT_PERFIX + 'createbg.jpg');
             this.bg.setSize(1400, 750);
 
             let scroll:ScrollBar = new ScrollBar(this.scrollbar);
