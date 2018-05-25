@@ -2,9 +2,9 @@
 module rf{
 
     export interface IScrollData{
-        dlen:number;
-        mlen:number;
-        pos:number;
+        dlen:number;//裁剪尺寸
+        mlen:number;//原始尺寸
+        pos:number;//位移后的坐标
         max:number;
     }
 
@@ -236,6 +236,8 @@ module rf{
                     scroll.mlen = width;
                     scroll.pos = x;
                 }
+
+                this.hScroll.pos = scroll.pos;
             }
 
             if(vStep > 0){
@@ -251,6 +253,8 @@ module rf{
                     scroll.mlen = height;
                     scroll.pos = y;
                 }
+
+                this.vScroll.pos = scroll.pos;
             }
             this.simpleDispatch(EventT.SCROLL,this);
 

@@ -148,7 +148,7 @@ module rf{
             let res:ResItem = e.data;
             let image:HTMLImageElement = res.data;
 
-            let bw:number = (d_setting['txtwidth'] >= image.width) ? d_setting['txtwidth'] : image.width;
+            let bw:number = d_setting['txtwidth'] + image.width;//(d_setting['txtwidth'] >= image.width) ? d_setting['txtwidth'] : image.width;
             let bh:number = d_setting['txtheight'] + image.height;
 
             let bmd:BitmapData = new BitmapData(bw, bh, true);
