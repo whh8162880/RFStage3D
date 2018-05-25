@@ -220,7 +220,7 @@ module rf{
             // g.clear();
             // g.drawRect(0,0,100,100,0xFFFFFF);
             // g.end();
-
+/*
             let image = new Image();
             image.renderer = new BatchRenderer(image);
             image.mouseEnabled = true;
@@ -271,8 +271,12 @@ module rf{
             drager.hStep = 0;
             drager.areacheck = true;
 
-
-
+*/
+            let list = new List(ROOT.source,TestListItemRender,100,20);
+            list.setPos(100,100);
+            list.setSize(100,40);
+            list.displayList([0,0,0,0,0]);
+            ROOT.addChild(list);
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";

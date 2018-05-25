@@ -2,12 +2,12 @@
 module rf {
     export class LinkVO implements IRecyclable {
 
-        public close: Boolean = true;
-        public data: any = undefined;
-        public args: any = undefined;
+        public close: boolean = true;
+        public data: any;
+        public args: any;
 
-        public next: Recyclable<LinkVO> = undefined;
-        public pre: Recyclable<LinkVO> = undefined;
+        public next: Recyclable<LinkVO> ;
+        public pre: Recyclable<LinkVO> ;
 
         public weight: number = 0;
 
@@ -265,6 +265,35 @@ module rf {
             }
             return s;
         }
-
     }
+
+    export interface LinkItem extends IRecyclable{
+        __next?:LinkItem;
+        __pre?:LinkItem;
+    }
+
+    // export class TLink<T>{
+    //     private last: TLinkItem<T>;
+    //     private first: TLinkItem<T>;
+
+    //     add(item:{}){
+    //         let b = item as TLinkItem<typeof item>;
+    //         if(b.__next || b.__pre){
+    //             return b;
+    //         }
+    //         let{last,first}=this;
+
+    //         if(first){
+
+    //         }
+
+    //         if(!this.last )
+    //     }
+
+    //     remove(item:{}){
+    //         let b = item as TLinkItem<typeof item>;
+
+    //         b.__next = b.__pre = undefined;
+    //     }
+    // }
 }

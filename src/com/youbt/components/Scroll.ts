@@ -280,7 +280,7 @@ module rf{
         resizeHandler(event?:EventX):void{
             let{w:width,h:height}=this.target;
             let{w,h}=this.rect; 
-            this.setArea(w,width,h,height);
+            this.setArea(w,h,width,height);
         }
 
 

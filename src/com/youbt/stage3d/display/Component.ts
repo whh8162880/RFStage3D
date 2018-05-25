@@ -46,8 +46,8 @@ module rf{
     export class Component extends Sprite{
         constructor(source?:BitmapSource){
 			super(source);
-        }
-
+		}
+		
         currentClip:number;
 
         symbol:IDisplaySymbol;
@@ -203,9 +203,9 @@ module rf{
 		get enabled():boolean{return this._enabled;}
 		doEnabled():void{}
 
-		_data:any;
-        set data(value:any){this._data = value;this.doData();}
-        get data():any{return this._data;}
+		_data:{};
+        set data(value:{}){this._data = value;this.doData();}
+        get data():{}{return this._data;}
 		doData():void{}
 		refreshData():void{this.doData();}
 		
