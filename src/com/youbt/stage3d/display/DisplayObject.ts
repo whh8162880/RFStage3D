@@ -538,15 +538,15 @@ module rf {
         //==============================================================
         dispatchEvent(event: EventX): boolean {
             var bool: boolean = false;
+            let{parent} = this;
             if (undefined != this.mEventListeners && event.type in this.mEventListeners) {
                 bool = super.dispatchEvent(event);
             }
 
-            if (false == event.stopImmediatePropagation && event.bubbles) {
-                if (this.parent) {
-                    this.parent.dispatchEvent(event);
-                }
+            if(parent && (false == event.stopImmediatePropagation && event.bubbles)){
+                parent.dispatchEvent(event);
             }
+            
             return bool;
         }
 
