@@ -24,10 +24,10 @@ module rf{
     }
 
     export class List extends Component{
-
         datas:{}[];
         option : IListOption;
         runtime : IListRuntime;
+        caches:(ListItem & Recyclable<Component>)[];
         scroll:Scroll;
         constructor(source:BitmapSource,Clazz:{new ():Component},itemWidth:number,itemHeight:number,gap:number = 0,vertical:boolean = true,columnCount:number = 1){
             super(source);
@@ -44,16 +44,20 @@ module rf{
                 selectedIndex:-1,
                 displayCount:-1,
             } as IListRuntime;
+
+            this.caches = [];
         }
 
         displayList(data?:{}[]) {
             this.datas = data;
 
-            let{option,scroll,runtime}=this;
+            let{option,scroll,runtime,caches}=this;
+
             runtime.selectedIndex = -1;
+            this.clear();
+
             this.refreshList();
 
-            
             let{columnCount,itemWidth,itemHeight,vertical,gap}=option;
             let len = data.length;
 
@@ -69,13 +73,15 @@ module rf{
         }
 
         clear(){
-            let{runtime}=this;
-            let{first}=runtime;
-            while(first){
-                let f = first.__next as ListItem & Recyclable<Component>;
-                this.removeItem(first);
-                first = f;
-            }
+            let{runtime,caches}=this;
+
+            caches.forEach(item => {
+                if(item.parent) item.remove();
+                item.recycle();
+                item.off(MouseEventX.MouseUp,this.itemClickHandler);
+            });
+
+            caches.length = 0;
             runtime.first = runtime.last = undefined;
         }
 
@@ -160,7 +166,7 @@ module rf{
                     this.removeItem(last);
                     last = l;
                 }
-                runtime.last = last;
+                runtime.last = last; 
             }
 
             if(first){
@@ -196,8 +202,16 @@ module rf{
 
 
         addItem(index:number,data:{}){
-            let{clazz,itemWidth,itemHeight,columnCount,gap,vertical}=this.option;
-            let ins = recyclable(clazz) as ListItem & Recyclable<Component>;
+            let{caches,option}=this;
+            let ins = caches[index];
+            if(ins){
+                this.addChild(ins);
+                return ins;
+            }
+
+
+            let{clazz,itemWidth,itemHeight,columnCount,gap,vertical}=option;
+            ins = recyclable(clazz) as ListItem & Recyclable<Component>;
             ins.index = index;
             ins.source = this.source;
             if(vertical){
@@ -208,18 +222,16 @@ module rf{
             ins.on(MouseEventX.MouseUp,this.itemClickHandler,this);
             ins.data = data;
             this.addChild(ins);
-            console.log(`create:${index}`);
+
+            caches[index] = ins;
+
             return ins;
         }
 
 
         removeItem(item:ListItem & Recyclable<Component>){
-            console.log(`remove:${item.index}`);
             item.remove();
-            item.recycle();
             item.__next = item.__pre = item.data = undefined;
-            item.index = -1;
-            item.off(MouseEventX.MouseUp,this.itemClickHandler);
         }
 
         
@@ -239,13 +251,13 @@ module rf{
             g.clear();
             g.drawRect(0,0,100,20,Math.floor(Math.random()*0xFFFFFF));
             g.end();
-            // this.t = new TextField()
-            // this.addChild(this.t);
+            this.t = new TextField()
+            this.addChild(this.t);
         }
 
-        // doData(){
-        //     this.t.text = (this as ListItem).index+"";
-        // }
+        doData(){
+            this.t.text = (this as ListItem).index+"";
+        }
 
 
     }

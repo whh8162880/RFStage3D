@@ -272,12 +272,17 @@ module rf{
             drager.areacheck = true;
 
 */
-            let list = new List(ROOT.source,TestListItemRender,100,20);
-            list.z = 10;
-            list.setPos(100,100);
-            list.setSize(100,40);
-            list.displayList(new Array(100));
-            ROOT.addChild(list);
+
+            for(let i = 1;i<5;i++){
+                let list = new List(ROOT.source,TestListItemRender,100,20);
+                list.z = 10;
+                list.setPos(i * 110,100);
+                list.setSize(100,10*20);
+                list.scroll.vStep = 20;
+                list.displayList(new Array(100));
+                ROOT.addChild(list);
+            }
+            
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
