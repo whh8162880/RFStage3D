@@ -499,7 +499,7 @@ module rf {
         }
 
 
-        drawBitmap(x: number, y: number,vo:BitmapSourceVO,color:number = 0xFFFFFF,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
+        drawBitmap(x: number, y: number,vo:IBitmapSourceVO,color:number = 0xFFFFFF,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
             const{w,h,ul,ur,vt,vb}=vo;
             let r = x + w;
             let b = y + h;

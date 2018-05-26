@@ -500,6 +500,15 @@ module rf {
     }
 
    
-
+    export function getChildrenCount(d:DisplayObjectContainer){
+        let count = 0;
+        d.childrens.forEach(child => {
+            count ++;
+            if(child instanceof DisplayObjectContainer){
+                count += this.getChildrenCount(child);
+            }
+        });
+        return count;
+    }
 
 }

@@ -1,4 +1,32 @@
 module rf{
+
+    export interface IBitmapSourceVO extends IFrame{
+        source:BitmapSource;
+
+        name:string;
+        used:number;
+        time:number;
+
+        //真实大小
+        rw:number;
+        rh:number;
+
+        //UV位置
+        ul:number;
+        ur:number;
+        vt:number;
+        vb:number;
+    }
+
+    export function refreshUV(vo:IBitmapSourceVO, mw:number,mh:number):void{
+        const { x, y, w, h } = vo;
+        vo.ul = x / mw;
+        vo.ur = (x + w)/mw;
+        vo.vt = y / mh;
+        vo.vb = (y + h) / mh;
+    }
+
+/*
     export class BitmapSourceVO implements IFrame{
         name:string = undefined;
         used:number = 0;
@@ -24,32 +52,34 @@ module rf{
             this.vt = y / mh;
             this.vb = (y + h) / mh;
         }
-
-        // dispose():void{
-        //     this.x = this.y = this.w = this.h = this.ix = this.iy = this.rw = this.rh = 0;
-        //     this.name = undefined;
-        //     this.used = this.time = 0;
-        // }
     }
+*/
+
+
     export class BitmapSourceArea{
         name:number = 0;
         source:BitmapSource = undefined;
-        frames:{[key:string]:BitmapSourceVO} = {};
+        frames:{[key:string]:IBitmapSourceVO} = {};
         init(){}
 
-        getArea(name:string,x:number,y:number,w:number,h:number):BitmapSourceVO{
-            let vo = new BitmapSourceVO();
-            vo.name = name;
-            vo.x = x;
-            vo.y = y;
-            vo.w = vo.rw = w;
-            vo.h = vo.rh = h;
-            vo.source = this.source;
+        getArea(name:string,x:number,y:number,w:number,h:number):IBitmapSourceVO{
+            let vo = {
+                name:name,
+                x:x,
+                y:y,
+                ix:0,
+                iy:0,
+                w:w,
+                h:h,
+                rw:w,
+                rh:h,
+                source:this.source
+            } as IBitmapSourceVO;
             this.frames[name] = vo;
             return vo;
         }
 
-        createFrameArea(name:string,frame:IFrame):BitmapSourceVO{
+        createFrameArea(name:string,frame:IFrame):IBitmapSourceVO{
             const{x,y,w,h,ix,iy} = frame;
             let vo = this.getArea(name,ix - x,iy - y,w,h);
             if(undefined != vo){
@@ -59,11 +89,11 @@ module rf{
             return vo
         }
 
-        getEmptyArea(name:string,sw:number,sh:number):BitmapSourceVO{
+        getEmptyArea(name:string,sw:number,sh:number):IBitmapSourceVO{
             return undefined
         }
 
-        getUnusedArea(name:string,sw:number,sh:number):BitmapSourceVO{
+        getUnusedArea(name:string,sw:number,sh:number):IBitmapSourceVO{
             let frames = this.frames;
             let vo;
             for(let name in frames){
@@ -94,7 +124,7 @@ module rf{
             this.maxRect = new MaxRectsBinPack(this.r - this.l,this.b-this.t);
         }
 
-        getEmptyArea(name:string,sw:number,sh:number):BitmapSourceVO{
+        getEmptyArea(name:string,sw:number,sh:number):IBitmapSourceVO{
             let rect = this.maxRect.insert(sw,sh);
             let vo;
             if(rect.w != 0){
@@ -164,17 +194,17 @@ module rf{
             return area;
         }
 
-        setSourceVO(name:string,w:number,h:number,area:number=1):BitmapSourceVO{
+        setSourceVO(name:string,w:number,h:number,area:number=1):IBitmapSourceVO{
             let barea = this.areas[area];
             if(undefined == barea){
                 return undefined;
             }
             let vo = barea.getEmptyArea(name,w,h);
-            vo.refreshUV(this.width,this.height);
+            refreshUV(vo,this.width,this.height);
             return vo;
         }
 
-        getSourceVO(name:string,area:number=0):BitmapSourceVO{
+        getSourceVO(name:string,area:number=0):IBitmapSourceVO{
             let barea = this.areas[area];
             if(undefined == barea){
                 return undefined;

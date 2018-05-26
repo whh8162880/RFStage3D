@@ -273,9 +273,8 @@ module rf{
 
 */
 
-            for(let i = 1;i<5;i++){
+            for(let i = 1;i<2;i++){
                 let list = new List(ROOT.source,TestListItemRender,100,20);
-                list.z = 10;
                 list.setPos(i * 110,100);
                 list.setSize(100,10*20);
                 list.scroll.vStep = 20;

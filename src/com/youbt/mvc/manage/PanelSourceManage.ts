@@ -157,17 +157,17 @@ module rf{
             this.source = new PanelSource();
             this.source.create(d_setting['image'], bmd, true);
 
-            let vo:BitmapSourceVO = this.source.setSourceVO("panelimg",image.width,image.height,1);
+            let vo:IBitmapSourceVO = this.source.setSourceVO("panelimg",image.width,image.height,1);
             // this.source.bmd.context.drawImage(image,vo.x,vo.y);
 
             let objkeys:string[] = Object.keys(d_setting['frames']);
             let areavo:BitmapSourceArea = this.source.areas[1];
-            let bitvo:BitmapSourceVO;
+            let bitvo:IBitmapSourceVO;
             let frameObj:object;
             for(let key of objkeys){
                 frameObj = d_setting['frames'][key];
                 bitvo = areavo.createFrameArea(key, {x:frameObj['ox'], y:frameObj['oy'], w:frameObj['width'], h:frameObj['height'], ix:frameObj['ix'], iy:frameObj['iy']});
-                bitvo.refreshUV(this.source.width, this.source.height);
+                refreshUV(bitvo,this.source.width, this.source.height);
             }
             this.source.isReady = true;
             this.setting = d_setting["symbols"];

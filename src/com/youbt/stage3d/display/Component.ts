@@ -95,8 +95,6 @@ module rf{
 			
 			let sp:Component;
 			
-			let tempMatrix:IMatrix = newMatrix();
-
 			let names:any[];
 			for(let ele of elements)
 			{
@@ -173,7 +171,7 @@ module rf{
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
 		renderFrameElement(element:IDisplayFrameElement,clean:Boolean = false):void{
-			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 1);
+			let vo:IBitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 1);
 			if(vo == undefined)
 			{
 				return;
@@ -720,10 +718,9 @@ module rf{
 		RadioButton,
 		TabItem,
 		ScrollBar,
-		Dele,
 		List,
 		MList,
-		Tab
+		Dele,
 	}
 
 	export let ComponentClass:{ [type: string]: { new(): Component } } = {
