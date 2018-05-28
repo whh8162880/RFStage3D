@@ -271,7 +271,7 @@ module rf{
             super();
             this.areacheck = true;
             this.bind(target,false);
-            if(target.states | DChange.area){
+            if(target.status | DChange.area){
                 target.updateHitArea();
             }
 

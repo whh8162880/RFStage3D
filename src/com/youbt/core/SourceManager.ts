@@ -152,11 +152,11 @@ module rf{
         height:number = 0;
         originU:number = 0;
         originV:number = 0;
-        areas:{[name:number]:BitmapSourceArea} = undefined;
+        areas:{[name:number]:BitmapSourceArea} = {};
         bmd:BitmapData;
+        status:LoadStates;
         create(name:string,bmd:BitmapData,pack:boolean = false):BitmapSource{
             this.name = name;
-            this.areas = {};
             this.bmd = bmd;
             this.width = bmd.width;
             this.height = bmd.height;
@@ -228,6 +228,7 @@ module rf{
             }
         }
     }
+
 
 
     export let bitmapSources:{[key:string]:BitmapSource} = {};

@@ -116,7 +116,7 @@ module rf {
                 _camera = camera;
             }
 
-            if (_camera.states) {
+            if (_camera.status) {
                 _camera.updateSceneTransform();
             }
 
@@ -214,7 +214,7 @@ module rf {
 
         //在这里驱动渲染
         update(now: number, interval: number): void {
-            if (this.states & DChange.ct) {
+            if (this.status & DChange.ct) {
                 this.updateTransform();
             }
             let{renderLink} = this;
@@ -278,7 +278,7 @@ module rf {
 
         render(link:Link,sun:DirectionalLight,now:number,interval:number){
             let{m,rtt,len,w,h} = this;
-            if(sun.states || sun.len != len){
+            if(sun.status || sun.len != len){
                 sun.len = len;
                 sun.updateSceneTransform();
             }
@@ -357,7 +357,7 @@ module rf {
                 _camera = camera;
             }
 
-            if (_camera.states) {
+            if (_camera.status) {
                 _camera.updateSceneTransform();
             }
 
@@ -380,7 +380,7 @@ module rf {
             let c = context3D;
             let g = gl;
 
-            if (cameraUI.states) {
+            if (cameraUI.status) {
                 cameraUI.updateSceneTransform();
             }
             this.material.uploadContextSetting();

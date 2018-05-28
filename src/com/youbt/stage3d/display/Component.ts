@@ -1,40 +1,6 @@
-///<reference path="../../mvc/manage/PanelSourceManage.ts" />
 ///<reference path="./Sprite.ts" />
 /// <reference path="../../components/Scroll.ts" />
 module rf{
-
-	export interface IDisplayFrameElement{
-		type:number;
-		name:string;
-		rect:any;
-		x:number;
-		y:number;
-		scaleX:number;
-		scaleY:number;
-		rotaion:number;
-		matrix2d:IMatrix;
-		libraryItemName:string;
-	}
-
-	export interface IDisplayTextElement extends IDisplayFrameElement
-	{
-		fontRenderingMode:String;
-		width:number;
-		height:number;
-		selectable:boolean;
-		text:string;
-		filter:any[];
-		format:object;
-		input:boolean;
-		multiline:boolean;
-		color:number;
-	}
-
-	export interface IDisplaySymbol extends IDisplayFrameElement{
-		className:String;
-		displayClip:number;
-		displayFrames:{[key:number]:IDisplayFrameElement[]}
-	}
 
 
 	export const enum SymbolConst{
@@ -65,8 +31,8 @@ module rf{
 				graphics.end();
 				return;
 			}
-			this.x = symbol.x;
-			this.y = symbol.y;
+			// this.x = symbol.x;
+			// this.y = symbol.y;
 			this.gotoAndStop(symbol.displayClip, true);
 			this.updateHitArea();
 			this.bindComponents();
@@ -98,7 +64,7 @@ module rf{
 			let names:any[];
 			for(let ele of elements)
 			{
-				let{type,x,y,rect,name,scaleX,scaleY}=ele;
+				let{type,x,y,rect,name,matrix2d}=ele;
 				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的
@@ -144,7 +110,7 @@ module rf{
 						{
 							this.scalerect = new Rect(rect.x, rect.y, rect.right, rect.bottom);
 						}
-						sp.setSize(Math.round(sp.w * scaleX),Math.round(sp.h * scaleY));
+						sp.setSize(Math.round(sp.w * matrix2d[0]),Math.round(sp.h * matrix2d[4]));
 						this.addChild(sp);
 						sp.name = name;
 						this[name] = sp;
@@ -171,7 +137,7 @@ module rf{
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
 		renderFrameElement(element:IDisplayFrameElement,clean:Boolean = false):void{
-			let vo:IBitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 1);
+			let vo:IBitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 0);
 			if(vo == undefined)
 			{
 				return;

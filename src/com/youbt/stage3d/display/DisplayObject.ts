@@ -159,7 +159,7 @@ module rf {
         sceneAlpha: number = 1;
 
         _visible: boolean = true;
-        states: number = 0;
+        status: number = 0;
 
         pivotZero: boolean = false;
         pivotPonumber: IVector3D;
@@ -189,7 +189,7 @@ module rf {
          */
         setChange(value: number, p: number = 0, c: boolean = false) {
             //batcher相关的都和我无关
-            this.states |= (value & ~DChange.batch);    //本层不需要batcher对象识别
+            this.status |= (value & ~DChange.batch);    //本层不需要batcher对象识别
             if (undefined != this.parent) {
                 if(value & DChange.ta){
                     value |= DChange.ct;                //如果本层transform or alpha 改变了 那就得通知上层
@@ -461,7 +461,7 @@ module rf {
                 transform.m3_recompose(this.pos,this.rot,this.sca)
             }
 
-            this.states &= ~DChange.trasnform;
+            this.status &= ~DChange.trasnform;
         }
 
 
@@ -477,7 +477,7 @@ module rf {
 
         updateAlpha(sceneAlpha: number): void {
             this.sceneAlpha = this.sceneAlpha * this._alpha;
-            this.states &= ~DChange.alpha;
+            this.status &= ~DChange.alpha;
         }
 
         remove(): void {
@@ -551,7 +551,7 @@ module rf {
         }
 
         updateHitArea():void{
-            this.states &= ~DChange.ac;
+            this.status &= ~DChange.ac;
         }
 
         getObjectByPoint(dx: number, dy: number,scale:number): DisplayObject {

@@ -68,7 +68,7 @@ module rf {
 
         setChange(value: number,p:number = 0,c:boolean = false): void {
             if(undefined != this.renderer){
-                this.states |= (value | p);
+                this.status |= (value | p);
             }else{
                 super.setChange(value,p,c);
             }
@@ -76,7 +76,7 @@ module rf {
 
         render(camera: Camera, now: number, interval: number): void {
             if (undefined != this.renderer) {
-                if(this.states & DChange.t_all){ //如果本层或者下层有transform alpha 改编 那就进入updateTransform吧
+                if(this.status & DChange.t_all){ //如果本层或者下层有transform alpha 改编 那就进入updateTransform吧
                     this.updateTransform();
                 }
                 this.renderer.render(camera, now, interval);
@@ -125,7 +125,7 @@ module rf {
             let hitArea = this.hitArea;
             hitArea.clean();
             for(let child of this.childrens){
-                if(child.states & DChange.ac){
+                if(child.status & DChange.ac){
                     child.updateHitArea();
                 }
                 hitArea.combine(child.hitArea,child._x,child._y);
@@ -142,7 +142,7 @@ module rf {
             this.w = hitArea.right - hitArea.left;
             this.h = hitArea.bottom - hitArea.top;
             // }
-            this.states &= ~DChange.ac;
+            this.status &= ~DChange.ac;
         }
 
         getObjectByPoint(dx: number, dy: number,scale:number): DisplayObject {
@@ -152,9 +152,9 @@ module rf {
             if(mouseEnabled == false && mouseChildren == false){
                 return undefined
             }
-            let{states,scrollRect,hitArea}=this;
+            let{status,scrollRect,hitArea}=this;
 
-            if(this.states & DChange.ac){
+            if(this.status & DChange.ac){
                 this.updateHitArea()
             }
 
@@ -611,7 +611,7 @@ module rf {
         public render(camera: Camera, now: number, interval: number): void {
             let target:Sprite = this.target;
             let c = context3D;
-            const{source,sceneTransform,states,_x,_y,_scaleX} = this.target;
+            const{source,sceneTransform,status,_x,_y,_scaleX} = this.target;
             if(undefined == source){
                 return;
             }
@@ -627,7 +627,7 @@ module rf {
             this.t = t;
 
 
-            if (states & DChange.vertex) {
+            if (status & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
                 this.getBatchTargets(target, -_x, -_y, 1 / _scaleX);
@@ -635,11 +635,11 @@ module rf {
                 this.toBatch();
 
                 this.geo = undefined;
-                target.states &= ~DChange.batch;
-            }else if(states & DChange.vcdata){
+                target.status &= ~DChange.batch;
+            }else if(status & DChange.vcdata){
                 //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
                 this.updateVCData(target, -_x, -_y, 1 / _scaleX);
-                target.states &= ~DChange.vcdata;
+                target.status &= ~DChange.vcdata;
             }
 
             if (undefined == this.program) {

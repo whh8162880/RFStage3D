@@ -50,7 +50,7 @@ module rf{
 
         bindComponents():void{
             this.centerFlag = true;
-            this._resizeable = true;
+            this.resizeable = true;
             this.setSize(1400, 750);
 
             this.bg = new IconView(this.source);

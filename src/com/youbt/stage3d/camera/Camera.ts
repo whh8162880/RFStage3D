@@ -14,13 +14,13 @@ module rf{
         }
 
         public updateSceneTransform(sceneTransform?:IMatrix3D):void{
-            if( this.states | DChange.trasnform){
+            if( this.status | DChange.trasnform){
                 this.updateTransform();
                 this.sceneTransform.m3_invert(this.transform);
                 this.worldTranform.m3_append(this.len,false,this.sceneTransform);
                 // this.states &= ~DChange.trasnform;
             }
-            this.states = 0;
+            this.status = 0;
         }
     }
 
@@ -28,7 +28,7 @@ module rf{
         if(camera){
             camera.w = width;
             camera.h = height;
-            camera.states |= DChange.trasnform;
+            camera.status |= DChange.trasnform;
         }
         
 
@@ -60,7 +60,7 @@ module rf{
         if(camera){
             camera.w = width;
             camera.h = height;
-            camera.states |= DChange.trasnform;
+            camera.status |= DChange.trasnform;
         }
        
 
@@ -93,7 +93,7 @@ module rf{
         if(camera){
             camera.w = width;
             camera.h = height;
-            camera.states |= DChange.trasnform;
+            camera.status |= DChange.trasnform;
         }
         
 
