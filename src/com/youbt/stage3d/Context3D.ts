@@ -396,6 +396,16 @@ namespace rf {
 			return texture;
 		}
 
+		public createCubeTexture(key:ITextureData): CubeTexture {
+			let texture = new CubeTexture();
+			texture.key = key.key ? key.key : (key.key = `${key.url}_${key.mipmap}_${key.mag}_${key.mix}_${key.repeat}`);
+			texture.data = key;
+			// texture.width = width;
+			// texture.height = height;
+			this.textureObj[key.key] = texture;
+			return texture;
+		}
+
 
 		public setRenderToTexture(texture:RTTexture,enableDepthAndStencil: boolean = true,antiAlias: number = 0,surfaceSelector: number /*int*/ = 0,colorOutputIndex: number /*int*/ = 0){
 			let g = gl;
