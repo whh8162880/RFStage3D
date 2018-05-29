@@ -41,10 +41,10 @@ module rf{
             super("create","ui.asyncpanel.create");
         }
 
-        btn_random:IButton = null;
-        btn_create:IButton = null;
+        btn_random:Button = null;
+        btn_create:Button = null;
         dele_info:IInfoDele = null;
-        scrollbar:Component = null;
+        bar_scroll:ScrollBar = null;
 
         bg:IconView;
 
@@ -58,8 +58,8 @@ module rf{
             this.bg.setUrl(ROOT_PERFIX + 'createbg.jpg');
             this.bg.setSize(1400, 750);
 
-            let scroll:ScrollBar = new ScrollBar(this.scrollbar);
-            scroll.init(this.bg, 500, 400, ScrollType.V_SCROLL);
+            // let scroll:ScrollBar = new ScrollBar(this.scrollbar);
+            this.bar_scroll.init(this.bg, 500, 400, ScrollType.V_SCROLL);
             // this.btn_random = skin["btn_random"];
             this.btn_random.addClick(this.randomHandler, this);
 
