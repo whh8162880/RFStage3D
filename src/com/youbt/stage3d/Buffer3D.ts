@@ -762,14 +762,17 @@ module rf {
                 index = this.files.indexOf(fname)
 
                 this.cubePixels[index] = image;
-                if(this.cubePixels.length == 6){
-                    for(let pixels of this.cubePixels){
-                        if(pixels != undefined){
-                            this.status = LoadStates.COMPLETE;
-                        }
+                let b = true;
+                for(let i:number = 0; i < 6; ++i)
+                {
+                    let pixels = this.cubePixels[i];
+                    if(pixels == undefined){
+                        b = false;
                     }
                 }
-                
+                if(b){
+                    this.status = LoadStates.COMPLETE;
+                }
             }else{
                 this.status = LoadStates.FAILED;
             }
