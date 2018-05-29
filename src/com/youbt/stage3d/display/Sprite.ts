@@ -346,7 +346,23 @@ module rf {
         }
     }
 
+    export interface IGraphicsGeometry{
+        offset:number;
+        numVertices:number;
+        base:Float32Array;
+        matrix:IMatrix;
+        vo:IBitmapSourceVO;
+        rect:Size;
+        w:number;
+        h:number;
+    }
+
+    export function newGraphicsGeometry(matrix?:IMatrix){
+        return {numVertices:0,matrix:matrix,offset:0} as IGraphicsGeometry;
+    }
+
     export class Graphics {
+        grometrys:IGraphicsGeometry[];
         target: Sprite;
         byte: Float32Array;
         hitArea:HitArea;
@@ -358,6 +374,22 @@ module rf {
             // this.byte = new Float32Byte(new Float32Array(0));
             this.numVertices = 0;
             this.hitArea = new HitArea();
+            this.grometrys = [];
+        }
+
+
+        setSize(width:number, height:number){
+            let{$batchOffset:batchoffset,grometrys,target}=this;
+
+            grometrys.forEach(element => {
+                let{rect,matrix,offset} = element;
+                let{$batchGeometry} = target;
+                if($batchGeometry){
+                    $batchGeometry.update(batchoffset + offset,element.base);
+                }
+            });
+
+            
         }
 
         clear(): void {
@@ -365,14 +397,30 @@ module rf {
             this.numVertices = 0;
             this.byte = undefined;
             this.hitArea.clean();
+            this.grometrys.length = 0;
         }
 
         end(): void {
-            let target = this.target;
+            let{target,grometrys,numVertices}=this;
             let change = 0;
+            
 
-            if(this.numVertices > 0){
-                let float = createGeometry(empty_float32_object,target.variables,this.numVertices);
+            
+
+            
+
+
+            if(numVertices > 0){
+
+                let data32PerVertex = target.variables["data32PerVertex"].size;
+                let float = new Float32Array(numVertices * data32PerVertex);
+                let offset = 0;
+                grometrys.forEach(geo => {
+                    geo.offset = offset;
+                    float.set(geo.base,offset);
+                    offset += geo.base.length;
+                });
+                // let float = createGeometry(empty_float32_object,target.variables,this.numVertices);
                 this.byte = float;
                 if(target.$batchGeometry && this.preNumVertices == this.numVertices){
                     target.$batchGeometry.update(this.$batchOffset,float);
@@ -392,11 +440,9 @@ module rf {
         }
         
 
-        addPoint(pos:number[],noraml:number[],uv:number[],color:number[]):void{
+        addPoint(geometry:IGraphicsGeometry,pos:number[],noraml:number[],uv:number[],color:number[],locksize:boolean):void{
             let variables = this.target.variables;
-            let numVertices = this.numVertices;
-
-
+            let numVertices = geometry.numVertices;
             function set(variable:IVariable,array:Float32Array,data:number[]):void{
                 if(undefined == data || undefined == variable){
                     return;
@@ -418,29 +464,32 @@ module rf {
             set(variables[VA.uv],empty_float32_uv,uv);
             set(variables[VA.color],empty_float32_color,color);
 
-            this.hitArea.updateArea(pos[0],pos[1],pos[2]);
 
-
-
-            this.numVertices++
+            if(!locksize){
+                this.hitArea.updateArea(pos[0],pos[1],pos[2]);
+            }
+            
+            // this.numVertices++
+            geometry.numVertices ++;
         }
 
-        drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, matrix:Float32Array = undefined,z: number = 0): void {
+        drawRect(x: number, y: number, width: number, height: number, color: number, alpha: number = 1, matrix:IMatrix = undefined,z: number = 0) {
 
-            const {originU,originV} = this.target.source;
-
+            let{variables,source,$vcIndex,locksize} = this.target;
+            let data32PerVertex = variables["data32PerVertex"].size;
+            const{originU,originV} = source;
             const rgba = [
                 ((color & 0x00ff0000) >>> 16) / 0xFF,
                 ((color & 0x0000ff00) >>> 8) / 0xFF,
                 (color & 0x000000ff) / 0xFF,
                 alpha
             ]
-
-
-            const uv = [originU,originV,this.target.$vcIndex];
-
+            const uv = [originU,originV,$vcIndex];
             const noraml = [0,0,1]
-            
+
+            let geometry = newGraphicsGeometry();
+            this.grometrys.push(geometry);
+
             let r = x + width;
             let b = y + height;
 
@@ -455,55 +504,110 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.addPoint(p,noraml,uv,rgba);
+                this.addPoint(geometry,p,noraml,uv,rgba,locksize);
             }
 
-
-
-            // let position = this.byte.array.length;
-            // let d = this.variables["data32PerVertex"].size;
-            // let v = this.variables;
-            // let f = m2dTransform;
-            // let p = EMPTY_POINT2D;
-            // let byte = this.byte;
-            // const {originU,originV} = this.target.source;
-            // this.byte.length = position + d * 4;
-            // let pos = v[VA.pos];
-            // let uv = v[VA.uv];
-            // let vacolor = v[VA.color];
-            // let normal = v[VA.normal];
-            // let points = [x,y,r,y,r,b,x,b];
-            // for(let i=0;i<8;i+=2){
-            //     let dp = position + (i / 2) * d;
-            //     p.x = points[i];
-            //     p.y = points[i+1];
-            //     if(undefined != matrix){
-            //         f(matrix,p,p);
-            //     }
-            //     this.hitArea.updateArea(p.x,p.y,z);
-            //     byte.wPoint3(dp+pos.offset,p.x,p.y,z)
-
-            //     if(undefined != normal){
-            //         byte.wPoint3(dp+normal.offset,0,0,1)
-            //     }
-                
-            //     if(undefined != uv){
-            //         byte.wPoint3(dp+uv.offset,originU,originV,0)
-            //     }
-
-            //     if(undefined != vacolor){
-            //         byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
-            //     }
-            //     this.numVertices += 1;
-            // }
+            geometry.base = createGeometry(empty_float32_object,variables,geometry.numVertices);
+            this.numVertices += geometry.numVertices;
+            return geometry;
         }
 
+        drawScale9Bitmap(x: number, y: number,vo:IBitmapSourceVO,rect:Size,matrix?:IMatrix,color:number = 0xFFFFFF,alpha:number = 1,z:number = 0,geometry?:IGraphicsGeometry){
+            const noraml = [0,0,1];
+            const rgba = [
+                ((color & 0x00ff0000) >>> 16) / 0xFF,
+                ((color & 0x0000ff00) >>> 8) / 0xFF,
+                (color & 0x000000ff) / 0xFF,
+                alpha
+            ]
+            let{variables,$vcIndex:index,locksize} = this.target;
 
-        drawBitmap(x: number, y: number,vo:IBitmapSourceVO,color:number = 0xFFFFFF,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
+            let sx = 1, sy = 1;
+            if(matrix){
+
+                let{
+                    0:m0,1:m1,2:m2,
+                    3:m3,4:m4
+                }=matrix as any;
+
+                sx = Math.sqrt(m0*m0 + m1*m1);
+                sy = Math.sqrt(m3*m3 + m4*m4);
+                
+                TEMP_MATRIX2D.set(matrix);
+                matrix = TEMP_MATRIX2D;
+
+                matrix[0] = m0 / sx;
+                matrix[1] = m1 / sx;
+
+                matrix[3] = m3 / sy;
+                matrix[4] = m4 / sy;
+            }
+
+            let{w,h,ul,ur,vt,vb}=vo;
+            let{x:rx,y:ry,w:rw,h:rh}=rect;
+            let rr = w - rw - rx ,rb = h - rh - ry;
+            let uw = ur - ul,vh = vb - vt;
+            let x2 = x + rx,y2 = y + ry;
+            let u2 = (rx / w) * uw + ul,u3 = ((rx+rw) / w) * uw + ul;
+            let v2 = (ry / h) * vh + vt,v3 = ((ry+rh) / h) * vh + vt;
+            // x3 = x2 + rw,,y3 = y2 + rh;
+            w = Math.round(w * sx);
+            h = Math.round(h * sy);
+
+            let x3 = w - rr,y3 = h - rb;
+            let r = x + w,b = y + h;
+
+            if(!geometry){
+                geometry = newGraphicsGeometry(matrix || newMatrix());
+                this.grometrys.push(geometry);
+            }else{
+                this.numVertices -= geometry.numVertices;
+                geometry.numVertices = 0;
+            }
+
+            geometry.w = w;
+            geometry.h = h;
+
+            let points = [
+                x,y,ul,vt,      x2,y,u2,vt,     x2,y2,u2,v2,    x,y2,ul,v2,  
+                x2,y,u2,vt,     x3,y,u3,vt,     x3,y2,u3,v2,    x2,y2,u2,v2,
+                x3,y,u3,vt,     r,y,ur,vt,      r,y2,ur,v2,     x3,y2,u3,v2,
+
+                x,y2,ul,v2,     x2,y2,u2,v2,    x2,y3,u2,v3,    x,y3,ul,v3,
+                x2,y2,u2,v2,    x3,y2,u3,v2,    x3,y3,u3,v3,    x2,y3,u2,v3,
+                x3,y2,u3,v2,    r,y2,ur,v2,     r,y3,ur,v3,     x3,y3,u3,v3,
+
+
+                x,y3,ul,v3,     x2,y3,u2,v3,    x2,b,u2,vb,     x,b,ul,vb,
+                x2,y3,u2,v3,    x3,y3,u3,v3,    x3,b,u3,vb,     x2,b,u2,vb,
+                x3,y3,u3,v3,    r,y3,ur,v3,     r,b,ur,vb,      x3,b,u3,vb
+            ];
+
+
+            let f = m2dTransform;
+            let p = [0,0,0];
+            for(let i=0;i<points.length;i+=4){
+                p[0] = points[i];
+                p[1] = points[i+1];
+                p[2] = z;
+                if(undefined != matrix){
+                    f(matrix,p,p);
+                }
+                this.addPoint(geometry,p,noraml,[points[i+2],points[i+3],index],rgba,locksize);
+            }
+
+            geometry.vo = vo;
+            geometry.rect = rect;
+            geometry.base = createGeometry(empty_float32_object,variables,geometry.numVertices);
+            this.numVertices += geometry.numVertices;
+            return geometry;
+
+        }
+
+        drawBitmap(x: number, y: number,vo:IBitmapSourceVO,matrix?:IMatrix,color:number = 0xFFFFFF,alpha:number = 1,z:number = 0){
             const{w,h,ul,ur,vt,vb}=vo;
             let r = x + w;
             let b = y + h;
-
             
             const rgba = [
                 ((color & 0x00ff0000) >>> 16) / 0xFF,
@@ -512,9 +616,12 @@ module rf {
                 alpha
             ]
 
-            const noraml = [0,0,1]
+            const noraml = [0,0,1];
 
-            const index = this.target.$vcIndex;
+            let{variables,$vcIndex:index,locksize} = this.target;
+
+            let geometry = newGraphicsGeometry();
+            this.grometrys.push(geometry);
 
             let f = m2dTransform;
             let p = [0,0,0];
@@ -527,52 +634,12 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
-                this.addPoint(p,noraml,[points[i+2],points[i+3],index],rgba);
+                this.addPoint(geometry,p,noraml,[points[i+2],points[i+3],index],rgba,locksize);
             }
-
-            // let v = this.target.variables;
-            // let f = m2dTransform;
-            // let d = v["data32PerVertex"].size;
-            // let position = this.byte.array.length;
-            // this.byte.length = position + d*4;
-          
-            // let p = EMPTY_POINT2D;
-            // let byte = this.byte;
-
-            // let pos = v[VA.pos];
-            // let uv = v[VA.uv];
-            // let vacolor = v[VA.color];
-            // let normal = v[VA.normal];
-
-            // let red = ((color & 0x00ff0000) >>> 16) / 0xFF;
-            // let green = ((color & 0x0000ff00) >>> 8) / 0xFF;
-            // let blue = (color & 0x000000ff) / 0xFF;
-
-            // let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
-            // for(let i=0;i<16;i+=4){
-            //     let dp = position + (i / 4) * d;
-            //     p.x = points[i];
-            //     p.y = points[i+1];
-            //     if(undefined != matrix){
-            //         f(matrix,p,p);
-            //     }
-            //     this.hitArea.updateArea(p.x,p.y,z);
-            //     byte.wPoint3(dp+pos.offset,p.x,p.y,z)
-
-            //     if(undefined != normal){
-            //         byte.wPoint3(dp+normal.offset,0,0,1)
-            //     }
-                
-            //     if(undefined != uv){
-            //         byte.wPoint3(dp+uv.offset,points[i+2],points[i+3],0)
-            //     }
-
-            //     if(undefined != vacolor){
-            //         byte.wPoint4(dp+vacolor.offset,red,green,blue,alpha)
-            //     }
-
-            //     this.numVertices += 1;
-            // }
+            geometry.vo = vo;
+            geometry.base = createGeometry(empty_float32_object,variables,geometry.numVertices);
+            this.numVertices += geometry.numVertices;
+            return geometry;
         }
     }
 
@@ -669,7 +736,7 @@ module rf {
             }
             let g = gl;
             let{scrollRect,sceneTransform}=this.target;
-            let worldTransform = TEMP_MATRIX;
+            let worldTransform = TEMP_MATRIX3D;
             if(scrollRect){
                 let{x,y,w,h}=scrollRect;
                 c.setScissor(sceneTransform[12],sceneTransform[13],w,h);

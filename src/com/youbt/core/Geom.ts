@@ -157,7 +157,8 @@ module rf {
         0, 0, 1, 0,
         0, 0, 0, 1]);
 
-    export let TEMP_MATRIX: IMatrix3D = newMatrix3D();
+    export let TEMP_MATRIX3D: IMatrix3D = newMatrix3D();
+    export let TEMP_MATRIX2D: IMatrix = newMatrix();
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
     export let TEMP_VECTOR3D: IVector3D = newVector3D();
     export let TEMP_DECOMPOSE: IVector3D[] = [newVector3D(), newVector3D(), newVector3D()];
