@@ -125,11 +125,10 @@ module rf{
 
 		setSize(width:number, height:number){
 			super.setSize(width,height);
-			// let{$graphics:graphics}=this;
-			// if(graphics){
-			// 	graphics.setSize(width,height);
-			// }
-			
+			let{$graphics:graphics}=this;
+			if(graphics){
+				graphics.setSize(width,height);
+			}
 		}
 		
 		addToStage():void{
