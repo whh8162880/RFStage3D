@@ -68,7 +68,7 @@ module rf {
 
         setChange(value: number,p:number = 0,c:boolean = false): void {
             if(undefined != this.renderer){
-                this.states |= (value | p);
+                this.status |= (value | p);
             }else{
                 super.setChange(value,p,c);
             }
@@ -76,7 +76,7 @@ module rf {
 
         render(camera: Camera, now: number, interval: number): void {
             if (undefined != this.renderer) {
-                if(this.states & DChange.t_all){ //如果本层或者下层有transform alpha 改编 那就进入updateTransform吧
+                if(this.status & DChange.t_all){ //如果本层或者下层有transform alpha 改编 那就进入updateTransform吧
                     this.updateTransform();
                 }
                 this.renderer.render(camera, now, interval);
@@ -112,9 +112,8 @@ module rf {
         {
             super.setSize(width, height);
             let hitArea = this.hitArea;
-            let {w, h} = this;
             hitArea.clean();
-            hitArea.updateArea(w, h, 0);
+            hitArea.updateArea(width, height, 0);
         }
 
         public updateHitArea():void{
@@ -126,7 +125,7 @@ module rf {
             let hitArea = this.hitArea;
             hitArea.clean();
             for(let child of this.childrens){
-                if(child.states & DChange.ac){
+                if(child.status & DChange.ac){
                     child.updateHitArea();
                 }
                 hitArea.combine(child.hitArea,child._x,child._y);
@@ -143,7 +142,7 @@ module rf {
             this.w = hitArea.right - hitArea.left;
             this.h = hitArea.bottom - hitArea.top;
             // }
-            this.states &= ~DChange.ac;
+            this.status &= ~DChange.ac;
         }
 
         getObjectByPoint(dx: number, dy: number,scale:number): DisplayObject {
@@ -153,9 +152,9 @@ module rf {
             if(mouseEnabled == false && mouseChildren == false){
                 return undefined
             }
-            let{states,scrollRect,hitArea}=this;
+            let{status,scrollRect,hitArea}=this;
 
-            if(this.states & DChange.ac){
+            if(this.status & DChange.ac){
                 this.updateHitArea()
             }
 
@@ -500,7 +499,7 @@ module rf {
         }
 
 
-        drawBitmap(x: number, y: number,vo:BitmapSourceVO,color:number = 0xFFFFFF,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
+        drawBitmap(x: number, y: number,vo:IBitmapSourceVO,color:number = 0xFFFFFF,matrix:Float32Array = undefined,alpha:number = 1,z:number = 0):void{
             const{w,h,ul,ur,vt,vb}=vo;
             let r = x + w;
             let b = y + h;
@@ -575,76 +574,6 @@ module rf {
             //     this.numVertices += 1;
             // }
         }
-
-
-        drawCube(x: number, y: number,z: number,
-             width: number, height: number, deep:number,
-            color: number, alpha: number = 1): void {
-
-            const {originU,originV} = this.target.source;
-
-            const rgba = [
-                ((color & 0x00ff0000) >>> 16) / 0xFF,
-                ((color & 0x0000ff00) >>> 8) / 0xFF,
-                (color & 0x000000ff) / 0xFF,
-                alpha
-            ]
-
-
-            const uv = [originU,originV,this.target.$vcIndex];
-
-            const noraml = [0,0,1]
-
-                let x2 = x + width;
-                let y2 = y + height;
-                let z2 = z + deep;
-
-                //前
-                this.addPoint([x,y,z],noraml,uv,rgba);
-                this.addPoint([x2,y,z],noraml,uv,rgba);
-                this.addPoint([x2,y2,z],noraml,uv,rgba);
-                this.addPoint([x,y2,z],noraml,uv,rgba);
-                
-                
-    			// beginFill(0x00FF00)
-                //上
-                this.addPoint([x,y,z],noraml,uv,rgba);
-                this.addPoint([x,y,z2],noraml,uv,rgba);
-                this.addPoint([x2,y,z2],noraml,uv,rgba);
-                this.addPoint([x2,y,z],noraml,uv,rgba);
-                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                
-                //左
-    //			beginFill(0x0000FF)
-                // addPoint(x,		y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                
-                //右
-    //			beginFill(0xFFFF00)
-                // addPoint(x2,	y,		z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                
-                //后
-    //			beginFill(0x00FFFF);
-                // addPoint(x,		y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y,		z2,	0,0,	_fr,_fg,_fb,_fa);
-                
-                //下
-    //			beginFill(0xFF00FF)
-                // addPoint(x,		y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x,		y2,	z2,	0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z2,		0,0,	_fr,_fg,_fb,_fa);
-                // addPoint(x2,	y2,	z,		0,0,	_fr,_fg,_fb,_fa);
-        }
     }
 
 
@@ -682,7 +611,7 @@ module rf {
         public render(camera: Camera, now: number, interval: number): void {
             let target:Sprite = this.target;
             let c = context3D;
-            const{source,sceneTransform,states,_x,_y,_scaleX} = this.target;
+            const{source,sceneTransform,status,_x,_y,_scaleX} = this.target;
             if(undefined == source){
                 return;
             }
@@ -698,7 +627,7 @@ module rf {
             this.t = t;
 
 
-            if (states & DChange.vertex) {
+            if (status & DChange.vertex) {
                 this.cleanBatch();
                 //step1 收集所有可合并对象
                 this.getBatchTargets(target, -_x, -_y, 1 / _scaleX);
@@ -706,11 +635,11 @@ module rf {
                 this.toBatch();
 
                 this.geo = undefined;
-                target.states &= ~DChange.batch;
-            }else if(states & DChange.vcdata){
+                target.status &= ~DChange.batch;
+            }else if(status & DChange.vcdata){
                 //坐标发生了变化 需要更新vcdata 逻辑想不清楚  那就全部vc刷一遍吧
                 this.updateVCData(target, -_x, -_y, 1 / _scaleX);
-                target.states &= ~DChange.vcdata;
+                target.status &= ~DChange.vcdata;
             }
 
             if (undefined == this.program) {
@@ -982,17 +911,19 @@ module rf {
             this.vertex.variables = variables;
             this.quadcount = this.vertex.numVertices / 4;
             this.vcData = new Float32Array(this.quadcount * 4)
-            let byte = this.vertex.vertex;
+            let{data32PerVertex,vertex:byte}=this.vertex;
+            let offset = vertex_ui_variable["uv"].offset+2
             let vo = this.link.getFrist();
             while(vo){
                 if (vo.close == false) {
                     let sp: Sprite = vo.data;
+                    let{$vcIndex}=sp;
                     let g = sp.$graphics;
-                    if(sp.$vcIndex > 0){
-                        g.byte.update(this.vertex.data32PerVertex,vertex_ui_variable["uv"].offset+2,sp.$vcIndex)
+                    if($vcIndex >= 0){
+                        g.byte.update(data32PerVertex,offset,$vcIndex)
                     }
                     byte.set(g.byte,g.$batchOffset);
-                    this.vcData.wPoint4(sp.$vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
+                    this.vcData.wPoint4($vcIndex * 4, sp.$vcox, sp.$vcoy, sp.$vcos, sp.sceneAlpha)
                 }
                 vo = vo.next;
             }

@@ -44,26 +44,28 @@ module rf{
         btn_random:IButton = null;
         btn_create:IButton = null;
         dele_info:IInfoDele = null;
+        scrollbar:Component = null;
 
         bg:IconView;
 
         bindComponents():void{
             this.centerFlag = true;
-            this._resizeable = true;
+            this.resizeable = true;
             this.setSize(1400, 750);
 
             this.bg = new IconView(this.source);
             this.addChildAt(this.bg, 0);
-            this.bg.setUrl('assets/createbg.jpg');
+            this.bg.setUrl(ROOT_PERFIX + 'createbg.jpg');
+            this.bg.setSize(1400, 750);
 
+            let scroll:ScrollBar = new ScrollBar(this.scrollbar);
+            scroll.init(this.bg, 500, 400, ScrollType.V_SCROLL);
             // this.btn_random = skin["btn_random"];
-            this.btn_random.addClick(this.randomHandler);
+            this.btn_random.addClick(this.randomHandler, this);
 
             if(this.dele_info.btn_create != undefined)
             {
-                this.dele_info.btn_create.addClick(this.createHandler);
-            }else{
-                alert("1112");
+                this.dele_info.btn_create.addClick(this.createHandler, this);
             }
         }
 

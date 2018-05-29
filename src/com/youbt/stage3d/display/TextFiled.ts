@@ -447,7 +447,7 @@ module rf {
 //             }
         }
 
-        getCharSourceVO(char: string, format: TextFormat): BitmapSourceVO {
+        getCharSourceVO(char: string, format: TextFormat): IBitmapSourceVO {
             let source = this.source;
             let name = format.font + "_" + char;
             let vo = source.getSourceVO(name, 1);
@@ -1133,7 +1133,7 @@ module rf {
         sx: number = 0;
         ex: number = 0;
         element: HtmlElement;
-        display: BitmapSourceVO | Sprite;
+        display: IBitmapSourceVO | Sprite;
         w: number;
         h: number
 

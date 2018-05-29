@@ -2,9 +2,9 @@
 module rf{
 
     export interface IScrollData{
-        dlen:number;
-        mlen:number;
-        pos:number;
+        dlen:number;//裁剪尺寸
+        mlen:number;//原始尺寸
+        pos:number;//位移后的坐标
         max:number;
     }
 
@@ -236,6 +236,8 @@ module rf{
                     scroll.mlen = width;
                     scroll.pos = x;
                 }
+
+                this.hScroll.pos = scroll.pos;
             }
 
             if(vStep > 0){
@@ -251,6 +253,8 @@ module rf{
                     scroll.mlen = height;
                     scroll.pos = y;
                 }
+
+                this.vScroll.pos = scroll.pos;
             }
             this.simpleDispatch(EventT.SCROLL,this);
 
@@ -267,7 +271,7 @@ module rf{
             super();
             this.areacheck = true;
             this.bind(target,false);
-            if(target.states | DChange.area){
+            if(target.status | DChange.area){
                 target.updateHitArea();
             }
 
@@ -280,7 +284,7 @@ module rf{
         resizeHandler(event?:EventX):void{
             let{w:width,h:height}=this.target;
             let{w,h}=this.rect; 
-            this.setArea(w,width,h,height);
+            this.setArea(w,h,width,height);
         }
 
 

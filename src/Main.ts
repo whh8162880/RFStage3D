@@ -1,5 +1,5 @@
-/// <reference path="./com/youbt/rfreference.ts" />
 /// <reference path="./AppBase.ts" />
+/// <reference path="./com/module/rfreference.ts" />
 module rf{
     // export let sp;
 
@@ -113,7 +113,7 @@ module rf{
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             
@@ -222,7 +222,7 @@ module rf{
 
 
             let profile = singleton(GUIProfile);
-            ROOT.addChild(profile);
+            // ROOT.addChild(profile);
 
 
             
@@ -234,7 +234,7 @@ module rf{
             // g.clear();
             // g.drawRect(0,0,100,100,0xFFFFFF);
             // g.end();
-
+/*
             let image = new Image();
             image.renderer = new BatchRenderer(image);
             image.mouseEnabled = true;
@@ -285,8 +285,22 @@ module rf{
             drager.hStep = 0;
             drager.areacheck = true;
 
+*/
+
+            for(let i = 1;i<2;i++){
+                let list = new List(ROOT.source,TestListItemRender,100,20);
+                list.setPos(i * 110,100);
+                list.setSize(100,10*20);
+                list.scroll.vStep = 20;
+                // list.displayList(new Array(100));
+                // ROOT.addChild(list);
+            }
 
 
+            
+
+            facade.toggleMediator(TestMediator,1);
+            
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
