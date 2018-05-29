@@ -104,7 +104,7 @@ module rf{
 
             let r = 40;
 
-            // m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
+            m.diffTex = context3D.getTextureData("../assets/mesh/a10010m/diff.png");
             m.diff = newColor(0xAAAAAA);
             let plane = new PlaneGeometry(variables).create(w*2,w*2);
             let mesh = new Mesh(variables);
@@ -117,18 +117,32 @@ module rf{
 
 
             
+            let box = new SkyBoxGeometry(variables).create();
+            
+            mesh = new Mesh(variables);
+            mesh.geometry = box;
+            
+            let msky = new SkyBoxMaterial();
+            msky.setData(undefined);
+            msky.cull = WebGLConst.NONE;
+            msky.diff = newColor(0xAA0000);
+            msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
+
+            mesh.material = msky;
+            scene.addChild(mesh);
+
+
+
+
+
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
             // mesh = new Mesh(variables);
             // mesh.init(plane,m);
             // mesh.setPos(w+80,0,0);
             // scene.addChild(mesh);
-
-  /*          // let box = new BoxGeometry(variables).create(w,w,w);
-            // mesh = new Mesh(variables);
-            // mesh.init(box,m);
-            // mesh.setPos(0,-110,0);
-            // scene.addChild(mesh);
+/*
+  
             let sphere = new SphereGeometry(variables).create(r,r,50);
             mesh = new Mesh(variables);
             mesh.shadowable = true;

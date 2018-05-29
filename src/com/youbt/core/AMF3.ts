@@ -1,5 +1,109 @@
 module rf{
 
+	export function inRange(a, min, max) {
+		return min <= a && a <= max;
+	}
+	
+
+	export function byte_decoderError(fatal, opt_code_point?): number {
+		if (fatal) {
+			// egret.$error(1027);
+		}
+		return opt_code_point || 0xFFFD;
+	}
+
+
+	export function byte_decodeUTF8(data: Uint8Array): string {
+		let fatal: boolean = false;
+		let pos: number = 0;
+		let result: string = "";
+		let code_point: number;
+		let utf8_code_point = 0;
+		let utf8_bytes_needed = 0;
+		let utf8_bytes_seen = 0;
+		let utf8_lower_boundary = 0;
+		let inRange = rf.inRange;
+		let decoderError = byte_decoderError;
+
+		while (data.length > pos) {
+
+			let _byte = data[pos++];
+
+			if (_byte == -1) {
+				if (utf8_bytes_needed != 0) {
+					code_point = decoderError(fatal);
+				} else {
+					code_point = -1;
+				}
+			} else {
+
+				if (utf8_bytes_needed == 0) {
+					if (inRange(_byte, 0x00, 0x7F)) {
+						code_point = _byte;
+					} else {
+						if (inRange(_byte, 0xC2, 0xDF)) {
+							utf8_bytes_needed = 1;
+							utf8_lower_boundary = 0x80;
+							utf8_code_point = _byte - 0xC0;
+						} else if (inRange(_byte, 0xE0, 0xEF)) {
+							utf8_bytes_needed = 2;
+							utf8_lower_boundary = 0x800;
+							utf8_code_point = _byte - 0xE0;
+						} else if (inRange(_byte, 0xF0, 0xF4)) {
+							utf8_bytes_needed = 3;
+							utf8_lower_boundary = 0x10000;
+							utf8_code_point = _byte - 0xF0;
+						} else {
+							decoderError(fatal);
+						}
+						utf8_code_point = utf8_code_point * Math.pow(64, utf8_bytes_needed);
+						code_point = null;
+					}
+				} else if (!inRange(_byte, 0x80, 0xBF)) {
+					utf8_code_point = 0;
+					utf8_bytes_needed = 0;
+					utf8_bytes_seen = 0;
+					utf8_lower_boundary = 0;
+					pos--;
+					code_point = decoderError(fatal, _byte);
+				} else {
+
+					utf8_bytes_seen += 1;
+					utf8_code_point = utf8_code_point + (_byte - 0x80) * Math.pow(64, utf8_bytes_needed - utf8_bytes_seen);
+
+					if (utf8_bytes_seen !== utf8_bytes_needed) {
+						code_point = null;
+					} else {
+
+						let cp = utf8_code_point;
+						let lower_boundary = utf8_lower_boundary;
+						utf8_code_point = 0;
+						utf8_bytes_needed = 0;
+						utf8_bytes_seen = 0;
+						utf8_lower_boundary = 0;
+						if (inRange(cp, lower_boundary, 0x10FFFF) && !inRange(cp, 0xD800, 0xDFFF)) {
+							code_point = cp;
+						} else {
+							code_point = decoderError(fatal, _byte);
+						}
+					}
+
+				}
+			}
+			//Decode string
+			if (code_point !== null && code_point !== -1) {
+				if (code_point <= 0xFFFF) {
+					if (code_point > 0) result += String.fromCharCode(code_point);
+				} else {
+					code_point -= 0x10000;
+					result += String.fromCharCode(0xD800 + ((code_point >> 10) & 0x3ff));
+					result += String.fromCharCode(0xDC00 + (code_point & 0x3ff));
+				}
+			}
+		}
+		return result;
+	}
+
     export class Byte{
         position:number;
         length:number;
@@ -66,13 +170,17 @@ module rf{
 
         readMultiByte(length:number, charSet:string="utf-8"):string  {
 			const{position,buf}=this;
+			let end =position + length 
 			
-			if(position + length > this.length) { this.outOfRange(); return; }
+			if(end >= this.length) { this.outOfRange(); return; }
+			this.position += length;
 
-            let str = "";
-            for (var i:number = 0; i < length;i++ ){
-                str += String.fromCharCode(buf.getUint8(position + i));
-            }
+			let str = byte_decodeUTF8(new Uint8Array(buf.buffer.slice(position,end)))
+
+            // let str = "";
+            // for (var i:number = 0; i < length;i++ ){
+            //     str += String.fromCharCode(buf.getUint8(position + i));
+            // }
 
 			// try{
 			// 	var u8 = new Uint8Array(length);
@@ -86,9 +194,9 @@ module rf{
 			// 		str += String.fromCharCode(buf.getUint8(position + i));
 			// 	}
 			// }
-			this.position += length;
+			
 			return str;
-        }
+		}
         
         readByteArray(length:number):ArrayBuffer{
             const{position}=this;

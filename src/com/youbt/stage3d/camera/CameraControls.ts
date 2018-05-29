@@ -88,7 +88,7 @@ module rf{
             let ry = -ox*speed + object.rotationY;
             
             if(target){
-                var transform:IMatrix3D = TEMP_MATRIX;
+                var transform:IMatrix3D = TEMP_MATRIX3D;
 				transform.m3_identity();
 				transform.m3_translation(0, 0, -distance);
 				transform.m3_rotation(rx * DEGREES_TO_RADIANS,X_AXIS);

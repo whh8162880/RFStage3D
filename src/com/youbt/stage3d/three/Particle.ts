@@ -24,7 +24,7 @@ module rf {
             //设置模型particle点数据(pos rot sca time velocity accelerition billboard ...)
             vertexBuffer.uploadContext(program);
             
-            let worldTranform = TEMP_MATRIX;
+            let worldTranform = TEMP_MATRIX3D;
             let rot = TEMP_VECTOR3D;
             //设置矩阵信息
             worldTranform.m3_append(camera.worldTranform,false,sceneTransform);

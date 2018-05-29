@@ -540,7 +540,7 @@ module rf {
             }
         }
 
-        private loadComplete(e:EventX):void{
+        loadComplete(e:EventX):void{
             if(e.type == EventT.COMPLETE){
                 this.status = LoadStates.COMPLETE;
                 let res:ResItem = e.data;
@@ -625,5 +625,171 @@ module rf {
             this.readly = false;
         }
     }
+
+
+    export class CubeTexture extends Texture{
+        frameBuffer:WebGLFramebuffer;
+        renderBuffer:WebGLRenderbuffer;
+        setting:IContext3DSetting = {} as IContext3DSetting;
+
+        files:string[] = ["nx", 'ny', 'nz', 'px', 'py', 'pz'];
+        
+        //nx, ny, nz, px, py, pz
+        cubePixels: (ImageBitmap | ImageData | HTMLVideoElement | HTMLImageElement | HTMLCanvasElement )[];
+        
+        awaken(): boolean {
+
+            let tex = this.texture;
+            let g = gl;
+            
+
+            let data:HTMLCanvasElement[] = [];
+            
+            let [nx, ny, nz, px, py, pz] = this.cubePixels;
+
+            let{data:textureData}=this;
+
+            if (undefined == tex) {
+                this.texture = tex = g.createTexture();
+            }
+
+            g.bindTexture(g.TEXTURE_CUBE_MAP, tex);
+
+            // g.pixelStorei(g.UNPACK_FLIP_Y_WEBGL,true);
+
+            g.texParameteri(g.TEXTURE_CUBE_MAP, g.TEXTURE_MAG_FILTER, textureData.mag);
+            g.texParameteri(g.TEXTURE_CUBE_MAP, g.TEXTURE_MIN_FILTER, textureData.mix);
+            let pepeat = textureData.repeat;
+            g.texParameteri(g.TEXTURE_CUBE_MAP, g.TEXTURE_WRAP_S, pepeat);   //U方向上设置
+            g.texParameteri(g.TEXTURE_CUBE_MAP, g.TEXTURE_WRAP_T, pepeat);
+
+
+            
+            // if(data){
+            g.texImage2D(g.TEXTURE_CUBE_MAP_POSITIVE_X, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, px);
+            g.texImage2D(g.TEXTURE_CUBE_MAP_NEGATIVE_X, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, nx);
+            g.texImage2D(g.TEXTURE_CUBE_MAP_POSITIVE_Y, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, py);
+            g.texImage2D(g.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, ny);
+            g.texImage2D(g.TEXTURE_CUBE_MAP_POSITIVE_Z, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, pz);
+            g.texImage2D(g.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0, g.RGB, g.RGB, g.UNSIGNED_BYTE, nz);
+
+                // g.texImage2D(g.TEXTURE_CUBE_MAP, 0, g.RGBA, g.RGBA, g.UNSIGNED_BYTE, data);
+            // }else{
+            //     g.texImage2D(g.TEXTURE_CUBE_MAP_POSITIVE_X, 0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            //     g.texImage2D(g.TEXTURE_CUBE_MAP_NEGATIVE_X, 0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            //     g.texImage2D(g.TEXTURE_CUBE_MAP_POSITIVE_Y, 0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            //     g.texImage2D(g.TEXTURE_CUBE_MAP_NEGATIVE_Y, 0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            //     g.texImage2D(g.TEXTURE_CUBE_MAP_POSITIVE_Z, 0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            //     g.texImage2D(g.TEXTURE_CUBE_MAP_NEGATIVE_Z, 0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+
+            //     // g.texImage2D(g.TEXTURE_CUBE_MAP,0,g.RGBA,this.width,this.height,0,gl.RGBA,gl.UNSIGNED_BYTE,undefined);
+            // }
+
+
+            //  createmipmap  limit:power of two
+
+            if(textureData.mipmap){
+                g.generateMipmap(g.TEXTURE_CUBE_MAP);
+            }
+
+            g.bindTexture(g.TEXTURE_CUBE_MAP, null);
+
+            this.readly = true;
+
+            //加入资源管理
+            context3D.bufferLink.add(this);
+
+            return true;
+        }
+
+        uploadContext(program: Program3D, index: number, variable: string): void {
+            if (false == this.readly) {
+                this.awaken();
+            }
+
+            let uniforms = program.uniforms;
+            let g = gl;
+            var index_tex;
+
+            g.activeTexture(gl["TEXTURE" + index]);
+            g.bindTexture(g.TEXTURE_CUBE_MAP, this.texture);
+            if (true == uniforms.hasOwnProperty(variable)) {
+                index_tex = uniforms[variable];
+            } else {
+                index_tex = g.getUniformLocation(program.program, variable);
+                uniforms[variable] = index_tex;
+            }
+
+            // var index_tex = gl.getUniformLocation(program.program, variable);
+            if (undefined != index_tex) {
+                g.uniform1i(index_tex, index);
+            }
+
+
+            this.preusetime = engineNow;
+
+        }
+
+
+        status:LoadStates = LoadStates.WAIT;
+
+        load(url?:string, type:string = '.jpg'){
+            if(undefined == url){
+                url = this.data.url as string;
+            }
+            if(url.charAt(url.length-1) != '/' ){
+                url += '/';
+            }
+            this.cubePixels = []
+            if(LoadStates.WAIT == this.status){
+                this.status = LoadStates.LOADING;
+                for(let face of this.files){
+                    let res:ResItem = loadRes(url + face + type, this.loadComplete,this,ResType.image);
+                }
+            }
+        }
+
+        loadComplete(e:EventX):void{
+            if(e.type == EventT.COMPLETE){
+                let res:ResItem = e.data;
+                let image = res.data;
+                this.width = image.width;
+                this.height = image.height;
+
+                let index = res.url.lastIndexOf('/');
+                let fname = res.url.slice(index+1);
+                fname = fname.split('.')[0]
+                index = this.files.indexOf(fname)
+
+                this.cubePixels[index] = image;
+                let b = true;
+                for(let i:number = 0; i < 6; ++i)
+                {
+                    let pixels = this.cubePixels[i];
+                    if(pixels == undefined){
+                        b = false;
+                    }
+                }
+                if(b){
+                    this.status = LoadStates.COMPLETE;
+                }
+            }else{
+                this.status = LoadStates.FAILED;
+            }
+        }
+
+
+        recycle(): void {
+            if (this.texture) {
+                gl.deleteTexture(this.texture);
+                this.texture = undefined;
+            }
+            this.readly = false;
+            
+        }
+        
+    }
+
+
 }
 

@@ -208,6 +208,137 @@ module rf{
 
     }
 
+    export class SkyBoxMaterial extends Material{
+
+        // //自发光
+        // emissive:IColor;
+        // emissiveTex:ITextureData;
+
+        uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
+            let scene = mesh.scene;
+            let c = context3D;
+            
+
+            let{diffTex}=this;
+
+            let{skAnim}=mesh;
+
+            if(!diffTex){
+                return false;
+            }
+
+            let b = this.checkTexs(diffTex);
+            if(false == b){
+                return false;
+            }
+
+            super.uploadContext(camera,mesh,now,interval);
+            let{program} = this;
+            
+            let t:Texture;
+            let textureID = 0;
+
+            t = c.textureObj[diffTex.key];
+            t.uploadContext(program,textureID++,FS.diff);
+
+            return true;
+        }
+
+        checkTexs(data){
+            let c = context3D;
+            let b = true;
+            let tex:Texture
+            if(data.key){
+                tex = c.textureObj[data.key];
+            }
+            if(undefined == tex){
+                tex = c.createCubeTexture(data);
+                b = false;
+            }
+            let{readly,status}=tex;
+            if(false == readly){
+                if(LoadStates.COMPLETE != status){
+                    if(LoadStates.WAIT == status){
+                        tex.load(this.getTextUrl(data));
+                    }
+                    b =false;
+                }
+            }
+            return b;
+        }
+
+        createProgram(mesh:Mesh){
+
+            const{diffTex} = this;
+            
+            let c = context3D;
+            
+            let f_def = "";
+            let v_def = "";
+
+            let key = "SkyBoxMaterial";
+
+            key += "-diff";
+            f_def += "#define DIFF\n";
+
+
+            let p = c.programs[key];
+
+            if(undefined != p){
+                return p;
+            }
+
+            let vertexCode = `
+                precision mediump float;
+                ${v_def}
+                attribute vec3 ${VA.pos};
+                attribute vec2 ${VA.uv};
+                
+                uniform mat4 ${VC.mvp};
+
+                varying vec3 v_texCoord;
+
+                void main() {
+                    vec4 t_pos = vec4(${VA.pos}, 1.0);
+                    
+                    v_texCoord = ${VA.pos};
+
+                    t_pos = ${VC.mvp} * t_pos;
+                    
+                    gl_Position = t_pos.xyww;
+                }
+            `
+            
+            
+
+
+
+            let fragmentCode = `
+            precision mediump float;    
+
+            ${f_def}
+
+            uniform samplerCube ${FS.diff};
+            
+            uniform vec4 ${VC.vc_diff};
+            uniform vec4 ${VC.vc_emissive};
+            
+            varying vec3 v_texCoord;
+
+            void main(void){
+
+                vec4 c = textureCube(${FS.diff}, v_texCoord);
+                
+                gl_FragColor = c;
+            }
+            `
+            p = c.createProgram(vertexCode,fragmentCode,key);
+
+            return p;
+
+        }
+
+    }
 
 
     export class PhongMaterial extends Material{
@@ -218,6 +349,9 @@ module rf{
         //高光
         specular:IColor;
         specularTex:ITextureData;
+
+
+        
 
         uploadContext(camera:Camera,mesh:Mesh, now: number, interval: number){
             let scene = mesh.scene;
