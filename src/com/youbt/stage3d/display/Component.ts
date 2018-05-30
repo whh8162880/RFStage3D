@@ -105,7 +105,7 @@ module rf{
 							this.addChild(sp);
 						}else{
 							sp.setSymbol(ele as IDisplaySymbol);
-							sp.setSize(Math.round(sp.w),Math.round(sp.h));
+							sp.locksize = true;
 						}
 						sp.x = x;
 						sp.y = y;
@@ -124,6 +124,11 @@ module rf{
 		}
 
 		setSize(width:number, height:number){
+			let{w,h}=this;
+			if(w == width && h == height){
+				return;
+			}
+			
 			super.setSize(width,height);
 			let{$graphics:graphics}=this;
 			if(graphics){
@@ -156,7 +161,6 @@ module rf{
 
 			let{rect,x,y}=element;
 
-			
 			if(rect){
 				graphics.drawScale9Bitmap(x,y,vo,rect,matrix);
 			}else{
