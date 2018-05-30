@@ -1172,7 +1172,7 @@ module rf {
                     display.y = (h - display.h) >> 1
                     this.addChild(display);
                 } else {
-                    g.drawBitmap(char.sx, h - display.h, display, undefined, ele.color);
+                    g.drawBitmap(char.sx, h - display.h, display, undefined, undefined, ele.color);
                 }
             }
             g.end();
