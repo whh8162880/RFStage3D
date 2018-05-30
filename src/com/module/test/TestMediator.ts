@@ -4,7 +4,7 @@ module rf{
     export class TestMediator extends Mediator{
         constructor(){
             super("TestMediator");
-            this.setPanel(new TestPanel("test","ui.asyncpanel.testbg"));
+            this.setPanel(new TestPanel("lib","ui.asyncpanel.test"));
         }
     }
 

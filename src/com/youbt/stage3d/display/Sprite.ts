@@ -494,9 +494,7 @@ module rf {
 
 
         setSize(width:number, height:number){
-
             this.preNumVertices = this.numVertices;
-
             this.grometrys.forEach(geometry => {
                 let{x,y,matrix,w,h,vo,rect,offset}=geometry;
                 let sx = width / w,sy = height / h;
@@ -548,13 +546,17 @@ module rf {
 
             geometry.x = x;
             geometry.y = y;
+
+            let dx = 0,dy = 0;
+
+
             
 
             let{w,h,ul,ur,vt,vb}=vo;
             let{x:rx,y:ry,w:rw,h:rh}=rect;
             let rr = w - rw - rx ,rb = h - rh - ry;
             let uw = ur - ul,vh = vb - vt;
-            let x2 = x + rx,y2 = y + ry;
+            let x2 = dx + rx,y2 = dy + ry;
             let u2 = (rx / w) * uw + ul,u3 = ((rx+rw) / w) * uw + ul;
             let v2 = (ry / h) * vh + vt,v3 = ((ry+rh) / h) * vh + vt;
             
@@ -564,32 +566,35 @@ module rf {
             w = Math.round(w * sx);
             h = Math.round(h * sy);
 
-            
-            
 
             let x3 = w - rr,y3 = h - rb;
-            let r = x + w,b = y + h;
-
-
-           
+            let r = dx + w,b = dy + h;
 
             let points = [
-                x,y,ul,vt,      x2,y,u2,vt,     x2,y2,u2,v2,    x,y2,ul,v2,  
-                x2,y,u2,vt,     x3,y,u3,vt,     x3,y2,u3,v2,    x2,y2,u2,v2,
-                x3,y,u3,vt,     r,y,ur,vt,      r,y2,ur,v2,     x3,y2,u3,v2,
+                dx,dy,ul,vt,     x2,dy,u2,vt,     x2,y2,u2,v2,    dx,y2,ul,v2,  
+                x2,dy,u2,vt,     x3,dy,u3,vt,     x3,y2,u3,v2,    x2,y2,u2,v2,
+                x3,dy,u3,vt,     r,dy,ur,vt,      r,y2,ur,v2,     x3,y2,u3,v2,
 
-                x,y2,ul,v2,     x2,y2,u2,v2,    x2,y3,u2,v3,    x,y3,ul,v3,
+                dx,y2,ul,v2,    x2,y2,u2,v2,    x2,y3,u2,v3,    dx,y3,ul,v3,
                 x2,y2,u2,v2,    x3,y2,u3,v2,    x3,y3,u3,v3,    x2,y3,u2,v3,
                 x3,y2,u3,v2,    r,y2,ur,v2,     r,y3,ur,v3,     x3,y3,u3,v3,
 
 
-                x,y3,ul,v3,     x2,y3,u2,v3,    x2,b,u2,vb,     x,b,ul,vb,
+                dx,y3,ul,v3,     x2,y3,u2,v3,    x2,b,u2,vb,     dx,b,ul,vb,
                 x2,y3,u2,v3,    x3,y3,u3,v3,    x3,b,u3,vb,     x2,b,u2,vb,
                 x3,y3,u3,v3,    r,y3,ur,v3,     r,b,ur,vb,      x3,b,u3,vb
             ];
 
 
+
             let f = m2dTransform;
+
+            let o = [0,0];
+            if(undefined != matrix){
+                f(matrix,o,o);
+            }
+
+            
             let p = [0,0,0];
             for(let i=0;i<points.length;i+=4){
                 p[0] = points[i];
@@ -598,6 +603,10 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
+
+                p[0] += x - o[0];
+                p[1] += y - o[1];
+
                 this.addPoint(geometry,p,noraml,[points[i+2],points[i+3],index],rgba,locksize);
             }
 
@@ -641,7 +650,15 @@ module rf {
             let f = m2dTransform;
             let p = [0,0,0];
 
-            let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
+            // let points = [x,y,ul,vt,r,y,ur,vt,r,b,ur,vb,x,b,ul,vb];
+
+            let points = [0,0,ul,vt,w,0,ur,vt,w,h,ur,vb,0,h,ul,vb];
+
+            let o = [0,0];
+            if(undefined != matrix){
+                f(matrix,o,o);
+            }
+
             for(let i=0;i<16;i+=4){
                 p[0] = points[i];
                 p[1] = points[i+1];
@@ -649,6 +666,10 @@ module rf {
                 if(undefined != matrix){
                     f(matrix,p,p);
                 }
+
+                p[0] += x - o[0];
+                p[1] += y - o[1];
+
                 this.addPoint(geometry,p,noraml,[points[i+2],points[i+3],index],rgba,locksize);
             }
             geometry.vo = vo;
