@@ -173,13 +173,6 @@ module rf{
 			
 		}
 
-		protected set9Size():void
-		{
-			let {w, h} = this;
-
-		}
-
-
 		_selected:boolean;
 		set selected(value:boolean){this._selected = value;this.doSelected();}
 		get selected():boolean{return this._selected;}

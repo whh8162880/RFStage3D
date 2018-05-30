@@ -24,7 +24,7 @@ module rf{
         $panel:CreatePanel;
         constructor(){
             super(CreateMeidator.NAME);
-            this.setPanel(new CreatePanel());
+            this.setPanel(new CreatePanel("create","ui.asyncpanel.create"));
         }
         mediatorReadyHandle():void{
             super.mediatorReadyHandle();
@@ -37,10 +37,6 @@ module rf{
     }
 
     export class CreatePanel extends Panel{
-        constructor(){
-            super("create","ui.asyncpanel.create");
-        }
-
         btn_random:Button = null;
         btn_create:Button = null;
         dele_info:IInfoDele = null;
@@ -55,11 +51,11 @@ module rf{
 
             this.bg = new IconView(this.source);
             this.addChildAt(this.bg, 0);
-            this.bg.setUrl(ROOT_PERFIX + 'createbg.jpg');
-            this.bg.setSize(1400, 750);
+            // this.bg.setUrl(ROOT_PERFIX + 'createbg.jpg');
+            // this.bg.setSize(1400, 750);
 
             // let scroll:ScrollBar = new ScrollBar(this.scrollbar);
-            this.bar_scroll.init(this.bg, 500, 400, ScrollType.V_SCROLL);
+            // this.bar_scroll.init(this.bg, 500, 400, ScrollType.V_SCROLL);
             // this.btn_random = skin["btn_random"];
             this.btn_random.addClick(this.randomHandler, this);
 
