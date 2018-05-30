@@ -346,15 +346,13 @@ module rf {
         }
     }
 
-    export interface IGraphicsGeometry{
+    export interface IGraphicsGeometry extends Size{
         offset:number;
         numVertices:number;
         base:Float32Array;
         matrix:IMatrix;
         vo:IBitmapSourceVO;
         rect:Size;
-        w:number;
-        h:number;
     }
 
     export function newGraphicsGeometry(matrix?:IMatrix){
@@ -378,20 +376,6 @@ module rf {
         }
 
 
-        setSize(width:number, height:number){
-            let{$batchOffset:batchoffset,grometrys,target}=this;
-
-            grometrys.forEach(element => {
-                let{rect,matrix,offset} = element;
-                let{$batchGeometry} = target;
-                if($batchGeometry){
-                    $batchGeometry.update(batchoffset + offset,element.base);
-                }
-            });
-
-            
-        }
-
         clear(): void {
             this.preNumVertices = this.numVertices;
             this.numVertices = 0;
@@ -405,13 +389,8 @@ module rf {
             let change = 0;
             
 
-            
-
-            
-
 
             if(numVertices > 0){
-
                 let data32PerVertex = target.variables["data32PerVertex"].size;
                 let float = new Float32Array(numVertices * data32PerVertex);
                 let offset = 0;
@@ -512,7 +491,28 @@ module rf {
             return geometry;
         }
 
-        drawScale9Bitmap(x: number, y: number,vo:IBitmapSourceVO,rect:Size,matrix?:IMatrix,color:number = 0xFFFFFF,alpha:number = 1,z:number = 0,geometry?:IGraphicsGeometry){
+
+
+        setSize(width:number, height:number){
+
+            this.preNumVertices = this.numVertices;
+
+            this.grometrys.forEach(geometry => {
+                let{x,y,matrix,w,h,vo,rect,offset}=geometry;
+                let sx = width / w,sy = height / h;
+                matrix.m2_scale(sx,sy);
+                if(vo){
+                    if(rect){
+                        this.drawScale9Bitmap(x,y,vo,rect,matrix,geometry);
+                    }else{
+                        this.drawBitmap(x,y,vo,matrix,geometry);
+                    }
+                }
+            });
+            this.end();
+        }
+
+        drawScale9Bitmap(x: number, y: number,vo:IBitmapSourceVO,rect:Size,matrix?:IMatrix,geometry?:IGraphicsGeometry,color:number = 0xFFFFFF,alpha:number = 1,z:number = 0){
             const noraml = [0,0,1];
             const rgba = [
                 ((color & 0x00ff0000) >>> 16) / 0xFF,
@@ -525,23 +525,30 @@ module rf {
             let sx = 1, sy = 1;
             if(matrix){
 
-                let{
-                    0:m0,1:m1,2:m2,
-                    3:m3,4:m4
-                }=matrix as any;
+                let d = matrix.m2_decompose();
+                sx = d.scaleX;
+                sy = d.scaleY;
 
-                sx = Math.sqrt(m0*m0 + m1*m1);
-                sy = Math.sqrt(m3*m3 + m4*m4);
-                
-                TEMP_MATRIX2D.set(matrix);
-                matrix = TEMP_MATRIX2D;
+                d.scaleX = 1;
+                d.scaleY = 1;
 
-                matrix[0] = m0 / sx;
-                matrix[1] = m1 / sx;
+                matrix = newMatrix();
+                matrix.m2_recompose(d);
 
-                matrix[3] = m3 / sy;
-                matrix[4] = m4 / sy;
             }
+            if(!geometry){
+                geometry = newGraphicsGeometry(matrix || newMatrix());
+                this.grometrys.push(geometry);
+            }else{
+                geometry.matrix = matrix;
+                this.numVertices -= geometry.numVertices;
+                geometry.numVertices = 0;
+            }
+
+
+            geometry.x = x;
+            geometry.y = y;
+            
 
             let{w,h,ul,ur,vt,vb}=vo;
             let{x:rx,y:ry,w:rw,h:rh}=rect;
@@ -550,23 +557,21 @@ module rf {
             let x2 = x + rx,y2 = y + ry;
             let u2 = (rx / w) * uw + ul,u3 = ((rx+rw) / w) * uw + ul;
             let v2 = (ry / h) * vh + vt,v3 = ((ry+rh) / h) * vh + vt;
-            // x3 = x2 + rw,,y3 = y2 + rh;
+            
+            geometry.w = w;
+            geometry.h = h;
+
             w = Math.round(w * sx);
             h = Math.round(h * sy);
+
+            
+            
 
             let x3 = w - rr,y3 = h - rb;
             let r = x + w,b = y + h;
 
-            if(!geometry){
-                geometry = newGraphicsGeometry(matrix || newMatrix());
-                this.grometrys.push(geometry);
-            }else{
-                this.numVertices -= geometry.numVertices;
-                geometry.numVertices = 0;
-            }
 
-            geometry.w = w;
-            geometry.h = h;
+           
 
             let points = [
                 x,y,ul,vt,      x2,y,u2,vt,     x2,y2,u2,v2,    x,y2,ul,v2,  
@@ -604,7 +609,7 @@ module rf {
 
         }
 
-        drawBitmap(x: number, y: number,vo:IBitmapSourceVO,matrix?:IMatrix,color:number = 0xFFFFFF,alpha:number = 1,z:number = 0){
+        drawBitmap(x: number, y: number,vo:IBitmapSourceVO,matrix?:IMatrix,geometry?:IGraphicsGeometry,color:number = 0xFFFFFF,alpha:number = 1,z:number = 0){
             const{w,h,ul,ur,vt,vb}=vo;
             let r = x + w;
             let b = y + h;
@@ -620,8 +625,18 @@ module rf {
 
             let{variables,$vcIndex:index,locksize} = this.target;
 
-            let geometry = newGraphicsGeometry();
-            this.grometrys.push(geometry);
+
+            if(!geometry){
+                geometry = newGraphicsGeometry(matrix || newMatrix());
+                this.grometrys.push(geometry);
+            }else{
+                this.numVertices -= geometry.numVertices;
+                geometry.numVertices = 0;
+            }
+
+            geometry.w = w;
+            geometry.h = h;
+
 
             let f = m2dTransform;
             let p = [0,0,0];

@@ -505,16 +505,41 @@ Object.defineProperties(Float32Array.prototype, {
     }
 })
 
+interface IMatrixComposeData{
+    x:number;
+    y:number;
+    scaleX:number;
+    scaleY:number;
+    rotaiton:number;
+}
 
 interface IMatrix extends IArrayBase {
     m2_identity();
     m2_append(m2: ArrayLike<number> | IArrayBase, prepend?: boolean, from?: ArrayLike<number>):IMatrix;
+    m2_scale(scalex:number,scaley:number);
+    m2_decompose(result?:IMatrixComposeData):IMatrixComposeData;
+    m2_recompose(value:IMatrixComposeData):IMatrix;
+    m2_clone():IMatrix;
 }
 
 Object.defineProperties(Float32Array.prototype, {
     m2_identitye: {
         value: function () {
             this.set(rf_m2_identity);
+        }
+    },
+
+
+    m2_clone: {
+        value: function () {
+            return new Float32Array(this);
+        }
+    },
+
+    m2_scale: {
+        value: function (scalex:number,scaley:number) {
+            this[0] *= scalex;
+            this[4] *= scaley;
         }
     },
 
@@ -555,6 +580,57 @@ Object.defineProperties(Float32Array.prototype, {
             return this;
         }
     },
+
+
+    m2_decompose: {
+        value: function (result?:IMatrixComposeData) {
+
+            let{
+                0:m0,1:m1,2:m2,
+                3:m3,4:m4,5:m5,
+                6:m6,7:m7
+            }= this as any;
+
+            let sx = Math.sqrt(m0*m0 + m1*m1) , sy = Math.sqrt(m3*m3 + m4*m4);
+
+            let x = m6,y = m7;
+
+            let rotaiton = Math.acos(m0/sx) * rf.RADIANS_TO_DEGREES;
+
+            if(!result){
+                result = {x:x,y:y,scaleX:sx,scaleY:sy,rotaiton:rotaiton} as IMatrixComposeData;
+            }else{
+                result.x = x;
+                result.y = y;
+                result.scaleX = sx;
+                result.scaleY = sy;
+                result.rotaiton = rotaiton;
+            }
+
+            return result;
+        }
+    },
+
+    m2_recompose: {
+        value: function (value:IMatrixComposeData){
+            let x = value.x === undefined ? 0 : value.x;
+            let y = value.y === undefined ? 0 : value.y;
+            let sx = value.scaleX === undefined ? 1 :  value.scaleX;
+            let sy = value.scaleY === undefined ? 1 :  value.scaleY;
+            let rotaiton = value.rotaiton  === undefined ? 0 : value.rotaiton;
+
+            rotaiton *= rf.DEGREES_TO_RADIANS;
+
+            let cos = Math.cos(rotaiton),sin = Math.sin(rotaiton);
+
+            this[0] = sx * cos;
+            this[1] = -sin;
+            this[3] = sin;
+            this[4] = cos * sy;
+            this[6] = x;
+            this[7] = y;
+        }
+    }
 });
 
 
@@ -780,6 +856,11 @@ module rf {
             w = 0;
         }
         return new Float32Array([Number(x), y, z, w]);
+    }
+
+
+    export function matrix2d_clearScale(matrix:IMatrix){
+    
     }
 
     // export const matrix3d_identity = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
