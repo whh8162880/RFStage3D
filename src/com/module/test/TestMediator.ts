@@ -8,8 +8,8 @@ module rf{
         }
     }
 
-    export class TestPanel extends Panel{
-
+    export class TestPanel extends Panel implements IModule_test{
+       
     }
 
 }
