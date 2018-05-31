@@ -5,7 +5,7 @@ module rf{
 		rect:any;
 		x:number;
 		y:number;
-		matrix2d:IMatrix;
+        matrix2d:IMatrix;
 		libraryItemName:string;
 	}
 

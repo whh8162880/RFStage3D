@@ -115,7 +115,7 @@ module rf{
 						this[name] = sp;
 					}
 				}else{
-					this.renderFrameElement(ele,symbol.matrix2d);
+					this.renderFrameElement(ele);
 				}
 			}
 			
@@ -148,23 +148,24 @@ module rf{
 		
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
-		renderFrameElement(element:IDisplayFrameElement,matrix?:IMatrix,clean?:Boolean):void{
+		renderFrameElement(element:IDisplayFrameElement,clean?:Boolean):void{
 			let vo:IBitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 0);
 			if(vo == undefined)
 			{
 				return;
 			}
-			const {graphics}  = this;
+			const {graphics,symbol}  = this;
 			if(clean){
 				graphics.clear();
 			}
 
-			let{rect,x,y}=element;
+			let{rect,x,y,matrix2d}=element;
+			
 
 			if(rect){
-				graphics.drawScale9Bitmap(x,y,vo,rect,matrix);
+				graphics.drawScale9Bitmap(x,y,vo,rect,symbol.matrix2d);
 			}else{
-				graphics.drawBitmap(x,y,vo,matrix);
+				graphics.drawBitmap(x,y,vo,matrix2d);
 			}
 
 			if(clean){
