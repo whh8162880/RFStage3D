@@ -253,7 +253,15 @@ module rf{
 
         constructor(buf?:ArrayBuffer){
             super(buf);
-        }
+		}
+		
+		clear(){
+			let{stringsTable,objectsTable,traitsTable}=this;
+			stringsTable.length = 0;
+			objectsTable.length = 0;
+			traitsTable.length = 0;
+			this.clsNameMap = {};
+		}
 
         private read29(unsign:boolean):number{
 			var v = 0,a = 0;
@@ -841,6 +849,7 @@ module rf{
 		if(byte instanceof Uint8Array){
 			byte = byte.buffer;
 		}
+		amf.clear();
 		amf.setArrayBuffer(byte);
 		let o = amf.readObject();
 		return o;
