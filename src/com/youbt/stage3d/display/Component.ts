@@ -67,7 +67,6 @@ module rf{
 				if(matrix2d instanceof ArrayBuffer){
 					ele.matrix2d = matrix2d = new Float32Array(matrix2d);
 				}
-				console.log(ele.libraryItemName);
 				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的

@@ -260,7 +260,7 @@ module rf {
                 this.bringTop();
                 return;
             }
-
+            console.log(source.name);
             if (!container) {
                 container = popContainer;
             }
