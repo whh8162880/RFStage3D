@@ -130,12 +130,28 @@ module rf {
     }
 
     export class Sphere{
+        
+        copyFrom(sphere:Sphere){
+            this.center.set(sphere.center);
+            this.radius = sphere.radius;
+        }
+
         radius:number = 0;
         center:IVector3D = newVector3D();
+
+
+        applyMatrix4( matrix:IMatrix3D, result?:Sphere):Sphere{
+            result = result || new Sphere();
+
+            result.copyFrom(this);
+            matrix.m3_transformVector(result.center, result.center);
+            result.radius = this.radius * matrix.m3_getMaxScaleOnAxis(); 
+            return result;
+        }
     }
 
-    export class OBB implements IBounding{
-        
+    export class OBB implements IBounding, IBox{
+
         constructor(bounding?:ArrayLike<number> | ArrayBuffer |number, maxx?:number, miny?:number, maxy?:number, minz?:number, maxz?:number)
         {
             if(bounding != undefined){
@@ -183,7 +199,6 @@ module rf {
         minz:number;
         maxz:number;
 
-        
         updateTriangle():void{
             if(!this.vertex){
                 this.vertex = new Float32Array(24);
@@ -200,18 +215,24 @@ module rf {
             this.vertex[21] = this.minx; this.vertex[22] = this.miny; this.vertex[23] = this.maxz;//7
         }
 
-        static createOBBByMesh(mesh:GeometryBase):OBB{
+        static createOBBByGeometry(mesh:GeometryBase):OBB{
             let obb = new OBB();
-            obb.maxx = obb.minx = mesh.vertex[0];
-            obb.maxy = obb.miny = mesh.vertex[1];
-            obb.maxz = obb.minz = mesh.vertex[2];
 
-            for(let i:number = 1, len:number = mesh.numVertices; i < len; ++i ){
-                let startIx = i*mesh.data32PerVertex;
-                let x = mesh.vertex[startIx];
-                let y = mesh.vertex[startIx+1];
-                let z = mesh.vertex[startIx+2];
+            const{numVertices,vertex,data32PerVertex,variables}=mesh.vertex.data;
+            // const{numVertices,vertex,data32PerVertex,variables} = mesh.data;
+            
+            let pos = variables['pos'];
+            
+            obb.maxx = obb.minx = vertex[pos.offset];
+            obb.maxy = obb.miny = vertex[pos.offset+1];
+            obb.maxz = obb.minz = vertex[pos.offset+2];
 
+            for(let i = 1;i<numVertices;i++){
+                let p = i * data32PerVertex + pos.offset;
+                let x = vertex[p];
+                let y = vertex[p+1];
+                let z = vertex[p+2];
+                
                 if(x < obb.minx)obb.minx = x;
                 else if(x > obb.maxx)obb.maxx = x;
 
@@ -220,7 +241,6 @@ module rf {
 
                 if(z < obb.minz)obb.minz = z;
                 else if(z > obb.maxz)obb.maxz = z;
-
             }
             return obb;
         }
@@ -334,6 +354,7 @@ module rf {
 
         data32PerVertex:number = 0;
         numVertices:number = 0;
+        centerPoint:IVector3D;
         numTriangles:number = 0;
 
 
@@ -420,6 +441,52 @@ module rf {
             }
 
             return triangles;
+        }
+
+        calculateBoundingSphere(center:IVector3D):Sphere{
+            let sphere:Sphere = new Sphere();
+
+            const{numVertices,vertex,data32PerVertex,variables}=this.vertex.data;
+            let minR = 0;
+            let pos = variables['pos'];
+            for(let i=0;i<numVertices;i++){
+                let p = i * data32PerVertex + pos.offset;
+                let x = vertex[p];
+                let y = vertex[p+1];
+                let z = vertex[p+2];
+
+                x -= center.x;
+                x *= x;
+
+                y -= center.y;
+                y *= y;
+
+                z -= center.z;
+                z *= z;
+                let dis = Math.sqrt( x + y + z);
+                if(dis > minR){
+                    minR = dis;
+                }
+            }
+            sphere.center.set(center);
+            sphere.radius = minR;
+            return sphere;
+        }
+
+        calculateCenterPoint():void{
+            this.centerPoint = newVector3D();
+
+            const{numVertices,vertex,data32PerVertex,variables}=this.vertex.data;
+            let minR = 0;
+            let pos = variables['pos'];
+            for(let i=0;i<numVertices;i++){
+                let p = i * data32PerVertex + pos.offset;
+                let x = vertex[p];
+                let y = vertex[p+1];
+                let z = vertex[p+2];
+
+            }
+
         }
 
 

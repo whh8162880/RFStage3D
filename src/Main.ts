@@ -9,6 +9,16 @@ module rf{
             super();
         }
 
+        rayCaster:Raycaster;
+        
+        public update(now: number, interval: number): void {
+            super.update(now, interval);
+            
+            this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
+
+            let intersects = this.rayCaster.intersectObjects(scene.childrens);
+            console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
+        }
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -113,23 +123,41 @@ module rf{
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            // scene.addChild(mesh);
+            scene.addChild(mesh);
 
 
             
-            // let box = new SkyBoxGeometry(variables).create();
-            // mesh = new Mesh(variables);
-            // mesh.geometry = box;
-            // let msky = new SkyBoxMaterial();
-            // msky.setData(undefined);
-            // msky.cull = WebGLConst.NONE;
-            // msky.diff = newColor(0xAA0000);
-            // msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
-            // mesh.material = msky;
-            // scene.addChild(mesh);
+            let box = new SkyBoxGeometry(variables).create();
+            mesh = new Mesh(variables);
+            mesh.geometry = box;
+            let msky = new SkyBoxMaterial();
+            msky.setData(undefined);
+            msky.cull = WebGLConst.NONE;
+            msky.diff = newColor(0xAA0000);
+            msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
+            mesh.material = msky;
+            scene.addChild(mesh);
 
 
+            for(let i = 0 ; i < 100; ++i){
+                let cube = new BoxGeometry(variables).create(100,100,100);
+                m = new PhongMaterial();
+                m.setData(undefined);
+                m.cull = WebGLConst.BACK;
+                m.diff = newColor(0xAAAAAA);
 
+                mesh = new Mesh(variables);
+                mesh.geometry = cube;
+                mesh.material = m;
+
+                mesh.x = Math.random() * 2000 - 1000;
+                mesh.y = Math.random() * 2000 - 1000;
+                mesh.z = Math.random() * 2000 - 1000;
+
+                scene.addChild(mesh);
+            }
+
+            this.rayCaster = new Raycaster(5000);
 
 
 

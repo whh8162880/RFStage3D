@@ -9,6 +9,11 @@ module rf{
             this.direction = newVector3D(direction);
         }
 
+        copyFrom(ray:Ray):Ray{
+            this.origin.set(ray.origin);
+            this.direction.set(ray.direction);
+            return this;
+        }
 
         at(t:number, target?:IVector3D){
             if(target == undefined){
@@ -20,6 +25,100 @@ module rf{
             return target;
         }
 
+        applyMatrix4(matrix:IMatrix3D):Ray{
+            matrix.m3_transformVector(this.origin);
+            matrix.m3_transformRotation(this.direction);
+            return this;
+        }
+
+        intersectsSphere(sphere:Sphere):boolean{
+            return this.distanceSqToPoint( sphere.center ) <= sphere.radius;
+        }
+
+        distanceSqToPoint( point:IVector3D ):number{
+            let v1 = rf.TEMP_VECTOR3D;
+            v1.set(point);
+            v1.v3_sub(this.origin);
+            
+			let directionDistance = v1.v3_dotProduct( this.direction );
+
+			if ( directionDistance < 0 ) {
+                v1.set(this.origin);
+                v1.v3_sub(point);
+				return v1.v3_length;
+			}
+            v1.set(this.direction);
+            v1.v3_scale(directionDistance);
+            v1.v3_add(this.origin);
+			v1.v3_sub(point);
+            return v1.v3_length;
+
+		}
+
+        intersectBox( box: IBox, target?:IVector3D):IVector3D {
+
+            let tmin, tmax, tymin, tymax, tzmin, tzmax;
+    
+            let invdirx = 1 / this.direction.x,
+                invdiry = 1 / this.direction.y,
+                invdirz = 1 / this.direction.z;
+    
+            var origin = this.origin;
+    
+            if ( invdirx >= 0 ) {
+    
+                tmin = ( box.minx - origin.x ) * invdirx;
+                tmax = ( box.maxx - origin.x ) * invdirx;
+    
+            } else {
+    
+                tmin = ( box.maxx - origin.x ) * invdirx;
+                tmax = ( box.minx - origin.x ) * invdirx;
+    
+            }
+    
+            if ( invdiry >= 0 ) {
+    
+                tymin = ( box.miny - origin.y ) * invdiry;
+                tymax = ( box.maxy - origin.y ) * invdiry;
+    
+            } else {
+    
+                tymin = ( box.maxy - origin.y ) * invdiry;
+                tymax = ( box.miny - origin.y ) * invdiry;
+    
+            }
+    
+            if ( ( tmin > tymax ) || ( tymin > tmax ) ) return null;
+    
+            if ( tymin > tmin || tmin !== tmin ) tmin = tymin;
+    
+            if ( tymax < tmax || tmax !== tmax ) tmax = tymax;
+    
+            if ( invdirz >= 0 ) {
+    
+                tzmin = ( box.minz - origin.z ) * invdirz;
+                tzmax = ( box.maxz - origin.z ) * invdirz;
+    
+            } else {
+    
+                tzmin = ( box.maxz - origin.z ) * invdirz;
+                tzmax = ( box.minz - origin.z ) * invdirz;
+    
+            }
+    
+            if ( ( tmin > tzmax ) || ( tzmin > tmax ) ) return null;
+    
+            if ( tzmin > tmin || tmin !== tmin ) tmin = tzmin;
+    
+            if ( tzmax < tmax || tmax !== tmax ) tmax = tzmax;
+    
+            if ( tmax < 0 ) return null;
+    
+            return this.at( tmin >= 0 ? tmin : tmax, target );
+    
+        }
+
 
 
         static diff:IVector3D = newVector3D();
@@ -27,7 +126,7 @@ module rf{
         static edge2:IVector3D = newVector3D();
         static normal:IVector3D = newVector3D();
 		
-        intersectTriangle( a:IVector3D, b:IVector3D, c:IVector3D, backfaceCulling:boolean, target:IVector3D ) {
+        intersectTriangle( a:IVector3D, b:IVector3D, c:IVector3D, backfaceCulling:boolean, target:IVector3D ):IVector3D{
 
             // from http://www.geometrictools.com/GTEngine/Include/Mathematics/GteIntrRay3Triangle3.h
             let{diff, edge1, edge2, normal} = Ray;
@@ -94,5 +193,15 @@ module rf{
 
 
     }
-    
+
+
+    export interface IBox{
+        minx:number;
+        maxx:number;
+        miny:number;
+        maxy:number;
+        minz:number;
+        maxz:number;
+    }
+        
 }
