@@ -124,6 +124,107 @@ module rf {
         }
     }
 
+    export interface IBounding{
+        vertex:Float32Array;
+        index:Uint16Array;
+    }
+
+    export class Sphere{
+        radius:number = 0;
+        center:IVector3D = newVector3D();
+    }
+
+    export class OBB implements IBounding{
+        
+        constructor(bounding?:ArrayLike<number> | ArrayBuffer |number, maxx?:number, miny?:number, maxy?:number, minz?:number, maxz?:number)
+        {
+            if(bounding != undefined){
+                if (bounding instanceof ArrayBuffer)
+                {
+                    this.minx = bounding[0]; this.maxx = bounding[1];
+                    this.miny = bounding[2]; this.maxy = bounding[3];
+                    this.minz = bounding[4]; this.maxz = bounding[5];
+                }else{
+                    this.minx = Number(bounding); this.maxx = maxx;
+                    this.miny = miny; this.maxy = maxy;
+                    this.minz = minz; this.maxz = maxz;
+                }
+                this.updateTriangle();
+            }
+        }
+
+       /*
+            7——————————4
+           /|         /|
+          6-|————————5 |
+          | 0--------|-3
+          |/         |/
+          1——————————2
+        */
+        vertex:Float32Array;
+        index:Uint16Array;
+        ////索引
+        // 0,1,2,3;   1,6,5,2;  2,5,4,3;    3,4,7,0;    4,5,6,7;    0,7,6,1;
+        static index:Uint16Array = new Uint16Array([
+            0,1,2,0,2,3,
+            1,6,5,1,5,2,
+            2,5,4,2,4,3,
+            3,4,7,3,7,0,
+            4,5,6,4,6,7,
+            0,7,6,0,6,1
+        ]);
+        
+        minx:number;
+        maxx:number;
+
+        miny:number;
+        maxy:number;
+
+        minz:number;
+        maxz:number;
+
+        
+        updateTriangle():void{
+            if(!this.vertex){
+                this.vertex = new Float32Array(24);
+                this.index = OBB.index;
+            }
+            this.vertex[0] = this.minx; this.vertex[1] = this.miny; this.vertex[2] = this.minz;//0
+            this.vertex[3] = this.minx; this.vertex[4] = this.maxy; this.vertex[5] = this.minz;//1
+            this.vertex[6] = this.maxx; this.vertex[7] = this.maxy; this.vertex[8] = this.minz;//2
+            this.vertex[9] = this.maxx; this.vertex[10] = this.miny; this.vertex[11] = this.minz;//3
+
+            this.vertex[12] = this.maxx; this.vertex[13] = this.miny; this.vertex[14] = this.maxz;//4
+            this.vertex[15] = this.maxx; this.vertex[16] = this.maxy; this.vertex[17] = this.maxz;//5
+            this.vertex[18] = this.minx; this.vertex[19] = this.maxy; this.vertex[20] = this.maxz;//6
+            this.vertex[21] = this.minx; this.vertex[22] = this.miny; this.vertex[23] = this.maxz;//7
+        }
+
+        static createOBBByMesh(mesh:GeometryBase):OBB{
+            let obb = new OBB();
+            obb.maxx = obb.minx = mesh.vertex[0];
+            obb.maxy = obb.miny = mesh.vertex[1];
+            obb.maxz = obb.minz = mesh.vertex[2];
+
+            for(let i:number = 1, len:number = mesh.numVertices; i < len; ++i ){
+                let startIx = i*mesh.data32PerVertex;
+                let x = mesh.vertex[startIx];
+                let y = mesh.vertex[startIx+1];
+                let z = mesh.vertex[startIx+2];
+
+                if(x < obb.minx)obb.minx = x;
+                else if(x > obb.maxx)obb.maxx = x;
+
+                if(y < obb.miny)obb.miny = y;
+                else if(y > obb.maxy)obb.maxy = y;
+
+                if(z < obb.minz)obb.minz = z;
+                else if(z > obb.maxz)obb.maxz = z;
+
+            }
+            return obb;
+        }
+    }
 
     export interface IGeometry {
         vertex: VertexBuffer3D;

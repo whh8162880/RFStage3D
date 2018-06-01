@@ -435,6 +435,7 @@ interface IVector3D extends IArrayBase {
     v3_normalize(from?: ArrayLike<number>);
     v3_dotProduct(t: ArrayLike<number>);
     v3_crossProduct(t: ArrayLike<number>, out?: IVector3D | number[]);
+    unproject(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D);
 }
 
 Object.defineProperties(Float32Array.prototype, {
@@ -502,7 +503,15 @@ Object.defineProperties(Float32Array.prototype, {
 
             return out;
         }
+    },
+    upproject:{
+        value:function(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D){
+
+            matrix.multiplyMatrices( camera.matrixWorld, matrix.getInverse( camera.projectionMatrix ) );
+			return this.applyMatrix4( matrix );
+        }
     }
+
 })
 
 

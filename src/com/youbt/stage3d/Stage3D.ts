@@ -11,6 +11,10 @@ module rf {
         shadowMatrix:IMatrix3D;
         geometry: GeometryBase;
         invSceneTransform: IMatrix3D;
+
+        minBoundingBox;
+        boundingSphere;
+        
         addChild(child: DisplayObject) {
             super.addChild(child);
             if (child instanceof SceneObject) {
