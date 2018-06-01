@@ -117,19 +117,16 @@ module rf{
 
 
             
-            let box = new SkyBoxGeometry(variables).create();
-            
-            mesh = new Mesh(variables);
-            mesh.geometry = box;
-            
-            let msky = new SkyBoxMaterial();
-            msky.setData(undefined);
-            msky.cull = WebGLConst.NONE;
-            msky.diff = newColor(0xAA0000);
-            msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
-
-            mesh.material = msky;
-            scene.addChild(mesh);
+            // let box = new SkyBoxGeometry(variables).create();
+            // mesh = new Mesh(variables);
+            // mesh.geometry = box;
+            // let msky = new SkyBoxMaterial();
+            // msky.setData(undefined);
+            // msky.cull = WebGLConst.NONE;
+            // msky.diff = newColor(0xAA0000);
+            // msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
+            // mesh.material = msky;
+            // scene.addChild(mesh);
 
 
 
@@ -221,7 +218,7 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
 
-            let profile = singleton(GUIProfile);
+            // let profile = singleton(GUIProfile);
             // ROOT.addChild(profile);
 
 
@@ -297,9 +294,7 @@ module rf{
             }
 
 
-            
-
-            facade.toggleMediator(TestMediator,1);
+            // facade.toggleMediator(TestMediator,1);
             
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";

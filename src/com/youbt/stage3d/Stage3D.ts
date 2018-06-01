@@ -310,7 +310,7 @@ module rf {
             // c.setCulling(cull);
             // c.setProgram(program);
             
-            let worldTranform = TEMP_MATRIX;
+            let worldTranform = TEMP_MATRIX3D;
             for(let vo = link.getFrist();vo;vo = vo.next){
                 if(vo.close == false){
                     let obj = vo.data as SceneObject;

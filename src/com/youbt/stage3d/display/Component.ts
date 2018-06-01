@@ -17,11 +17,9 @@ module rf{
 		
         currentClip:number;
 
-        symbol:IDisplaySymbol;
+		symbol:IDisplaySymbol;
 		
 		sceneMatrix:IMatrix;
-
-		protected scalerect:Rect;
 
 		setSymbol(symbol:IDisplaySymbol,matrix?:IMatrix):void{
 			this.symbol = symbol;
@@ -31,8 +29,8 @@ module rf{
 				graphics.end();
 				return;
 			}
-			// this.x = symbol.x;
-			// this.y = symbol.y;
+			this.x = symbol.x;
+			this.y = symbol.y;
 			this.gotoAndStop(symbol.displayClip, true);
 			this.updateHitArea();
 			this.bindComponents();
@@ -65,6 +63,11 @@ module rf{
 			for(let ele of elements)
 			{
 				let{type,x,y,rect,name,matrix2d}=ele;
+
+				if(matrix2d instanceof ArrayBuffer){
+					ele.matrix2d = matrix2d = new Float32Array(matrix2d);
+				}
+
 				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的
@@ -102,15 +105,11 @@ module rf{
 							this.addChild(sp);
 						}else{
 							sp.setSymbol(ele as IDisplaySymbol);
+							sp.locksize = true;
 						}
 						sp.x = x;
 						sp.y = y;
-						//缺少一个九宫
-						if(rect != undefined)
-						{
-							this.scalerect = new Rect(rect.x, rect.y, rect.right, rect.bottom);
-						}
-						sp.setSize(Math.round(sp.w * matrix2d[0]),Math.round(sp.h * matrix2d[4]));
+						
 						this.addChild(sp);
 						sp.name = name;
 						this[name] = sp;
@@ -122,6 +121,19 @@ module rf{
 			
 			graphics.end();
 			
+		}
+
+		setSize(width:number, height:number){
+			let{w,h}=this;
+			if(w == width && h == height){
+				return;
+			}
+			
+			super.setSize(width,height);
+			let{$graphics:graphics}=this;
+			if(graphics){
+				graphics.setSize(width,height);
+			}
 		}
 		
 		addToStage():void{
@@ -136,30 +148,26 @@ module rf{
 		
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
-		renderFrameElement(element:IDisplayFrameElement,clean:Boolean = false):void{
+		renderFrameElement(element:IDisplayFrameElement,clean?:Boolean):void{
 			let vo:IBitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 0);
 			if(vo == undefined)
 			{
 				return;
 			}
-			const {graphics}  = this;
+			const {graphics,symbol}  = this;
 			if(clean){
 				graphics.clear();
 			}
+
+			let{rect,x,y,matrix2d}=element;
 			
-			// if(element.rect){
-				// scaleGeomrtry = _graphics.scale9(vo,element.rect,scaleGeomrtry);
-				// if(_width == 0){
-				// 	_width = vo.w;
-				// }
-				// if(_height == 0){
-				// 	_height = vo.h;
-				// }
-				// scaleGeomrtry.set9Size(_width,_height);
-			// }else{
-				graphics.drawBitmap(0,0,vo);//,element.matrix2d
-			// }
-			
+
+			if(rect){
+				graphics.drawScale9Bitmap(x,y,vo,rect,symbol.matrix2d);
+			}else{
+				graphics.drawBitmap(x,y,vo,matrix2d);
+			}
+
 			if(clean){
 				graphics.end();
 			}
@@ -167,10 +175,7 @@ module rf{
 
 		protected doResize():void
 		{
-			if(this.scalerect != undefined)
-			{
-
-			}
+			
 		}
 
 		protected set9Size():void

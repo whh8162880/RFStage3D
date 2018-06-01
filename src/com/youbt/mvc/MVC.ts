@@ -32,7 +32,7 @@ module rf {
                 return mediator;
             }
 
-            this.togglepanel(mediator.panel)
+            this.togglepanel(mediator.panel,type)
 
             return mediator;
         }

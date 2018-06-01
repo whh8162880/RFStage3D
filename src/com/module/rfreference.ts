@@ -1,1 +1,0 @@
-/// <reference path="./test/TestMediator.ts" />
