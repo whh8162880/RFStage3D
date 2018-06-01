@@ -207,8 +207,6 @@ module rf {
         }
     }
 
-    
-
     export const enum PanelEvent {
         SHOW = "PanelEvent_SHOW",
         HIDE = "PanelEvent_HIDE",
@@ -260,7 +258,7 @@ module rf {
                 this.bringTop();
                 return;
             }
-            console.log(source.name);
+
             if (!container) {
                 container = popContainer;
             }
@@ -372,30 +370,33 @@ module rf {
         }
     }
 
-    export class TEventInteresterDele extends Component {
+    export class TEventInteresterDele extends MiniDispatcher {
         protected _eventInterests: { [key: string]: EventHandler };
-        constructor(source?: BitmapSource) {
-            super(source);
+        protected _skin:Component;
+
+        constructor(skin : Component) {
+            super();
 
             this._eventInterests = {};
 
-            //这个地方加添加和移除监听
-            //添加到时候将所有事件注册 移除时将所有事件移除
-            this.setBindView(true);
+            this._skin = skin;
+            this.setBindView();
+
+            this.bindComponents();
         }
 
         protected bindEventInterests(): void {
 
         }
 
-        setBindView(isBind: boolean): void {
-            if (isBind) {
-                this.addEventListener(EventT.ADD_TO_STAGE, this.awakenAndSleepHandle, this);
-                this.addEventListener(EventT.REMOVE_FROM_STAGE, this.awakenAndSleepHandle, this);
-            } else {
-                this.removeEventListener(EventT.ADD_TO_STAGE, this.awakenAndSleepHandle);
-                this.removeEventListener(EventT.REMOVE_FROM_STAGE, this.awakenAndSleepHandle);
-            }
+        bindComponents():void{
+            
+        }
+
+        setBindView(): void {
+            let {_skin} = this;
+            _skin.addEventListener(EventT.ADD_TO_STAGE, this.awakenAndSleepHandle, this);
+            _skin.addEventListener(EventT.REMOVE_FROM_STAGE, this.awakenAndSleepHandle, this);
         }
 
         awakenAndSleepHandle(e: EventX): void {
@@ -410,6 +411,16 @@ module rf {
                     this.sleep();
                     break;
             }
+        }
+
+        awaken():void
+        {
+
+        }
+
+        sleep():void
+        {
+
         }
     }
 }

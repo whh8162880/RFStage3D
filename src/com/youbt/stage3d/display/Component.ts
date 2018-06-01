@@ -67,6 +67,12 @@ module rf{
 				if(matrix2d instanceof ArrayBuffer){
 					ele.matrix2d = matrix2d = new Float32Array(matrix2d);
 				}
+
+				if(type == 9)
+				{
+					console.log("xxx");
+				}
+
 				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的
@@ -693,6 +699,7 @@ module rf{
 		4 : RadioButton,
 		5 : TabItem,
 		6 : ScrollBar,
-		7 : Component
+		7 : Component,
+		9 : Component
 	}
 }
