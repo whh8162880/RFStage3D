@@ -294,11 +294,18 @@ module rf{
             }
 
 
+            // facade.toggleMediator(TestMediator,1);
             
 
+<<<<<<< .mine
             // facade.toggleMediator(TestMediator,1);
             // facade.toggleMediator(CreateMediator,1);
 
+=======
+
+
+
+>>>>>>> .theirs
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
             // particle_Perfix = "assets/particle/";

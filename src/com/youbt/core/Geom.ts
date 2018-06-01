@@ -163,6 +163,18 @@ module rf {
     export let TEMP_VECTOR3D: IVector3D = newVector3D();
     export let TEMP_DECOMPOSE: IVector3D[] = [newVector3D(), newVector3D(), newVector3D()];
 
+
+
+    export interface IFunction{
+        func:Function;
+        thisobj:any;
+    }
+
+    export function newCallBackFunction(func:Function,thisobj:any){
+        return {func:func,thisobj:thisobj} as IFunction;
+    }
+
+
     /**
     * 经纬度 定位信息
     * 
