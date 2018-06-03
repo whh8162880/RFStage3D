@@ -113,7 +113,7 @@ module rf{
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            // scene.addChild(mesh);
+            scene.addChild(mesh);
 
 
             
