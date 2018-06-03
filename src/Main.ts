@@ -13,15 +13,15 @@ module rf{
         
         public update(now: number, interval: number): void {
             super.update(now, interval);
-            let mx = nativeMouseX/stageWidth;
-            mx = mx*2 - 1;
+            // let mx = nativeMouseX/stageWidth;
+            // mx = mx*2 - 1;
 
-            let my = nativeMouseY/stageHeight;
-            my = -2*my + 1;
-            this.rayCaster.setFromCamera(mx, my, scene.camera);
+            // let my = nativeMouseY/stageHeight;
+            // my = -2*my + 1;
+            // this.rayCaster.setFromCamera(mx, my, scene.camera);
 
-            let intersects = this.rayCaster.intersectObjects(scene.childrens);
-            console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
+            // let intersects = this.rayCaster.intersectObjects(scene.childrens);
+            // console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
         }
 
         public init(canvas?:HTMLCanvasElement):void{
@@ -162,7 +162,7 @@ module rf{
                 scene.addChild(mesh);
             }
 
-            this.rayCaster = new Raycaster(5000);
+            // this.rayCaster = new Raycaster(5000);
 
 
 
