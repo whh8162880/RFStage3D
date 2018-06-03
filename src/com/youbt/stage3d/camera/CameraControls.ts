@@ -66,6 +66,7 @@ module rf{
             ROOT.on(MouseEventX.MouseMove,this.mouseMoveHandler,this);
             ROOT.on(MouseEventX.MouseUp,this.mouseUpHandler,this);
             this.distance = this.object.pos.v3_sub(this.target).v3_length;
+            console.log(this.object.pos, this.object.rot )
         }
 
         mouseUpHandler(e:EventX){
@@ -84,21 +85,31 @@ module rf{
             let speed = (distance > 1000) ? mouseSitivity : mouseSitivity * distance / 1000;
             speed = Math.max(speed,0.1);
 
-            let rx = oy*speed + object.rotationX;
-            let ry = -ox*speed + object.rotationY;
+            let rx = 0;
+            let ry = 0;
             
             if(target){
                 var transform:IMatrix3D = TEMP_MATRIX3D;
-				transform.m3_identity();
-				transform.m3_translation(0, 0, -distance);
-				transform.m3_rotation(rx * DEGREES_TO_RADIANS,X_AXIS);
-				transform.m3_rotation(ry * DEGREES_TO_RADIANS, Y_AXIS);
+                transform.m3_identity();
+                transform.m3_translation(0, 0, -distance);
+
+                rx = object.rotationX - oy*speed;
+                ry = object.rotationY + ox*speed;
+                
+				transform.m3_rotation(-rx * DEGREES_TO_RADIANS,X_AXIS);
+                transform.m3_rotation(-ry * DEGREES_TO_RADIANS, Y_AXIS);
+                transform.m3_rotation(-object._rotationZ, Z_AXIS);
+
 				transform.m3_translation(target.x, target.y, target.z);
                 object.setPos(transform[12],transform[13],transform[14]);
+            }else{
+                rx = object.rotationX + oy*speed;
+                ry = object.rotationY - ox*speed;
             }
+
             object.rotationX = rx;
             object.rotationY = ry;
-            
+            console.log(this.object.pos, this.object.rot )
             this.updateSun();
         }
 

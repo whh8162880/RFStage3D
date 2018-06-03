@@ -41,8 +41,10 @@ module rf{
             scene.camera = camera;
             let f = camera.originFar;
             f = Math.sqrt(f*f / 3);
-            camera.setPos(f,f,f);
+            // camera.setPos(f,f,f);
+            camera.setPos(200,500,1000);
             camera.lookat(newVector3D(0,0,0));
+
             new TrackballControls(camera);
 
 
@@ -75,14 +77,9 @@ module rf{
            
 
             let w = 500;
-/*
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
-
-            sp = tr;
-*/
-            
 
             // line.rotationX = 45;
             // let line = new Line3D();
