@@ -66,7 +66,6 @@ module rf{
             ROOT.on(MouseEventX.MouseMove,this.mouseMoveHandler,this);
             ROOT.on(MouseEventX.MouseUp,this.mouseUpHandler,this);
             this.distance = this.object.pos.v3_sub(this.target).v3_length;
-            console.log(this.object.pos, this.object.rot )
         }
 
         mouseUpHandler(e:EventX){
@@ -93,7 +92,7 @@ module rf{
                 transform.m3_identity();
                 transform.m3_translation(0, 0, -distance);
 
-                rx = object.rotationX - oy*speed;
+                rx = object.rotationX + oy*speed;
                 ry = object.rotationY + ox*speed;
                 
 				transform.m3_rotation(-rx * DEGREES_TO_RADIANS,X_AXIS);
@@ -109,7 +108,6 @@ module rf{
 
             object.rotationX = rx;
             object.rotationY = ry;
-            console.log(this.object.pos, this.object.rot )
             this.updateSun();
         }
 

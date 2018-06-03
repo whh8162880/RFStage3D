@@ -43,7 +43,7 @@ module rf{
             f = Math.sqrt(f*f / 3);
             // camera.setPos(f,f,f);
             camera.setPos(200,500,1000);
-            camera.lookat(newVector3D(0,0,0));
+            // camera.lookat(newVector3D(0,0,0));
 
             new TrackballControls(camera);
 
