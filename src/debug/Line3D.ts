@@ -170,7 +170,7 @@ module rf{
             c.setProgram(p);
 
             m.set(this.sceneTransform);
-            m.m3_append(camera.sceneTransform);
+            m.m3_append(camera.invSceneTransform);
             c.setProgramConstantsFromMatrix(VC.mv,m);
             c.setProgramConstantsFromMatrix(VC.p,camera.len);
             v.uploadContext(p);

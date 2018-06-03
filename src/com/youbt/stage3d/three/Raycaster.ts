@@ -15,9 +15,9 @@ module rf {
 
             if ( ( camera && camera.isPerspectiveCamera ) ) {
     
-                this.ray.origin.set([camera.sceneTransform[12], camera.sceneTransform[13], camera.sceneTransform[14]]);
+                this.ray.origin.set([camera.pos[0], camera.pos[1], camera.pos[2]]);
     
-                this.ray.direction.set( [mousex, mousey, 1] )
+                this.ray.direction.set( [mousex,mousey , 0.5] )
                 this.ray.direction.v3_unproject( camera.sceneTransform, camera.len );
                 this.ray.direction.v3_sub( this.ray.origin );
                 this.ray.direction.v3_normalize();

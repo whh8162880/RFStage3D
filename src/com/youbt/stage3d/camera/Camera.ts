@@ -5,6 +5,8 @@ module rf{
         far :number;
         originFar:number;
         worldTranform:IMatrix3D;
+        invSceneTransform: IMatrix3D;
+
         isPerspectiveCamera:boolean = false;
         isOrthographicCamera:boolean = false;
         constructor(far:number = 10000){
@@ -13,6 +15,8 @@ module rf{
             this.originFar = far / Math.PI2;
             this.len = newMatrix3D();
             this.worldTranform = newMatrix3D();
+            this.invSceneTransform=  newMatrix3D();
+            
         }
 
         public updateSceneTransform(sceneTransform?:IMatrix3D):void{
@@ -24,6 +28,22 @@ module rf{
             }
             this.status = 0;
         }
+
+        // public updateSceneTransform(sceneTransform?:IMatrix3D):void{
+        //     let{status,transform,invSceneTransform,worldTranform,len}=this;
+        //     if( this.status | DChange.trasnform){
+        //         this.updateTransform();
+        //         if(sceneTransform){
+        //             this.sceneTransform.m3_append(sceneTransform,false,transform);
+        //         }else{
+        //             this.sceneTransform.set(transform);
+        //         }
+        //         invSceneTransform.m3_invert(this.sceneTransform);
+        //         worldTranform.m3_append(len,false,invSceneTransform);
+        //         // this.states &= ~DChange.trasnform;
+        //     }
+        //     this.status = 0;
+        // }
     }
 
     export function CameraUIResize(width: number, height: number,len:IMatrix3D,far:number,originFar,camera?:Camera){

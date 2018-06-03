@@ -32,7 +32,7 @@ module rf {
             
             //BILLBOARD
             if(nodes[P_PARTICLE.BILLBOARD]){
-                worldTranform.m3_append(camera.sceneTransform,false,sceneTransform);
+                worldTranform.m3_append(camera.invSceneTransform,false,sceneTransform);
                 if(nodes[P_PARTICLE.ROTATION_HEAD]){
                     c.setProgramConstantsFromMatrix(VC.mv,worldTranform);
                 }

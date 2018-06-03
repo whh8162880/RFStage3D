@@ -13,11 +13,15 @@ module rf{
         
         public update(now: number, interval: number): void {
             super.update(now, interval);
-            
-            this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
+            let mx = nativeMouseX/stageWidth;
+            mx = mx*2 - 1;
+
+            let my = nativeMouseY/stageHeight;
+            my = -2*my + 1;
+            this.rayCaster.setFromCamera(mx, my, scene.camera);
 
             let intersects = this.rayCaster.intersectObjects(scene.childrens);
-            console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
+            console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
         }
 
         public init(canvas?:HTMLCanvasElement):void{
@@ -49,9 +53,10 @@ module rf{
 
             let camera = ROOT.camera3D;
             scene.camera = camera;
-            let f = camera.originFar;
-            f = Math.sqrt(f*f / 3);
-            camera.setPos(f,f,f);
+            // let f = camera.originFar;
+            // f = Math.sqrt(f*f / 3);
+            // camera.setPos(f,f,f);
+            camera.setPos(0,0,-1000);
             camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
 
