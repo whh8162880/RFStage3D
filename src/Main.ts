@@ -117,16 +117,16 @@ module rf{
 
 
             
-            // let box = new SkyBoxGeometry(variables).create();
-            // mesh = new Mesh(variables);
-            // mesh.geometry = box;
-            // let msky = new SkyBoxMaterial();
-            // msky.setData(undefined);
-            // msky.cull = WebGLConst.NONE;
-            // msky.diff = newColor(0xAA0000);
-            // msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
-            // mesh.material = msky;
-            // scene.addChild(mesh);
+            let box = new SkyBoxGeometry(variables).create();
+            mesh = new Mesh(variables);
+            mesh.geometry = box;
+            let msky = new SkyBoxMaterial();
+            msky.setData(undefined);
+            msky.cull = WebGLConst.NONE;
+            msky.diff = newColor(0xAA0000);
+            msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
+            mesh.material = msky;
+            scene.addChild(mesh);
 
 
 
