@@ -218,8 +218,8 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
 
-            // let profile = singleton(GUIProfile);
-            // ROOT.addChild(profile);
+            let profile = singleton(GUIProfile);
+            ROOT.addChild(profile);
 
 
             
@@ -289,8 +289,8 @@ module rf{
                 list.setPos(i * 110,100);
                 list.setSize(100,10*20);
                 list.scroll.vStep = 20;
-                // list.displayList(new Array(100));
-                // ROOT.addChild(list);
+                list.displayList(new Array(100));
+                ROOT.addChild(list);
             }
 
 
