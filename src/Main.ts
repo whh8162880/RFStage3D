@@ -11,14 +11,12 @@ module rf{
 
         rayCaster:Raycaster;
         
-        public update(now: number, interval: number): void {
-            super.update(now, interval);
-            
-            this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
-
-            let intersects = this.rayCaster.intersectObjects(scene.childrens);
-            console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
-        }
+        // public update(now: number, interval: number): void {
+        //     super.update(now, interval);
+        //     this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
+        //     let intersects = this.rayCaster.intersectObjects(scene.childrens);
+        //     console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
+        // }
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -246,8 +244,8 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
 
-            // let profile = singleton(GUIProfile);
-            // ROOT.addChild(profile);
+            let profile = singleton(GUIProfile);
+            ROOT.addChild(profile);
 
 
             
