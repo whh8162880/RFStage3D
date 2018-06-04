@@ -25,6 +25,7 @@ interface IMatrix3D extends IArrayBase {
     m3_transformVector(v: IVector3D | number[], result?: IVector3D | number[]);
     m3_transformVectors(vin: ArrayLike<number>, vout: Float32Array | number[]);
     m3_transformRotation(v: IVector3D | number[], result?: IVector3D | number[]);
+    m3_getMaxScaleOnAxis();
 }
 
 /*********************************************************
@@ -419,6 +420,16 @@ Object.defineProperties(Float32Array.prototype, {
 
             return result;
         }
+    },
+    m3_getMaxScaleOnAxis: {
+        value: function(){
+            let scaleXSq = this[ 0 ] * this[ 0 ] + this[ 1 ] * this[ 1 ] + this[ 2 ] * this[ 2 ];
+            let scaleYSq = this[ 4 ] * this[ 4 ] + this[ 5 ] * this[ 5 ] + this[ 6 ] * this[ 6 ];
+            let scaleZSq = this[ 8 ] * this[ 8 ] + this[ 9 ] * this[ 9 ] + this[ 10 ] * this[ 10 ];
+            return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
+        }
+        
+
     }
 })
 
@@ -435,6 +446,7 @@ interface IVector3D extends IArrayBase {
     v3_normalize(from?: ArrayLike<number>);
     v3_dotProduct(t: ArrayLike<number>);
     v3_crossProduct(t: ArrayLike<number>, out?: IVector3D | number[]);
+    v3_unproject(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D);
 }
 
 Object.defineProperties(Float32Array.prototype, {
@@ -502,7 +514,16 @@ Object.defineProperties(Float32Array.prototype, {
 
             return out;
         }
+    },
+    v3_unproject:{
+        value:function(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D){
+            let m = rf.TEMP_MATRIX3D;
+            m.m3_invert(projectionMatrix);
+            m.m3_append(matrixWorld);
+            return m.m3_transformVector(this);
+        }
     }
+
 })
 
 interface IMatrixComposeData{

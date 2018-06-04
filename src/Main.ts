@@ -9,6 +9,16 @@ module rf{
             super();
         }
 
+        rayCaster:Raycaster;
+        
+        public update(now: number, interval: number): void {
+            super.update(now, interval);
+            
+            this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
+
+            let intersects = this.rayCaster.intersectObjects(scene.childrens);
+            console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
+        }
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -41,10 +51,8 @@ module rf{
             scene.camera = camera;
             let f = camera.originFar;
             f = Math.sqrt(f*f / 3);
-            // camera.setPos(f,f,f);
-            camera.setPos(200,500,1000);
-            // camera.lookat(newVector3D(0,0,0));
-
+            camera.setPos(f,f,f);
+            camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
 
 
@@ -77,9 +85,14 @@ module rf{
            
 
             let w = 500;
+/*
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
+
+            sp = tr;
+*/
+            
 
             // line.rotationX = 45;
             // let line = new Line3D();
@@ -126,7 +139,25 @@ module rf{
             scene.addChild(mesh);
 
 
+            for(let i = 0 ; i < 100; ++i){
+                let cube = new BoxGeometry(variables).create(100,100,100);
+                m = new PhongMaterial();
+                m.setData(undefined);
+                m.cull = WebGLConst.BACK;
+                m.diff = newColor(0xAAAAAA);
 
+                mesh = new Mesh(variables);
+                mesh.geometry = cube;
+                mesh.material = m;
+
+                mesh.x = Math.random() * 2000 - 1000;
+                mesh.y = Math.random() * 2000 - 1000;
+                mesh.z = Math.random() * 2000 - 1000;
+
+                scene.addChild(mesh);
+            }
+
+            this.rayCaster = new Raycaster(5000);
 
 
 
@@ -215,8 +246,8 @@ module rf{
             // rotFolder.add(kfmMesh,"rotationZ",-360,360);
 
 
-            let profile = singleton(GUIProfile);
-            ROOT.addChild(profile);
+            // let profile = singleton(GUIProfile);
+            // ROOT.addChild(profile);
 
 
             
@@ -286,16 +317,13 @@ module rf{
                 list.setPos(i * 110,100);
                 list.setSize(100,10*20);
                 list.scroll.vStep = 20;
-                list.displayList(new Array(100));
-                ROOT.addChild(list);
+                // list.displayList(new Array(100));
+                // ROOT.addChild(list);
             }
 
 
             // facade.toggleMediator(TestMediator,1);
             
-
-            // facade.toggleMediator(TestMediator,1);
-            // facade.toggleMediator(CreateMediator,1);
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";

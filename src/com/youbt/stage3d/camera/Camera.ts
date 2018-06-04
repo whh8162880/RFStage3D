@@ -5,6 +5,8 @@ module rf{
         far :number;
         originFar:number;
         worldTranform:IMatrix3D;
+        isPerspectiveCamera:boolean = false;
+        isOrthographicCamera:boolean = false;
         constructor(far:number = 10000){
             super();
             this.far = far;
@@ -29,6 +31,8 @@ module rf{
             camera.w = width;
             camera.h = height;
             camera.status |= DChange.trasnform;
+            camera.isOrthographicCamera = true;
+            camera.isPerspectiveCamera = false;
         }
         
 
@@ -61,6 +65,8 @@ module rf{
             camera.w = width;
             camera.h = height;
             camera.status |= DChange.trasnform;
+            camera.isOrthographicCamera = true;
+            camera.isPerspectiveCamera = false;
         }
        
 
@@ -94,6 +100,8 @@ module rf{
             camera.w = width;
             camera.h = height;
             camera.status |= DChange.trasnform;
+            camera.isPerspectiveCamera = true;
+            camera.isOrthographicCamera = false;
         }
         
 
