@@ -68,6 +68,11 @@ module rf{
 					ele.matrix2d = matrix2d = new Float32Array(matrix2d);
 				}
 
+				if(type == 9)
+				{
+					console.log("xxx");
+				}
+
 				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的
@@ -177,13 +182,6 @@ module rf{
 		{
 			
 		}
-
-		protected set9Size():void
-		{
-			let {w, h} = this;
-
-		}
-
 
 		_selected:boolean;
 		set selected(value:boolean){this._selected = value;this.doSelected();}
@@ -497,7 +495,7 @@ module rf{
 		}
 	}
 
-	export class ScrollBar{
+	export class ScrollBar extends Component{
 		btn_up:Button;
 		btn_down:Button;
 		btn_thumb:Button;
@@ -525,18 +523,17 @@ module rf{
 		 * 需要支持点击滚动 拖拽滚动 鼠标滚轮滚动
 		 * 
 		 */
-		constructor(skin:Component){
-			this._skin = skin;
-			this.bindComponents();
+		constructor(source?:BitmapSource){
+			super(source);
 		}
 
-		protected bindComponents():void
+		bindComponents():void
 		{
 			let {_skin} = this;
-			this.btn_up = _skin["btn_up"];
-			this.btn_down = _skin["btn_down"];
-			this.btn_thumb = _skin["btn_thumb"];
-			this.track = _skin["track"];
+			// this.btn_up = _skin["btn_up"];
+			// this.btn_down = _skin["btn_down"];
+			// this.btn_thumb = _skin["btn_thumb"];
+			// this.track = _skin["track"];
 		}
 
 		/**
@@ -701,6 +698,8 @@ module rf{
 		3 : CheckBox,
 		4 : RadioButton,
 		5 : TabItem,
-		7 : Component
+		6 : ScrollBar,
+		7 : Component,
+		9 : Component
 	}
 }

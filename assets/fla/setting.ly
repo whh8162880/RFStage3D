@@ -16,6 +16,6 @@ object root = {
 		sb:{type:6,extends:"ScrollBar"}
 		list:{type:7,extends:"List"}
 		mlist:{type:8,extends:"MList"}
-		dele:{type:9,extends:"{0}Dele"}
+		dele:{type:9,extends:"Component"}
 	}
 }

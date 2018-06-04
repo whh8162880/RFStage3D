@@ -41,8 +41,10 @@ module rf{
             scene.camera = camera;
             let f = camera.originFar;
             f = Math.sqrt(f*f / 3);
-            camera.setPos(f,f,f);
-            camera.lookat(newVector3D(0,0,0));
+            // camera.setPos(f,f,f);
+            camera.setPos(200,500,1000);
+            // camera.lookat(newVector3D(0,0,0));
+
             new TrackballControls(camera);
 
 
@@ -75,14 +77,9 @@ module rf{
            
 
             let w = 500;
-/*
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
-
-            sp = tr;
-*/
-            
 
             // line.rotationX = 45;
             // let line = new Line3D();
@@ -113,20 +110,20 @@ module rf{
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            // scene.addChild(mesh);
+            scene.addChild(mesh);
 
 
             
-            // let box = new SkyBoxGeometry(variables).create();
-            // mesh = new Mesh(variables);
-            // mesh.geometry = box;
-            // let msky = new SkyBoxMaterial();
-            // msky.setData(undefined);
-            // msky.cull = WebGLConst.NONE;
-            // msky.diff = newColor(0xAA0000);
-            // msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
-            // mesh.material = msky;
-            // scene.addChild(mesh);
+            let box = new SkyBoxGeometry(variables).create();
+            mesh = new Mesh(variables);
+            mesh.geometry = box;
+            let msky = new SkyBoxMaterial();
+            msky.setData(undefined);
+            msky.cull = WebGLConst.NONE;
+            msky.diff = newColor(0xAA0000);
+            msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
+            mesh.material = msky;
+            scene.addChild(mesh);
 
 
 
@@ -296,6 +293,9 @@ module rf{
 
             // facade.toggleMediator(TestMediator,1);
             
+
+            // facade.toggleMediator(TestMediator,1);
+            // facade.toggleMediator(CreateMediator,1);
 
             // particle_Perfix = "http://192.168.3.214/webgl/ss/particle/";
             // particle_Texture_Perfix = "http://192.168.3.214/webgl/ss/tex/particle/";
