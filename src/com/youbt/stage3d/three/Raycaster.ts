@@ -30,7 +30,7 @@ module rf {
     
             } else {
     
-                console.error( 'THREE.Raycaster: Unsupported camera type.' );
+                console.error( 'Raycaster: Unsupported camera type.' );
     
             }
     

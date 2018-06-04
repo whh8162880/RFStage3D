@@ -91,7 +91,7 @@ module rf {
             }
         }
         return result;
-    }
+    } 
 
     export interface IVariable{
         size:number;

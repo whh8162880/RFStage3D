@@ -852,7 +852,7 @@ module rf {
         if (undefined == z) {
             z = 0;
         }
-        if (undefined == w) {
+        if (undefined == w) { 
             w = 0;
         }
         return new Float32Array([Number(x), y, z, w]);

@@ -531,7 +531,7 @@ module rf {
             }
         }
 
-        protected doResize(): void { }
+        protected doResize(): void { } 
 
 
 
