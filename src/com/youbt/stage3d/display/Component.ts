@@ -1,40 +1,6 @@
-///<reference path="../../mvc/manage/PanelSourceManage.ts" />
 ///<reference path="./Sprite.ts" />
 /// <reference path="../../components/Scroll.ts" />
 module rf{
-
-	export interface IDisplayFrameElement{
-		type:number;
-		name:string;
-		rect:any;
-		x:number;
-		y:number;
-		scaleX:number;
-		scaleY:number;
-		rotaion:number;
-		matrix2d:IMatrix;
-		libraryItemName:string;
-	}
-
-	export interface IDisplayTextElement extends IDisplayFrameElement
-	{
-		fontRenderingMode:String;
-		width:number;
-		height:number;
-		selectable:boolean;
-		text:string;
-		filter:any[];
-		format:object;
-		input:boolean;
-		multiline:boolean;
-		color:number;
-	}
-
-	export interface IDisplaySymbol extends IDisplayFrameElement{
-		className:String;
-		displayClip:number;
-		displayFrames:{[key:number]:IDisplayFrameElement[]}
-	}
 
 
 	export const enum SymbolConst{
@@ -51,11 +17,9 @@ module rf{
 		
         currentClip:number;
 
-        symbol:IDisplaySymbol;
+		symbol:IDisplaySymbol;
 		
 		sceneMatrix:IMatrix;
-
-		protected scalerect:Rect;
 
 		setSymbol(symbol:IDisplaySymbol,matrix?:IMatrix):void{
 			this.symbol = symbol;
@@ -95,12 +59,20 @@ module rf{
 			
 			let sp:Component;
 			
-			let tempMatrix:IMatrix = newMatrix();
-
 			let names:any[];
 			for(let ele of elements)
 			{
-				let{type,x,y,rect,name,scaleX,scaleY}=ele;
+				let{type,x,y,rect,name,matrix2d}=ele;
+
+				if(matrix2d instanceof ArrayBuffer){
+					ele.matrix2d = matrix2d = new Float32Array(matrix2d);
+				}
+
+				if(type == 9)
+				{
+					console.log("xxx");
+				}
+
 				if(ComponentClass.hasOwnProperty(type+""))
 				{
 					//文本这样处理是不行的
@@ -138,15 +110,11 @@ module rf{
 							this.addChild(sp);
 						}else{
 							sp.setSymbol(ele as IDisplaySymbol);
+							sp.locksize = true;
 						}
 						sp.x = x;
 						sp.y = y;
-						//缺少一个九宫
-						if(rect != undefined)
-						{
-							this.scalerect = new Rect(rect.x, rect.y, rect.right, rect.bottom);
-						}
-						sp.setSize(Math.round(sp.w * scaleX),Math.round(sp.h * scaleY));
+						
 						this.addChild(sp);
 						sp.name = name;
 						this[name] = sp;
@@ -158,6 +126,19 @@ module rf{
 			
 			graphics.end();
 			
+		}
+
+		setSize(width:number, height:number){
+			let{w,h}=this;
+			if(w == width && h == height){
+				return;
+			}
+			
+			super.setSize(width,height);
+			let{$graphics:graphics}=this;
+			if(graphics){
+				graphics.setSize(width,height);
+			}
 		}
 		
 		addToStage():void{
@@ -172,30 +153,26 @@ module rf{
 		
 		// var scaleGeomrtry:ScaleNGeomrtry;
 		
-		renderFrameElement(element:IDisplayFrameElement,clean:Boolean = false):void{
-			let vo:BitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 1);
+		renderFrameElement(element:IDisplayFrameElement,clean?:Boolean):void{
+			let vo:IBitmapSourceVO = this.source.getSourceVO(element.libraryItemName, 0);
 			if(vo == undefined)
 			{
 				return;
 			}
-			const {graphics}  = this;
+			const {graphics,symbol}  = this;
 			if(clean){
 				graphics.clear();
 			}
+
+			let{rect,x,y,matrix2d}=element;
 			
-			// if(element.rect){
-				// scaleGeomrtry = _graphics.scale9(vo,element.rect,scaleGeomrtry);
-				// if(_width == 0){
-				// 	_width = vo.w;
-				// }
-				// if(_height == 0){
-				// 	_height = vo.h;
-				// }
-				// scaleGeomrtry.set9Size(_width,_height);
-			// }else{
-				graphics.drawBitmap(0,0,vo);//,element.matrix2d
-			// }
-			
+
+			if(rect){
+				graphics.drawScale9Bitmap(x,y,vo,rect,symbol.matrix2d);
+			}else{
+				graphics.drawBitmap(x,y,vo,matrix2d);
+			}
+
 			if(clean){
 				graphics.end();
 			}
@@ -203,18 +180,8 @@ module rf{
 
 		protected doResize():void
 		{
-			if(this.scalerect != undefined)
-			{
-
-			}
+			
 		}
-
-		protected set9Size():void
-		{
-			let {w, h} = this;
-
-		}
-
 
 		_selected:boolean;
 		set selected(value:boolean){this._selected = value;this.doSelected();}
@@ -528,7 +495,7 @@ module rf{
 		}
 	}
 
-	export class ScrollBar{
+	export class ScrollBar extends Component{
 		btn_up:Button;
 		btn_down:Button;
 		btn_thumb:Button;
@@ -556,18 +523,17 @@ module rf{
 		 * 需要支持点击滚动 拖拽滚动 鼠标滚轮滚动
 		 * 
 		 */
-		constructor(skin:Component){
-			this._skin = skin;
-			this.bindComponents();
+		constructor(source?:BitmapSource){
+			super(source);
 		}
 
-		protected bindComponents():void
+		bindComponents():void
 		{
 			let {_skin} = this;
-			this.btn_up = _skin["btn_up"];
-			this.btn_down = _skin["btn_down"];
-			this.btn_thumb = _skin["btn_thumb"];
-			this.track = _skin["track"];
+			// this.btn_up = _skin["btn_up"];
+			// this.btn_down = _skin["btn_down"];
+			// this.btn_thumb = _skin["btn_thumb"];
+			// this.track = _skin["track"];
 		}
 
 		/**
@@ -720,10 +686,9 @@ module rf{
 		RadioButton,
 		TabItem,
 		ScrollBar,
-		Dele,
 		List,
 		MList,
-		Tab
+		Dele,
 	}
 
 	export let ComponentClass:{ [type: string]: { new(): Component } } = {
@@ -733,6 +698,8 @@ module rf{
 		3 : CheckBox,
 		4 : RadioButton,
 		5 : TabItem,
-		7 : Component
+		6 : ScrollBar,
+		7 : Component,
+		9 : Component
 	}
 }

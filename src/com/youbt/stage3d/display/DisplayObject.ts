@@ -159,7 +159,7 @@ module rf {
         sceneAlpha: number = 1;
 
         _visible: boolean = true;
-        states: number = 0;
+        status: number = 0;
 
         pivotZero: boolean = false;
         pivotPonumber: IVector3D;
@@ -189,7 +189,7 @@ module rf {
          */
         setChange(value: number, p: number = 0, c: boolean = false) {
             //batcher相关的都和我无关
-            this.states |= (value & ~DChange.batch);    //本层不需要batcher对象识别
+            this.status |= (value & ~DChange.batch);    //本层不需要batcher对象识别
             if (undefined != this.parent) {
                 if(value & DChange.ta){
                     value |= DChange.ct;                //如果本层transform or alpha 改变了 那就得通知上层
@@ -461,7 +461,7 @@ module rf {
                 transform.m3_recompose(this.pos,this.rot,this.sca)
             }
 
-            this.states &= ~DChange.trasnform;
+            this.status &= ~DChange.trasnform;
         }
 
 
@@ -477,7 +477,7 @@ module rf {
 
         updateAlpha(sceneAlpha: number): void {
             this.sceneAlpha = this.sceneAlpha * this._alpha;
-            this.states &= ~DChange.alpha;
+            this.status &= ~DChange.alpha;
         }
 
         remove(): void {
@@ -531,7 +531,7 @@ module rf {
             }
         }
 
-        protected doResize(): void { }
+        protected doResize(): void { } 
 
 
 
@@ -551,7 +551,7 @@ module rf {
         }
 
         updateHitArea():void{
-            this.states &= ~DChange.ac;
+            this.status &= ~DChange.ac;
         }
 
         getObjectByPoint(dx: number, dy: number,scale:number): DisplayObject {
@@ -586,13 +586,11 @@ module rf {
             let zAxis = tempAxeZ;
             
             const{transform,_scaleX,_scaleY,_scaleZ,_x,_y,_z,rot}=this;
-			
+            
             if(undefined == upAxis){
                 upAxis = Y_AXIS;
             }
 			
-            upAxis = transform.m3_transformVector(upAxis,TEMP_VECTOR3D);
-            
 			
 			zAxis.x = target.x - _x;
 			zAxis.y = target.y - _y;
@@ -636,19 +634,25 @@ module rf {
 			raw[13] = _y;
 			raw[14] = _z;
 			raw[15] = 1;
-			
-			// if (zAxis.z < 0) {
-			// 	this.rotationY = (180 - this.rotationY);
-			// 	this.rotationX -= 180;
-			// 	this.rotationZ -= 180;
-            // }
+            
             transform.m3_decompose(undefined,rot,undefined);
 			
 			// let v = transform.decompose();
-			// xAxis = v[1];
-			this._rotationX = rot.x;
-			this._rotationY = rot.y;
+            // xAxis = v[1];
+            
+            
+            this._rotationX = rot.x;
+            this._rotationY = rot.y;
             this._rotationZ = rot.z;
+
+
+            if (zAxis.z < 0) {
+				this._rotationY = rot.y = (Math.PI - rot.y);
+				this._rotationX = rot.x = rot.x - Math.PI;
+				this._rotationZ = rot.z = rot.z - Math.PI;
+            }
+            
+            // this._rotationZ = rot.z = 0;
             
 			this.setChange(DChange.trasnform);
         }

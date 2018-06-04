@@ -11,6 +11,11 @@ module rf {
         shadowMatrix:IMatrix3D;
         geometry: GeometryBase;
         invSceneTransform: IMatrix3D;
+
+        minBoundingBox:OBB;
+        boundingSphere:Sphere;
+        distance:number = Number.MAX_VALUE;
+        
         addChild(child: DisplayObject) {
             super.addChild(child);
             if (child instanceof SceneObject) {
@@ -93,6 +98,60 @@ module rf {
             worldTranform.m3_append(sun.worldTranform,false,sceneTransform);
             c.setProgramConstantsFromMatrix(VC.mvp,worldTranform);
         }
+
+
+        static sphere = new Sphere();
+        static ray = new Ray()
+
+        raycast( raycaster:Raycaster, intersects?:IIntersectInfo[]):IIntersectInfo[]{
+            let {geometry} = this;
+
+            if(!geometry)return intersects;
+
+            
+
+            if(this.minBoundingBox == undefined){
+                let obb = this.minBoundingBox = OBB.createOBBByGeometry(geometry);
+                geometry.centerPoint = newVector3D( (obb.minx+obb.maxx)*0.5, (obb.miny+obb.maxy)*0.5, (obb.minz+obb.maxz)*0.5, 1 );
+            }
+            if(this.boundingSphere == undefined){
+                this.boundingSphere = geometry.calculateBoundingSphere(geometry.centerPoint);
+            }
+
+            let{sphere, ray} = SceneObject;
+            //首先检测球
+            sphere.copyFrom( this.boundingSphere );
+			sphere.applyMatrix4( this.sceneTransform );
+
+            if ( raycaster.ray.intersectsSphere( sphere ) == false ) {
+                return intersects;
+            }
+            
+            ray.copyFrom( raycaster.ray ).applyMatrix4( this.invSceneTransform );
+
+            let intersectPoint = ray.intersectBox( this.minBoundingBox);
+            if ( intersectPoint == null) {
+                // console.log('2222222222')
+                return intersects;
+            }
+
+            this.sceneTransform.m3_transformVector(intersectPoint,intersectPoint);
+
+            rf.TEMP_VECTOR3D.set(raycaster.ray.origin);
+            rf.TEMP_VECTOR3D.v3_sub(intersectPoint);
+
+			let distance = rf.TEMP_VECTOR3D.v3_length;
+
+			if ( distance < raycaster.near || distance > raycaster.far ) {
+                // console.log('333333333333333')
+                return intersects;
+            }
+            
+            intersects = intersects || [];
+            intersects.push({"obj":this, "distance": distance});
+
+            return intersects;
+        }
     }
 
     export class Scene extends SceneObject {
@@ -116,7 +175,7 @@ module rf {
                 _camera = camera;
             }
 
-            if (_camera.states) {
+            if (_camera.status) {
                 _camera.updateSceneTransform();
             }
 
@@ -214,7 +273,7 @@ module rf {
 
         //在这里驱动渲染
         update(now: number, interval: number): void {
-            if (this.states & DChange.ct) {
+            if (this.status & DChange.ct) {
                 this.updateTransform();
             }
             let{renderLink} = this;
@@ -278,7 +337,7 @@ module rf {
 
         render(link:Link,sun:DirectionalLight,now:number,interval:number){
             let{m,rtt,len,w,h} = this;
-            if(sun.states || sun.len != len){
+            if(sun.status || sun.len != len){
                 sun.len = len;
                 sun.updateSceneTransform();
             }
@@ -306,7 +365,7 @@ module rf {
             // c.setCulling(cull);
             // c.setProgram(program);
             
-            let worldTranform = TEMP_MATRIX;
+            let worldTranform = rf.TEMP_MATRIX3D;
             for(let vo = link.getFrist();vo;vo = vo.next){
                 if(vo.close == false){
                     let obj = vo.data as SceneObject;
@@ -357,7 +416,7 @@ module rf {
                 _camera = camera;
             }
 
-            if (_camera.states) {
+            if (_camera.status) {
                 _camera.updateSceneTransform();
             }
 
@@ -380,7 +439,7 @@ module rf {
             let c = context3D;
             let g = gl;
 
-            if (cameraUI.states) {
+            if (cameraUI.status) {
                 cameraUI.updateSceneTransform();
             }
             this.material.uploadContextSetting();
@@ -500,6 +559,15 @@ module rf {
     }
 
    
-
+    export function getChildrenCount(d:DisplayObjectContainer){
+        let count = 0;
+        d.childrens.forEach(child => {
+            count ++;
+            if(child instanceof DisplayObjectContainer){
+                count += this.getChildrenCount(child);
+            }
+        });
+        return count;
+    }
 
 }

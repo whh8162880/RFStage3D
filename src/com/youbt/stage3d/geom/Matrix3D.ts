@@ -25,6 +25,7 @@ interface IMatrix3D extends IArrayBase {
     m3_transformVector(v: IVector3D | number[], result?: IVector3D | number[]);
     m3_transformVectors(vin: ArrayLike<number>, vout: Float32Array | number[]);
     m3_transformRotation(v: IVector3D | number[], result?: IVector3D | number[]);
+    m3_getMaxScaleOnAxis();
 }
 
 /*********************************************************
@@ -419,6 +420,16 @@ Object.defineProperties(Float32Array.prototype, {
 
             return result;
         }
+    },
+    m3_getMaxScaleOnAxis: {
+        value: function(){
+            let scaleXSq = this[ 0 ] * this[ 0 ] + this[ 1 ] * this[ 1 ] + this[ 2 ] * this[ 2 ];
+            let scaleYSq = this[ 4 ] * this[ 4 ] + this[ 5 ] * this[ 5 ] + this[ 6 ] * this[ 6 ];
+            let scaleZSq = this[ 8 ] * this[ 8 ] + this[ 9 ] * this[ 9 ] + this[ 10 ] * this[ 10 ];
+            return Math.sqrt( Math.max( scaleXSq, scaleYSq, scaleZSq ) );
+        }
+        
+
     }
 })
 
@@ -435,6 +446,7 @@ interface IVector3D extends IArrayBase {
     v3_normalize(from?: ArrayLike<number>);
     v3_dotProduct(t: ArrayLike<number>);
     v3_crossProduct(t: ArrayLike<number>, out?: IVector3D | number[]);
+    v3_unproject(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D);
 }
 
 Object.defineProperties(Float32Array.prototype, {
@@ -502,18 +514,142 @@ Object.defineProperties(Float32Array.prototype, {
 
             return out;
         }
+    },
+    v3_unproject:{
+        value:function(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D){
+            let m = rf.TEMP_MATRIX3D;
+            m.m3_invert(projectionMatrix);
+            m.m3_append(matrixWorld);
+            return m.m3_transformVector(this);
+        }
     }
+
 })
 
+interface IMatrixComposeData{
+    x:number;
+    y:number;
+    scaleX:number;
+    scaleY:number;
+    rotaiton:number;
+}
 
 interface IMatrix extends IArrayBase {
     m2_identity();
+    m2_append(m2: ArrayLike<number> | IArrayBase, prepend?: boolean, from?: ArrayLike<number>):IMatrix;
+    m2_scale(scalex:number,scaley:number);
+    m2_decompose(result?:IMatrixComposeData):IMatrixComposeData;
+    m2_recompose(value:IMatrixComposeData):IMatrix;
+    m2_clone():IMatrix;
 }
 
 Object.defineProperties(Float32Array.prototype, {
     m2_identitye: {
         value: function () {
             this.set(rf_m2_identity);
+        }
+    },
+
+
+    m2_clone: {
+        value: function () {
+            return new Float32Array(this);
+        }
+    },
+
+    m2_scale: {
+        value: function (scalex:number,scaley:number) {
+            this[0] *= scalex;
+            this[4] *= scaley;
+        }
+    },
+
+    m2_append: {
+        value: function (m2: ArrayLike<number>, prepend?: boolean, from?: ArrayLike<number>) {
+            let a: ArrayLike<number>;
+            let b: ArrayLike<number>;
+            if (!prepend) {
+                a = from ? from : this;
+                b = m2
+            } else {
+                a = m2;
+                b = from ? from : this;
+            }
+            const [
+                a11, a12, a13,
+                a21, a22, a23,
+                a31, a32, a33,
+            ] = a as any;//目前typescript还没支持  TypedArray destructure，不过目前已经标准化，后面 typescript 应该会支持
+
+            const [
+                b11, b12, b13,
+                b21, b22, b23,
+                b31, b32, b33,
+            ] = b as any;
+
+            this[0] = a11 * b11 + a12 * b21 + a13 * b31;
+            this[1] = a11 * b12 + a12 * b22 + a13 * b32;
+            this[2] = a11 * b13 + a12 * b23 + a13 * b33;
+
+            this[3] = a21 * b11 + a22 * b21 + a23 * b31;
+            this[4] = a21 * b12 + a22 * b22 + a23 * b32;
+            this[5] = a21 * b13 + a22 * b23 + a23 * b33;
+
+            this[6] = a31 * b11 + a32 * b21 + a33 * b31;
+            this[7] = a31 * b12 + a32 * b22 + a33 * b32;
+            this[8] = a31 * b13 + a32 * b23 + a33 * b33;
+            return this;
+        }
+    },
+
+
+    m2_decompose: {
+        value: function (result?:IMatrixComposeData) {
+
+            let{
+                0:m0,1:m1,2:m2,
+                3:m3,4:m4,5:m5,
+                6:m6,7:m7
+            }= this as any;
+
+            let sx = Math.sqrt(m0*m0 + m1*m1) , sy = Math.sqrt(m3*m3 + m4*m4);
+
+            let x = m6,y = m7;
+
+            let rotaiton = Math.acos(m0/sx) * rf.RADIANS_TO_DEGREES;
+
+            if(!result){
+                result = {x:x,y:y,scaleX:sx,scaleY:sy,rotaiton:rotaiton} as IMatrixComposeData;
+            }else{
+                result.x = x;
+                result.y = y;
+                result.scaleX = sx;
+                result.scaleY = sy;
+                result.rotaiton = rotaiton;
+            }
+
+            return result;
+        }
+    },
+
+    m2_recompose: {
+        value: function (value:IMatrixComposeData){
+            let x = value.x === undefined ? 0 : value.x;
+            let y = value.y === undefined ? 0 : value.y;
+            let sx = value.scaleX === undefined ? 1 :  value.scaleX;
+            let sy = value.scaleY === undefined ? 1 :  value.scaleY;
+            let rotaiton = value.rotaiton  === undefined ? 0 : value.rotaiton;
+
+            rotaiton *= rf.DEGREES_TO_RADIANS;
+
+            let cos = Math.cos(rotaiton),sin = Math.sin(rotaiton);
+
+            this[0] = sx * cos;
+            this[1] = -sin;
+            this[3] = sin;
+            this[4] = cos * sy;
+            this[6] = x;
+            this[7] = y;
         }
     }
 });
@@ -737,10 +873,15 @@ module rf {
         if (undefined == z) {
             z = 0;
         }
-        if (undefined == w) {
+        if (undefined == w) { 
             w = 0;
         }
         return new Float32Array([Number(x), y, z, w]);
+    }
+
+
+    export function matrix2d_clearScale(matrix:IMatrix){
+    
     }
 
     // export const matrix3d_identity = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);

@@ -157,10 +157,23 @@ module rf {
         0, 0, 1, 0,
         0, 0, 0, 1]);
 
-    export let TEMP_MATRIX: IMatrix3D = newMatrix3D();
+    export let TEMP_MATRIX3D: IMatrix3D = newMatrix3D();
+    export let TEMP_MATRIX2D: IMatrix = newMatrix();
     // export let CALCULATION_MATRIX_2D:Matrix = new Matrix();
     export let TEMP_VECTOR3D: IVector3D = newVector3D();
     export let TEMP_DECOMPOSE: IVector3D[] = [newVector3D(), newVector3D(), newVector3D()];
+
+
+
+    export interface IFunction{
+        func:Function;
+        thisobj:any;
+    }
+
+    export function newCallBackFunction(func:Function,thisobj:any){
+        return {func:func,thisobj:thisobj} as IFunction;
+    }
+
 
     /**
     * 经纬度 定位信息
@@ -230,12 +243,12 @@ module rf {
             m31,m32,m33 
          ] = matrix as any;
          
-        let x = p[0];
-        let y = p[1];
-        let dx = x * m11 + y * m21 + m31;
-        let dy = x * m12 + y * m22 + m32;
-        out[0] = dx;
-        out[1] = dy;
+        let x = p[0] - m31;
+        let y = p[1] - m32;
+        let dx = x * m11 + y * m21;
+        let dy = x * m12 + y * m22;
+        out[0] = dx + m31;
+        out[1] = dy + m32;
     }
 
 

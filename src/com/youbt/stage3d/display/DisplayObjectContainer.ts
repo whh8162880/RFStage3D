@@ -8,7 +8,7 @@ module rf{
 
         setChange(value: number,p:number = 0,c:boolean = false): void {
             if(true == c){
-                this.states |= p;
+                this.status |= p;
                 if(this.parent){
                     this.parent.setChange(value,p,true);
                 }
@@ -142,7 +142,7 @@ module rf{
          * 讲真  这块更新逻辑还没有到最优化的结果 判断不会写了
          */
 		public updateTransform():void{
-            let states = this.states;
+            let states = this.status;
             if(states & DChange.trasnform){
                 //如果自己的transform发生了变化
                 //  step1 : 更新自己的transform
@@ -158,21 +158,21 @@ module rf{
             if(states & DChange.ct){
                 for(let child of this.childrens){
                     if(child instanceof DisplayObjectContainer){
-                        if(child.states & DChange.t_all){
+                        if(child.status & DChange.t_all){
                             child.updateTransform();
                         }
                     }else{
-                        if(child.states & DChange.trasnform){
+                        if(child.status & DChange.trasnform){
                             child.updateTransform();
                             child.updateSceneTransform(this.sceneTransform);
                         }
 
-                        if(child.states & DChange.alpha){
+                        if(child.status & DChange.alpha){
                             child.updateAlpha(this.sceneAlpha);
                         }
                     }
                 }
-                this.states &= ~DChange.ct;
+                this.status &= ~DChange.ct;
             }
         }
         
@@ -181,7 +181,7 @@ module rf{
             this.sceneTransform.set(this.transform);
             if (this.parent) this.sceneTransform.m3_append(this.parent.sceneTransform);
             for(let child of this.childrens){
-                if( (child.states & DChange.trasnform) != 0){
+                if( (child.status & DChange.trasnform) != 0){
                     //这里不更新其transform 是因为后续有人来让其更新
                     child.updateSceneTransform(this.sceneTransform);
                 }
@@ -194,7 +194,7 @@ module rf{
             for(let child of this.childrens){
                 child.updateAlpha(this.sceneAlpha);
             }
-            this.states &= ~DChange.alpha;
+            this.status &= ~DChange.alpha;
         }
 
         public updateHitArea():void{
@@ -205,13 +205,13 @@ module rf{
                     const{hitArea:hit}=child
                     if(undefined == hit) continue;
 
-                    if(child.states & DChange.ac){
+                    if(child.status & DChange.ac){
                         child.updateHitArea();
                     }
                     hitArea.combine(hit,child._x,child._y);
                 }
             }
-            this.states &= ~DChange.ac;
+            this.status &= ~DChange.ac;
         }
 
         

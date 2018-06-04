@@ -68,6 +68,7 @@ module rf {
         private constructor() {
             this._analyzerMap = {};
             this._analyzerMap[ResType.text] = ResTextLoader;
+            this._analyzerMap[ResType.amf] = ResAMFLoader
             this._analyzerMap[ResType.bin] = ResBinLoader;
             this._analyzerMap[ResType.sound] = ResSoundLoader;
             this._analyzerMap[ResType.image] = ResImageLoader;
@@ -230,6 +231,8 @@ module rf {
          * 二进制
          */
         bin,
+
+        amf,
         /**
          * 文本
          */
@@ -330,6 +333,20 @@ module rf {
             event.data = _resItem;
             this._resItem = this._compFunc = this._thisObject = undefined;
             if (_compFunc) {
+                _compFunc.call(_thisObject, this, event);
+            }
+        }
+    }
+
+
+
+    export class ResAMFLoader extends ResBinLoader{
+        protected onComplete(event: EventX): void {
+            const { _resItem, _compFunc, _thisObject, _httpRequest } = this;
+            _resItem.data = amf_readObject(_httpRequest.response);
+            event.data = _resItem;
+            this._resItem = this._compFunc = this._thisObject = undefined;
+            if (undefined != _compFunc) {
                 _compFunc.call(_thisObject, this, event);
             }
         }

@@ -17,6 +17,7 @@
 
 ///<reference path="./stage3d/geom/Matrix3D.ts" />
 ///<reference path="./stage3d/geom/Quaternion.ts" />
+///<reference path="./stage3d/geom/Ray.ts" />
 
 ///<reference path="./stage3d/three/Geometry.ts" />
 ///<reference path="./stage3d/three/Material.ts" />
