@@ -1,5 +1,5 @@
 //Matrix3D算法相关
-const rf_v3_identity = [0, 0, 0, 0];
+const rf_v3_identity = [0, 0, 0, 1];
 const rf_m3_identity = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
 const rf_m2_identity = [1, 0, 0, 0, 1, 0, 0, 0, 1];
 const rf_m3_temp = new Float32Array(16);
@@ -375,14 +375,15 @@ Object.defineProperties(Float32Array.prototype, {
 
     m3_transformVector: {
         value: function (v: Float32Array | number[], result?: IVector3D | number[]) {
-            const { 0: x, 1: y, 2: z } = v;
+            let { 0: x, 1: y, 2: z , 3 : w } = v;
+            // w = 1;
             if (undefined == result) {
                 result = new Float32Array(rf_v3_identity);
             }
-            result[0] = x * this[0] + y * this[4] + z * this[8] + this[12];
-            result[1] = x * this[1] + y * this[5] + z * this[9] + this[13];
-            result[2] = x * this[2] + y * this[6] + z * this[10] + this[14];
-            result[3] = x * this[3] + y * this[7] + z * this[11] + this[15];
+            result[0] = x * this[0] + y * this[4] + z * this[8] + w * this[12];
+            result[1] = x * this[1] + y * this[5] + z * this[9] + w * this[13];
+            result[2] = x * this[2] + y * this[6] + z * this[10] + w *this[14];
+            result[3] = x * this[3] + y * this[7] + z * this[11] + w *this[15];
 
             return result;
         }
@@ -446,7 +447,7 @@ interface IVector3D extends IArrayBase {
     v3_normalize(from?: ArrayLike<number>);
     v3_dotProduct(t: ArrayLike<number>);
     v3_crossProduct(t: ArrayLike<number>, out?: IVector3D | number[]);
-    v3_unproject(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D);
+    v3_applyMatrix4(e: ArrayLike<number>, out?: IVector3D | number[])
 }
 
 Object.defineProperties(Float32Array.prototype, {
@@ -481,6 +482,7 @@ Object.defineProperties(Float32Array.prototype, {
             this[0] *= v;
             this[1] *= v;
             this[2] *= v;
+            this[3] *= v;
         }
     },
     v3_normalize: {
@@ -515,12 +517,22 @@ Object.defineProperties(Float32Array.prototype, {
             return out;
         }
     },
-    v3_unproject:{
-        value:function(matrixWorld:IMatrix3D, projectionMatrix:IMatrix3D){
-            let m = rf.TEMP_MATRIX3D;
-            m.m3_invert(projectionMatrix);
-            m.m3_append(matrixWorld);
-            return m.m3_transformVector(this);
+
+    v3_applyMatrix4:{
+        value: function (e: ArrayLike<number>, out?: IVector3D | number[]) {
+            const { 0: x, 1: y, 2: z } = this;
+
+            if (undefined == out) {
+                out = this;
+            }
+
+            var w = 1 / ( e[ 3 ] * x + e[ 7 ] * y + e[ 11 ] * z + e[ 15 ] );
+
+            out[0] = ( e[ 0 ] * x + e[ 4 ] * y + e[ 8 ] * z + e[ 12 ] ) * w;
+            out[1] = ( e[ 1 ] * x + e[ 5 ] * y + e[ 9 ] * z + e[ 13 ] ) * w;
+            out[2] = ( e[ 2 ] * x + e[ 6 ] * y + e[ 10 ] * z + e[ 14 ] ) * w;
+            out[3] = 1
+            return out;
         }
     }
 

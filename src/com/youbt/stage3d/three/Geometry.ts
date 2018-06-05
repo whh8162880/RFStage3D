@@ -315,6 +315,7 @@ module rf {
                 v.x = points[p];
                 v.y = points[p+1];
                 v.z = points[p+2];
+                v.w = 1.0;
                 if(undefined != matrix3D){
                     matrix3D.m3_transformVector(v,v);
                 }
@@ -325,7 +326,6 @@ module rf {
                 v.x = 0;
                 v.y = 0;
                 v.z = 1;
-    
                 if(undefined != matrix3D){
                     matrix3D.m3_transformRotation(v,v);
                 }

@@ -14,19 +14,29 @@ module rf {
         setFromCamera( mousex:number, mousey:number, camera: Camera ) {
 
             if ( ( camera && camera.isPerspectiveCamera ) ) {
-    
+                
                 this.ray.origin.set([camera.pos[0], camera.pos[1], camera.pos[2]]);
-    
-                this.ray.direction.set( [mousex,mousey , 0.5] )
-                this.ray.direction.v3_unproject( camera.sceneTransform, camera.len );
+                // console.log("0000000", mousex, mousey, this.ray.origin, camera.rot);
+                
+                this.ray.direction.set( [mousex,mousey , 0.15] )
+
+                TEMP_MATRIX3D.m3_invert(camera.len);
+                TEMP_MATRIX3D.m3_transformVector(this.ray.direction,this.ray.direction);
+                this.ray.direction.v3_scale(1/this.ray.direction.w);
+
+                // console.log("111111:", this.ray.direction)
+                camera.transform.m3_transformVector(this.ray.direction, this.ray.direction);
+                // console.log("222222:", this.ray.direction)
                 this.ray.direction.v3_sub( this.ray.origin );
+                // console.log("333333:", this.ray.direction)
                 this.ray.direction.v3_normalize();
+                // console.log("444444444:", this.ray.direction)
     
             } else if ( ( camera && camera.isOrthographicCamera ) ) {
                 this.ray.origin.set( [mousex, mousey, 0.0 ] )
-                this.ray.origin.v3_unproject( camera.sceneTransform, camera.len  );
+                camera.worldTranform.m3_transformVector(this.ray.origin, this.ray.origin);
                 this.ray.direction.set( [0, 0, 1] );
-                camera.sceneTransform.m3_transformVector(this.ray.direction,this.ray.direction)
+                camera.transform.m3_transformVector(this.ray.direction,this.ray.direction)
     
             } else {
     

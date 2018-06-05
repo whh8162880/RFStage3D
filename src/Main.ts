@@ -10,13 +10,14 @@ module rf{
         }
 
         rayCaster:Raycaster;
-        
-        // public update(now: number, interval: number): void {
-        //     super.update(now, interval);
-        //     this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
-        //     let intersects = this.rayCaster.intersectObjects(scene.childrens);
-        //     console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
-        // }
+
+        raytest(e:EventX){
+            let mx = 2*nativeMouseX/stageWidth - 1;
+            let my = -2*nativeMouseY/stageHeight + 1;
+            this.rayCaster.setFromCamera(mx, my, scene.camera);
+            let intersects = this.rayCaster.intersectObjects(scene.childrens);
+            console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
+        }
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -24,6 +25,8 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+            ROOT.on(MouseEventX.CLICK,this.raytest,this);
 
             let perfix = "../assets/"
             
@@ -47,11 +50,116 @@ module rf{
 
             let camera = ROOT.camera3D;
             scene.camera = camera;
-            let f = camera.originFar;
-            f = Math.sqrt(f*f / 3);
-            camera.setPos(f,f,f);
-            camera.lookat(newVector3D(0,0,0));
+            // let f = camera.originFar;
+            // f = Math.sqrt(f*f / 3);
+            camera.setPos(0,0,-314);
+            // camera.lookat(newVector3D(0,0,0));
             new TrackballControls(camera);
+            
+            console.log(camera.far)
+
+            TEMP_VECTOR3D.set([100,100,500, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer",  TEMP_VECTOR3D);
+
+
+            TEMP_VECTOR3D.set([100,100,1000, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer1",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([100,100,5000, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer2",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([100,100,10000, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer3",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([100,100,100000, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer3",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([100,100,100000000000000000, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer4",  TEMP_VECTOR3D);
+
+            // TEMP_MATRIX3D.m3_invert(camera.len);
+            // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            // console.log("world",  TEMP_VECTOR3D);
+
+            // //////////
+            TEMP_VECTOR3D.set([100,100,camera.originFar, 1])
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            console.log("pixer",  TEMP_VECTOR3D);
+
+            // TEMP_MATRIX3D.m3_invert(camera.len);
+            // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            // console.log("world",  TEMP_VECTOR3D);
+
+
+            TEMP_VECTOR3D.set([-0.5,0.5, 0.01, 1]) //
+            TEMP_MATRIX3D.m3_invert(camera.len);
+            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            console.log("world111",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([-0.5,0.5, 0.05, 1]) //
+            TEMP_MATRIX3D.m3_invert(camera.len);
+            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            console.log("world222",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([-0.5,0.5, 0.1, 1]) //
+            TEMP_MATRIX3D.m3_invert(camera.len);
+            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            console.log("world222",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([-0.5,0.5, 0.159, 1]) //
+            TEMP_MATRIX3D.m3_invert(camera.len);
+            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            console.log("world222",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([-0.5,0.5, 0.2, 1]) //
+            TEMP_MATRIX3D.m3_invert(camera.len);
+            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            console.log("world222",  TEMP_VECTOR3D);
+
+            TEMP_VECTOR3D.set([-0.5,0.5, 1, 1]) //
+            TEMP_MATRIX3D.m3_invert(camera.len);
+            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            console.log("world222",  TEMP_VECTOR3D);
+            
+            //////////
+            // TEMP_VECTOR3D.set([0,0,0.001, 1])
+            // // camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
+            // // console.log("pixer",  TEMP_VECTOR3D);
+
+            // TEMP_MATRIX3D.m3_invert(camera.len);
+            // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
+            // console.log("world",  TEMP_VECTOR3D);
+
+
+            // TEMP_VECTOR3D.set([0,0,1, 1])
+            // TEMP_MATRIX3D.m3_invert(camera.len);
+            // TEMP_VECTOR3D.v3_applyMatrix4(TEMP_MATRIX3D)
+            // // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
+            // // TEMP_VECTOR3D.v3_scale(1./TEMP_VECTOR3D.w)
+            // console.log("11111",  TEMP_VECTOR3D);
 
 
             let sun = new DirectionalLight();
@@ -83,11 +191,11 @@ module rf{
            
 
             let w = 500;
-/*
+
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
-
+/*
             sp = tr;
 */
             
@@ -137,23 +245,62 @@ module rf{
             scene.addChild(mesh);
 
 
-            for(let i = 0 ; i < 100; ++i){
-                let cube = new BoxGeometry(variables).create(100,100,100);
-                m = new PhongMaterial();
-                m.setData(undefined);
-                m.cull = WebGLConst.BACK;
-                m.diff = newColor(0xAAAAAA);
+            let cube;
+            cube = new BoxGeometry(variables).create(20000,20000,20000);
+            m = new PhongMaterial();
+            m.setData(undefined);
+            m.cull = WebGLConst.BACK;
+            m.diff = newColor(0xAAAAAA);
 
-                mesh = new Mesh(variables);
-                mesh.geometry = cube;
-                mesh.material = m;
+            mesh = new Mesh(variables);
+            mesh.geometry = cube;
+            mesh.material = m;
 
-                mesh.x = Math.random() * 2000 - 1000;
-                mesh.y = Math.random() * 2000 - 1000;
-                mesh.z = Math.random() * 2000 - 1000;
+            mesh.x = -97328.1275939941406;
+            mesh.y = 48563.16262817382812;
+            mesh.z = 322716.9783935546875;
+            // -385.1275939941406, 192.16262817382812, 1276.9783935546875
+            // -97328.8671875, 48563.05078125, 322716.0625
+            scene.addChild(mesh);
 
-                scene.addChild(mesh);
-            }
+            ////////////////////
+            cube = new BoxGeometry(variables).create(3,3,3);
+            m = new PhongMaterial();
+            m.setData(undefined);
+            m.cull = WebGLConst.BACK;
+            m.diff = newColor(0xFF0000);
+
+            mesh = new Mesh(variables);
+            mesh.geometry = cube;
+            mesh.material = m;
+
+            mesh.x = -94.80776977539062;
+            mesh.y = 47.30513000488281;
+            mesh.z = 314.3568115234375;
+
+            scene.addChild(mesh);
+            // -94.80776977539062, 47.30513000488281, 314.3568115234375
+            // -101.10054016113281, 50.44496154785156, 335.221923828125,
+            // 100.88992309570312, 335.221923828125
+
+
+            // for(let i = 0 ; i < 100; ++i){
+            //     let cube = new BoxGeometry(variables).create(100,100,100);
+            //     m = new PhongMaterial();
+            //     m.setData(undefined);
+            //     m.cull = WebGLConst.BACK;
+            //     m.diff = newColor(0xAAAAAA);
+
+            //     mesh = new Mesh(variables);
+            //     mesh.geometry = cube;
+            //     mesh.material = m;
+
+            //     mesh.x = Math.random() * 2000 - 1000;
+            //     mesh.y = Math.random() * 2000 - 1000;
+            //     mesh.z = Math.random() * 2000 - 1000;
+
+            //     scene.addChild(mesh);
+            // }
 
             this.rayCaster = new Raycaster(5000);
 
