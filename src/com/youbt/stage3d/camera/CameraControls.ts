@@ -4,6 +4,7 @@ module rf{
         target:IVector3D;
         mouseSitivity:number = 0.3;
         distance:number;
+        lock:boolean = true;
         constructor(object:Camera){
             this.object = object;
             this.target = newVector3D();
@@ -57,7 +58,6 @@ module rf{
             }
             this.tweener = tweenTo({tdistance: distance+wheel*2},Math.abs(wheel)*2,defaultTimeMixer,this);
             
-            
             // this.object.z += e.deltaY > 0 ? 1: -1
             // this.distance = this.object.pos.subtract(this.target).length;
         }
@@ -87,7 +87,7 @@ module rf{
             let rx = 0;
             let ry = 0;
             
-            if(target){
+            if(this.lock){
                 var transform:IMatrix3D = TEMP_MATRIX3D;
                 transform.m3_identity();
                 transform.m3_translation(0, 0, -distance);
@@ -103,7 +103,7 @@ module rf{
                 object.setPos(transform[12],transform[13],transform[14]);
             }else{
                 rx = object.rotationX + oy*speed;
-                ry = object.rotationY - ox*speed;
+                ry = object.rotationY + ox*speed;
             }
 
             object.rotationX = rx;
@@ -135,5 +135,7 @@ module rf{
             ROOT.off(MouseEventX.MouseMove,this.mouseRightMoveHandler);
             ROOT.off(MouseEventX.MouseRightUp,this.mouseRightUpHandler);
         }
+
+        
     }
 }

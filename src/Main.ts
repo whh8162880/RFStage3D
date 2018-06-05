@@ -52,116 +52,12 @@ module rf{
             scene.camera = camera;
             // let f = camera.originFar;
             // f = Math.sqrt(f*f / 3);
-            camera.setPos(0,0,-314);
+            camera.setPos(0,0,0);
             // camera.lookat(newVector3D(0,0,0));
-            new TrackballControls(camera);
+            let ctl = new TrackballControls(camera);
+            ctl.lock = true;
             
-            console.log(camera.far)
-
-            TEMP_VECTOR3D.set([100,100,500, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer",  TEMP_VECTOR3D);
-
-
-            TEMP_VECTOR3D.set([100,100,1000, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer1",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([100,100,5000, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer2",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([100,100,10000, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer3",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([100,100,100000, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer3",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([100,100,100000000000000000, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer4",  TEMP_VECTOR3D);
-
-            // TEMP_MATRIX3D.m3_invert(camera.len);
-            // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            // console.log("world",  TEMP_VECTOR3D);
-
-            // //////////
-            TEMP_VECTOR3D.set([100,100,camera.originFar, 1])
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            console.log("pixer",  TEMP_VECTOR3D);
-
-            // TEMP_MATRIX3D.m3_invert(camera.len);
-            // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            // console.log("world",  TEMP_VECTOR3D);
-
-
-            TEMP_VECTOR3D.set([-0.5,0.5, 0.01, 1]) //
-            TEMP_MATRIX3D.m3_invert(camera.len);
-            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            console.log("world111",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([-0.5,0.5, 0.05, 1]) //
-            TEMP_MATRIX3D.m3_invert(camera.len);
-            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            console.log("world222",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([-0.5,0.5, 0.1, 1]) //
-            TEMP_MATRIX3D.m3_invert(camera.len);
-            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            console.log("world222",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([-0.5,0.5, 0.159, 1]) //
-            TEMP_MATRIX3D.m3_invert(camera.len);
-            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            console.log("world222",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([-0.5,0.5, 0.2, 1]) //
-            TEMP_MATRIX3D.m3_invert(camera.len);
-            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            console.log("world222",  TEMP_VECTOR3D);
-
-            TEMP_VECTOR3D.set([-0.5,0.5, 1, 1]) //
-            TEMP_MATRIX3D.m3_invert(camera.len);
-            TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            console.log("world222",  TEMP_VECTOR3D);
-            
-            //////////
-            // TEMP_VECTOR3D.set([0,0,0.001, 1])
-            // // camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w);
-            // // console.log("pixer",  TEMP_VECTOR3D);
-
-            // TEMP_MATRIX3D.m3_invert(camera.len);
-            // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // TEMP_VECTOR3D.v3_scale(1/TEMP_VECTOR3D.w)
-            // console.log("world",  TEMP_VECTOR3D);
-
-
-            // TEMP_VECTOR3D.set([0,0,1, 1])
-            // TEMP_MATRIX3D.m3_invert(camera.len);
-            // TEMP_VECTOR3D.v3_applyMatrix4(TEMP_MATRIX3D)
-            // // TEMP_MATRIX3D.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D);
-            // // TEMP_VECTOR3D.v3_scale(1./TEMP_VECTOR3D.w)
-            // console.log("11111",  TEMP_VECTOR3D);
-
-
+       
             let sun = new DirectionalLight();
             // f = 1000 / Math.PI2;
             // f = Math.sqrt(f*f / 3);
@@ -225,52 +121,56 @@ module rf{
             let plane = new PlaneGeometry(variables).create(w*2,w*2);
             let mesh = new Mesh(variables);
             mesh.shadowTarget = true;
+            mesh.name = "plane";
             // mesh.shadowable = true;
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             
             let box = new SkyBoxGeometry(variables).create();
             mesh = new Mesh(variables);
             mesh.geometry = box;
+            mesh.name = "skybox";
             let msky = new SkyBoxMaterial();
             msky.setData(undefined);
             msky.cull = WebGLConst.NONE;
             msky.diff = newColor(0xAA0000);
             msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
             mesh.material = msky;
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             let cube;
-            cube = new BoxGeometry(variables).create(20000,20000,20000);
+            cube = new BoxGeometry(variables).create(100,100,100);
             m = new PhongMaterial();
             m.setData(undefined);
             m.cull = WebGLConst.BACK;
             m.diff = newColor(0xAAAAAA);
 
             mesh = new Mesh(variables);
+            mesh.name = "bigbox";
             mesh.geometry = cube;
             mesh.material = m;
 
-            mesh.x = -97328.1275939941406;
-            mesh.y = 48563.16262817382812;
-            mesh.z = 322716.9783935546875;
+            mesh.x = -385.1275939941406;
+            mesh.y = 192.16262817382812;
+            mesh.z = 1276.9783935546875;
             // -385.1275939941406, 192.16262817382812, 1276.9783935546875
             // -97328.8671875, 48563.05078125, 322716.0625
             scene.addChild(mesh);
 
             ////////////////////
-            cube = new BoxGeometry(variables).create(3,3,3);
+            cube = new BoxGeometry(variables).create(6,6,6);
             m = new PhongMaterial();
             m.setData(undefined);
             m.cull = WebGLConst.BACK;
             m.diff = newColor(0xFF0000);
 
             mesh = new Mesh(variables);
+            mesh.name = 'smallBox'
             mesh.geometry = cube;
             mesh.material = m;
 
@@ -284,23 +184,23 @@ module rf{
             // 100.88992309570312, 335.221923828125
 
 
-            // for(let i = 0 ; i < 100; ++i){
-            //     let cube = new BoxGeometry(variables).create(100,100,100);
-            //     m = new PhongMaterial();
-            //     m.setData(undefined);
-            //     m.cull = WebGLConst.BACK;
-            //     m.diff = newColor(0xAAAAAA);
+            for(let i = 0 ; i < 10; ++i){
+                let cube = new BoxGeometry(variables).create(100,100,100);
+                m = new PhongMaterial();
+                m.setData(undefined);
+                m.cull = WebGLConst.BACK;
+                m.diff = newColor(0xAAAAAA);
 
-            //     mesh = new Mesh(variables);
-            //     mesh.geometry = cube;
-            //     mesh.material = m;
+                mesh = new Mesh(variables);
+                mesh.geometry = cube;
+                mesh.material = m;
 
-            //     mesh.x = Math.random() * 2000 - 1000;
-            //     mesh.y = Math.random() * 2000 - 1000;
-            //     mesh.z = Math.random() * 2000 - 1000;
+                mesh.x = Math.random() * 2000 - 1000;
+                mesh.y = Math.random() * 2000 - 1000;
+                mesh.z = Math.random() * 2000 - 1000;
 
-            //     scene.addChild(mesh);
-            // }
+                scene.addChild(mesh);
+            }
 
             this.rayCaster = new Raycaster(5000);
 
