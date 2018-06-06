@@ -417,7 +417,7 @@ Object.defineProperties(Float32Array.prototype, {
             result[0] = x * this[0] + y * this[4] + z * this[8];
             result[1] = x * this[1] + y * this[5] + z * this[9];
             result[2] = x * this[2] + y * this[6] + z * this[10];
-            result[3] = x * this[3] + y * this[7] + z * this[11];
+            // result[3] = x * this[3] + y * this[7] + z * this[11];
 
             return result;
         }
@@ -441,9 +441,10 @@ interface IVector3D extends IArrayBase {
     w: number;
     v3_lengthSquared: number;
     v3_length: number;
-    v3_add(v: IVector3D | ArrayLike<number>): IVector3D;
-    v3_sub(v: IVector3D | ArrayLike<number>): IVector3D;
+    v3_add(v: IVector3D | ArrayLike<number>, out?:IVector3D): IVector3D;
+    v3_sub(v: IVector3D | ArrayLike<number>, out?:IVector3D): IVector3D;
     v3_scale(v: number);
+    v4_scale(v: number);
     v3_normalize(from?: ArrayLike<number>);
     v3_dotProduct(t: ArrayLike<number>);
     v3_crossProduct(t: ArrayLike<number>, out?: IVector3D | number[]);
@@ -464,20 +465,27 @@ Object.defineProperties(Float32Array.prototype, {
         }
     },
     v3_add: {
-        value: function (v: IVector3D | ArrayLike<number>) {
-            let o = new Float32Array(4);
+        value: function (v: IVector3D | ArrayLike<number>, out?:IVector3D) {
+            let o = out || new Float32Array(4);
             for (let i = 0; i < 3; i++) o[i] = this[i] + v[i];
             return o;
         }
     },
     v3_sub: {
-        value: function (v: IVector3D | ArrayLike<number>) {
-            let o = new Float32Array(4);
+        value: function (v: IVector3D | ArrayLike<number>, out?:IVector3D) {
+            let o = out || new Float32Array(4);
             for (let i = 0; i < 3; i++) o[i] = this[i] - v[i];
             return o;
         }
     },
     v3_scale: {
+        value: function (v: number) {
+            this[0] *= v;
+            this[1] *= v;
+            this[2] *= v;
+        }
+    },
+    v4_scale: {
         value: function (v: number) {
             this[0] *= v;
             this[1] *= v;

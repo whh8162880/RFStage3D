@@ -162,7 +162,7 @@ module rf{
             // -97328.8671875, 48563.05078125, 322716.0625
             scene.addChild(mesh);
 
-            ////////////////////
+            //////////////////
             cube = new BoxGeometry(variables).create(6,6,6);
             m = new PhongMaterial();
             m.setData(undefined);
@@ -192,17 +192,18 @@ module rf{
                 m.diff = newColor(0xAAAAAA);
 
                 mesh = new Mesh(variables);
+                mesh.name = "box_" + String(i) 
                 mesh.geometry = cube;
                 mesh.material = m;
 
-                mesh.x = Math.random() * 2000 - 1000;
-                mesh.y = Math.random() * 2000 - 1000;
-                mesh.z = Math.random() * 2000 - 1000;
+                mesh.x = (i-5) * 300;
+                mesh.y = Math.random() * 200 - 100;
+                mesh.z = Math.random() * 100 + 4000;
 
                 scene.addChild(mesh);
             }
 
-            this.rayCaster = new Raycaster(5000);
+            this.rayCaster = new Raycaster(100000);
 
 
 

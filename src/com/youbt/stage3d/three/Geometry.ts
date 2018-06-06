@@ -141,7 +141,7 @@ module rf {
 
 
         applyMatrix4( matrix:IMatrix3D, result?:Sphere):Sphere{
-            result = result || new Sphere();
+            result = result || this;
 
             result.copyFrom(this);
             matrix.m3_transformVector(result.center, result.center);

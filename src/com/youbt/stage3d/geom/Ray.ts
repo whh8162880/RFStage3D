@@ -21,13 +21,13 @@ module rf{
             }
             target.set(this.direction);
             target.v3_scale(t);
-            target.v3_add(this.origin);
+            target.v3_add(this.origin, target);
             return target;
         }
 
         applyMatrix4(matrix:IMatrix3D):Ray{
-            matrix.m3_transformVector(this.origin);
-            matrix.m3_transformRotation(this.direction);
+            matrix.m3_transformVector(this.origin,this.origin);
+            matrix.m3_transformRotation(this.direction, this.direction);
             return this;
         }
 
@@ -38,19 +38,19 @@ module rf{
         distanceSqToPoint( point:IVector3D ):number{
             let v1 = rf.TEMP_VECTOR3D;
             v1.set(point);
-            v1.v3_sub(this.origin);
+            v1.v3_sub(this.origin, v1);
             
 			let directionDistance = v1.v3_dotProduct( this.direction );
 
 			if ( directionDistance < 0 ) {
                 v1.set(this.origin);
-                v1.v3_sub(point);
+                v1.v3_sub(point, v1);
 				return v1.v3_length;
 			}
             v1.set(this.direction);
             v1.v3_scale(directionDistance);
-            v1.v3_add(this.origin);
-			v1.v3_sub(point);
+            v1.v3_add(this.origin, v1);
+			v1.v3_sub(point, v1);
             return v1.v3_length;
 
 		}
@@ -132,9 +132,9 @@ module rf{
             let{diff, edge1, edge2, normal} = Ray;
 
             edge1.set(b);
-            edge1.v3_sub(a);
+            edge1.v3_sub(a, edge1);
             edge2.set(c);
-            edge2.v3_sub(a);
+            edge2.v3_sub(a, edge2);
             normal.set(edge1)
 			normal.v3_crossProduct( edge2, normal);
 
@@ -161,7 +161,7 @@ module rf{
 
 			}
             diff.set(this.origin);
-            diff.v3_sub(a);
+            diff.v3_sub(a, diff);
 
             diff.v3_crossProduct(edge2,edge2);
 			let DdQxE2 = sign * this.direction.v3_dotProduct(edge2 );

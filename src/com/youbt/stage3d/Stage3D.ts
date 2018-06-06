@@ -121,7 +121,7 @@ module rf {
             let{sphere, ray} = SceneObject;
             //首先检测球
             sphere.copyFrom( this.boundingSphere );
-			sphere.applyMatrix4( this.sceneTransform );
+			sphere.applyMatrix4( this.sceneTransform, sphere );
 
             if ( raycaster.ray.intersectsSphere( sphere ) == false ) {
                 return intersects;
@@ -138,7 +138,7 @@ module rf {
             this.sceneTransform.m3_transformVector(intersectPoint,intersectPoint);
 
             rf.TEMP_VECTOR3D.set(raycaster.ray.origin);
-            rf.TEMP_VECTOR3D.v3_sub(intersectPoint);
+            rf.TEMP_VECTOR3D.v3_sub(intersectPoint, rf.TEMP_VECTOR3D);
 
 			let distance = rf.TEMP_VECTOR3D.v3_length;
 
@@ -148,7 +148,7 @@ module rf {
             }
             
             intersects = intersects || [];
-            intersects.push({"obj":this, "distance": distance});
+            intersects.push({"obj":this, "distance": distance, "point":intersectPoint });
 
             return intersects;
         }
