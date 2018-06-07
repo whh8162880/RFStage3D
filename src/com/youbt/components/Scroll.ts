@@ -267,17 +267,19 @@ module rf{
 
 
     export class Scroll extends Drager{
-        constructor(target:RenderBase,w:number,h:number){
+        constructor(target:RenderBase){
             super();
+
+            let{scrollRect} = target;
+            this.rect = scrollRect;
+            let{w,h} = scrollRect;
             this.areacheck = true;
             this.bind(target,false);
             if(target.status | DChange.area){
                 target.updateHitArea();
             }
-
             let{w:width,h:height}=target;
             this.setArea(w,h,width,height);
-            target.scrollRect = this.rect;
             target.on(EventT.RESIZE,this.resizeHandler,this);
         }
 

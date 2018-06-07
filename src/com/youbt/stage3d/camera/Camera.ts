@@ -48,7 +48,7 @@ module rf{
 
         len[8] = 0;
         len[9] = 0;
-        len[10] = 1/far;
+        len[10] = -1/far;
         len[11] = 0;
 
         len[12] = -1;

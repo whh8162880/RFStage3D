@@ -121,18 +121,19 @@ namespace rf {
 			g.viewport(0, 0, width, height);
 			g.canvas.width = width;
 			g.canvas.height = height;
-			//TODO: antiAlias , Stencil
-			if (enableDepthAndStencil) {
-				this._clearBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
-				g.enable(g.DEPTH_TEST);
-				g.enable(g.STENCIL_TEST);
-			} else {
-				this._clearBit = g.COLOR_BUFFER_BIT;
-				g.disable(g.DEPTH_TEST);
-				g.disable(g.STENCIL_TEST);
-			}
 			g.frontFace(g.CW);
 			g.enable(g.BLEND);
+			//TODO: antiAlias , Stencil
+			// if (enableDepthAndStencil) {
+			// 	this._clearBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
+			// 	g.enable(g.DEPTH_TEST);
+			// 	g.enable(g.STENCIL_TEST);
+			// } else {
+			// 	this._clearBit = g.COLOR_BUFFER_BIT;
+			// 	g.disable(g.DEPTH_TEST);
+			// 	g.disable(g.STENCIL_TEST);
+			// }
+			// 
 		}
 
 		scissoring:boolean;

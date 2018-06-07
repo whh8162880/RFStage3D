@@ -166,7 +166,7 @@ module rf {
         }
 
         public render(camera: Camera, now: number, interval: number): void {
-            let { camera: _camera } = this;
+            let { camera: _camera ,childrens } = this;
             // const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
             let c = context3D;
             let g = gl;
@@ -179,17 +179,10 @@ module rf {
                 _camera.updateSceneTransform();
             }
 
-            this.material.uploadContextSetting();
-
-            // let{setting}=c;
-            // setting.cull = cull;
-            // setting.depth = depthMask;
-            // setting.depthMode = passCompareMode;
-            // setting.src = srcFactor;
-            // setting.dst = dstFactor;
-
-
-            super.render(_camera, now, interval);
+            if(childrens.length){
+                this.material.uploadContextSetting();
+                super.render(_camera, now, interval);
+            }
         }
     }
 

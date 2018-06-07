@@ -1,16 +1,16 @@
 ///<reference path="../../youbt/mvc/MVC.ts" />
 module rf{
 	export class TestPanel extends Panel{
-	   private panel:TestPanel & IMODULE_TEST;
-	   
-       constructor(uri: string, cls: string)
+        constructor(uri: string, cls: string)
         {
             super(uri,cls);
         }
         
         bindComponents(){
-            this.panel = this as TestPanel & IMODULE_TEST;
-            
+            let panel = this as TestPanel & IMODULE_TEST;
+            // this.scrollRect = new Rect(0,0,100,50);
+            // this.setPos(100,100);
+            // new Scroll(this);
         }
     }
     
@@ -19,6 +19,8 @@ module rf{
         constructor(){
             super("TestMediator");
             this.setPanel(new TestPanel("test","ui.asyncpanel.test"));
+            
+            this.$panel = this.$panel as TestPanel & IMODULE_TEST;
         }
         
         mediatorReadyHandle(): void {
