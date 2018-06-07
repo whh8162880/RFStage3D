@@ -173,6 +173,7 @@ module rf{
             m.m3_append(camera.sceneTransform);
             c.setProgramConstantsFromMatrix(VC.mv,m);
             c.setProgramConstantsFromMatrix(VC.p,camera.len);
+            c.setProgramConstantsFromVector(VC.originFar,1/camera.originFar, 1, false)
             v.uploadContext(p);
 
             let i = c.getIndexByQuad(quad);
@@ -195,13 +196,14 @@ module rf{
                 uniform mat4 mv;
                 uniform mat4 p;
                 varying vec4 vColor;
+                uniform float originFar;
 
                 void main(void){
                     vec4 pos = mv * vec4(posX,1.0); 
                     vec4 t = pos - mv * vec4(posY,1.0);
                     vec3 v = cross(t.xyz,vec3(0,0,1));
                     v = normalize(v);
-                    float t2 = pos.z * p[2].w;
+                    float t2 = pos.z * originFar;
                     if(t2 <= 0.0){
                        v.xyz *= len;
                     }else{

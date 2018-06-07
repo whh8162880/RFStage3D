@@ -18,7 +18,7 @@ module rf {
                 this.ray.origin.set([camera.pos[0], camera.pos[1], camera.pos[2], 1]);
                 // console.log("0000000", mousex, mousey, this.ray.origin, camera.rot);
                 
-                this.ray.direction.set( [mousex,mousey , 0.159, 1] )
+                this.ray.direction.set( [mousex,mousey , 1, 1] )
 
                 TEMP_MATRIX3D.m3_invert(camera.len);
                 TEMP_MATRIX3D.m3_transformVector(this.ray.direction,this.ray.direction);
@@ -27,7 +27,7 @@ module rf {
                 // console.log("111111:", this.ray.direction)
                 camera.transform.m3_transformVector(this.ray.direction, this.ray.direction);
                 // console.log("222222:", this.ray.direction)
-                this.ray.direction.v3_sub( this.ray.origin );
+                this.ray.direction.v3_sub( this.ray.origin, this.ray.direction );
                 // console.log("333333:", this.ray.direction)
                 this.ray.direction.v3_normalize();
                 // console.log("444444444:", this.ray.direction)
@@ -47,17 +47,16 @@ module rf {
         }
 
 
-        intersectObject(object:DisplayObject,intersects:IIntersectInfo[], recursive?:boolean ):void{
+        intersectObject(object:SceneObject,intersects:IIntersectInfo[], recursive?:boolean ):void{
             if ( object.visible === false ) return;
 
-            if(object instanceof SceneObject){
+            if(object.mouseEnabled){
                 object.raycast(this, intersects);
             }
-            
-
-            if(recursive && object instanceof DisplayObjectContainer){
+                
+            if(object.mouseChildren && recursive ){
                 for(let child of object.childrens){
-                    if(child instanceof DisplayObject){
+                    if(child instanceof SceneObject){
                         this.intersectObject(child, intersects, true);
                     }
                 }
@@ -70,7 +69,10 @@ module rf {
             let result:IIntersectInfo[] = intersects || []
 
             for ( let i = 0, l = arr.length; i < l; i ++ ) {
-                this.intersectObject( arr[ i ],  result, recursive );
+                let child = arr[i];
+                if(child instanceof SceneObject){
+                    this.intersectObject( child,  result, recursive );
+                }
             }
             result.sort(Raycaster.disSort)
             return result;

@@ -25,6 +25,7 @@ module rf {
         mvp = "mvp",
         ui = "ui",
         lightDirection = "lightDirection",
+        originFar = "originFar",
         vc_diff = "vc_diff",
         vc_emissive = "vc_emissive",
         vc_bones="bones"

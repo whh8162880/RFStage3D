@@ -211,6 +211,7 @@ module rf {
         cameraUI: Camera
         camera2D: Camera;
         camera3D: Camera;
+        cameraPerspective:Camera;
         camera: Camera;
         renderLink: Link;
         shadow:ShadowEffect;
@@ -220,6 +221,7 @@ module rf {
             this.camera2D = new Camera();
             this.camera3D = new Camera();
             this.cameraUI = new Camera();
+            this.cameraPerspective = new Camera();            
             this.renderer = new BatchRenderer(this);
             this.shadow = new ShadowEffect(1024,1024);
             this.renderLink = new Link();
@@ -297,10 +299,12 @@ module rf {
         }
 
         resize(width: number, height: number): void {
-            let { camera2D, camera3D, cameraUI } = this;
+            let { camera2D, camera3D, cameraUI,cameraPerspective} = this;
             CameraUIResize(width,height,cameraUI.len,cameraUI.far,cameraUI.originFar,cameraUI);
             CameraOrthResize(width,height,camera2D.len,camera2D.far,camera2D.originFar,camera2D);
             Camera3DResize(width,height,camera3D.len,camera3D.far,camera3D.originFar,camera3D);
+
+            PerspectiveResize(width,height,cameraPerspective.len,cameraPerspective.far,30,cameraPerspective)
             
         }
 

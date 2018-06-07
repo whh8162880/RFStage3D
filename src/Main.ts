@@ -10,6 +10,9 @@ module rf{
         }
 
         rayCaster:Raycaster;
+        line:Line3D;
+        cameraBox:Mesh;
+        directBox:Mesh;
 
         raytest(e:EventX){
             let mx = 2*nativeMouseX/stageWidth - 1;
@@ -17,6 +20,27 @@ module rf{
             this.rayCaster.setFromCamera(mx, my, scene.camera);
             let intersects = this.rayCaster.intersectObjects(scene.childrens);
             console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
+            let t = 3;
+
+            if(e.data.ctrl){
+                let line = this.line;
+            
+                line.clear();
+                let end = TEMP_VECTOR3D;
+                end = this.rayCaster.ray.at(0, end);
+                line.moveTo(end.x, end.y, end.z,t, 0xff0000);
+                end = this.rayCaster.ray.at(50000, end);
+                line.lineTo(end.x, end.y, end.z,t, 0xff0000);
+                line.end();
+
+                this.cameraBox.x = scene.camera.x;
+                this.cameraBox.y = scene.camera.y;
+                this.cameraBox.z = scene.camera.z;
+
+                this.rayCaster.ray.at(500, TEMP_VECTOR3D);
+                this.directBox.setPos(TEMP_VECTOR3D.x, TEMP_VECTOR3D.y, TEMP_VECTOR3D.z);
+            }
+           
         }
 
         public init(canvas?:HTMLCanvasElement):void{
@@ -48,7 +72,7 @@ module rf{
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
 
-            let camera = ROOT.camera3D;
+            let camera = ROOT.cameraPerspective;
             scene.camera = camera;
             // let f = camera.originFar;
             // f = Math.sqrt(f*f / 3);
@@ -91,21 +115,19 @@ module rf{
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
+
+
+            let l = new Line3D();
+            l.clear();
+            l.moveTo(0,0,0,3,0x0000FF);
+            l.lineTo(0,0,-1000,3,0x0000FF);
+            l.end();
+            // scene.addChild(l);
 /*
             sp = tr;
 */
-            
-
-            // line.rotationX = 45;
-            // let line = new Line3D();
-            // line.clear();
-            // line.moveTo(-500,0,500,t);
-            // line.lineTo(500,0,500,t);
-            // line.lineTo(500,0,-500,t);
-            // line.lineTo(-500,0,-500,t);
-            // line.lineTo(-500,0,500,t);
-            // line.end();
-            // scene.addChild(line);
+            this.line = new Line3D();
+            scene.addChild(this.line);
 
             let variables = vertex_mesh_variable;
             let w_e = w * 1.1
@@ -140,11 +162,12 @@ module rf{
             msky.diff = newColor(0xAA0000);
             msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
             mesh.material = msky;
-            // scene.addChild(mesh);
+            mesh.mouseChildren = mesh.mouseEnabled = false;
+            scene.addChild(mesh);
 
 
             let cube;
-            cube = new BoxGeometry(variables).create(100,100,100);
+            cube = new BoxGeometry(variables).create(400,400,400);
             m = new PhongMaterial();
             m.setData(undefined);
             m.cull = WebGLConst.BACK;
@@ -155,37 +178,58 @@ module rf{
             mesh.geometry = cube;
             mesh.material = m;
 
+            // mesh.y = -stageHeight/2;
+            mesh.z = 2000;
+
             mesh.x = -385.1275939941406;
             mesh.y = 192.16262817382812;
-            mesh.z = 1276.9783935546875;
+            // mesh.z = 1276.9783935546875;
             // -385.1275939941406, 192.16262817382812, 1276.9783935546875
             // -97328.8671875, 48563.05078125, 322716.0625
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
             //////////////////
-            cube = new BoxGeometry(variables).create(6,6,6);
+            cube = new BoxGeometry(variables).create(5,5,5);
+            m = new PhongMaterial();
+            m.setData(undefined);
+            m.cull = WebGLConst.BACK;
+            m.diff = newColor(0xFFFF00);
+
+            mesh = new Mesh(variables);
+            mesh.name = 'smallBox'
+            mesh.geometry = cube;
+            mesh.material = m; 
+            mesh.z = 1500;
+            this.directBox = mesh;
+            // scene.addChild(mesh);
+            mesh.x = -94.80776977539062;
+            mesh.y = 47.30513000488281;
+            // mesh.z = 314.3568115234375;
+            ////////cameraBox
+            cube = new BoxGeometry(variables).create(10,10,10);
             m = new PhongMaterial();
             m.setData(undefined);
             m.cull = WebGLConst.BACK;
             m.diff = newColor(0xFF0000);
 
             mesh = new Mesh(variables);
-            mesh.name = 'smallBox'
+            mesh.name = 'cameraBox'
             mesh.geometry = cube;
-            mesh.material = m;
+            mesh.material = m; 
+            mesh.x = camera.x;
+            mesh.y = camera.y;
+            mesh.z = camera.z;
+            // scene.addChild(mesh);
+            this.cameraBox = mesh;
 
-            mesh.x = -94.80776977539062;
-            mesh.y = 47.30513000488281;
-            mesh.z = 314.3568115234375;
-
-            scene.addChild(mesh);
+            
             // -94.80776977539062, 47.30513000488281, 314.3568115234375
             // -101.10054016113281, 50.44496154785156, 335.221923828125,
             // 100.88992309570312, 335.221923828125
 
 
             for(let i = 0 ; i < 10; ++i){
-                let cube = new BoxGeometry(variables).create(100,100,100);
+                let cube = new BoxGeometry(variables).create(50,50,50);
                 m = new PhongMaterial();
                 m.setData(undefined);
                 m.cull = WebGLConst.BACK;
@@ -197,14 +241,20 @@ module rf{
                 mesh.material = m;
 
                 mesh.x = (i-5) * 300;
-                mesh.y = Math.random() * 200 - 100;
-                mesh.z = Math.random() * 100 + 4000;
+                // mesh.x = Math.random() * 6000 - 6000;
+                mesh.y = Math.random() * 1000 - 500;
+                mesh.z = 3000;//Math.random() * 4000 + 2000;
 
                 scene.addChild(mesh);
             }
 
             this.rayCaster = new Raycaster(100000);
 
+
+            TEMP_VECTOR3D.set([0,0,1000000000000000000000]);
+            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D)
+            TEMP_VECTOR3D.v4_scale(1/TEMP_VECTOR3D.w)
+            console.log(TEMP_VECTOR3D)
 
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
