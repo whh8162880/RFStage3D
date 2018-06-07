@@ -155,7 +155,7 @@ module rf{
         len[0] = xScale;        len[1] = 0;                   len[2] = 0;                                       len[3] = 0;
         len[4] = 0;             len[5] = yScale;              len[6] = 0;                                       len[7] = 0;
         len[8] = 0;             len[9] = 0;                   len[10] =  (zFar + zNear) / (zFar - zNear);        len[11] = 1.0;
-        len[12] = 0;            len[13] = 0;                  len[14] = 2* zFar * zNear / (zNear - zFar);    len[15] = 0;
+        len[12] = 0;            len[13] = 0;                  len[14] =  zFar * zNear / (zNear - zFar);    len[15] = 0;
         camera.originFar = 0.5*height*yScale;
     }
 }
