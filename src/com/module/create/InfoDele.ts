@@ -1,7 +1,7 @@
 module rf{
 	export class InfoDele extends TEventInteresterDele{
 	
-        $skin:InfoDele & IMODULE_CREATE_DELE_INFO;
+        $skin:Component & InfoDele & IMODULE_CREATE_DELE_INFO;
         
         constructor(skin: Component) {
             super(skin);
@@ -12,7 +12,7 @@ module rf{
         }
         
         bindComponents():void{
-             this.$skin = this._skin as InfoDele & IMODULE_CREATE_DELE_INFO;
+             this.$skin = this._skin as Component & InfoDele & IMODULE_CREATE_DELE_INFO;
         }
 
         awaken(): void {
