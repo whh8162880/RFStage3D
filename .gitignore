@@ -1,5 +1,4 @@
 .tscache
-debug.html
 /build
 .vs
 .vscode
@@ -11,3 +10,4 @@ Main.ts
 *temp
 恢复_*
 *.rar
+debug*
