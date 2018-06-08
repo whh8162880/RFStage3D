@@ -26,6 +26,7 @@ module rf {
         ui = "ui",
         lightDirection = "lightDirection",
         originFar = "originFar",
+        logDepthFar = "logDepthFar",
         vc_diff = "vc_diff",
         vc_emissive = "vc_emissive",
         vc_bones="bones"

@@ -50,6 +50,9 @@ module rf{
                 return;
             }
 
+            var isFragDepthAvailable = gl.getExtension("EXT_frag_depth");
+            console.log("isFragDepthAvailable", isFragDepthAvailable)
+
             ROOT.on(MouseEventX.CLICK,this.raytest,this);
 
             let perfix = "../assets/"
@@ -76,8 +79,8 @@ module rf{
             scene.camera = camera;
             // let f = camera.originFar;
             // f = Math.sqrt(f*f / 3);
-            camera.setPos(0,0,0);
-            // camera.lookat(newVector3D(0,0,0));
+            camera.setPos(0,0,-1000);
+            camera.lookat(newVector3D(0,0,0));
             let ctl = new TrackballControls(camera);
             ctl.lock = true;
             
@@ -228,12 +231,13 @@ module rf{
             // 100.88992309570312, 335.221923828125
 
 
-            for(let i = 0 ; i < 10; ++i){
-                let cube = new BoxGeometry(variables).create(50,50,50);
+            for(let i = 0 ; i < 1000; ++i){
+                let cube = new BoxGeometry(variables).create(100,100,100);
                 m = new PhongMaterial();
                 m.setData(undefined);
                 m.cull = WebGLConst.BACK;
-                m.diff = newColor(0xAAAAAA);
+                let color = Math.random()*0xFFFFFF;
+                m.diff = newColor(color);
 
                 mesh = new Mesh(variables);
                 mesh.name = "box_" + String(i) 
@@ -241,9 +245,9 @@ module rf{
                 mesh.material = m;
 
                 mesh.x = (i-5) * 300;
-                // mesh.x = Math.random() * 6000 - 6000;
+                mesh.x = Math.random() * 1000 - 500;
                 mesh.y = Math.random() * 1000 - 500;
-                mesh.z = 3000;//Math.random() * 4000 + 2000;
+                mesh.z = Math.random() * 1000 - 500;
 
                 scene.addChild(mesh);
             }

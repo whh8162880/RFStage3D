@@ -74,6 +74,8 @@ namespace rf {
 	export interface IContext3DSetting{
 		cull:number;
 		depth:boolean;
+		logarithmicDepthBuffer:boolean;
+		use_logdepth_ext:boolean;
 		depthMode:number;
 		src:number;
 		dst:number;
@@ -85,6 +87,8 @@ namespace rf {
 		bufferLink:Link;
 		triangles:number;
 		dc:number;
+		logarithmicDepthBuffer:boolean = true;
+		use_logdepth_ext:boolean = false;
 		// change:number;
 		
 		setting:IContext3DSetting;
@@ -438,7 +442,7 @@ namespace rf {
 			
 			
 		}
-
+		
 		public setRenderToBackBuffer(): void {
 			let g = gl;
 			let{backBufferWidth,backBufferHeight,render_setting}=this;
