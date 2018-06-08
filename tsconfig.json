@@ -33,5 +33,5 @@
     ".d.ts",
     "Interface"
   ],
-  "templete":"debug.html"
+  "templete":"d.html"
 }

@@ -38,7 +38,7 @@ module rf{
 
 		
 		gotoAndStop(clip:any, refresh:Boolean=false):void{
-			const{symbol, graphics} = this;
+			const{symbol, graphics , source} = this;
 			if(symbol == undefined){
 				// this.gotoAndStop(clip,refresh);
 				return;
@@ -79,20 +79,18 @@ module rf{
 					sp = this[name];
 					if(!sp)
 					{
-						sp = recyclable(ComponentClass[type]);
-						sp.source = this.source;
-						if(type == ComponentConst.Label)
-						{//文本处理
+						if(type == ComponentConst.Label){
 							let textElement = ele as IDisplayTextElement;
+							let{format:e_format,width,height,text,color,multiline}=textElement
 							let textfield:TextField = recyclable(TextField);
-							let e_format:object = textElement.format;
+
 							let format:TextFormat = recyclable(TextFormat).init();
 							format.size = e_format["size"] == undefined ? 12 : e_format["size"];
 							format.align = e_format["alignment"] == undefined ? "left" : e_format["alignment"];
 
-							textfield.init(this.source, format);
-							textfield.color = textElement.color;
-							textfield.multiline = textElement.multiline;
+							textfield.init(source, format);
+							textfield.color = color;
+							textfield.multiline = multiline;
 							if(textElement.input){
 								textfield.type = TextFieldType.INPUT;
 								textfield.mouseEnabled = true;
@@ -100,24 +98,30 @@ module rf{
 								textfield.type = TextFieldType.DYNAMIC;
 							}
 							
-							textfield.setSize(textElement.width,textElement.height);
-							textfield.text = textElement.text;
-							sp["text"] = textfield;
-							sp.addChild(textfield);
+							textfield.setSize(width,height);
+							if(text){
+								textfield.text = text;
+							}
+
+							textfield.x = x;
+							textfield.y = y;
+							this.addChild(textfield);
+
+							textfield.name = name;
+							this[name] = textfield;
+						}else{
+							sp = recyclable(ComponentClass[type]);
+							sp.source = source;
+							sp.setSymbol(ele as IDisplaySymbol);
+
+							
+							sp.locksize = true;
 							sp.x = x;
 							sp.y = y;
-							sp.setSize(textfield.w, textfield.h);
 							this.addChild(sp);
-						}else{
-							sp.setSymbol(ele as IDisplaySymbol);
-							sp.locksize = true;
+							sp.name = name;
+							this[name] = sp;
 						}
-						sp.x = x;
-						sp.y = y;
-						
-						this.addChild(sp);
-						sp.name = name;
-						this[name] = sp;
 					}
 				}else{
 					this.renderFrameElement(ele);
@@ -183,7 +187,7 @@ module rf{
 			
 		}
 
-		_selected:boolean;
+		_selected:boolean = false;
 		set selected(value:boolean){this._selected = value;this.doSelected();}
 		get selected():boolean{return this._selected;}
 		doSelected():void{}
@@ -204,15 +208,9 @@ module rf{
         sleep():void{}
 	}
 
-	export interface ILabel{
-		label:string;
-		editable:boolean;
-		text:TextField;
-	}
 
-
-	export class Label extends Component implements ILabel{
-		text:TextField;
+	export class Label extends Component{
+		txt_label:TextField;
 		//---------------------------------------------------------------------------------------------------------------
 		//
 		//label
@@ -220,7 +218,7 @@ module rf{
 		//---------------------------------------------------------------------------------------------------------------
 		_label:string;
 		set label(value:string){this._label = value+"";this.doLabel();}
-		get label():string{const{_editable,text,_label}=this;if(_editable){return text.text;}return _label;}
+		get label():string{const{_editable,txt_label,_label}=this;if(_editable){return txt_label.text;}return _label;}
 		_editable:boolean;
 		set editable(value:boolean){this._editable = value;this.doEditable();}
 		get editable():boolean{return this._editable;}		
@@ -233,9 +231,9 @@ module rf{
 		}
 
 		doLabel(){
-			const{text,_label,_editable}=this;
-			if(text){
-				text.text = _label;
+			const{txt_label,_label,_editable}=this;
+			if(txt_label){
+				txt_label.text = _label;
 				// if(!_editable){
 				// 	textField.w = textField.textWidth+5;
 				// 	textField.h = textField.textHeight+5;
@@ -247,11 +245,7 @@ module rf{
 		textResize(){}
 	}
 
-	export interface IButton extends ILabel{
-		mouseDown:boolean;
-		addClick(func:Function,thisObj:any);
-	}
-	export class Button extends Label implements IButton{
+	export class Button extends Label{
 		mouseDown:boolean = false;
 		bindComponents():void
 		{
@@ -289,14 +283,14 @@ module rf{
 		}
 		
 		protected mouseDownHandler(event:EventX):void{
-			this.on(MouseEventX.MouseUp, this.mouseUpHandler, this);
+			ROOT.on(MouseEventX.MouseUp, this.mouseUpHandler, this);
 			this.mouseDown = true;
 			this.clipRefresh();
 		}
 
 		protected mouseUpHandler(event:EventX):void{
 			this.mouseDown = false;
-			this.off(MouseEventX.MouseUp, this.mouseUpHandler);
+			ROOT.off(MouseEventX.MouseUp, this.mouseUpHandler);
 			this.clipRefresh();
 		}
 
@@ -305,8 +299,8 @@ module rf{
 		}
 
 		protected clipRefresh():void{
-			const{mouseDown} = this;
-			this.gotoAndStop(mouseDown ? 2 : (this.mouseroll ? 1 : 0));
+			const{mouseDown,mouseroll} = this;
+			this.gotoAndStop(mouseDown ? 2 : (mouseroll ? 1 : 0));
 		}
 
 		addClick(listener:Function,thisObj:any){
@@ -334,6 +328,11 @@ module rf{
 		doSelected():void{
 			this.simpleDispatch(EventT.SELECT);
 			this.clipRefresh();
+		}
+
+		protected clipRefresh():void{
+			const{mouseDown,mouseroll,_selected} = this;
+			this.gotoAndStop(_selected ? (mouseDown ? 6 : (mouseroll ? 5 : 4)) : (mouseDown ? 2 : (mouseroll ? 1 : 0) ) );
 		}
 	}
 
@@ -484,7 +483,7 @@ module rf{
 		doSelected():void{
 			this.clipRefresh();
 
-			let text:TextField = this.text;
+			let text:TextField = this.txt_label;
 			let colors:object = TabItem.colors;
 			let {_selected, _label} = this;
 			if(colors != undefined && text != undefined)
@@ -544,41 +543,33 @@ module rf{
 		 */
 		init(target:Sprite, w:number, h:number, scrolltype:number = ScrollType.H_SCROLL):void
 		{
-			this.scrolltype = scrolltype;
-			this.target = target;
-
-			target.renderer = new BatchRenderer(target);
-
-			this._scroll = new Scroll(target, w, h);
-			this._scroll.hStep = 0;
-			this._scroll.vStep = 1;
-			this._scroll.areacheck = true;
+			// this.scrolltype = scrolltype;
+			// this.target = target;
+			// target.renderer = new BatchRenderer(target);
+			// this._scroll = new Scroll(target, w, h);
+			// this._scroll.hStep = 0;
+			// this._scroll.vStep = 1;
+			// this._scroll.areacheck = true;
 			// target需要支持mousewheel事件
 			let {mouseWheelHandler, targetScrollHandler, upHandler, downHandler, mousedownHandler, targetresizeHandler} = this;
-
 			target.addEventListener(MouseEventX.MouseWheel, mouseWheelHandler, this);
 			target.on(EventT.RESIZE, targetresizeHandler,this);
-
 			this._scroll.addEventListener(EventT.SCROLL, targetScrollHandler, this);
-
 			this.btn_up.addClick(upHandler, this);
 			this.btn_down.addClick(downHandler, this);
 			this.btn_thumb.addEventListener(MouseEventX.MouseDown, mousedownHandler, this);
-
 			if(scrolltype == ScrollType.H_SCROLL)
 			{
 				this._defaultLen = w - this.btn_up.w - this.btn_down.w;
 				this.track.setSize(this._defaultLen, this.track.h);
 				this.btn_down.x = w - this.btn_down.w;
 				this._skin.setSize(w, this._skin.h);//这个地方需要对——skin重新赋值 目前因为使用setsize会锁定检测区域 因此需要重新赋值 
-
 				this._maxPos = this.btn_down.x - this.btn_thumb.w;
 			}else if(scrolltype == ScrollType.V_SCROLL){
 				this._defaultLen = h - this.btn_down.h - this.btn_up.h;
 				this.track.setSize(this.track.w, this._defaultLen);
 				this.btn_down.y = h - this.btn_down.h;
 				this._skin.setSize(this._skin.w, h);
-
 				this._maxPos = this.btn_down.y - this.btn_thumb.h;
 			}
 		}
@@ -599,7 +590,6 @@ module rf{
 				this._maxPos = this.btn_down.x - this.btn_thumb.w;
 			}else{
 				this.btn_thumb.setSize(this.btn_thumb.w, tracklen);
-
 				this._maxPos = this.btn_down.y - this.btn_thumb.h;
 			}
 		}

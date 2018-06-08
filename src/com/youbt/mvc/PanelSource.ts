@@ -79,7 +79,11 @@ module rf{
 
             let vo = frames["emptyTextarea"];
             if(vo){
-                this.setArea(BitmapSource.PACK,vo.x,vo.y,vo.w,vo.h);
+                let area = this.setArea(BitmapSource.PACK,vo.x,vo.y,vo.w,vo.h);
+                let evo = this.setSourceVO("origin",1,1);
+                bmd.fillRect(evo.x,evo.y,evo.w,evo.h,"rgba(255,255,255,255)");
+                this.originU = evo.ul;
+                this.originV = evo.vt;
             }
 
             this.status = LoadStates.COMPLETE;
