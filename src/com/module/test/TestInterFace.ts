@@ -1,41 +1,41 @@
 module rf{
 	// %code_start%
-	export interface IMODULE_TEST_SYMBOL0_BTN_DECARRAW{
+	export interface IMODULE_TEST_SYMBOL3_TRACK{
 
 	}
-	export interface IMODULE_TEST_SYMBOL0_TRACK{
+	export interface IMODULE_TEST_SYMBOL3_BTN_DOWN{
 
 	}
-	export interface IMODULE_TEST_SYMBOL0_BTN_ADDARRAW{
+	export interface IMODULE_TEST_SYMBOL3_BTN_UP{
 
 	}
-	export interface IMODULE_TEST_SYMBOL0_BTN_THUMB{
+	export interface IMODULE_TEST_SYMBOL3_BTN_THUMB{
 
 	}
-	export interface IMODULE_TEST_SYMBOL0{
-		btn_thumb?:Button & IMODULE_TEST_SYMBOL0_BTN_THUMB;
-		btn_addarraw?:Button & IMODULE_TEST_SYMBOL0_BTN_ADDARRAW;
-		track?:Component & IMODULE_TEST_SYMBOL0_TRACK;
-		btn_decarraw?:Button & IMODULE_TEST_SYMBOL0_BTN_DECARRAW;
+	export interface IMODULE_TEST_SYMBOL3{
+		btn_thumb?:Button & IMODULE_TEST_SYMBOL3_BTN_THUMB;
+		btn_up?:Button & IMODULE_TEST_SYMBOL3_BTN_UP;
+		btn_down?:Button & IMODULE_TEST_SYMBOL3_BTN_DOWN;
+		track?:Component & IMODULE_TEST_SYMBOL3_TRACK;
 
 	}
-	export interface IMODULE_TEST_SYMBOL1_BTN_THUMB{
+	export interface IMODULE_TEST_SYMBOL2_BTN_DOWN{
 
 	}
-	export interface IMODULE_TEST_SYMBOL1_BTN_ADDARRAW{
+	export interface IMODULE_TEST_SYMBOL2_BTN_UP{
 
 	}
-	export interface IMODULE_TEST_SYMBOL1_TRACK{
+	export interface IMODULE_TEST_SYMBOL2_BTN_THUMB{
 
 	}
-	export interface IMODULE_TEST_SYMBOL1_BTN_DECARRAW{
+	export interface IMODULE_TEST_SYMBOL2_TRACK{
 
 	}
-	export interface IMODULE_TEST_SYMBOL1{
-		btn_decarraw?:Button & IMODULE_TEST_SYMBOL1_BTN_DECARRAW;
-		track?:Component & IMODULE_TEST_SYMBOL1_TRACK;
-		btn_addarraw?:Button & IMODULE_TEST_SYMBOL1_BTN_ADDARRAW;
-		btn_thumb?:Button & IMODULE_TEST_SYMBOL1_BTN_THUMB;
+	export interface IMODULE_TEST_SYMBOL2{
+		track?:Component & IMODULE_TEST_SYMBOL2_TRACK;
+		btn_thumb?:Button & IMODULE_TEST_SYMBOL2_BTN_THUMB;
+		btn_up?:Button & IMODULE_TEST_SYMBOL2_BTN_UP;
+		btn_down?:Button & IMODULE_TEST_SYMBOL2_BTN_DOWN;
 
 	}
 	export interface IMODULE_TEST_AREA_CK_CHECKBOX_TXT_LABEL{
@@ -67,8 +67,8 @@ module rf{
 	}
 	export interface IMODULE_TEST{
 		area?:Component & IMODULE_TEST_AREA;
-		symbol1?:Component & IMODULE_TEST_SYMBOL1;
-		symbol0?:Component & IMODULE_TEST_SYMBOL0;
+		symbol2?:Component & IMODULE_TEST_SYMBOL2;
+		symbol3?:Component & IMODULE_TEST_SYMBOL3;
 
 	}	
 // %code_end%
