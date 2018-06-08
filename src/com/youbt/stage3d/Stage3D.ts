@@ -12,8 +12,8 @@ module rf {
         geometry: GeometryBase;
         invSceneTransform: IMatrix3D;
 
-        minBoundingBox:OBB;
-        boundingSphere:Sphere;
+        minBoundingBox:OBB = new OBB();
+        boundingSphere:Sphere = new Sphere();
         distance:number = Number.MAX_VALUE;
         
         addChild(child: DisplayObject) {
@@ -108,17 +108,18 @@ module rf {
 
             if(!geometry)return intersects;
 
+            if(this.minBoundingBox == undefined || this.minBoundingBox.change)
+            {
+                let obb = this.minBoundingBox = OBB.updateOBBByGeometry(geometry, this.minBoundingBox);
+                geometry.centerPoint.set([ (obb.minx+obb.maxx)*0.5, (obb.miny+obb.maxy)*0.5, (obb.minz+obb.maxz)*0.5, 1 ] );
+            }
             
-
-            if(this.minBoundingBox == undefined){
-                let obb = this.minBoundingBox = OBB.createOBBByGeometry(geometry);
-                geometry.centerPoint = newVector3D( (obb.minx+obb.maxx)*0.5, (obb.miny+obb.maxy)*0.5, (obb.minz+obb.maxz)*0.5, 1 );
+            if(this.boundingSphere == undefined || this.boundingSphere.change)
+            {
+                this.boundingSphere = geometry.calculateBoundingSphere(geometry.centerPoint, this.boundingSphere);
             }
-            if(this.boundingSphere == undefined){
-                this.boundingSphere = geometry.calculateBoundingSphere(geometry.centerPoint);
-            }
-
-            let{sphere, ray} = SceneObject;
+            
+            let{sphere} = SceneObject;
             //首先检测球
             sphere.copyFrom( this.boundingSphere );
 			sphere.applyMatrix4( this.sceneTransform, sphere );
@@ -126,7 +127,7 @@ module rf {
             if ( raycaster.ray.intersectsSphere( sphere ) == false ) {
                 return intersects;
             }
-            
+            let{ray} = SceneObject;
             ray.copyFrom( raycaster.ray ).applyMatrix4( this.invSceneTransform );
 
             let intersectPoint = ray.intersectBox( this.minBoundingBox);
@@ -214,7 +215,7 @@ module rf {
             this.camera2D = new Camera();
             this.camera3D = new Camera();
             this.cameraUI = new Camera();
-            this.cameraPerspective = new Camera(1000000);            
+            this.cameraPerspective = new Camera(100000);            
             this.renderer = new BatchRenderer(this);
             this.shadow = new ShadowEffect(1024,1024);
             this.renderLink = new Link();
@@ -275,6 +276,7 @@ module rf {
             if (scene.childChange) {
                 renderLink.clean();
                 this.filterRenderList(scene,renderLink);
+                scene.childChange = false;
             }
             let c = context3D;
             c.dc = 0;

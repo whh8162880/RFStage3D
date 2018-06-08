@@ -18,29 +18,34 @@ module rf{
             let mx = 2*nativeMouseX/stageWidth - 1;
             let my = -2*nativeMouseY/stageHeight + 1;
             this.rayCaster.setFromCamera(mx, my, scene.camera);
-            let intersects = this.rayCaster.intersectObjects(scene.childrens);
-            console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
-            let t = 3;
+            
+            
 
             if(e.data.ctrl){
-                let line = this.line;
+                let intersects = this.rayCaster.intersectObjects(scene.childrens);
+                console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
+                let t = 3;
+
+                // let line = this.line;
             
-                line.clear();
-                let end = TEMP_VECTOR3D;
-                end = this.rayCaster.ray.at(0, end);
-                line.moveTo(end.x, end.y, end.z,t, 0xff0000);
-                end = this.rayCaster.ray.at(50000, end);
-                line.lineTo(end.x, end.y, end.z,t, 0xff0000);
-                line.end();
+                // line.clear();
+                // let end = TEMP_VECTOR3D;
+                // end = this.rayCaster.ray.at(0, end);
+                // line.moveTo(end.x, end.y, end.z,t, 0xff0000);
+                // end = this.rayCaster.ray.at(50000, end);
+                // line.lineTo(end.x, end.y, end.z,t, 0xff0000);
+                // line.end();
 
-                this.cameraBox.x = scene.camera.x;
-                this.cameraBox.y = scene.camera.y;
-                this.cameraBox.z = scene.camera.z;
+                // this.cameraBox.x = scene.camera.x;
+                // this.cameraBox.y = scene.camera.y;
+                // this.cameraBox.z = scene.camera.z;
 
-                this.rayCaster.ray.at(500, TEMP_VECTOR3D);
-                this.directBox.setPos(TEMP_VECTOR3D.x, TEMP_VECTOR3D.y, TEMP_VECTOR3D.z);
+                // this.rayCaster.ray.at(500, TEMP_VECTOR3D);
+                // this.directBox.setPos(TEMP_VECTOR3D.x, TEMP_VECTOR3D.y, TEMP_VECTOR3D.z);
+
+                intersects = null
             }
-           
+            
         }
 
         public init(canvas?:HTMLCanvasElement):void{
@@ -79,7 +84,7 @@ module rf{
             scene.camera = camera;
             // let f = camera.originFar;
             // f = Math.sqrt(f*f / 3);
-            camera.setPos(0,0,-1000);
+            camera.setPos(0,0,-2500);
             camera.lookat(newVector3D(0,0,0));
             let ctl = new TrackballControls(camera);
             ctl.lock = true;
@@ -230,8 +235,9 @@ module rf{
             // -101.10054016113281, 50.44496154785156, 335.221923828125,
             // 100.88992309570312, 335.221923828125
 
+            
 
-            for(let i = 0 ; i < 1000; ++i){
+            for(let i = 0 ; i < 3000; ++i){
                 let cube = new BoxGeometry(variables).create(100,100,100);
                 m = new PhongMaterial();
                 m.setData(undefined);
@@ -243,11 +249,11 @@ module rf{
                 mesh.name = "box_" + String(i) 
                 mesh.geometry = cube;
                 mesh.material = m;
-
+                
                 mesh.x = (i-5) * 300;
-                mesh.x = Math.random() * 1000 - 500;
-                mesh.y = Math.random() * 1000 - 500;
-                mesh.z = Math.random() * 1000 - 500;
+                mesh.x = Math.random() * 10000 - 5000;
+                mesh.y = Math.random() * 10000 - 5000;
+                mesh.z = Math.random() * 10000 - 5000;
 
                 scene.addChild(mesh);
             }
@@ -410,7 +416,7 @@ module rf{
             drager.hStep = 0;
             drager.areacheck = true;
 
-*/
+
 
             for(let i = 1;i<2;i++){
                 let list = new List(ROOT.source,TestListItemRender,100,20);
@@ -421,7 +427,7 @@ module rf{
                 // ROOT.addChild(list);
             }
 
-
+*/
             // facade.toggleMediator(TestMediator,1);
             
 
