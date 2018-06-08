@@ -173,7 +173,10 @@ module rf{
             m.m3_append(camera.sceneTransform);
             c.setProgramConstantsFromMatrix(VC.mv,m);
             c.setProgramConstantsFromMatrix(VC.p,camera.len);
-            c.setProgramConstantsFromVector(VC.originFar,1/camera.originFar, 1, false)
+            c.setProgramConstantsFromVector(VC.originFar,1/camera.originFar, 1, false);
+            if(context3D.logarithmicDepthBuffer){
+                c.setProgramConstantsFromVector(VC.logDepthFar, camera.logDepthFar, 1, false);
+            }
             v.uploadContext(p);
 
             let i = c.getIndexByQuad(quad);
@@ -186,12 +189,33 @@ module rf{
 
 
         protected createProgram():Program3D{
+            let v_def = "";
+            let f_def = "";
+            if(context3D.logarithmicDepthBuffer){
+                // key += "-log_depth_buffer";
+                v_def += "#define LOG_DEPTH_BUFFER\n";
+                f_def += "#define LOG_DEPTH_BUFFER\n";
+                if(context3D.use_logdepth_ext){
+                    // key += "_ext";
+                    v_def += "#define LOG_DEPTH_BUFFER_EXT\n";
+                    f_def += "#define LOG_DEPTH_BUFFER_EXT\n";
+                }
+            }
 
             let vertexCode = `
+                ${v_def}
                 attribute vec3 posX;
                 attribute vec3 posY;
                 attribute float len;
                 attribute vec4 color;
+
+                #ifdef LOG_DEPTH_BUFFER
+                    #ifdef LOG_DEPTH_BUFFER_EXT
+                        varying float depth;
+                    #else
+                        uniform float logDepthFar;
+                    #endif
+                #endif
 
                 uniform mat4 mv;
                 uniform mat4 p;
@@ -211,7 +235,18 @@ module rf{
                     }
                     pos.xy += v.xy;
                     pos = p * pos;
+                    
                     gl_Position = pos;
+                    
+                    #ifdef LOG_DEPTH_BUFFER
+                        #ifdef LOG_DEPTH_BUFFER_EXT
+                            depth = gl_Position.w + 1.0;
+                        #else
+                            gl_Position.z = log2( max( 0.0000001, gl_Position.w + 1.0 ) ) * logDepthFar * 2.0 - 1.0;
+                            gl_Position.z *= gl_Position.w;
+                        #endif
+                    #endif
+
                     vColor = color;
                     // t2 = pos.z;
                     // pos = vec4(t2,t2,t2,1.0);
@@ -220,10 +255,21 @@ module rf{
             `
 
             let fragmentCode = ` 
+                ${f_def}
+                #ifdef LOG_DEPTH_BUFFER_EXT
+                    #extension GL_EXT_frag_depth : enable
+                #endif
                 precision mediump float;
                 varying vec4 vColor;
+                #ifdef LOG_DEPTH_BUFFER_EXT
+                    varying float depth;
+                    uniform float logDepthFar;
+                #endif
                 void main(void){
                     gl_FragColor = vColor;
+                    #ifdef LOG_DEPTH_BUFFER_EXT
+	                    gl_FragDepthEXT = log2( depth ) * logDepthFar;
+                    #endif
                 }
             `
 

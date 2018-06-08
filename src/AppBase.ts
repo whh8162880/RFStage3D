@@ -67,6 +67,11 @@ module rf {
             let g = gl;
             let container = new Scene(vertex_mesh_variable);
             let material = new Material();
+
+            let isFragDepthAvailable = gl.getExtension("EXT_frag_depth");
+            context3D.use_logdepth_ext = isFragDepthAvailable ? true : false;
+            // context3D.use_logdepth_ext = false;
+            
             material.depthMask = true;
             material.passCompareMode = WebGLConst.LEQUAL;
             material.srcFactor = WebGLConst.SRC_ALPHA;

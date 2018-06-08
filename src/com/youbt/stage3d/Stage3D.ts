@@ -221,7 +221,7 @@ module rf {
             this.camera2D = new Camera();
             this.camera3D = new Camera();
             this.cameraUI = new Camera();
-            this.cameraPerspective = new Camera();            
+            this.cameraPerspective = new Camera(1000000);            
             this.renderer = new BatchRenderer(this);
             this.shadow = new ShadowEffect(1024,1024);
             this.renderLink = new Link();

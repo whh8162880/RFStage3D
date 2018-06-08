@@ -18,11 +18,14 @@ module rf {
                 this.ray.origin.set([camera.pos[0], camera.pos[1], camera.pos[2], 1]);
                 // console.log("0000000", mousex, mousey, this.ray.origin, camera.rot);
                 
-                this.ray.direction.set( [mousex,mousey , 1, 1] )
+                this.ray.direction.set( [mousex,mousey , 0.9999, 1] )
 
                 TEMP_MATRIX3D.m3_invert(camera.len);
                 TEMP_MATRIX3D.m3_transformVector(this.ray.direction,this.ray.direction);
-                this.ray.direction.v4_scale(1/this.ray.direction.w);
+                if(this.ray.direction.w != 0){
+                    this.ray.direction.v4_scale(1/this.ray.direction.w);
+                }
+                
 
                 // console.log("111111:", this.ray.direction)
                 camera.transform.m3_transformVector(this.ray.direction, this.ray.direction);
