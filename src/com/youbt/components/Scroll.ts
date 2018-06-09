@@ -1,4 +1,4 @@
-/// <reference path="./component.ts" />
+/// <reference path="./Component.ts" />
 module rf{
 
     export interface IScrollData{

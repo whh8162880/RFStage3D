@@ -40,6 +40,7 @@ module rf {
 
         createSource():void{
             // panels= singleton(PanelSourceManage)
+
             let bmd = new BitmapData(2048,2048,true);
             let source = new BitmapSource().create("component",bmd,true);
             let vo = source.setSourceVO("origin",1,1);
@@ -60,6 +61,21 @@ module rf {
             pixelRatio = getPixelRatio(bmd.context);
 
             // pixelRatio = 1;
+
+
+
+            ComponentClass = {
+                0 : Component,
+                1 : Label,
+                2 : Button,
+                3 : CheckBox,
+                4 : RadioButton,
+                5 : TabItem,
+                6 : ScrollBar,
+                7 : Component,
+                9 : Component
+            }
+
         }
 
 

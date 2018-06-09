@@ -29,7 +29,7 @@
   ],
   "exclude": [
     "think/**/*",
-    "src/com/youbt/rfreference.ts",
+    // "src/com/youbt/rfreference.ts",
     ".d.ts",
     "Interface"
   ],

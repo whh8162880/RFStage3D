@@ -1,4 +1,3 @@
-/// <reference path="./AppBase.ts" />
 /// <reference path="./com/module/rfreference.ts" />
 module rf{
     // export let sp;

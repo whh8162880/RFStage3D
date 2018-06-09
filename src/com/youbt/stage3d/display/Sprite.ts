@@ -563,8 +563,8 @@ module rf {
             geometry.w = w;
             geometry.h = h;
 
-            w = Math.round(w * sx);
-            h = Math.round(h * sy);
+            w = w * sx;
+            h = h * sy;
 
 
             let x3 = w - rr,y3 = h - rb;

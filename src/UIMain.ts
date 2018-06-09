@@ -1,3 +1,4 @@
+/// <reference path="./com/module/rfreference.ts" />
 module rf{
     export class UIMain extends AppBase{
 

@@ -41,12 +41,16 @@ module rf{
         }
         
         setSize(width:number, height:number){
-            let{btn_down,track,btn_thumb}=this;
+            let{btn_down,track,btn_thumb,hitArea}=this;
             let sh = btn_down.h;
-            let h =height - sh * 2;
+			let h =height - sh * 2;
 
-            track.setSize(btn_thumb.w,h);
-            btn_down.y = h + sh;
+			track.setSize(track.w,h);
+			btn_thumb.setSize(btn_thumb.w,h);
+			btn_down.y = h + sh;
+			
+			hitArea.clean();
+            hitArea.updateArea(width, height, 0);
         }
 
 

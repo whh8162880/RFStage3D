@@ -96,9 +96,7 @@ module rf {
             }
 
             this.panel = panel;
-            if ("$panel" in this) {
-                this["$panel"] = panel;
-            }
+            this["$panel"] = panel;
         }
 
         startSync(): boolean {
