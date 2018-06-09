@@ -1,4 +1,4 @@
-///<reference path="../../youbt/mvc/MVC.ts" />
+///<reference path="../../youbt/components/MVC.ts" />
 module rf{
 	export class TestPanel extends Panel{
 		
@@ -20,6 +20,9 @@ module rf{
         mediatorReadyHandle(): void {
 			let{$panel:panel} = this;
             //event
+            let{bar_bar}=panel;
+
+            bar_bar.setSize(bar_bar.w,200);
 
             super.mediatorReadyHandle()
 

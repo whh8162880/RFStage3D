@@ -1,4 +1,4 @@
-/// <reference path="../stage3d/display/Component.ts" />
+/// <reference path="./component.ts" />
 module rf{
 
     export interface IScrollData{

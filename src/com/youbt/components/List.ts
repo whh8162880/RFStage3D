@@ -1,4 +1,4 @@
-/// <reference path="../stage3d/display/Component.ts" />
+/// <reference path="./Component.ts" />
 module rf{
     export interface IListOption {
         itemWidth?: number;     //item 宽度
