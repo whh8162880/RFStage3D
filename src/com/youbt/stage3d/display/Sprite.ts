@@ -9,12 +9,13 @@ module rf {
         material:Material;
         tm:ITimeMixer;
         scrollRect:Size;
+
         // triangleFaceToCull: string = Context3DTriangleFace.NONE;
         // sourceFactor: number;
         // destinationFactor: number;
         // depthMask: boolean = false;
         // passCompareMode: number;
-        public render(camera: Camera, now: number, interval: number): void { 
+        render(camera: Camera, now: number, interval: number) { 
             let i = 0;
             let childrens = this.childrens;
             let len = childrens.length;

@@ -8,6 +8,11 @@ module rf{
         max:number;
     }
 
+    export interface IScrollDrager{
+        dragDirX:number;
+        dragDirY:number;
+    }
+
 
     export class Drager extends MiniDispatcher{
         vStep:number = 1;
@@ -17,23 +22,27 @@ module rf{
 
         rect:Size
 
+        x:number;
+        y:number;
+
         width:number;
         height:number;
 
         target:RenderBase;
         tweener:ITweener;
         areacheck:boolean = false;
-        dragTarget:boolean = false;
 
         updateScroll(scroll:IScrollData,dlen:number,mlen:number){
             scroll.dlen = dlen;
             scroll.mlen = mlen;
             scroll.max = Math.max(0,mlen-dlen);
+            scroll.pos = 0;
             return scroll;
         }
 
-        setArea(w:number,h:number,width:number,height:number){
-            let{rect,hStep,vStep,updateScroll,dragTarget,target}=this;
+        setArea(w:number,h:number,width:number,height:number,x:number = 0,y:number = 0){
+            let{rect,hStep,vStep,updateScroll,target}=this;
+
 
             if(!rect){
                 this.rect = rect = {x:0,y:0,w:w,h:h};
@@ -42,9 +51,12 @@ module rf{
                 rect.h = h;
             }
 
-            if(dragTarget){
-                rect.x = target.x;
-                rect.y = target.y;
+            this.x = x;
+            this.y = y;
+
+            if(target){
+                rect.x = target.x - x;
+                rect.y = target.y - y;
             }
 
             this.width = width;
@@ -183,25 +195,31 @@ module rf{
         }
 
 
+        disbind(target:RenderBase){
 
+            if(this.target == target){
+                this.target = undefined;
+            }
 
-        bind(target:RenderBase,drager:boolean){
-            let{target:t,mouseDownHandler}=this;
-            if(t == target){
-                return;
-            }
-            if(t){
-                t.off(MouseEventX.MouseDown,mouseDownHandler);
-            }
-            this.target = target;
-            target.on(MouseEventX.MouseDown,mouseDownHandler,this);
-            this.dragTarget = drager;
+            target.off(MouseEventX.MouseDown,this.mouseDownHandler);
+        }
+
+        bind(target:RenderBase,directionX:number,directionY:number){
+            target.on(MouseEventX.MouseDown,this.mouseDownHandler,this);
+
+            let t = target as RenderBase & IScrollDrager;
+            t.dragDirX = directionX;
+            t.dragDirY = directionY;
+
             return this;
         }
 
 
+        protected currentDrager:RenderBase & IScrollDrager;
+
         mouseDownHandler(event:EventX){
             let{mouseMoveHandler,mouseUpHandler}=this;
+            this.currentDrager = event.currentTarget as RenderBase & IScrollDrager;
             ROOT.on(MouseEventX.MouseMove,mouseMoveHandler,this);
             ROOT.on(MouseEventX.MouseUp,mouseUpHandler,this);
             this.start();
@@ -216,12 +234,13 @@ module rf{
 
 
         mouseMoveHandler(event:EventX){
+            let{dragDirX,dragDirY} = this.currentDrager;
             let{ox,oy} = event.data;
-            this.update(ox,oy);
+            this.update(ox * dragDirX,oy * dragDirY);
         }
 
         refreshScroll(tweener?:ITweener){
-            let{hStep,vStep,rect,width,height,dragTarget,target}=this;
+            let{hStep,vStep,rect,width,height,target}=this;
             let{x,y,w,h}=rect;
             if(hStep > 0){
                 let{hScroll:scroll}=this;
@@ -241,14 +260,14 @@ module rf{
             }
 
             if(vStep > 0){
-                let{hScroll:scroll}=this;
+                let{vScroll:scroll}=this;
                 let{max}=scroll
                 if(y > 0){
                     scroll.mlen = height + y;
                     scroll.pos = max;
                 }else if(y < -max){
                     scroll.mlen = height - y;
-                    scroll.pos = 0;
+                    scroll.pos =  Math.max(0,scroll.mlen - scroll.dlen);
                 }else{
                     scroll.mlen = height;
                     scroll.pos = y;
@@ -258,8 +277,8 @@ module rf{
             }
             this.simpleDispatch(EventT.SCROLL,this);
 
-            if(dragTarget){
-                target.setPos(x,y);
+            if(target){
+                target.setPos(x+this.x,y+this.y);
             }
         }
 
@@ -269,12 +288,10 @@ module rf{
     export class Scroll extends Drager{
         constructor(target:RenderBase){
             super();
-
             let{scrollRect} = target;
             this.rect = scrollRect;
             let{w,h} = scrollRect;
             this.areacheck = true;
-            this.bind(target,false);
             if(target.status | DChange.area){
                 target.updateHitArea();
             }
@@ -347,18 +364,28 @@ module rf{
                 }
                 
                 if(vStep > 0){
-                    if(y + height < h ){
-                        if(!o){
-                            o = {y:h - height};
-                        }else{
-                            o.y = h - height;
-                        }   
-                    }else if(y > 0){
-                        if(!o){
-                            o = {y:0};
-                        }else{
-                            o.y = 0;
-                        } 
+                    if(height > h){
+                        if(y + height < h ){
+                            if(!o){
+                                o = {y:h - height};
+                            }else{
+                                o.y = h - height;
+                            }   
+                        }else if(y > 0){
+                            if(!o){
+                                o = {y:0};
+                            }else{
+                                o.y = 0;
+                            } 
+                        }
+                    }else{
+                        if(y != 0){
+                            if(!o){
+                                o = {y:0};
+                            }else{
+                                o.y = 0;
+                            }   
+                        }
                     }
                 }
             }

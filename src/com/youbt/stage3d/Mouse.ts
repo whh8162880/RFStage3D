@@ -177,6 +177,7 @@ module rf{
 
 
         touchHandler(e:TouchEvent):void{
+            e.preventDefault();
             let mouse = MouseInstance;
             const{touchElement:elements,touchLen,touchCenterY:centerY}=mouse;
             var touch = e.changedTouches[0];
@@ -249,6 +250,7 @@ module rf{
         touchCenterY:number = 0;
         touchLen:number = 0;
         touchMoveHandler(e:TouchEvent):void{
+            e.preventDefault();
             let mouse = MouseInstance;
             let now = engineNow;
             if(mouse.preMoveTime == now){

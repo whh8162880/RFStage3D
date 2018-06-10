@@ -20,9 +20,10 @@ module rf{
         mediatorReadyHandle(): void {
 			let{$panel:panel} = this;
             //event
-            let{bar_bar}=panel;
-
+            let{bar_bar,area}=panel;
+            let scroll = area.setScrollRect(100,100);
             bar_bar.setSize(bar_bar.w,200);
+            bar_bar.bindScroll(scroll);
 
             super.mediatorReadyHandle()
 

@@ -11,6 +11,8 @@ module rf{
         constructor(source?:BitmapSource){
 			super(source);
 		}
+
+		scroll:Scroll;
 		
         currentClip:number;
 
@@ -209,7 +211,26 @@ module rf{
 		
 		bindComponents():void{}
 		awaken():void{}
-        sleep():void{}
+		sleep():void{}
+		
+
+		setScrollRect(w:number,h:number){
+			let{renderer,scroll}=this;
+
+			if(!renderer){
+				this.renderer = renderer = new BatchRenderer(this);
+			}
+
+			this.scrollRect = {x:0,y:0,w:w,h:h};
+
+			if(!scroll){
+				this.scroll = scroll = new Scroll(this);
+				scroll.bind(this,1,1);
+			}
+
+			return scroll;
+			
+		}
 	}
 
 
