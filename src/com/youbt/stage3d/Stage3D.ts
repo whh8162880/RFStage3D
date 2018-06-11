@@ -159,11 +159,16 @@ module rf {
         sun: DirectionalLight;
         childChange: boolean;
         camera: Camera;
+
+        rayCaster:Raycaster;
+
         constructor(variables?: { [key: string]: IVariable }) {
             super(variables);
             this.scene = this;
             this.hitArea = new HitArea();
             this.hitArea.allWays = true;
+
+            this.rayCaster = new Raycaster(50000);
         }
 
         public render(camera: Camera, now: number, interval: number): void {
@@ -183,6 +188,23 @@ module rf {
             if(childrens.length){
                 this.material.uploadContextSetting();
                 super.render(_camera, now, interval);
+            }
+        }
+
+        getObjectByPoint(dx: number, dy: number,scale:number): SceneObject {
+            if(this.camera == undefined){
+                return;
+            }
+
+            let mx = 2*dx/stageWidth - 1;
+            let my = -2*dy/stageHeight + 1;
+            this.rayCaster.setFromCamera(mx, my, this.camera);
+            
+            let intersects = this.rayCaster.intersectObjects(this.childrens, false);
+            if(intersects.length){
+                return intersects[0].obj;
+            }else{
+                return super.getObjectByPoint(dx, dy, scale) as SceneObject;
             }
         }
     }

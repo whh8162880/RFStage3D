@@ -236,7 +236,7 @@ module rf{
 
             
 
-            for(let i = 0 ; i < 3000; ++i){
+            for(let i = 0 ; i < 2000; ++i){
                 let cube = new BoxGeometry(variables).create(100,100,100);
                 m = new PhongMaterial();
                 m.setData(undefined);
