@@ -1,6 +1,6 @@
 module rf{
 
-    export interface IBitmapSourceVO extends IFrame{
+    export interface IBitmapSourceVO extends IUVFrame{
         source:BitmapSource;
 
         name:string;
@@ -10,12 +10,7 @@ module rf{
         //真实大小
         rw:number;
         rh:number;
-
-        //UV位置
-        ul:number;
-        ur:number;
-        vt:number;
-        vb:number;
+        
     }
 
     export function refreshUV(vo:IBitmapSourceVO, mw:number,mh:number):void{
