@@ -48,6 +48,13 @@ module rf {
         iy:number;
     }
 
+    export interface IUVFrame extends IFrame{
+        ul:number;
+        ur:number;
+        vt:number;
+        vb:number;
+    }
+
     export interface IColor{
         r:number,
         g:number,
