@@ -11,6 +11,7 @@ module rf {
 
         public weight: number = 0;
 
+        public time:number = 0;
 
         public onRecycle(): void {
             this.data = undefined;
