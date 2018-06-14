@@ -234,7 +234,8 @@ module rf{
             // -101.10054016113281, 50.44496154785156, 335.221923828125,
             // 100.88992309570312, 335.221923828125
 
-            
+            let ani = new Ani();
+            ani.load(perfix + "ani/e/e.ha")
 
             for(let i = 0 ; i < 2000; ++i){
                 let cube = new BoxGeometry(variables).create(100,100,100);

@@ -244,7 +244,7 @@ module rf {
         /**
          * 图片
          */
-        image,
+        image
     }
 
 
