@@ -234,9 +234,6 @@ module rf{
             // -101.10054016113281, 50.44496154785156, 335.221923828125,
             // 100.88992309570312, 335.221923828125
 
-            let ani = new Ani();
-            ani.load(perfix + "ani/e/e.ha")
-
             for(let i = 0 ; i < 2000; ++i){
                 let cube = new BoxGeometry(variables).create(100,100,100);
                 m = new PhongMaterial();
@@ -265,6 +262,11 @@ module rf{
             camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D)
             TEMP_VECTOR3D.v4_scale(1/TEMP_VECTOR3D.w)
             console.log(TEMP_VECTOR3D)
+
+            let aniuri = "e";
+            let ani:Ani = new Ani();
+            ani.load("e");
+            ROOT.addChild(ani);
 
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
@@ -649,10 +651,6 @@ module rf{
             // panel.y = 300;
             // ROOT.addChild(panel);
             // let panelutil = new PanelUtils();
-
-
-            // 潘华专用  
-            new Pan_Test();
         }
 
 
