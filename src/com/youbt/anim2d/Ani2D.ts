@@ -17,6 +17,9 @@ module rf {
 
     export class Anim2dSource extends BitmapSource {
         config: any;
+
+        cachefs:{ [key: string]: IBitmapSourceVO };
+
         constructor(url: string) {
             super();
             this.name = url;
@@ -81,15 +84,14 @@ module rf {
      * 为了更好的查找ani 目前使用的目录是以名称作为文件夹包了一层
      */
     export class Ani extends Sprite {
-        constructor() {
-            super();
+        constructor(source?:BitmapSource) {
+            super(source);
             this.renderer = new BatchRenderer(this);
             this.source = undefined;
         }
 
         url: string;
         config: ANIData
-
 
         fe: number;
         cur: number = 0;
@@ -173,14 +175,9 @@ module rf {
                 if (!vo) return;
                 let g = this.graphics;
                 g.clear();
-                g.drawBitmap(0, 0, vo, config.matrix2d);
+                g.drawBitmap(vo.ix, vo.iy, vo, config.matrix2d);
                 g.end();
             }
-
-            
-
-            
-
         }
 
         // setSize(width: number, height: number) {
@@ -207,4 +204,187 @@ module rf {
         // }
     }
 
+    export class PakAnim extends Ani{
+        constructor()
+        {
+            super();
+        }
+        
+        load(url: string): void {
+
+            url = getFullUrl(url, ROOT_PERFIX, "hp");
+            if (this.url == url) { return; }
+
+            this.url = url;
+
+            let source = bitmapSources[url] as Anim2dSource;
+            if (!source) {
+                bitmapSources[url] = source = new Anim2dSource(url);
+                source.on(EventT.COMPLETE, this.onSouceComplete, this);
+                source.load();
+            } else {
+                if (source.status == LoadStates.COMPLETE) {
+                    this.play(source.config);
+                } else {
+                    source.on(EventT.COMPLETE, this.onSouceComplete, this);
+                    if (source.status == LoadStates.WAIT) {
+                        source.load();
+                    }
+                }
+            }
+        }
+    }
+
+    /** 
+     * 定制版本ani 公用一个batcher
+     * 可以指定source 不知道默认是componentSource
+     * 加载完成之后将frames写入到指定的source中去
+    */
+//    export class AniSimple extends Ani{
+//         //限制最大帧
+//         lm:number = 6;
+
+//         cs:{ [key: string]: IBitmapSourceVO };
+
+//        constructor(source?:BitmapSource){
+//            super(source);
+//            this.source = source ? source : componentSource;
+//         //    this.renderer = null;
+//        }
+
+//        onSouceComplete(e: EventX): void {
+//             if (e.type != EventT.COMPLETE) {
+//                 return;
+//             }
+
+//             //加载全部完成进行初始化
+//             let source = e.currentTarget as Anim2dSource;
+//             source.off(e.type, this.onSouceComplete);
+
+//             //将加载好的内容重新赋值到默认的source中算出uv 图片设置到source中
+//             let {config} = source;
+//             let {fs, m} = config;
+//             let {lm} = this;
+//             let key:string;
+//             let step:number = 0;
+
+           
+//             let tmp = this.source.setSourceVO(source.name, source.width, source.height);
+//             this.source.drawimg(source.bmd.canvas, tmp.x, tmp.y, source.width, source.height);
+//             let cs = config.cachefs;
+//             if(!cs)
+//             {
+//                 config.cachefs = cs = {};
+
+//                 //根据整个图片的uv对原始vo进行重新计算
+//                  //超过限制帧采取抽帧
+//                 let nc:boolean = m > lm;
+                
+//                 if(nc)
+//                 {
+//                     let index:number;
+//                     let vo:IBitmapSourceVO;
+//                     for(step = 0; step < lm; step++)
+//                     {
+//                         index = m / lm * (step + 1) - 1;
+//                         key = source.name + "_" + step;
+//                         vo = fs[index];
+//                         tmp = this.source.setSourceVO(key, vo.w, vo.h);
+
+//                         cs[step+""] = tmp;
+//                     }
+//                 }else{
+//                     let co:object;
+//                     for(let fm of fs)
+//                     {
+//                         co = {};
+//                         for(let msg in fm)
+//                         {
+//                             co[msg] = fm[msg];
+//                             // uv需要重新计算 ul ur vt vb
+//                             // x y
+//                             // console.log(msg + "xxx" + fm[msg]);
+//                             switch(msg)
+//                             {
+//                                 case "ul":
+//                                     co[msg] = tmp[msg] + tmp[msg] * fm[msg];
+//                                 break;
+//                                 case "ur":
+//                                     co[msg] = tmp[msg] + tmp[msg] * fm[msg];
+//                                 break;
+//                                 case "vt":
+//                                     co[msg] = tmp[msg] + tmp[msg] * fm[msg];
+//                                 break;
+//                                 case "vb":
+//                                     co[msg] = tmp[msg] + tmp[msg] * fm[msg];
+//                                 break;
+//                                 case "x":
+//                                     co[msg] = tmp[msg] + tmp[msg];
+//                                 break;
+//                                 case "y":
+//                                     co[msg] = tmp[msg] + tmp[msg];
+//                                 break;
+//                             }
+
+//                             console.log(msg + ":" + co[msg]);
+//                         }
+
+
+//                         key = source.name + "_" + step;
+//                         // tmp = this.source.setSourceVO(key, fm.w, fm.h);
+//                         cs[step+""] = co;
+//                         step++;
+//                     }
+//                 }
+
+//                 this.cs = cs;
+//             }
+           
+           
+//             this.play(source.config);
+
+//             this.simpleDispatch(EventT.COMPLETE);
+//         }
+
+//         play(config: ANIData) {
+
+//             this.config = config;
+
+//             this.fe = 1000 / config.f;
+//             this.max = config.m;
+//             this.nt = engineNow + this.fe;
+//             this.cur = 0;
+//         }
+
+//         render(camera: Camera, now: number, interval: number): void {
+//             let { source } = this;
+//             if (!source) return;
+
+
+//             super.render(camera, now, interval);
+
+//             let{tm,nt}=this;
+//             if (tm.now > nt) {
+//                 let { max, cur, config } = this;
+//                 if (cur >= max - 1) {
+//                     cur = config.l;
+//                     if (cur == -1) {
+//                         this.remove();
+//                         return;
+//                     }
+//                 } else {
+//                     cur++;
+//                 }
+//                 this.cur = cur;
+//                 this.nt = nt + this.fe;
+//                 let key = this.url + "_" + cur;
+//                 let vo = this.cs[cur];//source.getSourceVO(key, 0);
+//                 if (!vo) return;
+//                 let g = this.graphics;
+//                 g.clear();
+//                 g.drawBitmap(0, 0, vo, config.matrix2d);
+//                 g.end();
+//             }
+//         }
+//    }
 }
