@@ -124,6 +124,7 @@ module rf {
             vo = recyclable(LinkVO);
             vo.weight = weight;
             vo.data = value;
+            vo.thisObj = thisObj;
             vo.args = args;
             this.length++;
 
