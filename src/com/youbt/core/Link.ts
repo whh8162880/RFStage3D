@@ -2,27 +2,29 @@
 module rf {
     export class LinkVO implements IRecyclable {
 
-        public close: boolean = true;
-        public data: any;
-        public args: any;
+        close:boolean = true;
+        data: any;
+        args: any;
+        thisObj:any;
 
-        public next: Recyclable<LinkVO> ;
-        public pre: Recyclable<LinkVO> ;
+        next: Recyclable<LinkVO> ;
+        pre: Recyclable<LinkVO> ;
 
-        public weight: number = 0;
+        weight: number = 0;
 
-        public time:number = 0;
+        time:number = 0;
 
-        public onRecycle(): void {
+        onRecycle() {
             this.data = undefined;
             this.args = undefined;
+            this.thisObj = undefined;
             this.next = undefined;
             this.pre = undefined;
             this.weight = 0;
             this.close = true;
         }
 
-        public onSpawn(): void {
+        onSpawn(){
             this.close = false;
         }
     }
@@ -62,12 +64,12 @@ module rf {
         }
 
 
-        public getValueLink(value: any): Recyclable<LinkVO> {
+        public getValueLink(value: any,thisObj:object): Recyclable<LinkVO> {
             let vo: Recyclable<LinkVO> = this.getFrist();
             if (undefined == vo) return undefined;
             while (vo) {
                 if (false == vo.close) {
-                    if (value == vo.data) {
+                    if (value == vo.data && thisObj == vo.thisObj) {
                         return vo;
                     }
                 }
@@ -77,11 +79,11 @@ module rf {
         }
 
 
-        public add(value: any, args?: any): Recyclable<LinkVO> {
+        public add(value: any, thisObj?:object, args?: any): Recyclable<LinkVO> {
             if (!value) return undefined;
             var vo: Recyclable<LinkVO>
             if (this.checkSameData) {
-                vo = this.getValueLink(value);
+                vo = this.getValueLink(value,thisObj);
                 if (vo && vo.close == false) return vo;
             }
 
@@ -89,6 +91,7 @@ module rf {
             vo = recyclable(LinkVO);
             vo.data = value;
             vo.args = args;
+            vo.thisObj = thisObj;
             this.length++;
 
             if (undefined == this.first) {
@@ -104,12 +107,12 @@ module rf {
         }
 
 
-        public addByWeight(value: any, weight: number, args?: any): Recyclable<LinkVO> {
+        public addByWeight(value: any, weight: number, thisObj?:object, args?: any): Recyclable<LinkVO> {
             if (!value) return undefined;
             var vo: Recyclable<LinkVO>
 
             if (this.checkSameData) {
-                vo = this.getValueLink(value);
+                vo = this.getValueLink(value,thisObj);
                 if (vo && vo.close == false) {
                     if (weight == vo.weight) {
                         return vo;
@@ -162,8 +165,8 @@ module rf {
         }
 
 
-        public remove(value: any): void {
-            let vo: Recyclable<LinkVO> = this.getValueLink(value);
+        public remove(value: any,thisObj?:any): void {
+            let vo: Recyclable<LinkVO> = this.getValueLink(value,thisObj);
             if (!vo) return;
             this.removeLink(vo);
         }

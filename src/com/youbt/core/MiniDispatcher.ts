@@ -96,7 +96,7 @@ module rf {
 	 * 
 	 */
 	export class MiniDispatcher implements IEventDispatcherX, IRecyclable {
-		public mEventListeners: Object;
+		public mEventListeners: {[key:string]: Recyclable<Link>};
 		public mTarget: IEventDispatcherX;
 
 		/** Creates an EventDispatcher. */
@@ -140,7 +140,7 @@ module rf {
 
 			if (type && this.mEventListeners) {
 				signal = this.mEventListeners[type];
-				if (undefined != signal) {
+				if ( signal) {
 					signal.recycle();
 					this.mEventListeners[type] = undefined;
 				}
@@ -148,7 +148,7 @@ module rf {
 			} else if (this.mEventListeners) {
 				for (type in this.mEventListeners) {
 					signal = this.mEventListeners[type];
-					if (undefined != signal) {
+					if ( signal) {
 						signal.recycle();
 						this.mEventListeners[type] = undefined;
 					}
@@ -162,12 +162,12 @@ module rf {
 		 *  travel up along the line of parents, until it either hits the root object or someone
 		 *  stops its propagation manually. */
 		public dispatchEvent(event: EventX): boolean {
-			if (undefined == this.mEventListeners || undefined == this.mEventListeners[event.type]) {
+			if (!this.mEventListeners || !this.mEventListeners[event.type]) {
 				return false;
 			}
 
 			event.currentTarget = this.mTarget;
-			let signal: Link = this.mEventListeners[event.type];
+			let signal = this.mEventListeners[event.type];
 			let vo: LinkVO = signal.getFrist();
 			while (vo) {
 				if (event.stopPropagation || event.stopImmediatePropagation) {
@@ -176,8 +176,7 @@ module rf {
 				if (false == vo.close) {
 					let f: Function = vo.data;
 					if (undefined != f) {
-						f.call(vo.args, event);
-						// f(vo.args,event);
+						f.call(vo.thisObj, event);
 					}
 				}
 				vo = vo.next;

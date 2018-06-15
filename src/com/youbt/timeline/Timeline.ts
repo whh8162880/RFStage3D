@@ -21,7 +21,7 @@ module rf{
         }
 
 
-        play(timeline:any,caster:any, dispather:MiniDispatcher = null, mx:number=0, my:number = 0):void{
+        play(timeline:any,caster:any, dispather?:MiniDispatcher, mx:number=0, my:number = 0):void{
             this.tid = timeline.id;
             this.timeline = timeline;
             this.initData();
@@ -37,7 +37,7 @@ module rf{
             for(let o of timeline.value){
 				if(o){
 					o.index = index++;
-					let linkvo:LinkVO = link.add(o);
+					let linkvo:LinkVO = link.add(o,this,undefined);
 					let time:number;
                     
                     if(o["time"]){

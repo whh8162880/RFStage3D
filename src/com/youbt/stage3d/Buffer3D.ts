@@ -87,7 +87,7 @@ module rf {
             }
 
             //加入资源管理
-            context3D.bufferLink.add(this);
+            context3D.bufferLink.add(this,this,undefined);
             return true;
         }
 
