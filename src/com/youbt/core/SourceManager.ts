@@ -199,7 +199,7 @@ module rf{
             return vo;
         }
 
-        getSourceVO(name:string,area:number=0):IBitmapSourceVO{
+        getSourceVO(name:string|number,area:number=0):IBitmapSourceVO{
             let barea = this.areas[area];
             if(undefined == barea){
                 return undefined;
