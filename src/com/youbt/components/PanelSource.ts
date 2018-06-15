@@ -114,42 +114,4 @@ module rf{
 
         return source;
     }
-
-    // export class PanelSourceManage{
-    //     protected all_res:{[key:string]:PanelSource};
-
-    //     constructor()
-    //     {
-    //         this.all_res = {};
-    //     }
-
-    //     load(url:string):PanelSource
-    //     {
-
-    //         if (url.indexOf("://") == -1) {
-    //             url = ROOT_PERFIX + `p3d/${url}`;
-    //         }
-           
-    //         if(url.lastIndexOf(ExtensionDefine.P3D) == -1) {
-    //             url += ExtensionDefine.P3D;
-    //         }
-
-    //         let{all_res}=this;
-
-    //         let source = all_res[url];
-
-    //         if(!source){
-    //             all_res[url] = source = new PanelSource();
-    //             source.name = url;
-    //         }
-
-    //         if(source.status == LoadStates.WAIT){
-    //             source.status = LoadStates.LOADING;
-    //             loadRes(url,source.loadConfigComplete,source,ResType.amf);
-    //         }
-
-    //         return source;
-    //     }
-    // }
-    // export let sourceManger = singleton(PanelSourceManage);
 }

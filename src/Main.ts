@@ -57,7 +57,7 @@ module rf{
             var isFragDepthAvailable = gl.getExtension("EXT_frag_depth");
             console.log("isFragDepthAvailable", isFragDepthAvailable)
 
-            ROOT.on(MouseEventX.CLICK,this.raytest,this);
+            // ROOT.on(MouseEventX.CLICK,this.raytest,this);
 
             let perfix = "../assets/"
             
@@ -170,7 +170,7 @@ module rf{
             msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
             mesh.material = msky;
             mesh.mouseChildren = mesh.mouseEnabled = false;
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             let cube;
@@ -234,39 +234,50 @@ module rf{
             // -101.10054016113281, 50.44496154785156, 335.221923828125,
             // 100.88992309570312, 335.221923828125
 
-            for(let i = 0 ; i < 2000; ++i){
-                let cube = new BoxGeometry(variables).create(100,100,100);
-                m = new PhongMaterial();
-                m.setData(undefined);
-                m.cull = WebGLConst.BACK;
-                let color = Math.random()*0xFFFFFF;
-                m.diff = newColor(color);
+            // for(let i = 0 ; i < 2000; ++i){
+            //     let cube = new BoxGeometry(variables).create(100,100,100);
+            //     m = new PhongMaterial();
+            //     m.setData(undefined);
+            //     m.cull = WebGLConst.BACK;
+            //     let color = Math.random()*0xFFFFFF;
+            //     m.diff = newColor(color);
 
-                mesh = new Mesh(variables);
-                mesh.name = "box_" + String(i) 
-                mesh.geometry = cube;
-                mesh.material = m;
+            //     mesh = new Mesh(variables);
+            //     mesh.name = "box_" + String(i) 
+            //     mesh.geometry = cube;
+            //     mesh.material = m;
                 
-                mesh.x = (i-5) * 300;
-                mesh.x = Math.random() * 10000 - 5000;
-                mesh.y = Math.random() * 10000 - 5000;
-                mesh.z = Math.random() * 10000 - 5000;
+            //     mesh.x = (i-5) * 300;
+            //     mesh.x = Math.random() * 10000 - 5000;
+            //     mesh.y = Math.random() * 10000 - 5000;
+            //     mesh.z = Math.random() * 10000 - 5000;
 
-                scene.addChild(mesh);
+            //     scene.addChild(mesh);
+            // }
+
+            // this.rayCaster = new Raycaster(100000);
+
+
+            // TEMP_VECTOR3D.set([0,0,1000000000000000000000]);
+            // camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D)
+            // TEMP_VECTOR3D.v4_scale(1/TEMP_VECTOR3D.w)
+            // console.log(TEMP_VECTOR3D)
+
+            // let anic:Sprite = new Sprite();
+            // ROOT.addChild(anic);
+            // anic.renderer = new BatchRenderer(anic);
+            let aniuri = "ani/e/e.ha";
+            let ani:Ani;
+            for(let i = 0 ; i < 1000; ++i)
+            {
+                ani = new Ani();
+                ani.load(aniuri);
+                // ani.setSize(200, 200);
+                ROOT.addChild(ani);
+                ani.x = 1000 - Math.random() * 1000;
+                ani.y = 1000 - Math.random() * 1000;
             }
-
-            this.rayCaster = new Raycaster(100000);
-
-
-            TEMP_VECTOR3D.set([0,0,1000000000000000000000]);
-            camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D)
-            TEMP_VECTOR3D.v4_scale(1/TEMP_VECTOR3D.w)
-            console.log(TEMP_VECTOR3D)
-
-            let aniuri = "e";
-            let ani:Ani = new Ani();
-            ani.load("e");
-            ROOT.addChild(ani);
+           
 
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
