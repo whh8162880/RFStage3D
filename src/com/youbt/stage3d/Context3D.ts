@@ -74,6 +74,8 @@ namespace rf {
 	export interface IContext3DSetting{
 		cull:number;
 		depth:boolean;
+		logarithmicDepthBuffer:boolean;
+		use_logdepth_ext:boolean;
 		depthMode:number;
 		src:number;
 		dst:number;
@@ -85,6 +87,8 @@ namespace rf {
 		bufferLink:Link;
 		triangles:number;
 		dc:number;
+		logarithmicDepthBuffer:boolean = true;
+		use_logdepth_ext:boolean = false;
 		// change:number;
 		
 		setting:IContext3DSetting;
@@ -121,18 +125,19 @@ namespace rf {
 			g.viewport(0, 0, width, height);
 			g.canvas.width = width;
 			g.canvas.height = height;
-			//TODO: antiAlias , Stencil
-			if (enableDepthAndStencil) {
-				this._clearBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
-				g.enable(g.DEPTH_TEST);
-				g.enable(g.STENCIL_TEST);
-			} else {
-				this._clearBit = g.COLOR_BUFFER_BIT;
-				g.disable(g.DEPTH_TEST);
-				g.disable(g.STENCIL_TEST);
-			}
 			g.frontFace(g.CW);
 			g.enable(g.BLEND);
+			//TODO: antiAlias , Stencil
+			// if (enableDepthAndStencil) {
+			// 	this._clearBit = g.COLOR_BUFFER_BIT | g.DEPTH_BUFFER_BIT | g.STENCIL_BUFFER_BIT;
+			// 	g.enable(g.DEPTH_TEST);
+			// 	g.enable(g.STENCIL_TEST);
+			// } else {
+			// 	this._clearBit = g.COLOR_BUFFER_BIT;
+			// 	g.disable(g.DEPTH_TEST);
+			// 	g.disable(g.STENCIL_TEST);
+			// }
+			// 
 		}
 
 		scissoring:boolean;
@@ -437,7 +442,7 @@ namespace rf {
 			
 			
 		}
-
+		
 		public setRenderToBackBuffer(): void {
 			let g = gl;
 			let{backBufferWidth,backBufferHeight,render_setting}=this;

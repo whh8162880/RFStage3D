@@ -134,14 +134,16 @@ module rf {
         copyFrom(sphere:Sphere){
             this.center.set(sphere.center);
             this.radius = sphere.radius;
+            this.change = false;
         }
 
+        change:boolean = true;
         radius:number = 0;
         center:IVector3D = newVector3D();
 
 
         applyMatrix4( matrix:IMatrix3D, result?:Sphere):Sphere{
-            result = result || new Sphere();
+            result = result || this;
 
             result.copyFrom(this);
             matrix.m3_transformVector(result.center, result.center);
@@ -151,9 +153,11 @@ module rf {
     }
 
     export class OBB implements IBounding, IBox{
-
         constructor(bounding?:ArrayLike<number> | ArrayBuffer |number, maxx?:number, miny?:number, maxy?:number, minz?:number, maxz?:number)
         {
+            this.vertex = new Float32Array(24);
+            this.index = OBB.index;
+
             if(bounding != undefined){
                 if (bounding instanceof ArrayBuffer)
                 {
@@ -166,6 +170,7 @@ module rf {
                     this.minz = minz; this.maxz = maxz;
                 }
                 this.updateTriangle();
+                this.change = false;
             }
         }
 
@@ -189,7 +194,9 @@ module rf {
             4,5,6,4,6,7,
             0,7,6,0,6,1
         ]);
-        
+
+        change:boolean = true;
+
         minx:number;
         maxx:number;
 
@@ -200,10 +207,6 @@ module rf {
         maxz:number;
 
         updateTriangle():void{
-            if(!this.vertex){
-                this.vertex = new Float32Array(24);
-                this.index = OBB.index;
-            }
             this.vertex[0] = this.minx; this.vertex[1] = this.miny; this.vertex[2] = this.minz;//0
             this.vertex[3] = this.minx; this.vertex[4] = this.maxy; this.vertex[5] = this.minz;//1
             this.vertex[6] = this.maxx; this.vertex[7] = this.maxy; this.vertex[8] = this.minz;//2
@@ -214,12 +217,10 @@ module rf {
             this.vertex[18] = this.minx; this.vertex[19] = this.maxy; this.vertex[20] = this.maxz;//6
             this.vertex[21] = this.minx; this.vertex[22] = this.miny; this.vertex[23] = this.maxz;//7
         }
-
-        static createOBBByGeometry(mesh:GeometryBase):OBB{
-            let obb = new OBB();
+        static updateOBBByGeometry(mesh:GeometryBase, out?:OBB):OBB{
+            let obb = out || new OBB();
 
             const{numVertices,vertex,data32PerVertex,variables}=mesh.vertex.data;
-            // const{numVertices,vertex,data32PerVertex,variables} = mesh.data;
             
             let pos = variables['pos'];
             
@@ -242,6 +243,8 @@ module rf {
                 if(z < obb.minz)obb.minz = z;
                 else if(z > obb.maxz)obb.maxz = z;
             }
+            obb.updateTriangle();
+            obb.change = false;
             return obb;
         }
     }
@@ -315,6 +318,7 @@ module rf {
                 v.x = points[p];
                 v.y = points[p+1];
                 v.z = points[p+2];
+                v.w = 1.0;
                 if(undefined != matrix3D){
                     matrix3D.m3_transformVector(v,v);
                 }
@@ -325,7 +329,6 @@ module rf {
                 v.x = 0;
                 v.y = 0;
                 v.z = 1;
-    
                 if(undefined != matrix3D){
                     matrix3D.m3_transformRotation(v,v);
                 }
@@ -354,7 +357,7 @@ module rf {
 
         data32PerVertex:number = 0;
         numVertices:number = 0;
-        centerPoint:IVector3D;
+        centerPoint:IVector3D = newVector3D();
         numTriangles:number = 0;
 
 
@@ -443,8 +446,8 @@ module rf {
             return triangles;
         }
 
-        calculateBoundingSphere(center:IVector3D):Sphere{
-            let sphere:Sphere = new Sphere();
+        calculateBoundingSphere(center:IVector3D, out?:Sphere):Sphere{
+            let sphere:Sphere = out || new Sphere();
 
             const{numVertices,vertex,data32PerVertex,variables}=this.vertex.data;
             let minR = 0;
@@ -470,24 +473,10 @@ module rf {
             }
             sphere.center.set(center);
             sphere.radius = minR;
+            sphere.change = false;
             return sphere;
         }
 
-        calculateCenterPoint():void{
-            this.centerPoint = newVector3D();
-
-            const{numVertices,vertex,data32PerVertex,variables}=this.vertex.data;
-            let minR = 0;
-            let pos = variables['pos'];
-            for(let i=0;i<numVertices;i++){
-                let p = i * data32PerVertex + pos.offset;
-                let x = vertex[p];
-                let y = vertex[p+1];
-                let z = vertex[p+2];
-
-            }
-
-        }
 
 
         uploadContext(camera:Camera,mesh:SceneObject, program:Program3D, now: number, interval: number){

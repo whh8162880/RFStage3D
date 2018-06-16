@@ -11,9 +11,9 @@ object root = {
 		}
 		btn:{type:2,extends:"Button"}
 		ck:{type:3,extends:"CheckBox"}
-		rd:{type:4,extends:"RidaoButton"}
+		rd:{type:4,extends:"RadioButton"}
 		tb:{type:5,extends:"TabButton"}
-		sb:{type:6,extends:"ScrollBar"}
+		bar:{type:6,extends:"ScrollBar"}
 		list:{type:7,extends:"List"}
 		mlist:{type:8,extends:"MList"}
 		dele:{type:9,extends:"Component"}

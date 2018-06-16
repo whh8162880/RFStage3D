@@ -12,8 +12,8 @@ module rf {
         geometry: GeometryBase;
         invSceneTransform: IMatrix3D;
 
-        minBoundingBox:OBB;
-        boundingSphere:Sphere;
+        minBoundingBox:OBB = new OBB();
+        boundingSphere:Sphere = new Sphere();
         distance:number = Number.MAX_VALUE;
         
         addChild(child: DisplayObject) {
@@ -108,25 +108,26 @@ module rf {
 
             if(!geometry)return intersects;
 
+            if(this.minBoundingBox == undefined || this.minBoundingBox.change)
+            {
+                let obb = this.minBoundingBox = OBB.updateOBBByGeometry(geometry, this.minBoundingBox);
+                geometry.centerPoint.set([ (obb.minx+obb.maxx)*0.5, (obb.miny+obb.maxy)*0.5, (obb.minz+obb.maxz)*0.5, 1 ] );
+            }
             
-
-            if(this.minBoundingBox == undefined){
-                let obb = this.minBoundingBox = OBB.createOBBByGeometry(geometry);
-                geometry.centerPoint = newVector3D( (obb.minx+obb.maxx)*0.5, (obb.miny+obb.maxy)*0.5, (obb.minz+obb.maxz)*0.5, 1 );
+            if(this.boundingSphere == undefined || this.boundingSphere.change)
+            {
+                this.boundingSphere = geometry.calculateBoundingSphere(geometry.centerPoint, this.boundingSphere);
             }
-            if(this.boundingSphere == undefined){
-                this.boundingSphere = geometry.calculateBoundingSphere(geometry.centerPoint);
-            }
-
-            let{sphere, ray} = SceneObject;
+            
+            let{sphere} = SceneObject;
             //首先检测球
             sphere.copyFrom( this.boundingSphere );
-			sphere.applyMatrix4( this.sceneTransform );
+			sphere.applyMatrix4( this.sceneTransform, sphere );
 
             if ( raycaster.ray.intersectsSphere( sphere ) == false ) {
                 return intersects;
             }
-            
+            let{ray} = SceneObject;
             ray.copyFrom( raycaster.ray ).applyMatrix4( this.invSceneTransform );
 
             let intersectPoint = ray.intersectBox( this.minBoundingBox);
@@ -138,7 +139,7 @@ module rf {
             this.sceneTransform.m3_transformVector(intersectPoint,intersectPoint);
 
             rf.TEMP_VECTOR3D.set(raycaster.ray.origin);
-            rf.TEMP_VECTOR3D.v3_sub(intersectPoint);
+            rf.TEMP_VECTOR3D.v3_sub(intersectPoint, rf.TEMP_VECTOR3D);
 
 			let distance = rf.TEMP_VECTOR3D.v3_length;
 
@@ -148,7 +149,7 @@ module rf {
             }
             
             intersects = intersects || [];
-            intersects.push({"obj":this, "distance": distance});
+            intersects.push({"obj":this, "distance": distance, "point":intersectPoint });
 
             return intersects;
         }
@@ -158,15 +159,20 @@ module rf {
         sun: DirectionalLight;
         childChange: boolean;
         camera: Camera;
+
+        rayCaster:Raycaster;
+
         constructor(variables?: { [key: string]: IVariable }) {
             super(variables);
             this.scene = this;
             this.hitArea = new HitArea();
             this.hitArea.allWays = true;
+
+            this.rayCaster = new Raycaster(50000);
         }
 
         public render(camera: Camera, now: number, interval: number): void {
-            let { camera: _camera } = this;
+            let { camera: _camera ,childrens } = this;
             // const { depthMask, passCompareMode, srcFactor, dstFactor, cull } = this.material;
             let c = context3D;
             let g = gl;
@@ -179,17 +185,27 @@ module rf {
                 _camera.updateSceneTransform();
             }
 
-            this.material.uploadContextSetting();
+            if(childrens.length){
+                this.material.uploadContextSetting();
+                super.render(_camera, now, interval);
+            }
+        }
 
-            // let{setting}=c;
-            // setting.cull = cull;
-            // setting.depth = depthMask;
-            // setting.depthMode = passCompareMode;
-            // setting.src = srcFactor;
-            // setting.dst = dstFactor;
+        getObjectByPoint(dx: number, dy: number,scale:number): SceneObject {
+            if(this.camera == undefined){
+                return;
+            }
 
-
-            super.render(_camera, now, interval);
+            let mx = 2*dx/stageWidth - 1;
+            let my = -2*dy/stageHeight + 1;
+            this.rayCaster.setFromCamera(mx, my, this.camera);
+            
+            let intersects = this.rayCaster.intersectObjects(this.childrens, false);
+            if(intersects.length){
+                return intersects[0].obj;
+            }else{
+                return super.getObjectByPoint(dx, dy, scale) as SceneObject;
+            }
         }
     }
 
@@ -211,6 +227,7 @@ module rf {
         cameraUI: Camera
         camera2D: Camera;
         camera3D: Camera;
+        cameraPerspective:Camera;
         camera: Camera;
         renderLink: Link;
         shadow:ShadowEffect;
@@ -220,6 +237,7 @@ module rf {
             this.camera2D = new Camera();
             this.camera3D = new Camera();
             this.cameraUI = new Camera();
+            this.cameraPerspective = new Camera(100000);            
             this.renderer = new BatchRenderer(this);
             this.shadow = new ShadowEffect(1024,1024);
             this.renderLink = new Link();
@@ -280,6 +298,7 @@ module rf {
             if (scene.childChange) {
                 renderLink.clean();
                 this.filterRenderList(scene,renderLink);
+                scene.childChange = false;
             }
             let c = context3D;
             c.dc = 0;
@@ -297,10 +316,12 @@ module rf {
         }
 
         resize(width: number, height: number): void {
-            let { camera2D, camera3D, cameraUI } = this;
+            let { camera2D, camera3D, cameraUI,cameraPerspective} = this;
             CameraUIResize(width,height,cameraUI.len,cameraUI.far,cameraUI.originFar,cameraUI);
             CameraOrthResize(width,height,camera2D.len,camera2D.far,camera2D.originFar,camera2D);
             Camera3DResize(width,height,camera3D.len,camera3D.far,camera3D.originFar,camera3D);
+
+            PerspectiveResize(width,height,cameraPerspective.len,cameraPerspective.far,30,cameraPerspective)
             
         }
 

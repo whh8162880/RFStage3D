@@ -1,4 +1,4 @@
-/// <reference path="../stage3d/display/Component.ts" />
+/// <reference path="./Component.ts" />
 module rf{
     export interface IListOption {
         itemWidth?: number;     //item 宽度
@@ -86,34 +86,34 @@ module rf{
         }
 
 
-        setSize(width:number, height:number)
-        {
-            super.setSize(width,height);
-            let{option,scroll,runtime}=this;
-            let{gap,vertical,columnCount}=option;
-            let count = 1;
-            if(vertical){
-                let{itemHeight}=option;
-                count = Math.ceil(height / itemHeight) + 1;
-            }else{
-                let{itemWidth}=option;
-                count = Math.ceil(width / itemWidth) + 1;
-            }
-            runtime.displayCount = count;
-            if(!scroll){
-                this.renderer = new BatchRenderer(this);
-                this.scroll = scroll = new Scroll(this,width,height);
-                if(vertical){
-                    scroll.hStep = 0;
-                }else{
-                    scroll.vStep = 0;
-                }
-                scroll.on(EventT.SCROLL,this.refreshList,this);
-            }else{
-                scroll.setArea(width,height,this.w,this.h);
-            }
+        // setSize(width:number, height:number)
+        // {
+        //     super.setSize(width,height);
+        //     let{option,scroll,runtime}=this;
+        //     let{gap,vertical,columnCount}=option;
+        //     let count = 1;
+        //     if(vertical){
+        //         let{itemHeight}=option;
+        //         count = Math.ceil(height / itemHeight) + 1;
+        //     }else{
+        //         let{itemWidth}=option;
+        //         count = Math.ceil(width / itemWidth) + 1;
+        //     }
+        //     runtime.displayCount = count;
+        //     if(!scroll){
+        //         this.renderer = new BatchRenderer(this);
+        //         this.scroll = scroll = new Scroll(this,width,height);
+        //         if(vertical){
+        //             scroll.hStep = 0;
+        //         }else{
+        //             scroll.vStep = 0;
+        //         }
+        //         scroll.on(EventT.SCROLL,this.refreshList,this);
+        //     }else{
+        //         scroll.setArea(width,height,this.w,this.h);
+        //     }
             
-        }
+        // }
 
 
         refreshList(event?:EventX){

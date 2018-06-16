@@ -159,6 +159,10 @@ module rf{
                         skinMatrix += ${VA.weight}.w * boneMatW;
                         t_pos = skinMatrix * t_pos;
                     #endif
+                    
+                    // t_pos = ${VC.mvp} * t_pos;
+                    // t_pos.z = log(t_pos.z + 1.0)/8.0;
+                    // gl_Position = t_pos;
 
                     gl_Position = vPos = ${VC.mvp} * t_pos;
                 }
@@ -400,6 +404,10 @@ module rf{
                 c.setProgramConstantsFromVector(VC.vc_emissive,[emissive.r,emissive.g,emissive.b,0.0],4);
             }
 
+            if(context3D.logarithmicDepthBuffer){
+                c.setProgramConstantsFromVector(VC.logDepthFar, camera.logDepthFar, 1, false);
+            }
+
             return true;
         }
 
@@ -433,13 +441,24 @@ module rf{
 
             if(shadowTarget){
                 key += "-shadow";
-                f_def += "#define SHADOW";
-                v_def += "#define SHADOW";
+                f_def += "#define SHADOW\n";
+                v_def += "#define SHADOW\n";
             }
 
             if(undefined != skAnim){
                 key += "-skeleton";
                 v_def += "#define USE_SKINNING\n           #define MAX_BONES 50\n";
+            }
+
+            if(context3D.logarithmicDepthBuffer){
+                key += "-log_depth_buffer";
+                v_def += "#define LOG_DEPTH_BUFFER\n";
+                f_def += "#define LOG_DEPTH_BUFFER\n";
+                if(context3D.use_logdepth_ext){
+                    key += "_ext";
+                    v_def += "#define LOG_DEPTH_BUFFER_EXT\n";
+                    f_def += "#define LOG_DEPTH_BUFFER_EXT\n";
+                }
             }
 
             let p = c.programs[key];
@@ -469,6 +488,14 @@ module rf{
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
                 varying vec4 vShadowUV;
+                #ifdef LOG_DEPTH_BUFFER
+                    #ifdef LOG_DEPTH_BUFFER_EXT
+                        varying float depth;
+                    #else
+                        uniform float logDepthFar;
+                    #endif
+                #endif
+                
 #ifdef USE_SKINNING
                 uniform mat4 ${VC.vc_bones}[ MAX_BONES ];
                 mat4 getBoneMatrix( const in float i ) {
@@ -500,7 +527,17 @@ module rf{
                     float diffuse  = clamp(dot(t_normal.xyz, invLight), 0.1, 1.0);
                     vDiffuse = vec4(vec3(diffuse), 1.0);
                     vUV = ${VA.uv};
+                    
                     gl_Position = ${VC.mvp} * t_pos;
+                    #ifdef LOG_DEPTH_BUFFER
+                        #ifdef LOG_DEPTH_BUFFER_EXT
+                            depth = gl_Position.w + 1.0;
+                        #else
+                            gl_Position.z = log2( max( 0.0000001, gl_Position.w + 1.0 ) ) * logDepthFar * 2.0 - 1.0;
+                            gl_Position.z *= gl_Position.w;
+                        #endif
+                    #endif
+                    
 #ifdef SHADOW
                     t_pos = ${VC.sunmvp} * t_pos;
                     // t_pos.xyz /= t_pos.w;
@@ -515,10 +552,13 @@ module rf{
 
 
             let fragmentCode = `
-                precision mediump float;    
-
                 ${f_def}
-
+                precision mediump float;    
+                
+                #ifdef LOG_DEPTH_BUFFER_EXT
+                    #extension GL_EXT_frag_depth : enable
+                #endif
+                
                 uniform sampler2D ${FS.diff};
                 uniform sampler2D ${FS.SHADOW};
 
@@ -527,8 +567,12 @@ module rf{
 
                 varying vec4 vDiffuse;
                 varying vec2 vUV;
-
                 varying vec4 vShadowUV;
+                
+                #ifdef LOG_DEPTH_BUFFER_EXT
+                    varying float depth;
+                    uniform float logDepthFar;
+                #endif
 
                 // const float UnpackDownscale = 255.0 / 256.0;
                 // const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256., 256. );
@@ -560,7 +604,7 @@ module rf{
                             vec4 c = vec4(1.0,1.0,1.0,1.0) ;
                         #endif
                     #endif
-
+                    
                     #ifdef SHADOW
                         vec3 projCoords = vShadowUV.xyz / vShadowUV.w;
                         projCoords.xyz = projCoords.xyz * 0.5 + 0.5;
@@ -601,7 +645,11 @@ module rf{
                     if(c.w < 0.1){
                         discard;
                     }
+                    #ifdef LOG_DEPTH_BUFFER_EXT
+	                    gl_FragDepthEXT = log2( depth ) * logDepthFar;
+                    #endif
                     gl_FragColor = c;
+                    
                     // gl_FragColor = vec4(1.0,1.0,1.0,1.0);
                     // gl_FragColor = vec4(vUV,0.0,1.0);
                 }

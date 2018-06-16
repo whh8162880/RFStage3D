@@ -1,5 +1,4 @@
-/// <reference path="./AppBase.ts" />
-/// <reference path="./com/module/rfreference.ts" />
+/// <reference path="./game/rfreference.ts" />
 module rf{
     // export let sp;
 
@@ -10,13 +9,43 @@ module rf{
         }
 
         rayCaster:Raycaster;
-        
-        // public update(now: number, interval: number): void {
-        //     super.update(now, interval);
-        //     this.rayCaster.setFromCamera(nativeMouseX, nativeMouseY, scene.camera);
-        //     let intersects = this.rayCaster.intersectObjects(scene.childrens);
-        //     console.log(nativeMouseX, nativeMouseY, this.rayCaster.ray.origin, this.rayCaster.ray.direction, this.rayCaster.ray.direction.v3_length,  intersects.length);
-        // }
+        line:Line3D;
+        cameraBox:Mesh;
+        directBox:Mesh;
+
+        raytest(e:EventX){
+            let mx = 2*nativeMouseX/stageWidth - 1;
+            let my = -2*nativeMouseY/stageHeight + 1;
+            this.rayCaster.setFromCamera(mx, my, scene.camera);
+            
+            
+
+            if(e.data.ctrl){
+                let intersects = this.rayCaster.intersectObjects(scene.childrens);
+                console.log(mx, my, this.rayCaster.ray.origin, this.rayCaster.ray.direction,  intersects.length);
+                let t = 3;
+
+                // let line = this.line;
+            
+                // line.clear();
+                // let end = TEMP_VECTOR3D;
+                // end = this.rayCaster.ray.at(0, end);
+                // line.moveTo(end.x, end.y, end.z,t, 0xff0000);
+                // end = this.rayCaster.ray.at(50000, end);
+                // line.lineTo(end.x, end.y, end.z,t, 0xff0000);
+                // line.end();
+
+                // this.cameraBox.x = scene.camera.x;
+                // this.cameraBox.y = scene.camera.y;
+                // this.cameraBox.z = scene.camera.z;
+
+                // this.rayCaster.ray.at(500, TEMP_VECTOR3D);
+                // this.directBox.setPos(TEMP_VECTOR3D.x, TEMP_VECTOR3D.y, TEMP_VECTOR3D.z);
+
+                intersects = null
+            }
+            
+        }
 
         public init(canvas?:HTMLCanvasElement):void{
             super.init(canvas);
@@ -24,6 +53,11 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+            var isFragDepthAvailable = gl.getExtension("EXT_frag_depth");
+            console.log("isFragDepthAvailable", isFragDepthAvailable)
+
+            // ROOT.on(MouseEventX.CLICK,this.raytest,this);
 
             let perfix = "../assets/"
             
@@ -45,15 +79,16 @@ module rf{
             // gl.depthFunc(gl.LEQUAL);
             // context3D.setDepthTest(true,gl.LEQUAL)
 
-            let camera = ROOT.camera3D;
+            let camera = ROOT.cameraPerspective;
             scene.camera = camera;
-            let f = camera.originFar;
-            f = Math.sqrt(f*f / 3);
-            camera.setPos(f,f,f);
+            // let f = camera.originFar;
+            // f = Math.sqrt(f*f / 3);
+            camera.setPos(0,0,-2500);
             camera.lookat(newVector3D(0,0,0));
-            new TrackballControls(camera);
-
-
+            let ctl = new TrackballControls(camera);
+            ctl.lock = true;
+            
+       
             let sun = new DirectionalLight();
             // f = 1000 / Math.PI2;
             // f = Math.sqrt(f*f / 3);
@@ -83,25 +118,23 @@ module rf{
            
 
             let w = 500;
-/*
+
             let t = 2;
             let tr = new Trident(w,t);
             scene.addChild(tr);
 
+
+            let l = new Line3D();
+            l.clear();
+            l.moveTo(0,0,0,3,0x0000FF);
+            l.lineTo(0,0,-1000,3,0x0000FF);
+            l.end();
+            // scene.addChild(l);
+/*
             sp = tr;
 */
-            
-
-            // line.rotationX = 45;
-            // let line = new Line3D();
-            // line.clear();
-            // line.moveTo(-500,0,500,t);
-            // line.lineTo(500,0,500,t);
-            // line.lineTo(500,0,-500,t);
-            // line.lineTo(-500,0,-500,t);
-            // line.lineTo(-500,0,500,t);
-            // line.end();
-            // scene.addChild(line);
+            this.line = new Line3D();
+            scene.addChild(this.line);
 
             let variables = vertex_mesh_variable;
             let w_e = w * 1.1
@@ -117,46 +150,145 @@ module rf{
             let plane = new PlaneGeometry(variables).create(w*2,w*2);
             let mesh = new Mesh(variables);
             mesh.shadowTarget = true;
+            mesh.name = "plane";
             // mesh.shadowable = true;
             mesh.rotationX = -90;
             mesh.geometry = plane;
             mesh.material = m;
-            scene.addChild(mesh);
+            // scene.addChild(mesh);
 
 
             
             let box = new SkyBoxGeometry(variables).create();
             mesh = new Mesh(variables);
             mesh.geometry = box;
+            mesh.name = "skybox";
             let msky = new SkyBoxMaterial();
             msky.setData(undefined);
             msky.cull = WebGLConst.NONE;
             msky.diff = newColor(0xAA0000);
             msky.diffTex = context3D.getTextureData("../assets/tex/skybox/");
             mesh.material = msky;
-            scene.addChild(mesh);
+            mesh.mouseChildren = mesh.mouseEnabled = false;
+            // scene.addChild(mesh);
 
 
-            for(let i = 0 ; i < 100; ++i){
-                let cube = new BoxGeometry(variables).create(100,100,100);
-                m = new PhongMaterial();
-                m.setData(undefined);
-                m.cull = WebGLConst.BACK;
-                m.diff = newColor(0xAAAAAA);
+            let cube;
+            cube = new BoxGeometry(variables).create(400,400,400);
+            m = new PhongMaterial();
+            m.setData(undefined);
+            m.cull = WebGLConst.BACK;
+            m.diff = newColor(0xAAAAAA);
 
-                mesh = new Mesh(variables);
-                mesh.geometry = cube;
-                mesh.material = m;
+            mesh = new Mesh(variables);
+            mesh.name = "bigbox";
+            mesh.geometry = cube;
+            mesh.material = m;
 
-                mesh.x = Math.random() * 2000 - 1000;
-                mesh.y = Math.random() * 2000 - 1000;
-                mesh.z = Math.random() * 2000 - 1000;
+            // mesh.y = -stageHeight/2;
+            mesh.z = 2000;
 
-                scene.addChild(mesh);
-            }
+            mesh.x = -385.1275939941406;
+            mesh.y = 192.16262817382812;
+            // mesh.z = 1276.9783935546875;
+            // -385.1275939941406, 192.16262817382812, 1276.9783935546875
+            // -97328.8671875, 48563.05078125, 322716.0625
+            // scene.addChild(mesh);
 
-            this.rayCaster = new Raycaster(5000);
+            //////////////////
+            cube = new BoxGeometry(variables).create(5,5,5);
+            m = new PhongMaterial();
+            m.setData(undefined);
+            m.cull = WebGLConst.BACK;
+            m.diff = newColor(0xFFFF00);
 
+            mesh = new Mesh(variables);
+            mesh.name = 'smallBox'
+            mesh.geometry = cube;
+            mesh.material = m; 
+            mesh.z = 1500;
+            this.directBox = mesh;
+            // scene.addChild(mesh);
+            mesh.x = -94.80776977539062;
+            mesh.y = 47.30513000488281;
+            // mesh.z = 314.3568115234375;
+            ////////cameraBox
+            cube = new BoxGeometry(variables).create(10,10,10);
+            m = new PhongMaterial();
+            m.setData(undefined);
+            m.cull = WebGLConst.BACK;
+            m.diff = newColor(0xFF0000);
+
+            mesh = new Mesh(variables);
+            mesh.name = 'cameraBox'
+            mesh.geometry = cube;
+            mesh.material = m; 
+            mesh.x = camera.x;
+            mesh.y = camera.y;
+            mesh.z = camera.z;
+            // scene.addChild(mesh);
+            this.cameraBox = mesh;
+
+            
+            // -94.80776977539062, 47.30513000488281, 314.3568115234375
+            // -101.10054016113281, 50.44496154785156, 335.221923828125,
+            // 100.88992309570312, 335.221923828125
+
+            // for(let i = 0 ; i < 2000; ++i){
+            //     let cube = new BoxGeometry(variables).create(100,100,100);
+            //     m = new PhongMaterial();
+            //     m.setData(undefined);
+            //     m.cull = WebGLConst.BACK;
+            //     let color = Math.random()*0xFFFFFF;
+            //     m.diff = newColor(color);
+
+            //     mesh = new Mesh(variables);
+            //     mesh.name = "box_" + String(i) 
+            //     mesh.geometry = cube;
+            //     mesh.material = m;
+                
+            //     mesh.x = (i-5) * 300;
+            //     mesh.x = Math.random() * 10000 - 5000;
+            //     mesh.y = Math.random() * 10000 - 5000;
+            //     mesh.z = Math.random() * 10000 - 5000;
+
+            //     scene.addChild(mesh);
+            // }
+
+            // this.rayCaster = new Raycaster(100000);
+
+
+            // TEMP_VECTOR3D.set([0,0,1000000000000000000000]);
+            // camera.len.m3_transformVector(TEMP_VECTOR3D,TEMP_VECTOR3D)
+            // TEMP_VECTOR3D.v4_scale(1/TEMP_VECTOR3D.w)
+            // console.log(TEMP_VECTOR3D)
+
+            // let anic:Sprite = new Sprite();
+            // ROOT.addChild(anic);
+            // anic.renderer = new BatchRenderer(anic);
+            let aniuri = "ani/e/e.ha";
+            // let anis:AniSimple = new AniSimple();
+            // anis.load(aniuri);
+            // anis.setPos(200, 300);
+            // ROOT.addChild(anis);
+
+
+            aniuri = "pak/gong/0.hp";
+            let pak = new Pak();
+            pak.load(aniuri);
+            pak.setPos(300, 300);
+            ROOT.addChild(pak);
+            // let ani:Ani;
+            // for(let i = 0 ; i < 1; ++i)
+            // {
+            //     ani = new Ani();
+            //     ani.load(aniuri);
+            //     // ani.setSize(200, 200);
+            //     ROOT.addChild(ani);
+            //     ani.x = 1000 - Math.random() * 1000;
+            //     ani.y = 1000 - Math.random() * 1000;
+            // }
+           
 
 
             // plane = new PlaneGeometry(variables).create(w*2,w);
@@ -308,7 +440,7 @@ module rf{
             drager.hStep = 0;
             drager.areacheck = true;
 
-*/
+
 
             for(let i = 1;i<2;i++){
                 let list = new List(ROOT.source,TestListItemRender,100,20);
@@ -319,7 +451,7 @@ module rf{
                 // ROOT.addChild(list);
             }
 
-
+*/
             // facade.toggleMediator(TestMediator,1);
             
 
@@ -541,10 +673,6 @@ module rf{
             // panel.y = 300;
             // ROOT.addChild(panel);
             // let panelutil = new PanelUtils();
-
-
-            // 潘华专用  
-            new Pan_Test();
         }
 
 

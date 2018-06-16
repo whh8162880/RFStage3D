@@ -9,12 +9,13 @@ module rf {
         material:Material;
         tm:ITimeMixer;
         scrollRect:Size;
+
         // triangleFaceToCull: string = Context3DTriangleFace.NONE;
         // sourceFactor: number;
         // destinationFactor: number;
         // depthMask: boolean = false;
         // passCompareMode: number;
-        public render(camera: Camera, now: number, interval: number): void { 
+        render(camera: Camera, now: number, interval: number) { 
             let i = 0;
             let childrens = this.childrens;
             let len = childrens.length;
@@ -205,8 +206,8 @@ module rf {
 
     export class Image extends Sprite{
         _url:string;
-        constructor(source?:BitmapSource){
-            super(source);
+        constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }){
+            super(source,variables);
         }
         load(url:string):void
         {
@@ -231,14 +232,21 @@ module rf {
             let res:ResItem = e.data;
             let image:HTMLImageElement = res.data;
             let source = this.source;
+            
             let vo = source.setSourceVO(this._url,image.width,image.height,1);
             source.drawimg(image,vo.x,vo.y);
 
+            this.draw(vo);
+        }
+
+        draw(vo:IBitmapSourceVO){
             let g = this.graphics;
             g.clear();
             g.drawBitmap(0,0,vo)
             g.end();
         }
+
+
     }
 
 
@@ -563,8 +571,8 @@ module rf {
             geometry.w = w;
             geometry.h = h;
 
-            w = Math.round(w * sx);
-            h = Math.round(h * sy);
+            w = w * sx;
+            h = h * sy;
 
 
             let x3 = w - rr,y3 = h - rb;

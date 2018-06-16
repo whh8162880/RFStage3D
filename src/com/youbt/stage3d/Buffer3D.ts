@@ -25,6 +25,8 @@ module rf {
         mvp = "mvp",
         ui = "ui",
         lightDirection = "lightDirection",
+        originFar = "originFar",
+        logDepthFar = "logDepthFar",
         vc_diff = "vc_diff",
         vc_emissive = "vc_emissive",
         vc_bones="bones"
@@ -85,7 +87,7 @@ module rf {
             }
 
             //加入资源管理
-            context3D.bufferLink.add(this);
+            context3D.bufferLink.add(this,this,undefined);
             return true;
         }
 

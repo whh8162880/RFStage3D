@@ -244,7 +244,7 @@ module rf {
         /**
          * 图片
          */
-        image,
+        image
     }
 
 
@@ -485,5 +485,18 @@ module rf {
             this.queue = {};
             this.progress = this.total = 0;
         }
+    }
+
+
+    export function getFullUrl(url:string,perfix:string,extension:string):string{
+        if(url.lastIndexOf(extension) == -1) {
+            url += extension;
+        }
+        
+        if (url.indexOf("://") == -1) {
+            url = perfix + url;
+        }
+
+        return url;
     }
 }

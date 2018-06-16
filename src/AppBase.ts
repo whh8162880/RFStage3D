@@ -20,11 +20,15 @@ module rf {
                 canvas = document.createElement("canvas");
                 document.body.appendChild(canvas);
             }
+
+
             var b:boolean = ROOT.requestContext3D(canvas);
             if(false == b){
                 console.log("GL create fail");
                 return;
             }
+
+            this.initCanvas(canvas);
 
             this.initContainer();
 
@@ -38,8 +42,13 @@ module rf {
             
         }
 
+        initCanvas(canvas:HTMLCanvasElement){
+
+        }
+
         createSource():void{
             // panels= singleton(PanelSourceManage)
+
             let bmd = new BitmapData(2048,2048,true);
             let source = new BitmapSource().create("component",bmd,true);
             let vo = source.setSourceVO("origin",1,1);
@@ -60,6 +69,21 @@ module rf {
             pixelRatio = getPixelRatio(bmd.context);
 
             // pixelRatio = 1;
+
+
+
+            ComponentClass = {
+                0 : Component,
+                1 : Label,
+                2 : Button,
+                3 : CheckBox,
+                4 : RadioButton,
+                5 : TabItem,
+                6 : ScrollBar,
+                7 : Component,
+                9 : Component
+            }
+
         }
 
 
@@ -67,6 +91,11 @@ module rf {
             let g = gl;
             let container = new Scene(vertex_mesh_variable);
             let material = new Material();
+
+            let isFragDepthAvailable = gl.getExtension("EXT_frag_depth");
+            context3D.use_logdepth_ext = isFragDepthAvailable ? true : false;
+            // context3D.use_logdepth_ext = false;
+            
             material.depthMask = true;
             material.passCompareMode = WebGLConst.LEQUAL;
             material.srcFactor = WebGLConst.SRC_ALPHA;
@@ -101,7 +130,7 @@ module rf {
         }
 
         public resize(width:number,height:number):void{
-            context3D.configureBackBuffer(stageWidth,stageHeight,0);
+            context3D.configureBackBuffer(width * pixelRatio,height * pixelRatio,0);
             ROOT.resize(width,height);
             
         }

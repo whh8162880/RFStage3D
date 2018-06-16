@@ -29,9 +29,9 @@
   ],
   "exclude": [
     "think/**/*",
-    "src/com/youbt/rfreference.ts",
+    // "src/com/youbt/rfreference.ts",
     ".d.ts",
     "Interface"
   ],
-  "templete":"debug.html"
+  "templete":"d.html"
 }

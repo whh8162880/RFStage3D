@@ -133,78 +133,74 @@ function updateDebugFile(files, template,outDir) {
 }
 
 
+function getFileNativePath(f,t){
+
+    var bf = f;
+    var bt = t;
+
+    if(f.lastIndexOf(".") != -1){
+        f = f.slice(0,f.lastIndexOf("/"));   
+    }
+
+    t = t.replace(/\\/g,"/");
+
+    var i;
+    while(true){
+        i = t.indexOf("../");
+        if(i != -1){
+            f = f.slice(0,f.lastIndexOf("/"));
+            t = t.replace("../","");
+        }else{
+            break;
+        }
+    }
+    
+    t = t.replace(/\.\//g,"");
+
+    return f + "/" + t;
+}
+
 
 function getReference(files) {
     referenceMatch = /reference path=\"(.*?)\"/;
     var fileobj = {};
-    var filemap = {};
     var reference = [];
-    var filelist = [];
     for (var i = 0; i < files.length; i++) {
         var relativepath = files[i]
-
         var filepath = path.resolve(relativepath);
         var content = grunt.file.read(filepath);
-        var filename = filepath.slice(filepath.lastIndexOf("\\") + 1).toLocaleLowerCase();
-        var arr = fileobj[filename] = [];
-        filemap[filename] = relativepath;
-        // console.log(filename+":"+relativepath+":"+files[i]);
-        filelist.push(filename);
+        var arr = fileobj[relativepath] = [];
         while (true) {
             var match = referenceMatch.exec(content);
             if (match) {
                 content = content.replace(match[0], "");
-                // console.log(filename+":"+match[1]);
-                // console.log(content);
-                filepath = match[1];
-                arr.push(filepath.slice(filepath.lastIndexOf("/") + 1).toLocaleLowerCase());
-            } else {
+                filepath = getFileNativePath(relativepath,match[1]);
+                arr.push(filepath);
+            }else{
                 break;
             }
         }
-
-        // var match = content.match(referenceMatch);
-        // console.log(content);
-        // break;
     }
+
     var key;
 
-    // for(key in filelist){
-    //     console.log(key+"::"+filelist[key]);
-    // }
-
-    // console.log("engine:"+fileobj["engine.ts"]);
-
-
     var processes = [];
-
-
-
     function process(arr) {
         for (var i = 0; i < arr.length; i++) {
             var key = arr[i];
-
             if (processes.indexOf(key) == -1) {
                 processes.push(key);
                 if (reference.indexOf(key) == -1) {
                     if (undefined != fileobj[key]) {
                         process(fileobj[key]);
                     }
-                    if (undefined != key) {
-                        // console.log("push: %c "+key);
-                        reference.push(key);
-                    }
+                    reference.push(key);
                 }
             }
         }
     }
 
-    process(filelist);
-
-    for (i = 0; i < reference.length; i++) {
-        // console.log(reference[i] + ":" +filemap[reference[i]]);
-        reference[i] = filemap[reference[i]];
-    }
+    process(files);
 
     return reference;
 };

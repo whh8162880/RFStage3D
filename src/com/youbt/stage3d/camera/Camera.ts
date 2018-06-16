@@ -4,13 +4,14 @@ module rf{
         len:IMatrix3D;
         far :number;
         originFar:number;
+        logDepthFar:number;
         worldTranform:IMatrix3D;
         isPerspectiveCamera:boolean = false;
         isOrthographicCamera:boolean = false;
         constructor(far:number = 10000){
             super();
             this.far = far;
-            this.originFar = far / Math.PI2;
+            this.originFar = far;
             this.len = newMatrix3D();
             this.worldTranform = newMatrix3D();
         }
@@ -30,6 +31,7 @@ module rf{
         if(camera){
             camera.w = width;
             camera.h = height;
+            camera.far = far;
             camera.status |= DChange.trasnform;
             camera.isOrthographicCamera = true;
             camera.isPerspectiveCamera = false;
@@ -48,7 +50,7 @@ module rf{
 
         len[8] = 0;
         len[9] = 0;
-        len[10] = 1/far;
+        len[10] = -1/far;
         len[11] = 0;
 
         len[12] = -1;
@@ -64,6 +66,7 @@ module rf{
         if(camera){
             camera.w = width;
             camera.h = height;
+            camera.far = far;
             camera.status |= DChange.trasnform;
             camera.isOrthographicCamera = true;
             camera.isPerspectiveCamera = false;
@@ -99,6 +102,7 @@ module rf{
         if(camera){
             camera.w = width;
             camera.h = height;
+            camera.far = far;
             camera.status |= DChange.trasnform;
             camera.isPerspectiveCamera = true;
             camera.isOrthographicCamera = false;
@@ -125,15 +129,44 @@ module rf{
         // this.len = len;
         // let yScale: number = 1.0 / Math.tan(45 / 2.0);
         // let xScale: number = yScale / width * height;
-        // rawData[0] = xScale;        rawData[1] = 0;                   rawData[2] = 0;                                       rawData[3] = 0;
-        // rawData[4] = 0;             rawData[5] = yScale;              rawData[6] = 0;                                       rawData[7] = 0;
-        // rawData[8] = 0;             rawData[9] = 0;                   rawData[10] = (zFar + zNear) / (zFar - zNear);        rawData[11] = 1.0;
-        // rawData[12] = 0;            rawData[13] = 0;                  rawData[14] = 2.0 * zFar * zNear / (zNear - zFar);    rawData[15] = 0;
-
+        // len[0] = xScale;        len[1] = 0;                   len[2] = 0;                                       len[3] = 0;
+        // len[4] = 0;             len[5] = yScale;              len[6] = 0;                                       len[7] = 0;
+        // len[8] = 0;             len[9] = 0;                   len[10] = (zFar + zNear) / (zFar - zNear);        len[11] = 1.0;
+        // len[12] = 0;            len[13] = 0;                  len[14] = 2.0 * zFar * zNear / (zNear - zFar);    len[15] = 0;
 
         len[0] = 2/width;      len[1] = 0;             len[2] = 0;                  len[3] = 0;
         len[4] = 0;            len[5] = 2/height;      len[6] = 0;                  len[7] = 0;
         len[8] = 0;            len[9] = 0;             len[10] = 1/far;        len[11] = 1/originFar;
         len[12] = 0;           len[13] = 0;            len[14] = -1/far*Math.PI*100;       len[15] = 0;
+    }
+
+
+    export function PerspectiveResize(width: number, height: number,len:IMatrix3D,far:number,degree:number,camera?:Camera): void{
+        let radians = degree * DEGREES_TO_RADIANS;
+        let zNear = 0.001; //1mm
+        let zFar = far;
+
+        let standardHeight = 960;
+        let standardSy: number = 1.0 / Math.tan(radians / 2.0);
+        let yScale: number = standardSy * standardHeight / height;
+        let xScale: number = standardSy * standardHeight / width;
+
+        if(camera){
+            camera.w = width;
+            camera.h = height;
+            camera.far = far;
+            camera.originFar = 0.5*height*yScale;
+            camera.logDepthFar = 1.0 / ( Math.log( camera.far + 1.0 ) / Math.LN2 );
+
+            camera.status |= DChange.trasnform;
+            camera.isPerspectiveCamera = true;
+            camera.isOrthographicCamera = false;
+        }
+
+        len[0] = xScale;        len[1] = 0;                   len[2] = 0;                                       len[3] = 0;
+        len[4] = 0;             len[5] = yScale;              len[6] = 0;                                       len[7] = 0;
+        len[8] = 0;             len[9] = 0;                   len[10] =  (zFar + zNear) / (zFar - zNear);        len[11] = 1.0;
+        len[12] = 0;            len[13] = 0;                  len[14] =  zFar * zNear / (zNear - zFar);    len[15] = 0;
+        
     }
 }

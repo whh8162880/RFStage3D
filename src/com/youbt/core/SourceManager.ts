@@ -1,6 +1,6 @@
 module rf{
 
-    export interface IBitmapSourceVO extends IFrame{
+    export interface IBitmapSourceVO extends IUVFrame{
         source:BitmapSource;
 
         name:string;
@@ -10,12 +10,7 @@ module rf{
         //真实大小
         rw:number;
         rh:number;
-
-        //UV位置
-        ul:number;
-        ur:number;
-        vt:number;
-        vb:number;
+        
     }
 
     export function refreshUV(vo:IBitmapSourceVO, mw:number,mh:number):void{
@@ -204,7 +199,7 @@ module rf{
             return vo;
         }
 
-        getSourceVO(name:string,area:number=0):IBitmapSourceVO{
+        getSourceVO(name:string|number,area:number=0):IBitmapSourceVO{
             let barea = this.areas[area];
             if(undefined == barea){
                 return undefined;
@@ -212,7 +207,7 @@ module rf{
             return barea.frames[name];
         }
 
-        drawimg(img:HTMLImageElement,x:number,y:number,w?:number,h?:number):void
+        drawimg(img:HTMLImageElement|HTMLCanvasElement,x:number,y:number,w?:number,h?:number):void
         {//可能需要其他的处理
             const {bmd, name,textureData} = this;
             if(w == undefined && h == undefined)
