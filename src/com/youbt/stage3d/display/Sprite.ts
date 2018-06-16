@@ -206,8 +206,8 @@ module rf {
 
     export class Image extends Sprite{
         _url:string;
-        constructor(source?:BitmapSource){
-            super(source);
+        constructor(source?:BitmapSource,variables?:{ [key: string]: IVariable }){
+            super(source,variables);
         }
         load(url:string):void
         {
@@ -232,14 +232,21 @@ module rf {
             let res:ResItem = e.data;
             let image:HTMLImageElement = res.data;
             let source = this.source;
+            
             let vo = source.setSourceVO(this._url,image.width,image.height,1);
             source.drawimg(image,vo.x,vo.y);
 
+            this.draw(vo);
+        }
+
+        draw(vo:IBitmapSourceVO){
             let g = this.graphics;
             g.clear();
             g.drawBitmap(0,0,vo)
             g.end();
         }
+
+
     }
 
 

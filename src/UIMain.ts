@@ -17,7 +17,7 @@ module rf{
             
 
             let map = new Map();
-            map.addbg1("m/1/bg_0.png",1);
+            map.initbg("m/1/bg_0.png","m/1/bg_1.png","m/1/bg_2.jpg");
             ROOT.addChild(map);
 
             
