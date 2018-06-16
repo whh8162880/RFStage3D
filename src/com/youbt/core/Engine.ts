@@ -96,6 +96,15 @@ namespace rf {
 
 
 	export const defaultTimeMixer:ITimeMixer = newTimeMixer(0.0,1.0);
+
+	
+
+	export function defaultResize(width:number,height:number){
+		stageWidth = window.innerWidth * pixelRatio;
+		stageHeight = window.innerHeight * pixelRatio;
+	}
+
+	export let resizeStageSizeFunction:Function = defaultResize;
 	
 	// export let engie_animation_request:Function = undefined;
 	export class Engine {
@@ -159,8 +168,9 @@ namespace rf {
 			window.onresize = function () {
 				isWindowResized = true;
 			};
-			stageWidth = window.innerWidth * pixelRatio;
-			stageHeight = window.innerHeight * pixelRatio;
+
+
+			resizeStageSizeFunction(window.innerWidth,window.innerHeight);
 
 			//窗口最大化最小化监听
 			var hidden, state, visibilityChange;
@@ -239,8 +249,7 @@ namespace rf {
 		public static update(now: number, interval: number): void {
 			if (isWindowResized) {
 				isWindowResized = false;
-				stageWidth = window.innerWidth * pixelRatio;
-				stageHeight = window.innerHeight * pixelRatio;
+				resizeStageSizeFunction(window.innerWidth,window.innerHeight);
 				Engine.resize(stageWidth, stageHeight);
 			}
 

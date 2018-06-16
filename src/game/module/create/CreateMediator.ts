@@ -1,4 +1,4 @@
-///<reference path="../../youbt/components/MVC.ts" />
+///<reference path="../../../com/youbt/components/MVC.ts" />
 module rf{
 	export class CreatePanel extends Panel{
 		
