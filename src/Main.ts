@@ -1,4 +1,4 @@
-/// <reference path="./game/module/rfreference.ts" />
+/// <reference path="./game/rfreference.ts" />
 module rf{
     // export let sp;
 

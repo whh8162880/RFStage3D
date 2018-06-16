@@ -1,4 +1,4 @@
-/// <reference path="./game/module/rfreference.ts" />
+/// <reference path="./game/rfreference.ts" />
 module rf{
     export class UIMain extends AppBase{
         init(canvas?:HTMLCanvasElement){
@@ -19,6 +19,8 @@ module rf{
             let map = new Map();
             map.initbg("m/1/bg_0.png","m/1/bg_1.png","m/1/bg_2.jpg");
             ROOT.addChild(map);
+
+            // let main = new 
 
             
 
