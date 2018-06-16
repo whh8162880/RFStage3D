@@ -20,6 +20,9 @@ module rf {
                 canvas = document.createElement("canvas");
                 document.body.appendChild(canvas);
             }
+
+            this.initCanvas(canvas);
+
             var b:boolean = ROOT.requestContext3D(canvas);
             if(false == b){
                 console.log("GL create fail");
@@ -36,6 +39,10 @@ module rf {
             this.nextGCTime = engineNow + this.gcDelay;
 
             
+        }
+
+        initCanvas(canvas:HTMLCanvasElement){
+
         }
 
         createSource():void{
