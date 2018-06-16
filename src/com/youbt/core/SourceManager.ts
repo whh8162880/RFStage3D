@@ -207,7 +207,7 @@ module rf{
             return barea.frames[name];
         }
 
-        drawimg(img:HTMLImageElement,x:number,y:number,w?:number,h?:number):void
+        drawimg(img:HTMLImageElement|HTMLCanvasElement,x:number,y:number,w?:number,h?:number):void
         {//可能需要其他的处理
             const {bmd, name,textureData} = this;
             if(w == undefined && h == undefined)

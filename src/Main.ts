@@ -267,16 +267,27 @@ module rf{
             // ROOT.addChild(anic);
             // anic.renderer = new BatchRenderer(anic);
             let aniuri = "ani/e/e.ha";
-            let ani:Ani;
-            for(let i = 0 ; i < 1000; ++i)
-            {
-                ani = new Ani();
-                ani.load(aniuri);
-                // ani.setSize(200, 200);
-                ROOT.addChild(ani);
-                ani.x = 1000 - Math.random() * 1000;
-                ani.y = 1000 - Math.random() * 1000;
-            }
+            // let anis:AniSimple = new AniSimple();
+            // anis.load(aniuri);
+            // anis.setPos(200, 300);
+            // ROOT.addChild(anis);
+
+
+            aniuri = "pak/H01080/0.hp";
+            let pak = new PakAnim();
+            pak.load(aniuri);
+            pak.setPos(300, 300);
+            ROOT.addChild(pak);
+            // let ani:Ani;
+            // for(let i = 0 ; i < 1; ++i)
+            // {
+            //     ani = new Ani();
+            //     ani.load(aniuri);
+            //     // ani.setSize(200, 200);
+            //     ROOT.addChild(ani);
+            //     ani.x = 1000 - Math.random() * 1000;
+            //     ani.y = 1000 - Math.random() * 1000;
+            // }
            
 
 
