@@ -149,11 +149,13 @@ namespace rf {
 			function onAnimationChange(): void {
 				animationRequest(onAnimationChange);
 				let time = getT();
-				if (time < nextUpdateTime) {
+				if(time < Engine.startTime){
+					time = nextUpdateTime;
+				}else if (time < nextUpdateTime) {
 					return;
 				}
-				let now: number = time - Engine.startTime;
-				let interval: number = (Engine.interval = now - engineNow);
+				let now = time - Engine.startTime;
+				let interval = (Engine.interval = now - engineNow);
 				defaultTimeMixer.now = now;
 				defaultTimeMixer.interval = interval;
 				nextUpdateTime += frameInterval;

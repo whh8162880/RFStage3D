@@ -7,8 +7,11 @@ module rf{
             if(undefined == gl){
                 return;
             }
+
+            Engine.frameRate = 30;
+
             let perfix = "../assets/"
-            ROOT_PERFIX = perfix;
+            ROOT_PERFIX = "";
 
             var base = document.createElement("base");
 			var head = document.getElementsByTagName("head")[0];
@@ -18,11 +21,29 @@ module rf{
 
             let map = new Map();
             map.initbg("m/1/bg_0.png","m/1/bg_1.png","m/1/bg_2.jpg");
-            ROOT.addChild(map);
+            popContainer.addChild(map);
 
-            // let main = new 
+            let profile = singleton(GUIProfile);
+            ROOT.addChild(profile);
 
-            
+
+            for(let i=0;i<5;i++){
+                let p = new Pak();
+                p.load("pak/zhaoyun/0.hp");
+                p.setPos(150,600 + i *100);
+                popContainer.addChild(p);
+            }
+
+
+            for(let i=0;i<5;i++){
+                let p = new Pak();
+                p.scaleX = -1;
+                p.load("pak/gong/0.hp");
+                p.setPos(500,600 + i *100);
+                popContainer.addChild(p);
+            }
+
+
 
         }
 
@@ -32,23 +53,24 @@ module rf{
             let pw = 640;
             let ph = 1136;
 
+            stageWidth = pw;
+            stageHeight = ph;
+
+            if(!ROOT){
+                return;
+            }
+
             let w = width;
             let h = height;
 
             let p = pw / ph;
 
             if(w < h){
-                h = w / p;
+                h = Math.round(w / p);
             }else{
-                w = h * p;
+                w = Math.round(h * p);
             }
-
-            stageWidth = pw * pixelRatio;
-            stageHeight = ph * pixelRatio;
-
-            if(!ROOT){
-                return;
-            }
+           
             let canvas = ROOT.canvas;
             canvas.style.width = w+"px";
             canvas.style.height = h+"px";
@@ -64,13 +86,7 @@ module rf{
 
 
         initCanvas(canvas:HTMLCanvasElement){
-            let w = stageWidth / pixelRatio;
-            let h = stageHeight / pixelRatio;
-
-            canvas.style.width = w+"px";
-            canvas.style.height = h+"px";
-            canvas.style.left = ((window.innerWidth - w) >> 1) + "px";
-            canvas.style.top = ((window.innerHeight - h) >> 1) + "px";
+            this.resizeCanvas(window.innerWidth,window.innerHeight)
         }
     }
 }

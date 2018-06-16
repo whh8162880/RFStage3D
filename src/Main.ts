@@ -273,8 +273,8 @@ module rf{
             // ROOT.addChild(anis);
 
 
-            aniuri = "pak/H01080/0.hp";
-            let pak = new PakAnim();
+            aniuri = "pak/gong/0.hp";
+            let pak = new Pak();
             pak.load(aniuri);
             pak.setPos(300, 300);
             ROOT.addChild(pak);

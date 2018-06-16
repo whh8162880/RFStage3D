@@ -21,13 +21,14 @@ module rf {
                 document.body.appendChild(canvas);
             }
 
-            this.initCanvas(canvas);
 
             var b:boolean = ROOT.requestContext3D(canvas);
             if(false == b){
                 console.log("GL create fail");
                 return;
             }
+
+            this.initCanvas(canvas);
 
             this.initContainer();
 
@@ -129,7 +130,7 @@ module rf {
         }
 
         public resize(width:number,height:number):void{
-            context3D.configureBackBuffer(stageWidth,stageHeight,0);
+            context3D.configureBackBuffer(width * pixelRatio,height * pixelRatio,0);
             ROOT.resize(width,height);
             
         }
